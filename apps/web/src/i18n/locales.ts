@@ -36,5 +36,7 @@ export const NAMESPACES = [
   'devui',
   'onboarding',
   'data',
+  'review',
+  'dev',
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];

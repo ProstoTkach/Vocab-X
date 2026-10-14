@@ -1,0 +1,12 @@
+{
+  "title": "Developer panel",
+  "now": "App time: {time}",
+  "offset": "Offset: {days, plural, one {# day} other {# days}}",
+  "plusDay": "+1 day",
+  "plusWeek": "+7 days",
+  "resetTime": "Reset time",
+  "close": "Close panel",
+  "hint": "Ctrl+Shift+D — show or hide",
+  "toggle": "Developer mode",
+  "toggleHint": "Time-shift panel for demonstrating spaced repetition."
+}

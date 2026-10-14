@@ -1,7 +1,7 @@
 // Visual review: /dev/ui and key routes in every control viewport and theme.
 // Output goes to apps/web/screenshots (not committed).
 import { expect, test } from '@playwright/test';
-import { seedOnboarded } from './fixtures';
+import { onboard, seedOnboarded } from './fixtures';
 
 const VIEWPORTS = [
   { name: '360x740', width: 360, height: 740 },
@@ -21,6 +21,19 @@ for (const vp of VIEWPORTS) {
       await page.goto('/uk/dev/ui');
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
       await page.screenshot({ path: `screenshots/devui-${vp.name}.png`, fullPage: true });
+    });
+
+    test('review', async ({ page }) => {
+      await onboard(page);
+      await page.goto('/uk/review');
+      const card = page.getByTestId('review-card');
+      await expect(card).toBeVisible();
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `screenshots/review-front-${vp.name}.png` });
+      await page.getByRole('button', { name: 'Показати відповідь' }).click();
+      await expect(card).toHaveAttribute('data-side', 'back');
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `screenshots/review-back-${vp.name}.png` });
     });
 
     test('onboarding', async ({ page }) => {

@@ -105,6 +105,8 @@ export interface AppSettings {
   sidebarCollapsed: boolean;
   /** Demo/dev: offset applied to the clock, ms. */
   timeOffsetMs: number;
+  /** Shows the developer panel (time travel for demos). */
+  devTools: boolean;
 }
 
 /** Materialized card state; can always be rebuilt from the review log. */

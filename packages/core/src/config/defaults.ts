@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   },
   sidebarCollapsed: false,
   timeOffsetMs: 0,
+  devTools: false,
 };
 
 export const INITIAL_GAMIFICATION: GamificationState = {

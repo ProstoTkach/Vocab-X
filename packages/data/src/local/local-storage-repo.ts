@@ -201,6 +201,12 @@ export class LocalStorageRepo implements Repos, DataPort {
     return stored ? mergeSettings(DEFAULT_SETTINGS, stored) : DEFAULT_SETTINGS;
   }
 
+  /** Empty collections are removed rather than stored, keeping storage canonical. */
+  private writeOrRemove(key: string, value: object) {
+    if (Object.keys(value).length === 0) this.store.remove(key);
+    else this.store.write(key, value);
+  }
+
   private readMap<T>(key: string): Record<Id, T> {
     return this.store.read<Record<Id, T>>(key) ?? {};
   }
@@ -279,7 +285,7 @@ export class LocalStorageRepo implements Repos, DataPort {
       remove: async (wordId) => {
         for (const lang of langs()) {
           const { [wordId]: removed, ...rest } = read(lang);
-          if (removed) this.store.write(KEYS.progress(lang), rest);
+          if (removed) this.writeOrRemove(KEYS.progress(lang), rest);
         }
       },
     };
@@ -294,19 +300,21 @@ export class LocalStorageRepo implements Repos, DataPort {
       const stats = readStats();
       const date = this.dateKey(e.at);
       const s = stats[date] ?? { date, reviews: 0, newCards: 0, correct: 0, xp: 0 };
-      stats[date] = {
+      const next = {
         date,
         reviews: s.reviews + sign,
         newCards: s.newCards + (e.wasNew ? sign : 0),
         correct: s.correct + (e.grade >= 2 ? sign : 0),
         xp: s.xp + sign * e.xp,
       };
-      this.store.write(KEYS.stats, stats);
+      // A day emptied by undo disappears, so undo restores storage exactly.
+      const { [date]: _old, ...others } = stats;
+      this.writeOrRemove(KEYS.stats, next.reviews === 0 ? others : { ...others, [date]: next });
     };
     const writeLog = (log: PackedEvent[]) => {
       let tail = log.length > this.maxLogEvents ? log.slice(-this.maxLogEvents) : log;
       try {
-        this.store.write(KEYS.log, tail);
+        this.writeOrRemove(KEYS.log, tail);
       } catch (e) {
         if (!(e instanceof StorageQuotaError) || tail.length < 2) throw e;
         // Out of space: older events are already folded into stats and card snapshots,

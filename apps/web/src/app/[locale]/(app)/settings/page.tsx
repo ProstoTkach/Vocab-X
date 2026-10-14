@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { PageHeader } from '@/components/page-header';
+import { DevToggle } from '@/components/dev/dev-toggle';
 import { DataSettings } from '@/components/settings/data-settings';
 import { LocalePicker } from '@/components/settings/locale-picker';
 import { ThemePicker } from '@/components/settings/theme-picker';
@@ -33,6 +34,8 @@ export default async function SettingsPage() {
           <CardTitle id="settings-data">{data('title')}</CardTitle>
           <CardText className="mt-1 mb-4">{data('hint')}</CardText>
           <DataSettings />
+          <hr className="my-4 border-line" />
+          <DevToggle />
         </Card>
       </div>
     </>

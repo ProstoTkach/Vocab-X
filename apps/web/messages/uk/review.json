@@ -1,0 +1,67 @@
+{
+  "title": "Повторення",
+  "exit": "Завершити сесію",
+  "undo": "Скасувати останню оцінку",
+  "progress": "Пройдено {done} з {total}",
+  "remaining": "{count, plural, one {Лишилась # картка} few {Лишилось # картки} many {Лишилось # карток} other {Лишилось # картки}}",
+  "cardAnnouncement": "Картка {current} з {total}: {front}",
+  "show": "Показати відповідь",
+  "showHint": "Пробіл або Enter",
+  "grades": {
+    "again": "Знову",
+    "hard": "Важко",
+    "good": "Добре",
+    "easy": "Легко"
+  },
+  "gradeKey": "Клавіша {key}",
+  "swipeHint": "Проведіть: {directions}",
+  "dir": {
+    "left": "←",
+    "right": "→",
+    "up": "↑",
+    "down": "↓"
+  },
+  "format": {
+    "REC": "Впізнавання",
+    "PROD": "Відтворення",
+    "AUD_PART": "Аудіо з підказкою",
+    "AUD_FULL": "Лише аудіо"
+  },
+  "translateTo": "Як це буде {lang}?",
+  "listen": "Прослухати",
+  "listenPrompt": "Прослухайте й згадайте слово",
+  "noVoice": "Для цієї мови немає голосу на пристрої — показуємо текстову підказку.",
+  "example": "Приклад",
+  "typePlaceholder": "Введіть слово",
+  "typeLabel": "Ваша відповідь",
+  "check": "Перевірити",
+  "verdict": {
+    "exact": "Правильно!",
+    "near": "Майже — перевірте написання",
+    "wrong": "Неправильно"
+  },
+  "yourAnswer": "Ваша відповідь: {answer}",
+  "suggested": "Запропонована оцінка: {grade}",
+  "hotkeys": "Гарячі клавіші",
+  "hotkeyFlip": "Перевернути картку",
+  "hotkeyGrades": "Оцінки",
+  "hotkeyArrows": "Оцінки стрілками",
+  "hotkeyUndo": "Скасувати оцінку",
+  "sessionStats": "Ця сесія",
+  "xpEarned": "+{xp} XP",
+  "empty": "На сьогодні карток немає",
+  "emptyText": "Нові слова з’являться завтра або додайте колоду.",
+  "summaryTitle": "Сесію завершено!",
+  "summaryText": "{count, plural, one {Ви повторили # картку} few {Ви повторили # картки} many {Ви повторили # карток} other {Ви повторили # картки}} за {minutes, plural, one {# хвилину} few {# хвилини} many {# хвилин} other {# хвилини}}.",
+  "accuracy": "Точність {percent}%",
+  "home": "На головну",
+  "more": "Ще картки",
+  "interval": "{days, plural, one {# день} few {# дні} many {# днів} other {# дня}}",
+  "intervalMonths": "{months, plural, one {# міс.} few {# міс.} many {# міс.} other {# міс.}}",
+  "level": "Рівень {level} з 4",
+  "keys": {
+    "space": "Пробіл",
+    "enter": "Enter",
+    "undo": "Z"
+  }
+}

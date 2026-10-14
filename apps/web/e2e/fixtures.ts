@@ -24,3 +24,14 @@ export async function seedOnboarded(page: Page, uiLocale = 'uk') {
     );
   }, uiLocale);
 }
+
+/** Goes through onboarding with defaults (English B1 deck) and the given pace. */
+export async function onboard(page: Page, pace: 'Легкий' | 'Звичайний' | 'Інтенсивний' = 'Легкий') {
+  await page.goto('/uk/onboarding');
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.getByRole('radio', { name: new RegExp(pace) }).click();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.getByRole('button', { name: 'Почати навчання' }).click();
+  await page.waitForURL(/\/uk$/);
+}

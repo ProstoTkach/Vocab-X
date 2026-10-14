@@ -89,6 +89,7 @@ export const settingsPatchSchema = z.object({
   study: studySettingsSchema.partial().optional(),
   sidebarCollapsed: z.boolean().optional(),
   timeOffsetMs: z.number().optional(),
+  devTools: z.boolean().optional(),
 });
 
 export const cardStateSchema = z.object({

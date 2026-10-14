@@ -1,0 +1,67 @@
+{
+  "title": "Review",
+  "exit": "End session",
+  "undo": "Undo last grade",
+  "progress": "{done} of {total} done",
+  "remaining": "{count, plural, one {# card left} other {# cards left}}",
+  "cardAnnouncement": "Card {current} of {total}: {front}",
+  "show": "Show answer",
+  "showHint": "Space or Enter",
+  "grades": {
+    "again": "Again",
+    "hard": "Hard",
+    "good": "Good",
+    "easy": "Easy"
+  },
+  "gradeKey": "Key {key}",
+  "swipeHint": "Swipe: {directions}",
+  "dir": {
+    "left": "←",
+    "right": "→",
+    "up": "↑",
+    "down": "↓"
+  },
+  "format": {
+    "REC": "Recognition",
+    "PROD": "Recall",
+    "AUD_PART": "Audio with hint",
+    "AUD_FULL": "Audio only"
+  },
+  "translateTo": "How do you say it in {lang}?",
+  "listen": "Listen",
+  "listenPrompt": "Listen and recall the word",
+  "noVoice": "No voice for this language on your device — showing a text hint instead.",
+  "example": "Example",
+  "typePlaceholder": "Type the word",
+  "typeLabel": "Your answer",
+  "check": "Check",
+  "verdict": {
+    "exact": "Correct!",
+    "near": "Almost — check the spelling",
+    "wrong": "Incorrect"
+  },
+  "yourAnswer": "Your answer: {answer}",
+  "suggested": "Suggested grade: {grade}",
+  "hotkeys": "Keyboard shortcuts",
+  "hotkeyFlip": "Flip the card",
+  "hotkeyGrades": "Grades",
+  "hotkeyArrows": "Grades with arrows",
+  "hotkeyUndo": "Undo grade",
+  "sessionStats": "This session",
+  "xpEarned": "+{xp} XP",
+  "empty": "No cards for today",
+  "emptyText": "New words arrive tomorrow, or add a deck.",
+  "summaryTitle": "Session complete!",
+  "summaryText": "{count, plural, one {You reviewed # card} other {You reviewed # cards}} in {minutes, plural, one {# minute} other {# minutes}}.",
+  "accuracy": "Accuracy {percent}%",
+  "home": "Home",
+  "more": "More cards",
+  "interval": "{days, plural, one {# day} other {# days}}",
+  "intervalMonths": "{months, plural, one {# mo} other {# mo}}",
+  "level": "Level {level} of 4",
+  "keys": {
+    "space": "Space",
+    "enter": "Enter",
+    "undo": "Z"
+  }
+}

@@ -20,3 +20,5 @@ export * from './study';
 export * from './placement';
 export * from './schemas';
 export * from './onboarding';
+export * from './review';
+export * from './session';
