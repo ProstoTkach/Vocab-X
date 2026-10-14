@@ -46,6 +46,16 @@ describe('built-in decks', () => {
     }
   });
 
+  test('Ukrainian deck has 30 words with English translations', () => {
+    const deck = catalog.decks.find((d) => d.id === 'builtin:uk-a2-essentials')!;
+    expect(deck.wordIds).toHaveLength(30);
+    for (const w of catalog.words.filter((x) => deck.wordIds.includes(x.id))) {
+      expect(w.lang).toBe('uk');
+      expect(w.translations.en?.length).toBeGreaterThan(0);
+      expect(w.examples[0]?.translations?.en).toBeTruthy();
+    }
+  });
+
   test('words shared between decks are stored once', () => {
     const file = DECK_FILES[0]!;
     const twice = buildCatalog([file, { ...file, id: 'builtin:copy' }]);

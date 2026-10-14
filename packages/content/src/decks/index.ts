@@ -10,6 +10,7 @@ import type {
   Word,
 } from '@vocabx/core';
 import enB1Essentials from './en-b1-essentials.json';
+import ukA2Essentials from './uk-a2-essentials.json';
 
 export interface DeckFileWord {
   term: string;
@@ -33,7 +34,10 @@ export interface DeckFile {
   words: DeckFileWord[];
 }
 
-export const DECK_FILES: readonly DeckFile[] = [enB1Essentials as DeckFile];
+export const DECK_FILES: readonly DeckFile[] = [
+  enB1Essentials as DeckFile,
+  ukA2Essentials as DeckFile,
+];
 
 /** Stable id of a built-in word: language + lemma, shared by every deck that contains it. */
 export const builtinWordId = (lang: LangCode, lemma: string) => `${lang}:${lemma.toLowerCase()}`;

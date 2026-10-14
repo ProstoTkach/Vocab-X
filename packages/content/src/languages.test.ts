@@ -8,8 +8,8 @@ describe('language registry', () => {
   test('адаптер відповідає коду мови', () => {
     for (const l of LANGUAGES) expect(l.adapter.code).toBe(l.code);
   });
-  test('en, de, es доступні для вивчення', () => {
-    expect(learnableLanguages().map((l) => l.code)).toEqual(['en', 'de', 'es']);
+  test('en, de, es, uk доступні для вивчення', () => {
+    expect(learnableLanguages().map((l) => l.code)).toEqual(['en', 'de', 'es', 'uk']);
   });
   test('регіональний тег зводиться до базової мови', () => {
     expect(getLanguage('en-GB')?.code).toBe('en');

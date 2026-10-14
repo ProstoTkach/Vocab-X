@@ -56,6 +56,26 @@ test('new learner goes through onboarding and lands on a ready stack', async ({ 
   await expect(page).toHaveURL(/\/uk$/);
 });
 
+test('an English speaker can learn Ukrainian', async ({ page }) => {
+  await page.goto('/en/onboarding');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole('radio', { name: /English/ }).click();
+  await expect(page.getByRole('checkbox', { name: /Ukrainian/ })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(page.getByRole('checkbox', { name: /Ukrainian: essentials/ })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await page.getByRole('button', { name: 'Start learning' }).click();
+  await expect(page).toHaveURL(/\/en$/);
+  await expect(page.getByRole('heading', { name: 'Learning: Ukrainian' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Continue review (10)' })).toBeVisible();
+});
+
 test('export → reset → import restores the state', async ({ page }) => {
   await completeOnboarding(page, { check: false });
   await page.goto('/uk/settings');

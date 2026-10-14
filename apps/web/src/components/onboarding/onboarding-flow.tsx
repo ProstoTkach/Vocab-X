@@ -28,6 +28,13 @@ import { LevelCheck } from './level-check';
 const STEPS = ['welcome', 'languages', 'goal', 'decks'] as const;
 type Step = (typeof STEPS)[number] | 'check';
 const GOALS = Object.keys(DAILY_GOAL_PRESETS) as DailyGoalPreset[];
+
+/** First language other than the native one that has a starter deck (Ukrainian for English speakers). */
+function defaultTarget(native: string): string {
+  const others = learnableLanguages().filter((l) => l.code !== native);
+  const withDecks = others.find((l) => builtinCatalog().decks.some((d) => d.lang === l.code));
+  return (withDecks ?? others[0]!).code;
+}
 /** Enough to place a learner roughly without turning setup into a test. */
 const CHECK_SIZE = 12;
 
@@ -42,10 +49,9 @@ export function OnboardingFlow() {
   const catalog = builtinCatalog();
 
   const [step, setStep] = useState<Step>('welcome');
-  const [nativeLang, setNativeLang] = useState<string>(
-    translationLanguages().some((l) => l.code === locale) ? locale : 'uk',
-  );
-  const [targets, setTargets] = useState<string[]>(['en']);
+  const initialNative = translationLanguages().some((l) => l.code === locale) ? locale : 'uk';
+  const [nativeLang, setNativeLang] = useState<string>(initialNative);
+  const [targets, setTargets] = useState<string[]>(() => [defaultTarget(initialNative)]);
   const [goal, setGoal] = useState<DailyGoalPreset>('regular');
   const [excludedDecks, setExcludedDecks] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -89,7 +95,7 @@ export function OnboardingFlow() {
   const changeNative = (code: string) => {
     setNativeLang(code);
     const next = targets.filter((c) => c !== code);
-    setTargets(next.length ? next : [learnableLanguages().find((l) => l.code !== code)!.code]);
+    setTargets(next.length ? next : [defaultTarget(code)]);
   };
   const toggleTarget = (code: string, on: boolean) =>
     setTargets((prev) => (on ? [...prev, code] : prev.filter((c) => c !== code)));

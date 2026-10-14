@@ -64,7 +64,7 @@ export const LANGUAGES: readonly LanguageInfo[] = [
     dir: 'ltr',
     script: 'Cyrl',
     speechLang: 'uk-UA',
-    learnable: false,
+    learnable: true,
     translatable: true,
     adapter: uk,
   },

@@ -1,0 +1,358 @@
+{
+  "id": "builtin:uk-a2-essentials",
+  "lang": "uk",
+  "cefr": "A2",
+  "title": "Ukrainian: essentials",
+  "titleI18n": {
+    "uk": "Українська: основне",
+    "en": "Ukrainian: essentials"
+  },
+  "descriptionI18n": {
+    "uk": "30 поширених українських слів рівня A2–B1 з перекладом англійською.",
+    "en": "30 common Ukrainian A2–B1 words with English translations."
+  },
+  "words": [
+    {
+      "term": "подорож",
+      "pos": "noun",
+      "translations": { "en": ["journey", "trip"] },
+      "examples": [
+        {
+          "text": "Подорож із Києва до Львова потягом триває п'ять годин.",
+          "translations": { "en": "The train journey from Kyiv to Lviv takes five hours." }
+        }
+      ]
+    },
+    {
+      "term": "досвід",
+      "pos": "noun",
+      "cefr": "B1",
+      "translations": { "en": ["experience"] },
+      "examples": [
+        {
+          "text": "У неї великий досвід роботи з дітьми.",
+          "translations": { "en": "She has a lot of experience working with children." }
+        }
+      ]
+    },
+    {
+      "term": "рішення",
+      "pos": "noun",
+      "translations": { "en": ["decision", "solution"] },
+      "examples": [
+        {
+          "text": "Переїзд був складним рішенням.",
+          "translations": { "en": "Moving was a difficult decision." }
+        }
+      ]
+    },
+    {
+      "term": "можливість",
+      "pos": "noun",
+      "cefr": "B1",
+      "translations": { "en": ["opportunity", "possibility"] },
+      "examples": [
+        {
+          "text": "Ця робота — чудова можливість подорожувати.",
+          "translations": { "en": "This job is a great opportunity to travel." }
+        }
+      ]
+    },
+    {
+      "term": "порада",
+      "pos": "noun",
+      "translations": { "en": ["advice", "tip"] },
+      "examples": [
+        {
+          "text": "Дякую за корисну пораду!",
+          "translations": { "en": "Thanks for the useful advice!" }
+        }
+      ]
+    },
+    {
+      "term": "знання",
+      "pos": "noun",
+      "translations": { "en": ["knowledge"] },
+      "examples": [
+        {
+          "text": "Знання мов допомагає в подорожах.",
+          "translations": { "en": "Knowing languages helps when travelling." }
+        }
+      ]
+    },
+    {
+      "term": "погода",
+      "pos": "noun",
+      "translations": { "en": ["weather"] },
+      "examples": [
+        {
+          "text": "Сьогодні чудова погода для прогулянки.",
+          "translations": { "en": "The weather is great for a walk today." }
+        }
+      ]
+    },
+    {
+      "term": "довкілля",
+      "pos": "noun",
+      "cefr": "B1",
+      "translations": { "en": ["environment"] },
+      "examples": [
+        {
+          "text": "Ми маємо дбати про довкілля.",
+          "translations": { "en": "We must take care of the environment." }
+        }
+      ]
+    },
+    {
+      "term": "поведінка",
+      "pos": "noun",
+      "cefr": "B1",
+      "translations": { "en": ["behaviour", "conduct"] },
+      "examples": [
+        {
+          "text": "Учителька задоволена поведінкою дітей.",
+          "translations": { "en": "The teacher is pleased with the children's behaviour." }
+        }
+      ]
+    },
+    {
+      "term": "зустріч",
+      "pos": "noun",
+      "translations": { "en": ["meeting", "appointment"] },
+      "examples": [
+        {
+          "text": "Зустріч перенесли на завтра.",
+          "translations": { "en": "The meeting was moved to tomorrow." }
+        }
+      ]
+    },
+    {
+      "term": "досягати",
+      "pos": "verb",
+      "cefr": "B1",
+      "translations": { "en": ["to achieve", "to reach"] },
+      "examples": [
+        {
+          "text": "Важливо досягати цілей крок за кроком.",
+          "translations": { "en": "It is important to achieve goals step by step." }
+        }
+      ]
+    },
+    {
+      "term": "уникати",
+      "pos": "verb",
+      "translations": { "en": ["to avoid"] },
+      "examples": [
+        {
+          "text": "Намагайся уникати поїздок у годину пік.",
+          "translations": { "en": "Try to avoid travelling in the rush hour." }
+        }
+      ]
+    },
+    {
+      "term": "скаржитися",
+      "pos": "verb",
+      "translations": { "en": ["to complain"] },
+      "examples": [
+        {
+          "text": "Немає сенсу скаржитися на погоду.",
+          "translations": { "en": "There is no point complaining about the weather." }
+        }
+      ]
+    },
+    {
+      "term": "покращувати",
+      "pos": "verb",
+      "translations": { "en": ["to improve"] },
+      "examples": [
+        {
+          "text": "Щоденне читання допомагає покращувати словниковий запас.",
+          "translations": { "en": "Reading every day helps improve your vocabulary." }
+        }
+      ]
+    },
+    {
+      "term": "зменшувати",
+      "pos": "verb",
+      "translations": { "en": ["to reduce", "to decrease"] },
+      "examples": [
+        {
+          "text": "Велосипеди допомагають зменшувати затори.",
+          "translations": { "en": "Bicycles help reduce traffic jams." }
+        }
+      ]
+    },
+    {
+      "term": "пропонувати",
+      "pos": "verb",
+      "translations": { "en": ["to suggest", "to offer"] },
+      "examples": [
+        {
+          "text": "Він любить пропонувати нові ідеї.",
+          "translations": { "en": "He likes to suggest new ideas." }
+        }
+      ]
+    },
+    {
+      "term": "вимагати",
+      "pos": "verb",
+      "cefr": "B1",
+      "translations": { "en": ["to require", "to demand"] },
+      "examples": [
+        {
+          "text": "Ця робота вимагає уважності.",
+          "translations": { "en": "This job requires attention to detail." }
+        }
+      ]
+    },
+    {
+      "term": "впоратися",
+      "pos": "verb",
+      "translations": { "en": ["to cope", "to manage"] },
+      "examples": [
+        {
+          "text": "Ти обов'язково зможеш впоратися з цим завданням.",
+          "translations": { "en": "You will definitely manage this task." }
+        }
+      ]
+    },
+    {
+      "term": "вирішувати",
+      "pos": "verb",
+      "translations": { "en": ["to decide", "to solve"] },
+      "examples": [
+        {
+          "text": "Нам треба вирішувати це питання разом.",
+          "translations": { "en": "We need to solve this issue together." }
+        }
+      ]
+    },
+    {
+      "term": "доставляти",
+      "pos": "verb",
+      "translations": { "en": ["to deliver"] },
+      "examples": [
+        {
+          "text": "Кур'єри доставляють посилки щодня.",
+          "translations": { "en": "Couriers deliver parcels every day." }
+        }
+      ]
+    },
+    {
+      "term": "надійний",
+      "pos": "adjective",
+      "cefr": "B1",
+      "translations": { "en": ["reliable", "trustworthy"] },
+      "examples": [
+        {
+          "text": "Мені потрібен надійний інтернет.",
+          "translations": { "en": "I need a reliable internet connection." }
+        }
+      ]
+    },
+    {
+      "term": "впевнений",
+      "pos": "adjective",
+      "translations": { "en": ["confident", "sure"] },
+      "examples": [
+        {
+          "text": "Я впевнений, що все вийде.",
+          "translations": { "en": "I'm sure everything will work out." }
+        }
+      ]
+    },
+    {
+      "term": "доступний",
+      "pos": "adjective",
+      "translations": { "en": ["available", "affordable", "accessible"] },
+      "examples": [
+        {
+          "text": "Цей номер доступний на вихідні.",
+          "translations": { "en": "This room is available for the weekend." }
+        }
+      ]
+    },
+    {
+      "term": "стурбований",
+      "pos": "adjective",
+      "cefr": "B1",
+      "translations": { "en": ["worried", "concerned"] },
+      "examples": [
+        {
+          "text": "Чому ти такий стурбований?",
+          "translations": { "en": "Why are you so worried?" }
+        }
+      ]
+    },
+    {
+      "term": "імовірний",
+      "pos": "adjective",
+      "cefr": "B1",
+      "variants": ["ймовірний"],
+      "translations": { "en": ["likely", "probable"] },
+      "examples": [
+        {
+          "text": "Це цілком імовірний результат.",
+          "translations": { "en": "That is quite a likely outcome." }
+        }
+      ]
+    },
+    {
+      "term": "особливо",
+      "pos": "adverb",
+      "translations": { "en": ["especially", "particularly"] },
+      "examples": [
+        {
+          "text": "Я люблю Київ, особливо навесні.",
+          "translations": { "en": "I love Kyiv, especially in spring." }
+        }
+      ]
+    },
+    {
+      "term": "зручний",
+      "pos": "adjective",
+      "translations": { "en": ["convenient", "comfortable"] },
+      "examples": [
+        {
+          "text": "Цей диван дуже зручний.",
+          "translations": { "en": "This sofa is very comfortable." }
+        }
+      ]
+    },
+    {
+      "term": "вплив",
+      "pos": "noun",
+      "cefr": "B1",
+      "translations": { "en": ["influence", "effect", "impact"] },
+      "examples": [
+        {
+          "text": "Погода має великий вплив на настрій.",
+          "translations": { "en": "The weather has a big effect on mood." }
+        }
+      ]
+    },
+    {
+      "term": "впливати",
+      "pos": "verb",
+      "cefr": "B1",
+      "translations": { "en": ["to affect", "to influence"] },
+      "examples": [
+        {
+          "text": "Музика може впливати на емоції.",
+          "translations": { "en": "Music can affect emotions." }
+        }
+      ]
+    },
+    {
+      "term": "спроба",
+      "pos": "noun",
+      "translations": { "en": ["attempt", "try"] },
+      "examples": [
+        {
+          "text": "Це була вдала спроба.",
+          "translations": { "en": "It was a successful attempt." }
+        }
+      ]
+    }
+  ]
+}

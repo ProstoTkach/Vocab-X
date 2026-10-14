@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { BottomNav } from './bottom-nav';
+import { DevRouteWarmup } from './dev-route-warmup';
 import { MobileTopBar } from './mobile-top-bar';
 import { NavStateProvider } from './nav-state';
 import { OnboardingGate } from './onboarding-gate';
@@ -16,6 +17,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <NavStateProvider>
       <OnboardingGate />
+      {process.env.NODE_ENV === 'development' && <DevRouteWarmup />}
       <div className="min-h-dvh md:flex">
         <a
           href="#main"
