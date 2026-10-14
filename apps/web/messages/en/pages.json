@@ -1,0 +1,28 @@
+{
+  "home": {
+    "title": "Home",
+    "greeting": "Welcome to Vocabix!",
+    "intro": "Your avatar, level, streak and the “Continue review” button will live here.",
+    "continue": "Continue review ({count})"
+  },
+  "review": {
+    "title": "Review",
+    "intro": "A single-window review session: cards, swipes and keyboard shortcuts."
+  },
+  "decks": {
+    "title": "Decks",
+    "intro": "Your own and built-in decks, search and import."
+  },
+  "league": {
+    "title": "League",
+    "intro": "A weekly league with demo participants."
+  },
+  "profile": {
+    "title": "Profile",
+    "intro": "Avatar, achievements, cosmetics and statistics."
+  },
+  "settings": {
+    "title": "Settings",
+    "intro": "Appearance and interface language."
+  }
+}

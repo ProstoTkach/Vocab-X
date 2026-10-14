@@ -1,0 +1,14 @@
+{
+  "appName": "Vocabix",
+  "loading": "Loading…",
+  "close": "Close",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "save": "Save",
+  "demo": "Demo",
+  "locked": "Locked",
+  "comingSoon": "This section arrives in stage {stage}.",
+  "notFoundTitle": "Page not found",
+  "notFoundText": "The link may be outdated or the page has moved.",
+  "goHome": "Go home"
+}

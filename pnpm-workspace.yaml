@@ -1,3 +1,11 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+  - 'tools/*'
+
+# Native binaries that must run install scripts.
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  sharp: true
+  unrs-resolver: true

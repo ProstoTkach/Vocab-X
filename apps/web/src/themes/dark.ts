@@ -1,0 +1,32 @@
+import type { Theme } from './types';
+
+export const dark: Theme = {
+  id: 'dark',
+  nameKey: 'dark',
+  colorScheme: 'dark',
+  unlock: 'free',
+  colors: {
+    bg: '#0e1117',
+    surface: '#161b24',
+    'surface-2': '#1e2430',
+    'surface-3': '#283040',
+    fg: '#e8ebf2',
+    'fg-muted': '#a3abbd',
+    line: '#2c3444',
+    'line-strong': '#6b7891',
+    accent: '#8b87ff',
+    'accent-strong': '#a5a1ff',
+    'on-accent': '#0e1117',
+    success: '#4ade80',
+    'on-success': '#062b14',
+    warning: '#fbbf24',
+    'on-warning': '#2a1a00',
+    danger: '#f87171',
+    'on-danger': '#2b0909',
+    info: '#38bdf8',
+    'on-info': '#04212f',
+    focus: '#a5a1ff',
+    scrim: '#000000b3',
+    shadow: '#00000066',
+  },
+};

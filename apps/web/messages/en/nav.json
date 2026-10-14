@@ -1,0 +1,12 @@
+{
+  "main": "Main navigation",
+  "skipToContent": "Skip to content",
+  "home": "Home",
+  "review": "Review",
+  "decks": "Decks",
+  "league": "League",
+  "profile": "Profile",
+  "settings": "Settings",
+  "collapse": "Collapse sidebar",
+  "expand": "Expand sidebar"
+}

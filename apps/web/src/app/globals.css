@@ -1,0 +1,124 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Colors come from the active theme ([data-theme] blocks generated from
+ * src/themes); the default Tailwind palette is removed, so raw colors like bg-white or
+ * text-gray-900 do not exist at all.
+ */
+
+@custom-variant sidebar-collapsed (&:where([data-sidebar='collapsed'], [data-sidebar='collapsed'] *));
+
+@theme {
+  --color-*: initial;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, var(--vx-font-script), sans-serif;
+  --font-display:
+    var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, var(--vx-font-script),
+    sans-serif;
+
+  --text-display: clamp(1.75rem, 1.3rem + 1.8vw, 2.5rem);
+  --text-display--line-height: 1.15;
+  --text-title: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --text-title--line-height: 1.3;
+
+  --radius-control: 0.75rem;
+  --radius-card: 1.25rem;
+
+  --shadow-card: 0 1px 2px var(--vx-shadow), 0 4px 16px var(--vx-shadow);
+  --shadow-pop: 0 12px 40px var(--vx-shadow);
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1.2);
+}
+
+@theme inline {
+  --color-bg: var(--vx-bg);
+  --color-surface: var(--vx-surface);
+  --color-surface-2: var(--vx-surface-2);
+  --color-surface-3: var(--vx-surface-3);
+  --color-fg: var(--vx-fg);
+  --color-fg-muted: var(--vx-fg-muted);
+  --color-line: var(--vx-line);
+  --color-line-strong: var(--vx-line-strong);
+  --color-accent: var(--vx-accent);
+  --color-accent-strong: var(--vx-accent-strong);
+  --color-on-accent: var(--vx-on-accent);
+  --color-success: var(--vx-success);
+  --color-on-success: var(--vx-on-success);
+  --color-warning: var(--vx-warning);
+  --color-on-warning: var(--vx-on-warning);
+  --color-danger: var(--vx-danger);
+  --color-on-danger: var(--vx-on-danger);
+  --color-info: var(--vx-info);
+  --color-on-info: var(--vx-on-info);
+  --color-focus: var(--vx-focus);
+  --color-scrim: var(--vx-scrim);
+}
+
+@layer base {
+  :root {
+    /* Motion durations; scaled to 0 for reduced motion and by the user's speed setting. */
+    --vx-motion-fast: 120ms;
+    --vx-motion-normal: 200ms;
+    --vx-motion-slow: 320ms;
+    --vx-motion-scale: 1;
+    /* Fallback glyphs for scripts the bundled fonts do not cover. */
+    --vx-font-script: ui-sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  [data-script='Arab'] {
+    --vx-font-script: 'Noto Naskh Arabic', 'Segoe UI', Tahoma;
+  }
+  [data-script='Hebr'] {
+    --vx-font-script: 'Noto Sans Hebrew', 'Segoe UI', Arial;
+  }
+  [data-script='Hans'] {
+    --vx-font-script: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei';
+  }
+  [data-script='Jpan'] {
+    --vx-font-script: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic';
+  }
+  [data-script='Kore'] {
+    --vx-font-script: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic';
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --vx-motion-scale: 0;
+    }
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    overscroll-behavior-y: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+}
+
+@utility motion-fast {
+  transition-duration: calc(var(--vx-motion-fast) * var(--vx-motion-scale));
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-normal {
+  transition-duration: calc(var(--vx-motion-normal) * var(--vx-motion-scale));
+  transition-timing-function: var(--ease-standard);
+}
+@utility motion-slow {
+  transition-duration: calc(var(--vx-motion-slow) * var(--vx-motion-scale));
+  transition-timing-function: var(--ease-standard);
+}
+
+/* Padding that keeps content clear of the mobile bottom bar and the home indicator. */
+@utility pb-bottom-nav {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}

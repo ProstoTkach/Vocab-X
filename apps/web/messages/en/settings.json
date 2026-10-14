@@ -1,0 +1,9 @@
+{
+  "appearance": "Appearance",
+  "theme": "Theme",
+  "themeHint": "“System” follows your device’s light or dark mode.",
+  "lockedAtLevel": "Unlocks at level {level}",
+  "selected": "Selected",
+  "language": "Interface language",
+  "languageHint": "Language of buttons and hints. The language you study is set separately."
+}

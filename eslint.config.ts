@@ -1,11 +1,24 @@
 import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import nextPlugin from '@next/eslint-plugin-next';
 import prettier from 'eslint-config-prettier';
+import reactHooks from 'eslint-plugin-react-hooks';
+import vocabix from 'eslint-plugin-vocabix';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
 
-export default tseslint.config(
+export default defineConfig(
   {
-    ignores: ['reference/**', '**/node_modules/**', '**/dist/**', '**/.next/**', '**/coverage/**'],
+    ignores: [
+      'reference/**',
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.next/**',
+      '**/coverage/**',
+      '**/next-env.d.ts',
+      '**/playwright-report/**',
+      '**/test-results/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
@@ -15,6 +28,7 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       // With noUncheckedIndexedAccess, '!' marks indices proven in range by the surrounding loop.
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/no-confusing-void-expression': 'off',
@@ -26,7 +40,6 @@ export default tseslint.config(
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' },
       ],
-      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       'no-restricted-syntax': [
         'error',
         {
@@ -41,10 +54,33 @@ export default tseslint.config(
     },
   },
   {
+    files: ['apps/web/**/*.{ts,tsx}'],
+    plugins: { '@next/next': nextPlugin, 'react-hooks': reactHooks, vocabix },
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs['core-web-vitals'].rules,
+      ...reactHooks.configs.flat.recommended.rules,
+      'vocabix/design-tokens': 'error',
+      'vocabix/no-jsx-literals': 'error',
+      // UI must go through repositories, never straight to storage.
+      'no-restricted-globals': [
+        'error',
+        { name: 'localStorage', message: 'Use repositories from useRepos().' },
+        { name: 'sessionStorage', message: 'Use repositories from useRepos().' },
+      ],
+    },
+    settings: { next: { rootDir: 'apps/web' } },
+  },
+  {
+    // Tests, e2e and tooling may use literals and storage to set up state.
+    files: ['apps/web/e2e/**', 'apps/web/**/*.test.ts'],
+    rules: { 'vocabix/no-jsx-literals': 'off', 'no-restricted-globals': 'off' },
+  },
+  {
     files: ['**/*.js', '**/*.mjs'],
     ...tseslint.configs.disableTypeChecked,
     languageOptions: {
-      ...tseslint.configs.disableTypeChecked.languageOptions,
+      parserOptions: { projectService: false, program: null },
       globals: globals.node,
     },
   },

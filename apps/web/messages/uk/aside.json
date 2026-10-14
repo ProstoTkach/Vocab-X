@@ -1,0 +1,8 @@
+{
+  "label": "Ваш прогрес",
+  "streakTitle": "Серія",
+  "streakDays": "{count, plural, one {# день} few {# дні} many {# днів} other {# дня}}",
+  "goalTitle": "Ціль на сьогодні",
+  "goalProgress": "{current} з {goal} XP",
+  "demoNote": "Прототип: дані зберігаються лише в цьому браузері."
+}

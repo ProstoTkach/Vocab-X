@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     swipeLayout: 'default',
     dailyGoalXp: 50,
   },
+  sidebarCollapsed: false,
   timeOffsetMs: 0,
 };
 

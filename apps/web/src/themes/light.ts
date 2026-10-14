@@ -1,0 +1,32 @@
+import type { Theme } from './types';
+
+export const light: Theme = {
+  id: 'light',
+  nameKey: 'light',
+  colorScheme: 'light',
+  unlock: 'free',
+  colors: {
+    bg: '#f5f6fa',
+    surface: '#ffffff',
+    'surface-2': '#eef0f6',
+    'surface-3': '#e2e6ef',
+    fg: '#141824',
+    'fg-muted': '#515a6e',
+    line: '#d9dde7',
+    'line-strong': '#868fa3',
+    accent: '#4f46e5',
+    'accent-strong': '#4338ca',
+    'on-accent': '#ffffff',
+    success: '#15803d',
+    'on-success': '#ffffff',
+    warning: '#b45309',
+    'on-warning': '#ffffff',
+    danger: '#c42b2b',
+    'on-danger': '#ffffff',
+    info: '#0369a1',
+    'on-info': '#ffffff',
+    focus: '#4f46e5',
+    scrim: '#0f172a99',
+    shadow: '#0f172a1a',
+  },
+};
