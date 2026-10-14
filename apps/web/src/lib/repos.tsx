@@ -1,6 +1,6 @@
 'use client';
 
-import { LocalStorageRepo, MemoryStorage, type KeyValueStorage } from '@vocabix/data';
+import { LocalStorageRepo, MemoryStorage, type KeyValueStorage } from '@vocabx/data';
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
 const ReposContext = createContext<LocalStorageRepo | null>(null);
@@ -10,7 +10,7 @@ function browserStorage(): KeyValueStorage {
   try {
     // Accessing localStorage throws when storage is disabled (some private modes).
     const s = window.localStorage;
-    s.getItem('vocabix:probe');
+    s.getItem('vocabx:probe');
     return s;
   } catch {
     return new MemoryStorage();

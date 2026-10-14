@@ -1,5 +1,5 @@
 {
-  "name": "@vocabix/web",
+  "name": "@vocabx/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,9 +11,9 @@
     "e2e": "playwright test"
   },
   "dependencies": {
-    "@vocabix/content": "workspace:*",
-    "@vocabix/core": "workspace:*",
-    "@vocabix/data": "workspace:*",
+    "@vocabx/content": "workspace:*",
+    "@vocabx/core": "workspace:*",
+    "@vocabx/data": "workspace:*",
     "lucide-react": "^1.56.0",
     "next": "^16.4.0",
     "next-intl": "^4.14.9",

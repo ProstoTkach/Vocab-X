@@ -1,5 +1,5 @@
 // Registry of languages known to the app. Adding a language = an adapter file + one entry here.
-import { createBasicAdapter, type LangCode, type LanguageAdapter } from '@vocabix/core';
+import { createBasicAdapter, type LangCode, type LanguageAdapter } from '@vocabx/core';
 import { de } from './adapters/de';
 import { en } from './adapters/en';
 import { es } from './adapters/es';

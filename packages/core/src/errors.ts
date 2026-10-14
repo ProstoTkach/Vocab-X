@@ -10,7 +10,7 @@ export class StorageQuotaError extends Error {
 }
 
 export type ImportErrorCode =
-  'invalid_json' | 'not_vocabix' | 'unsupported_version' | 'invalid_data';
+  'invalid_json' | 'not_vocabx' | 'unsupported_version' | 'invalid_data';
 
 export class ImportError extends Error {
   override readonly name = 'ImportError';

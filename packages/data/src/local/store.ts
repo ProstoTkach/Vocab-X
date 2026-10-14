@@ -1,8 +1,8 @@
-import { StorageQuotaError } from '@vocabix/core';
+import { StorageQuotaError } from '@vocabx/core';
 import { isQuotaError, type KeyValueStorage } from '../storage';
 
 /** Namespace for every key the app owns; bump `v1` only for a layout that migrations cannot express. */
-export const KEY_PREFIX = 'vocabix:v1:';
+export const KEY_PREFIX = 'vocabx:v1:';
 
 /** JSON access to namespaced keys with quota errors translated into StorageQuotaError. */
 export class LocalStore {

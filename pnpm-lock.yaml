@@ -187,9 +187,9 @@ importers:
       eslint-plugin-react-hooks:
         specifier: ^7.1.1
         version: 7.1.1(eslint@10.12.0(jiti@2.7.0))
-      eslint-plugin-vocabix:
+      eslint-plugin-vocabx:
         specifier: workspace:*
-        version: link:tools/eslint-plugin-vocabix
+        version: link:tools/eslint-plugin-vocabx
       globals:
         specifier: ^17.13.0
         version: 17.13.0
@@ -211,13 +211,13 @@ importers:
 
   apps/web:
     dependencies:
-      '@vocabix/content':
+      '@vocabx/content':
         specifier: workspace:*
         version: link:../../packages/content
-      '@vocabix/core':
+      '@vocabx/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@vocabix/data':
+      '@vocabx/data':
         specifier: workspace:*
         version: link:../../packages/data
       lucide-react:
@@ -266,7 +266,7 @@ importers:
 
   packages/content:
     dependencies:
-      '@vocabix/core':
+      '@vocabx/core':
         specifier: workspace:*
         version: link:../core
 
@@ -274,11 +274,11 @@ importers:
 
   packages/data:
     dependencies:
-      '@vocabix/core':
+      '@vocabx/core':
         specifier: workspace:*
         version: link:../core
 
-  tools/eslint-plugin-vocabix: {}
+  tools/eslint-plugin-vocabx: {}
 
 packages:
 

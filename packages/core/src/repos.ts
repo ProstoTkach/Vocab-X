@@ -84,14 +84,14 @@ export interface Repos {
 
 /** Whole-dataset operations: export/import to a JSON file and reset. */
 export interface DataPort {
-  exportAll(): Promise<VocabixExport>;
+  exportAll(): Promise<VocabXExport>;
   /** Replaces all user data. Throws ImportError on invalid input. */
   importAll(data: unknown): Promise<void>;
   reset(): Promise<void>;
 }
 
-export interface VocabixExport {
-  format: 'vocabix-export';
+export interface VocabXExport {
+  format: 'vocabx-export';
   schemaVersion: number;
   exportedAt: number;
   data: Record<string, unknown>;

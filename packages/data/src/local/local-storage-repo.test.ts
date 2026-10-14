@@ -10,7 +10,7 @@ import {
   type Profile,
   type ReviewEvent,
   type Word,
-} from '@vocabix/core';
+} from '@vocabx/core';
 import { beforeEach, describe, expect, test } from 'vitest';
 import { MemoryStorage } from '../storage';
 import { LocalStorageRepo, type BuiltinCatalog } from './local-storage-repo';
@@ -184,9 +184,9 @@ describe('LocalStorageRepo', () => {
         (e: unknown) => (e instanceof ImportError ? e.code : 'other'),
       );
     expect(await code(repo.importAll('{nope'))).toBe('invalid_json');
-    expect(await code(repo.importAll({ format: 'other' }))).toBe('not_vocabix');
+    expect(await code(repo.importAll({ format: 'other' }))).toBe('not_vocabx');
     expect(
-      await code(repo.importAll({ format: 'vocabix-export', schemaVersion: 99, data: {} })),
+      await code(repo.importAll({ format: 'vocabx-export', schemaVersion: 99, data: {} })),
     ).toBe('unsupported_version');
     expect(await repo.profile.get()).toEqual(profile);
   });
@@ -196,7 +196,7 @@ describe('LocalStorageRepo', () => {
     const r = new LocalStorageRepo(s);
     await r.profile.save(profile);
     const huge = {
-      format: 'vocabix-export',
+      format: 'vocabx-export',
       schemaVersion: 1,
       data: { words: { x: 'y'.repeat(5000) } },
     };

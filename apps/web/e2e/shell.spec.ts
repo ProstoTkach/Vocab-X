@@ -57,6 +57,31 @@ test('applies the stored theme before hydration and keeps it after reload', asyn
   await expect(page.getByRole('radio', { name: 'Океан' })).toHaveAttribute('aria-checked', 'true');
 });
 
+test('switching the language keeps the theme', async ({ page }) => {
+  await page.goto('/uk/settings');
+  await page.getByRole('radio', { name: 'Океан' }).click();
+  await page.getByRole('radio', { name: 'English' }).click();
+  await expect(page).toHaveURL(/\/en\/settings$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean');
+  await expect(page.getByRole('radio', { name: 'Ocean' })).toHaveAttribute('aria-checked', 'true');
+});
+
+test('the tab lights up on click, before the page arrives', async ({ page }) => {
+  await page.goto('/uk');
+  // Hold back the next page's data to observe the pending state.
+  await page.route('**/uk/decks**', async (route) => {
+    await new Promise((r) => setTimeout(r, 800));
+    await route.continue();
+  });
+  const nav = mainNav(page);
+  await nav.getByRole('link', { name: 'Колоди' }).click();
+  await expect(nav.getByRole('link', { name: 'Колоди' })).toHaveAttribute('aria-current', 'page', {
+    timeout: 300,
+  });
+  await expect(page.getByRole('heading', { level: 1, name: 'Колоди' })).toBeVisible();
+});
+
 test('locked themes cannot be chosen', async ({ page }) => {
   await page.goto('/uk/settings');
   await expect(page.getByRole('radio', { name: /Захід сонця/ })).toBeDisabled();
@@ -64,7 +89,7 @@ test('locked themes cannot be chosen', async ({ page }) => {
 
 test('a locked theme from storage falls back to system', async ({ page }) => {
   await page.addInitScript(() =>
-    localStorage.setItem('vocabix:v1:settings', JSON.stringify({ themeId: 'sunset' })),
+    localStorage.setItem('vocabx:v1:settings', JSON.stringify({ themeId: 'sunset' })),
   );
   await page.goto('/uk');
   await expect(page.locator('html')).toHaveAttribute('data-theme-choice', 'system');
@@ -108,7 +133,7 @@ for (const route of ROUTES) {
 test('every theme passes axe on settings', async ({ page }) => {
   for (const themeId of ['light', 'dark', 'ocean']) {
     await page.addInitScript(
-      (id) => localStorage.setItem('vocabix:v1:settings', JSON.stringify({ themeId: id })),
+      (id) => localStorage.setItem('vocabx:v1:settings', JSON.stringify({ themeId: id })),
       themeId,
     );
     await page.goto('/uk/settings');

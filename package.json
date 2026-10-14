@@ -1,5 +1,5 @@
 {
-  "name": "vocabix",
+  "name": "vocabx",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@12.11.2",
@@ -13,10 +13,10 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "dev": "pnpm --filter @vocabix/web dev",
-    "build": "pnpm --filter @vocabix/web build",
-    "e2e": "pnpm --filter @vocabix/web e2e --project mobile --project desktop",
-    "screenshots": "pnpm --filter @vocabix/web e2e --project screenshots"
+    "dev": "pnpm --filter @vocabx/web dev",
+    "build": "pnpm --filter @vocabx/web build",
+    "e2e": "pnpm --filter @vocabx/web e2e --project mobile --project desktop",
+    "screenshots": "pnpm --filter @vocabx/web e2e --project screenshots"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -26,7 +26,7 @@
     "eslint": "^10.12.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-vocabix": "workspace:*",
+    "eslint-plugin-vocabx": "workspace:*",
     "globals": "^17.13.0",
     "jiti": "^2.7.0",
     "prettier": "^3.9.10",

@@ -25,10 +25,10 @@ import {
   type ReviewLogRepo,
   type SettingsPatch,
   type SettingsRepo,
-  type VocabixExport,
+  type VocabXExport,
   type Word,
   type WordRepo,
-} from '@vocabix/core';
+} from '@vocabx/core';
 import type { KeyValueStorage } from '../storage';
 import { packEvent, unpackEvent, type PackedEvent } from './log-codec';
 import {
@@ -122,11 +122,11 @@ export class LocalStorageRepo implements Repos, DataPort {
 
   // ---- DataPort ----
 
-  exportAll(): Promise<VocabixExport> {
+  exportAll(): Promise<VocabXExport> {
     const data: RawData = {};
     for (const k of this.store.keys()) if (k !== KEYS.meta) data[k] = this.store.read(k);
     return Promise.resolve({
-      format: 'vocabix-export',
+      format: 'vocabx-export',
       schemaVersion: this.schemaVersion,
       // Export time is metadata, not domain logic, so it does not need the injected clock.
       // eslint-disable-next-line no-restricted-syntax
@@ -353,7 +353,7 @@ function mergeSettings(base: AppSettings, patch: SettingsPatch): AppSettings {
   return { ...base, ...rest, study: { ...base.study, ...study } };
 }
 
-function parseExport(input: unknown, currentVersion: number): VocabixExport {
+function parseExport(input: unknown, currentVersion: number): VocabXExport {
   let value = input;
   if (typeof value === 'string') {
     try {
@@ -365,12 +365,12 @@ function parseExport(input: unknown, currentVersion: number): VocabixExport {
   if (
     typeof value !== 'object' ||
     value === null ||
-    (value as { format?: unknown }).format !== 'vocabix-export'
+    (value as { format?: unknown }).format !== 'vocabx-export'
   ) {
-    throw new ImportError('not_vocabix', 'The file is not a Vocabix export');
+    throw new ImportError('not_vocabx', 'The file is not a VocabX export');
   }
   // Fields are unknown until checked: the file comes from outside.
-  const v = value as { [K in keyof VocabixExport]?: unknown };
+  const v = value as { [K in keyof VocabXExport]?: unknown };
   if (
     typeof v.schemaVersion !== 'number' ||
     !Number.isInteger(v.schemaVersion) ||
@@ -387,5 +387,5 @@ function parseExport(input: unknown, currentVersion: number): VocabixExport {
   if (typeof v.data !== 'object' || v.data === null || Array.isArray(v.data)) {
     throw new ImportError('invalid_data', 'Missing data section');
   }
-  return v as VocabixExport;
+  return v as VocabXExport;
 }

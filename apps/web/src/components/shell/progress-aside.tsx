@@ -1,6 +1,6 @@
 'use client';
 
-import { DEFAULT_SETTINGS, localDateKey, systemClock } from '@vocabix/core';
+import { DEFAULT_SETTINGS, localDateKey, systemClock } from '@vocabx/core';
 import { Flame, Target } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';

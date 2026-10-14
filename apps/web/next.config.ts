@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const config: NextConfig = {
   // Workspace packages ship TypeScript sources.
-  transpilePackages: ['@vocabix/core', '@vocabix/content', '@vocabix/data'],
+  transpilePackages: ['@vocabx/core', '@vocabx/content', '@vocabx/data'],
   reactStrictMode: true,
   poweredByHeader: false,
 };

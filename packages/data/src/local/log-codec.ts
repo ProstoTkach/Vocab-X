@@ -1,6 +1,6 @@
 // Review events are the bulk of stored data, so they are kept as positional tuples:
 // roughly 3× smaller than objects with repeated property names.
-import { REVIEW_FORMATS, TEST_FORMATS, isGrade, type ReviewEvent } from '@vocabix/core';
+import { REVIEW_FORMATS, TEST_FORMATS, isGrade, type ReviewEvent } from '@vocabx/core';
 
 const FORMATS = [...REVIEW_FORMATS, ...TEST_FORMATS] as const;
 

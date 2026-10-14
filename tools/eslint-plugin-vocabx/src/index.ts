@@ -113,7 +113,7 @@ const noJsxLiterals: Rule.RuleModule = {
 };
 
 const plugin: ESLint.Plugin = {
-  meta: { name: 'eslint-plugin-vocabix' },
+  meta: { name: 'eslint-plugin-vocabx' },
   rules: { 'design-tokens': designTokens, 'no-jsx-literals': noJsxLiterals },
 };
 

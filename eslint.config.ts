@@ -2,7 +2,7 @@ import js from '@eslint/js';
 import nextPlugin from '@next/eslint-plugin-next';
 import prettier from 'eslint-config-prettier';
 import reactHooks from 'eslint-plugin-react-hooks';
-import vocabix from 'eslint-plugin-vocabix';
+import vocabx from 'eslint-plugin-vocabx';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import { defineConfig } from 'eslint/config';
@@ -55,13 +55,13 @@ export default defineConfig(
   },
   {
     files: ['apps/web/**/*.{ts,tsx}'],
-    plugins: { '@next/next': nextPlugin, 'react-hooks': reactHooks, vocabix },
+    plugins: { '@next/next': nextPlugin, 'react-hooks': reactHooks, vocabx },
     rules: {
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs['core-web-vitals'].rules,
       ...reactHooks.configs.flat.recommended.rules,
-      'vocabix/design-tokens': 'error',
-      'vocabix/no-jsx-literals': 'error',
+      'vocabx/design-tokens': 'error',
+      'vocabx/no-jsx-literals': 'error',
       // UI must go through repositories, never straight to storage.
       'no-restricted-globals': [
         'error',
@@ -74,7 +74,7 @@ export default defineConfig(
   {
     // Tests, e2e and tooling may use literals and storage to set up state.
     files: ['apps/web/e2e/**', 'apps/web/**/*.test.ts'],
-    rules: { 'vocabix/no-jsx-literals': 'off', 'no-restricted-globals': 'off' },
+    rules: { 'vocabx/no-jsx-literals': 'off', 'no-restricted-globals': 'off' },
   },
   {
     files: ['**/*.js', '**/*.mjs'],

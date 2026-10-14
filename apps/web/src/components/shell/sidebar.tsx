@@ -3,13 +3,14 @@
 import { PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Tooltip } from '@/components/ui/tooltip';
-import { Link, usePathname } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { cx } from '@/lib/cx';
 import { useRepos } from '@/lib/repos';
 import { useRootAttribute } from '@/lib/root-attribute';
 import { LanguageSwitcher } from './language-switcher';
 import { Logo } from './logo';
 import { isActive, PRIMARY_NAV } from './nav-items';
+import { useNavState } from './nav-state';
 
 const itemClass = cx(
   'flex min-h-11 items-center gap-3 rounded-control px-3 font-medium text-fg-muted',
@@ -23,7 +24,7 @@ const labelClass = 'truncate sidebar-collapsed:sr-only';
  * set before hydration by the boot script, so the width never jumps on load. */
 export function Sidebar() {
   const t = useTranslations('nav');
-  const pathname = usePathname();
+  const { path: pathname, navigateTo } = useNavState();
   const repos = useRepos();
   const collapsed = useRootAttribute('sidebar', undefined) === 'collapsed';
 
@@ -53,6 +54,7 @@ export function Sidebar() {
             <Tooltip key={item.key} content={t(item.key)} side="right" disabled={!collapsed}>
               <Link
                 href={item.href}
+                onClick={() => navigateTo(item.href)}
                 aria-current={active ? 'page' : undefined}
                 className={itemClass}
               >
@@ -67,6 +69,7 @@ export function Sidebar() {
         <Tooltip content={t('settings')} side="right" disabled={!collapsed}>
           <Link
             href="/settings"
+            onClick={() => navigateTo('/settings')}
             aria-current={isActive(pathname, '/settings') ? 'page' : undefined}
             className={itemClass}
           >

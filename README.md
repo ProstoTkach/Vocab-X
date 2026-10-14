@@ -1,4 +1,4 @@
-# Vocabix
+# VocabX
 
 Вебзастосунок для вивчення іншомовної лексики з інтервальним повторенням (FSRS-6 + рівні формату вправ).
 
@@ -20,7 +20,7 @@ pnpm e2e           # Playwright: мобільний (390×844) і десктоп
 pnpm screenshots   # скріншоти /dev/ui і сторінок у 5 в'юпортах × 5 тем → apps/web/screenshots
 ```
 
-Перед першим `pnpm e2e`: `pnpm --filter @vocabix/web exec playwright install chromium`.
+Перед першим `pnpm e2e`: `pnpm --filter @vocabx/web exec playwright install chromium`.
 
 Сторінка `/uk/dev/ui` показує всі компоненти в усіх темах. Вона доступна в `pnpm dev`;
 у production-збірці — лише з `NEXT_PUBLIC_ENABLE_DEV_UI=1`.
@@ -39,7 +39,7 @@ packages/core            чисті функції: FSRS-6, XP, стопка, о
                          інтерфейси репозиторіїв, Clock/Rng, параметри моделі (src/config)
 packages/content         реєстр мов, що вивчаються, і мовні адаптери
 packages/data            реалізації репозиторіїв: LocalStorageRepo (фаза A)
-tools/eslint-plugin-vocabix  правила: design-tokens, no-jsx-literals
+tools/eslint-plugin-vocabx  правила: design-tokens, no-jsx-literals
 reference/               еталонні файли, з яких перенесено ядро
 ```
 
@@ -51,14 +51,14 @@ reference/               еталонні файли, з яких перенес
   випадковий зсув інтервалу береться з `Rng`, засіяного `id` події, тож відтворення детерміноване.
 - **Параметри моделі** (`w₀…w₂₀`, `ρ`, `τ⁰`, ліміти, пороги оцінювання, XP) — лише в
   `packages/core/src/config/params.ts`.
-- **localStorage**: ключі `vocabix:v1:*`, `schemaVersion` з міграціями, компактний журнал,
+- **localStorage**: ключі `vocabx:v1:*`, `schemaVersion` з міграціями, компактний журнал,
   `StorageQuotaError` при переповненні, експорт/імпорт JSON з відкатом. UI звертається до даних
   лише через `useRepos()`; лінтер забороняє `localStorage` у компонентах.
 - **Теми — набори семантичних токенів.** Стандартну палітру Tailwind вимкнено (`--color-*: initial`),
-  тож `bg-white` чи `text-gray-900` не існують; правило `vocabix/design-tokens` додатково ловить
+  тож `bg-white` чи `text-gray-900` не існують; правило `vocabx/design-tokens` додатково ловить
   сирі кольори, `dark:` і фізичні напрямки (`ml-`, `left-`, `text-right`). Тема застосовується
   inline-скриптом у `<head>` до гідратації — без «блимання».
-- **Жодних рядків у JSX.** Правило `vocabix/no-jsx-literals` ловить текст і текстові атрибути
+- **Жодних рядків у JSX.** Правило `vocabx/no-jsx-literals` ловить текст і текстові атрибути
   (`aria-label`, `alt`, `placeholder`…). Тест перевіряє, що всі локалі мають однакові ключі й
   коректний ICU з тими самими аргументами.
 - **Доступність.** Контраст токенів кожної теми (WCAG AA) перевіряє unit-тест; сторінки — axe у

@@ -25,7 +25,7 @@ export async function generateMetadata({
   if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: 'meta' });
   return {
-    title: { default: t('title'), template: '%s · Vocabix' },
+    title: { default: t('title'), template: '%s · VocabX' },
     description: t('description'),
   };
 }
@@ -52,10 +52,11 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={info.dir}
-      data-theme={DEFAULT_THEME.id}
       data-script={info.script}
       className={`${inter.variable} ${manrope.variable}`}
-      // The boot script sets theme attributes before React hydrates.
+      // Theme attributes (data-theme, color-scheme) are owned by the boot script and
+      // ThemeProvider, not React: rendering them here would reset the theme whenever the
+      // root layout re-renders, e.g. on a locale switch.
       suppressHydrationWarning
     >
       <head>

@@ -1,14 +1,15 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Link, usePathname } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { cx } from '@/lib/cx';
 import { isActive, PRIMARY_NAV } from './nav-items';
+import { useNavState } from './nav-state';
 
 /** Phone navigation: fixed to the bottom, within thumb reach, above the home indicator. */
 export function BottomNav() {
   const t = useTranslations('nav');
-  const pathname = usePathname();
+  const { path: pathname, navigateTo } = useNavState();
   return (
     <nav
       aria-label={t('main')}
@@ -21,6 +22,7 @@ export function BottomNav() {
             <li key={item.key}>
               <Link
                 href={item.href}
+                onClick={() => navigateTo(item.href)}
                 aria-current={active ? 'page' : undefined}
                 className={cx(
                   'flex min-h-16 flex-col items-center justify-center gap-1 px-0.5 text-[0.6875rem] leading-tight font-medium tracking-tight touch-manipulation',

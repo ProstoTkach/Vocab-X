@@ -1,7 +1,7 @@
 {
   "home": {
     "title": "Home",
-    "greeting": "Welcome to Vocabix!",
+    "greeting": "Welcome to VocabX!",
     "intro": "Your avatar, level, streak and the “Continue review” button will live here.",
     "continue": "Continue review ({count})"
   },

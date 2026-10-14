@@ -25,7 +25,7 @@ for (const vp of VIEWPORTS) {
     for (const theme of THEMES) {
       test(`app in ${theme}`, async ({ page }) => {
         await page.addInitScript((themeId) => {
-          localStorage.setItem('vocabix:v1:settings', JSON.stringify({ themeId }));
+          localStorage.setItem('vocabx:v1:settings', JSON.stringify({ themeId }));
         }, theme);
         for (const route of ROUTES) {
           await page.goto(`/uk${route}`);

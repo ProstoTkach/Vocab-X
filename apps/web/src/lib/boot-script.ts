@@ -1,6 +1,8 @@
-// Runs in <head> before first paint, so the stored theme is applied without a flash.
-// This is the only code that reads localStorage directly: repositories are not loaded yet.
-import { KEY_PREFIX } from '@vocabix/data';
+// Applies stored theme and sidebar state to <html> before first paint (no flash).
+// It runs twice: inline in <head> on page load, and from Providers when React remounts
+// <html> (a locale switch clears its attributes). It reads localStorage directly because
+// it must be synchronous and repositories are not loaded yet.
+import { KEY_PREFIX } from '@vocabx/data';
 import { SYSTEM_THEMES, THEMES } from '@/themes/registry';
 import { SYSTEM_THEME_ID } from '@/themes/types';
 
@@ -35,12 +37,20 @@ function boot(c: BootConfig) {
   if (s.sidebarCollapsed) d.dataset.sidebar = 'collapsed';
 }
 
-export function bootScript(): string {
-  const config: BootConfig = {
+function config(): BootConfig {
+  return {
     key: KEY_PREFIX + 'settings',
     schemes: Object.fromEntries(THEMES.map((t) => [t.id, t.colorScheme])),
     system: SYSTEM_THEMES,
     systemId: SYSTEM_THEME_ID,
   };
-  return '(' + boot.toString() + ')(' + JSON.stringify(config) + ')';
+}
+
+export function bootScript(): string {
+  return '(' + boot.toString() + ')(' + JSON.stringify(config()) + ')';
+}
+
+/** Re-applies the stored root attributes if something removed them. */
+export function restoreRootAttributes(): void {
+  if (!document.documentElement.dataset.theme) boot(config());
 }
