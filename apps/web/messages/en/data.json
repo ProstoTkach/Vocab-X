@@ -1,0 +1,18 @@
+{
+  "title": "Data",
+  "hint": "The prototype keeps everything in this browser only. Make a backup to move your progress.",
+  "usage": "About {kb} KB used",
+  "export": "Export JSON",
+  "import": "Import JSON",
+  "importConfirmTitle": "Replace data from file?",
+  "importConfirmText": "Current progress in this browser will be replaced with the contents of “{name}”.",
+  "importDone": "Data imported",
+  "importFailed": "Could not import the file",
+  "importInvalid": "The file is damaged or is not a VocabX backup.",
+  "importNewer": "The file was created by a newer version of the app.",
+  "reset": "Reset demo data",
+  "resetConfirmTitle": "Reset all data?",
+  "resetConfirmText": "Decks, progress and settings in this browser will be deleted. You will go through the initial setup again.",
+  "quotaTitle": "Storage is full",
+  "quotaText": "Export your data and clear history to free up space."
+}

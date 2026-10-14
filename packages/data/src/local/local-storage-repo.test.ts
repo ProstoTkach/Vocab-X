@@ -5,6 +5,7 @@ import {
   StorageQuotaError,
   applyEvent,
   replayCard,
+  type BuiltinCatalog,
   type CardProgress,
   type Deck,
   type Profile,
@@ -13,7 +14,7 @@ import {
 } from '@vocabx/core';
 import { beforeEach, describe, expect, test } from 'vitest';
 import { MemoryStorage } from '../storage';
-import { LocalStorageRepo, type BuiltinCatalog } from './local-storage-repo';
+import { LocalStorageRepo } from './local-storage-repo';
 import { KEY_PREFIX } from './store';
 
 const word = (id: string, lang = 'en'): Word => ({
@@ -198,10 +199,33 @@ describe('LocalStorageRepo', () => {
     const huge = {
       format: 'vocabx-export',
       schemaVersion: 1,
-      data: { words: { x: 'y'.repeat(5000) } },
+      data: {
+        words: Object.fromEntries(
+          Array.from({ length: 40 }, (_, i) => [
+            `w${i}`,
+            { ...word(`w${i}`), term: 'y'.repeat(150) },
+          ]),
+        ),
+      },
     };
     await expect(r.importAll(huge)).rejects.toBeInstanceOf(StorageQuotaError);
     expect(await r.profile.get()).toEqual(profile);
+  });
+
+  test('імпорт перевіряє структуру даних', async () => {
+    await repo.profile.save(profile);
+    const code = async (data: unknown) =>
+      repo.importAll({ format: 'vocabx-export', schemaVersion: 1, data }).then(
+        () => 'ok',
+        (e: unknown) => (e instanceof ImportError ? e.code + ': ' + e.message : 'other'),
+      );
+    expect(await code({ words: { w1: { ...word('w1'), lang: 42 } } })).toMatch(
+      /^invalid_data: Invalid words.w1.lang/,
+    );
+    expect(await code({ hacker: 1 })).toMatch(/^invalid_data: Unknown section/);
+    expect(await code({ log: [['e1', 'w1', 1, 9, 0, 100, 0.9, 0, 0]] })).toMatch(/^invalid_data/);
+    expect(await code({ 'progress:en': {}, profile })).toBe('ok');
+    expect(await repo.profile.get()).toEqual(profile);
   });
 
   test('міграції запускаються для старих даних', async () => {

@@ -270,13 +270,24 @@ importers:
         specifier: workspace:*
         version: link:../core
 
-  packages/core: {}
+  packages/core:
+    dependencies:
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
 
   packages/data:
     dependencies:
       '@vocabx/core':
         specifier: workspace:*
         version: link:../core
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@vocabx/content':
+        specifier: workspace:*
+        version: link:../content
 
   tools/eslint-plugin-vocabx: {}
 

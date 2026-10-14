@@ -1,4 +1,5 @@
-// Applies stored theme and sidebar state to <html> before first paint (no flash).
+// Applies stored theme and sidebar state to <html> before first paint (no flash) and
+// redirects to onboarding when it has not been completed.
 // It runs twice: inline in <head> on page load, and from Providers when React remounts
 // <html> (a locale switch clears its attributes). It reads localStorage directly because
 // it must be synchronous and repositories are not loaded yet.
@@ -37,6 +38,32 @@ function boot(c: BootConfig) {
   if (s.sidebarCollapsed) d.dataset.sidebar = 'collapsed';
 }
 
+interface GateConfig {
+  profileKey: string;
+  /** First path segment after the locale that is reachable without onboarding. */
+  open: string[];
+}
+
+// Sends a learner who has not finished onboarding there before anything is painted.
+// Client-side navigations are covered by <OnboardingGate>.
+function gate(c: GateConfig) {
+  const [, locale, section = ''] = location.pathname.split('/');
+  if (!locale || c.open.includes(section)) return;
+  let onboarded: boolean;
+  try {
+    // eslint-disable-next-line no-restricted-globals -- runs before repositories exist
+    const p = JSON.parse(localStorage.getItem(c.profileKey) ?? 'null') as {
+      onboardedAt?: number;
+    } | null;
+    onboarded = !!p?.onboardedAt;
+  } catch {
+    onboarded = true; // storage unavailable: do not trap the user in a redirect loop
+  }
+  if (!onboarded) location.replace('/' + locale + '/onboarding');
+}
+
+export const OPEN_SECTIONS = ['onboarding', 'dev'];
+
 function config(): BootConfig {
   return {
     key: KEY_PREFIX + 'settings',
@@ -47,7 +74,11 @@ function config(): BootConfig {
 }
 
 export function bootScript(): string {
-  return '(' + boot.toString() + ')(' + JSON.stringify(config()) + ')';
+  const gateConfig: GateConfig = { profileKey: KEY_PREFIX + 'profile', open: OPEN_SECTIONS };
+  return [
+    '(' + gate.toString() + ')(' + JSON.stringify(gateConfig) + ')',
+    '(' + boot.toString() + ')(' + JSON.stringify(config()) + ')',
+  ].join(';');
 }
 
 /** Re-applies the stored root attributes if something removed them. */

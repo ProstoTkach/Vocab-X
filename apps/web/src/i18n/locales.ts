@@ -34,5 +34,7 @@ export const NAMESPACES = [
   'themes',
   'languages',
   'devui',
+  'onboarding',
+  'data',
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];

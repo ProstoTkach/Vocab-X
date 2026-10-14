@@ -47,9 +47,14 @@ export interface Word {
 
 export interface Deck {
   id: Id;
-  /** Name for user decks; built-in decks use an i18n key instead. */
+  /** Name of the deck; for built-in decks a fallback for titleI18n. */
   title: string;
+  /** Localized names of built-in decks keyed by UI locale. */
+  titleI18n?: Partial<Record<LangCode, string>>;
   description?: string;
+  descriptionI18n?: Partial<Record<LangCode, string>>;
+  /** Typical CEFR level of the deck, for pickers. */
+  cefr?: Cefr;
   /** Language being learned with this deck. */
   lang: LangCode;
   /** Study order. */
@@ -124,6 +129,11 @@ export interface ReviewEvent {
   /** r_eff used for this review: needed to replay intervals exactly. */
   retention: number;
   xp: number;
+  /**
+   * "placement": the learner marked the word as known in the onboarding level check.
+   * It schedules the card like a review but is not study activity: no XP, no daily limits.
+   */
+  kind?: 'placement';
 }
 
 export interface DailyStats {
@@ -144,4 +154,10 @@ export interface GamificationState {
   achievements: Record<Id, number>;
   inventory: Id[];
   equipped: Partial<Record<string, Id>>;
+}
+
+/** Read-only content shipped with the app: built-in decks and their words. */
+export interface BuiltinCatalog {
+  decks: readonly Deck[];
+  words: readonly Word[];
 }

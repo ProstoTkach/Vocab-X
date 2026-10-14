@@ -16,3 +16,7 @@ export * from './model';
 export * from './repos';
 export * from './providers';
 export * from './errors';
+export * from './study';
+export * from './placement';
+export * from './schemas';
+export * from './onboarding';

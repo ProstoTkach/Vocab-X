@@ -14,6 +14,8 @@ export type PackedEvent = [
   retention: number,
   xp: number,
   wasNew: 0 | 1,
+  /** Optional trailing flag: 1 = placement. Older tuples simply lack it. */
+  placement?: 1,
 ];
 
 export function packEvent(e: ReviewEvent): PackedEvent {
@@ -27,12 +29,24 @@ export function packEvent(e: ReviewEvent): PackedEvent {
     e.retention,
     e.xp,
     e.wasNew ? 1 : 0,
-  ];
+    ...(e.kind === 'placement' ? ([1] as const) : []),
+  ] as PackedEvent;
 }
 
 export function unpackEvent(p: PackedEvent): ReviewEvent {
-  const [id, wordId, at, grade, format, responseMs, retention, xp, wasNew] = p;
+  const [id, wordId, at, grade, format, responseMs, retention, xp, wasNew, placement] = p;
   const fmt = FORMATS[format];
   if (!isGrade(grade) || !fmt) throw new Error(`Corrupted review event ${id}`);
-  return { id, wordId, at, grade, format: fmt, responseMs, retention, xp, wasNew: wasNew === 1 };
+  return {
+    id,
+    wordId,
+    at,
+    grade,
+    format: fmt,
+    responseMs,
+    retention,
+    xp,
+    wasNew: wasNew === 1,
+    ...(placement === 1 ? { kind: 'placement' as const } : {}),
+  };
 }

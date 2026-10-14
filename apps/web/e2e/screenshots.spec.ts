@@ -1,6 +1,7 @@
 // Visual review: /dev/ui and key routes in every control viewport and theme.
 // Output goes to apps/web/screenshots (not committed).
 import { expect, test } from '@playwright/test';
+import { seedOnboarded } from './fixtures';
 
 const VIEWPORTS = [
   { name: '360x740', width: 360, height: 740 },
@@ -22,8 +23,15 @@ for (const vp of VIEWPORTS) {
       await page.screenshot({ path: `screenshots/devui-${vp.name}.png`, fullPage: true });
     });
 
+    test('onboarding', async ({ page }) => {
+      await page.goto('/uk/onboarding');
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      await page.screenshot({ path: `screenshots/onboarding-${vp.name}.png`, fullPage: true });
+    });
+
     for (const theme of THEMES) {
       test(`app in ${theme}`, async ({ page }) => {
+        await seedOnboarded(page);
         await page.addInitScript((themeId) => {
           localStorage.setItem('vocabx:v1:settings', JSON.stringify({ themeId }));
         }, theme);

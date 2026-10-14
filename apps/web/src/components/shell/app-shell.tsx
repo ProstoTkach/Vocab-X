@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { BottomNav } from './bottom-nav';
 import { MobileTopBar } from './mobile-top-bar';
 import { NavStateProvider } from './nav-state';
+import { OnboardingGate } from './onboarding-gate';
 import { ProgressAside } from './progress-aside';
 import { Sidebar } from './sidebar';
 
@@ -14,6 +15,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const t = useTranslations('nav');
   return (
     <NavStateProvider>
+      <OnboardingGate />
       <div className="min-h-dvh md:flex">
         <a
           href="#main"

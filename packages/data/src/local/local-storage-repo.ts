@@ -7,6 +7,7 @@ import {
   StorageQuotaError,
   localDateKey,
   type AppSettings,
+  type BuiltinCatalog,
   type CardProgress,
   type DailyStats,
   type DataPort,
@@ -41,12 +42,7 @@ import {
   type RawData,
 } from './schema';
 import { LocalStore } from './store';
-
-/** Read-only content shipped with the app (built-in decks and their words). */
-export interface BuiltinCatalog {
-  decks: readonly Deck[];
-  words: readonly Word[];
-}
+import { validateData } from './validate';
 
 export interface LocalStorageRepoOptions {
   catalog?: BuiltinCatalog;
@@ -59,6 +55,7 @@ export interface LocalStorageRepoOptions {
 }
 
 const DEFAULT_MAX_LOG_EVENTS = 5000;
+const LOCAL_STORAGE_QUOTA = 5 * 1024 * 1024;
 
 export class LocalStorageRepo implements Repos, DataPort {
   readonly profile: ProfileRepo;
@@ -115,9 +112,9 @@ export class LocalStorageRepo implements Repos, DataPort {
     };
   }
 
-  /** Approximate bytes used, for the storage indicator in settings. */
-  usageBytes(): number {
-    return this.store.usageBytes();
+  storageUsage() {
+    // Browsers give localStorage about 5 MB per origin (UTF-16, so ~5M bytes of our estimate).
+    return Promise.resolve({ usedBytes: this.store.usageBytes(), quotaBytes: LOCAL_STORAGE_QUOTA });
   }
 
   // ---- DataPort ----
@@ -137,7 +134,10 @@ export class LocalStorageRepo implements Repos, DataPort {
 
   async importAll(input: unknown): Promise<void> {
     const parsed = parseExport(input, this.schemaVersion);
-    const data = migrate(parsed.data, parsed.schemaVersion, this.migrations, this.schemaVersion);
+    // Migrate first (old files may have an older shape), then validate against the current one.
+    const data = validateData(
+      migrate(parsed.data, parsed.schemaVersion, this.migrations, this.schemaVersion),
+    );
 
     // All-or-nothing: keep the current state to roll back if the new one does not fit.
     const backup = this.snapshot();
@@ -289,6 +289,8 @@ export class LocalStorageRepo implements Repos, DataPort {
     const readLog = () => this.store.read<PackedEvent[]>(KEYS.log) ?? [];
     const readStats = () => this.readMap<DailyStats>(KEYS.stats);
     const writeStats = (e: ReviewEvent, sign: 1 | -1) => {
+      // Placement answers are not study activity and do not count toward today.
+      if (e.kind === 'placement') return;
       const stats = readStats();
       const date = this.dateKey(e.at);
       const s = stats[date] ?? { date, reviews: 0, newCards: 0, correct: 0, xp: 0 };

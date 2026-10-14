@@ -1,11 +1,12 @@
 'use client';
 
-import { DEFAULT_SETTINGS, localDateKey, systemClock } from '@vocabx/core';
+import { DEFAULT_SETTINGS } from '@vocabx/core';
 import { Flame, Target } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Card, CardTitle } from '@/components/ui/card';
 import { ProgressBar } from '@/components/ui/progress-bar';
+import { useClock } from '@/lib/clock';
 import { useRepos } from '@/lib/repos';
 
 interface Snapshot {
@@ -18,6 +19,7 @@ interface Snapshot {
 export function ProgressAside() {
   const t = useTranslations('aside');
   const repos = useRepos();
+  const { clock, dayOf } = useClock();
   const [s, setS] = useState<Snapshot>({
     streak: 0,
     xpToday: 0,
@@ -27,7 +29,7 @@ export function ProgressAside() {
   useEffect(() => {
     const ctrl = new AbortController();
     void (async () => {
-      const today = localDateKey(systemClock.now());
+      const today = dayOf(clock.now());
       const [g, settings, stats] = await Promise.all([
         repos.gamification.get(),
         repos.settings.get(),
@@ -41,7 +43,7 @@ export function ProgressAside() {
         });
     })();
     return () => ctrl.abort();
-  }, [repos]);
+  }, [repos, clock, dayOf]);
 
   return (
     <aside

@@ -11,6 +11,10 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
-    "@vocabx/core": "workspace:*"
+    "@vocabx/core": "workspace:*",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@vocabx/content": "workspace:*"
   }
 }

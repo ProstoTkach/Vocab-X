@@ -2,8 +2,11 @@
   "home": {
     "title": "Home",
     "greeting": "Welcome to VocabX!",
-    "intro": "Your avatar, level, streak and the “Continue review” button will live here.",
-    "continue": "Continue review ({count})"
+    "intro": "Your stack for today.",
+    "continue": "Continue review ({count})",
+    "summary": "{fresh, plural, one {# new} other {# new}} · {due, plural, one {# review} other {# reviews}}",
+    "empty": "All done for today! New cards arrive tomorrow.",
+    "learning": "Learning: {lang}"
   },
   "review": {
     "title": "Review",

@@ -1,11 +1,12 @@
 'use client';
 
+import { builtinCatalog } from '@vocabx/content';
 import { LocalStorageRepo, MemoryStorage, type KeyValueStorage } from '@vocabx/data';
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
 const ReposContext = createContext<LocalStorageRepo | null>(null);
 
-function browserStorage(): KeyValueStorage {
+export function browserStorage(): KeyValueStorage {
   if (typeof window === 'undefined') return new MemoryStorage();
   try {
     // Accessing localStorage throws when storage is disabled (some private modes).
@@ -19,10 +20,10 @@ function browserStorage(): KeyValueStorage {
 
 function createRepo(): LocalStorageRepo {
   try {
-    return new LocalStorageRepo(browserStorage());
+    return new LocalStorageRepo(browserStorage(), { catalog: builtinCatalog() });
   } catch {
     // Data from a newer app version: run on an empty in-memory store instead of corrupting it.
-    return new LocalStorageRepo(new MemoryStorage());
+    return new LocalStorageRepo(new MemoryStorage(), { catalog: builtinCatalog() });
   }
 }
 

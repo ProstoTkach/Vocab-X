@@ -5,6 +5,7 @@ import { useLayoutEffect, type ReactNode } from 'react';
 import { ToastProvider } from '@/components/ui/toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { restoreRootAttributes } from '@/lib/boot-script';
+import { ClockProvider } from '@/lib/clock';
 import { ReposProvider } from '@/lib/repos';
 import { ThemeProvider } from '@/lib/theme';
 
@@ -15,11 +16,13 @@ export function Providers({ dir, children }: { dir: 'ltr' | 'rtl'; children: Rea
   return (
     <Direction.Provider dir={dir}>
       <ReposProvider>
-        <ThemeProvider>
-          <TooltipProvider delayDuration={300}>
-            <ToastProvider>{children}</ToastProvider>
-          </TooltipProvider>
-        </ThemeProvider>
+        <ClockProvider>
+          <ThemeProvider>
+            <TooltipProvider delayDuration={300}>
+              <ToastProvider>{children}</ToastProvider>
+            </TooltipProvider>
+          </ThemeProvider>
+        </ClockProvider>
       </ReposProvider>
     </Direction.Provider>
   );

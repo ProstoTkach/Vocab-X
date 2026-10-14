@@ -1,11 +1,14 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { seedOnboarded } from './fixtures';
 
 const ROUTES = ['/uk', '/uk/review', '/uk/decks', '/uk/league', '/uk/profile', '/uk/settings'];
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) < 768;
 
 /** The navigation landmark for this viewport: bottom bar on phones, sidebar on desktop. */
 const mainNav = (page: Page) => page.getByRole('navigation', { name: 'Основна навігація' });
+
+test.beforeEach(({ page }) => seedOnboarded(page));
 
 test('shows the layout for the viewport', async ({ page }) => {
   await page.goto('/uk');

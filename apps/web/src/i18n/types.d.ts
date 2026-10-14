@@ -1,10 +1,12 @@
 // Message keys are type-checked against the default (Ukrainian) locale.
 import type aside from '../../messages/uk/aside.json';
 import type common from '../../messages/uk/common.json';
+import type data from '../../messages/uk/data.json';
 import type devui from '../../messages/uk/devui.json';
 import type languages from '../../messages/uk/languages.json';
 import type meta from '../../messages/uk/meta.json';
 import type nav from '../../messages/uk/nav.json';
+import type onboarding from '../../messages/uk/onboarding.json';
 import type pages from '../../messages/uk/pages.json';
 import type settings from '../../messages/uk/settings.json';
 import type themes from '../../messages/uk/themes.json';
@@ -16,10 +18,12 @@ declare module 'next-intl' {
     Messages: {
       aside: typeof aside;
       common: typeof common;
+      data: typeof data;
       devui: typeof devui;
       languages: typeof languages;
       meta: typeof meta;
       nav: typeof nav;
+      onboarding: typeof onboarding;
       pages: typeof pages;
       settings: typeof settings;
       themes: typeof themes;

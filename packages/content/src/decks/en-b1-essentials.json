@@ -1,0 +1,347 @@
+{
+  "id": "builtin:en-b1-essentials",
+  "lang": "en",
+  "cefr": "B1",
+  "title": "English B1: essentials",
+  "titleI18n": {
+    "uk": "Англійська B1: основне",
+    "en": "English B1: essentials"
+  },
+  "descriptionI18n": {
+    "uk": "30 поширених слів рівня B1 для щоденного спілкування, роботи й подорожей.",
+    "en": "30 common B1 words for everyday talk, work and travel."
+  },
+  "words": [
+    {
+      "term": "achieve",
+      "pos": "verb",
+      "translations": { "uk": ["досягати", "досягти"] },
+      "examples": [
+        {
+          "text": "She worked hard to achieve her goals.",
+          "translations": { "uk": "Вона багато працювала, щоб досягти своїх цілей." }
+        }
+      ]
+    },
+    {
+      "term": "advice",
+      "pos": "noun",
+      "translations": { "uk": ["порада", "поради"] },
+      "examples": [
+        {
+          "text": "Can you give me some advice about learning English?",
+          "translations": { "uk": "Можеш дати мені пораду щодо вивчення англійської?" }
+        }
+      ]
+    },
+    {
+      "term": "device",
+      "pos": "noun",
+      "translations": { "uk": ["пристрій"] },
+      "examples": [
+        {
+          "text": "Please switch off all electronic devices.",
+          "translations": { "uk": "Будь ласка, вимкніть усі електронні пристрої." }
+        }
+      ]
+    },
+    {
+      "term": "afford",
+      "pos": "verb",
+      "translations": { "uk": ["дозволити собі", "мати змогу (заплатити)"] },
+      "examples": [
+        {
+          "text": "We can't afford a new car this year.",
+          "translations": { "uk": "Цього року ми не можемо дозволити собі нову машину." }
+        }
+      ]
+    },
+    {
+      "term": "appointment",
+      "pos": "noun",
+      "translations": { "uk": ["запис (на прийом)", "зустріч"] },
+      "examples": [
+        {
+          "text": "I have a dentist appointment at ten.",
+          "translations": { "uk": "У мене запис до стоматолога на десяту." }
+        }
+      ]
+    },
+    {
+      "term": "attempt",
+      "pos": "noun",
+      "translations": { "uk": ["спроба"] },
+      "examples": [
+        {
+          "text": "He passed the exam at his second attempt.",
+          "translations": { "uk": "Він склав іспит з другої спроби." }
+        }
+      ]
+    },
+    {
+      "term": "available",
+      "pos": "adjective",
+      "translations": { "uk": ["доступний", "наявний", "вільний"] },
+      "examples": [
+        {
+          "text": "Is this room available for tonight?",
+          "translations": { "uk": "Цей номер вільний на сьогоднішню ніч?" }
+        }
+      ]
+    },
+    {
+      "term": "avoid",
+      "pos": "verb",
+      "translations": { "uk": ["уникати"] },
+      "examples": [
+        {
+          "text": "Try to avoid driving in the rush hour.",
+          "translations": { "uk": "Намагайся не їздити в годину пік." }
+        }
+      ]
+    },
+    {
+      "term": "behaviour",
+      "pos": "noun",
+      "variants": ["behavior"],
+      "translations": { "uk": ["поведінка"] },
+      "examples": [
+        {
+          "text": "The teacher was pleased with the children's behaviour.",
+          "translations": { "uk": "Учителька була задоволена поведінкою дітей." }
+        }
+      ]
+    },
+    {
+      "term": "complain",
+      "pos": "verb",
+      "translations": { "uk": ["скаржитися"] },
+      "examples": [
+        {
+          "text": "The guests complained about the noise.",
+          "translations": { "uk": "Гості скаржилися на шум." }
+        }
+      ]
+    },
+    {
+      "term": "confident",
+      "pos": "adjective",
+      "translations": { "uk": ["впевнений"] },
+      "examples": [
+        {
+          "text": "I feel more confident when I speak slowly.",
+          "translations": { "uk": "Я почуваюся впевненіше, коли говорю повільно." }
+        }
+      ]
+    },
+    {
+      "term": "decision",
+      "pos": "noun",
+      "translations": { "uk": ["рішення"] },
+      "examples": [
+        {
+          "text": "Moving to another city was a difficult decision.",
+          "translations": { "uk": "Переїзд до іншого міста був складним рішенням." }
+        }
+      ]
+    },
+    {
+      "term": "deliver",
+      "pos": "verb",
+      "translations": { "uk": ["доставляти", "доставити"] },
+      "examples": [
+        {
+          "text": "The parcel will be delivered tomorrow morning.",
+          "translations": { "uk": "Посилку доставлять завтра вранці." }
+        }
+      ]
+    },
+    {
+      "term": "environment",
+      "pos": "noun",
+      "translations": { "uk": ["довкілля", "середовище"] },
+      "examples": [
+        {
+          "text": "We should do more to protect the environment.",
+          "translations": { "uk": "Нам слід робити більше, щоб захищати довкілля." }
+        }
+      ]
+    },
+    {
+      "term": "especially",
+      "pos": "adverb",
+      "translations": { "uk": ["особливо"] },
+      "examples": [
+        {
+          "text": "I love this city, especially in spring.",
+          "translations": { "uk": "Я люблю це місто, особливо навесні." }
+        }
+      ]
+    },
+    {
+      "term": "experience",
+      "pos": "noun",
+      "translations": { "uk": ["досвід", "враження"] },
+      "examples": [
+        {
+          "text": "Do you have any experience of working with children?",
+          "translations": { "uk": "Чи маєте ви досвід роботи з дітьми?" }
+        }
+      ]
+    },
+    {
+      "term": "improve",
+      "pos": "verb",
+      "translations": { "uk": ["покращувати", "покращуватися"] },
+      "examples": [
+        {
+          "text": "Reading every day will improve your vocabulary.",
+          "translations": { "uk": "Щоденне читання покращить твій словниковий запас." }
+        }
+      ]
+    },
+    {
+      "term": "journey",
+      "pos": "noun",
+      "translations": { "uk": ["подорож", "поїздка"] },
+      "examples": [
+        {
+          "text": "The journey from Kyiv to Lviv takes about five hours by train.",
+          "translations": { "uk": "Поїздка з Києва до Львова потягом триває близько п'яти годин." }
+        }
+      ]
+    },
+    {
+      "term": "knowledge",
+      "pos": "noun",
+      "translations": { "uk": ["знання"] },
+      "examples": [
+        {
+          "text": "Her knowledge of history is impressive.",
+          "translations": { "uk": "Її знання історії вражають." }
+        }
+      ]
+    },
+    {
+      "term": "likely",
+      "pos": "adjective",
+      "translations": { "uk": ["імовірний", "ймовірно"] },
+      "examples": [
+        {
+          "text": "It's likely to rain this afternoon.",
+          "translations": { "uk": "Сьогодні вдень, імовірно, буде дощ." }
+        }
+      ]
+    },
+    {
+      "term": "manage",
+      "pos": "verb",
+      "translations": { "uk": ["впоратися", "керувати"] },
+      "examples": [
+        {
+          "text": "Did you manage to find the hotel?",
+          "translations": { "uk": "Тобі вдалося знайти готель?" }
+        }
+      ]
+    },
+    {
+      "term": "opportunity",
+      "pos": "noun",
+      "translations": { "uk": ["можливість", "нагода"] },
+      "examples": [
+        {
+          "text": "This job is a great opportunity to travel.",
+          "translations": { "uk": "Ця робота — чудова можливість подорожувати." }
+        }
+      ]
+    },
+    {
+      "term": "prefer",
+      "pos": "verb",
+      "translations": { "uk": ["віддавати перевагу", "воліти"] },
+      "examples": [
+        {
+          "text": "I prefer tea to coffee.",
+          "translations": { "uk": "Я віддаю перевагу чаю, а не каві." }
+        }
+      ]
+    },
+    {
+      "term": "reduce",
+      "pos": "verb",
+      "translations": { "uk": ["зменшувати", "скорочувати"] },
+      "examples": [
+        {
+          "text": "Cycling to work helps reduce traffic.",
+          "translations": { "uk": "Поїздки на роботу велосипедом допомагають зменшити затори." }
+        }
+      ]
+    },
+    {
+      "term": "reliable",
+      "pos": "adjective",
+      "translations": { "uk": ["надійний"] },
+      "examples": [
+        {
+          "text": "We need a reliable internet connection.",
+          "translations": { "uk": "Нам потрібне надійне інтернет-з'єднання." }
+        }
+      ]
+    },
+    {
+      "term": "require",
+      "pos": "verb",
+      "translations": { "uk": ["вимагати", "потребувати"] },
+      "examples": [
+        {
+          "text": "This job requires good communication skills.",
+          "translations": { "uk": "Ця робота вимагає добрих комунікативних навичок." }
+        }
+      ]
+    },
+    {
+      "term": "suggest",
+      "pos": "verb",
+      "translations": { "uk": ["пропонувати", "радити"] },
+      "examples": [
+        {
+          "text": "I suggest we meet at the station.",
+          "translations": { "uk": "Пропоную зустрітися на вокзалі." }
+        }
+      ]
+    },
+    {
+      "term": "affect",
+      "pos": "verb",
+      "translations": { "uk": ["впливати", "вплинути"] },
+      "examples": [
+        {
+          "text": "The weather can affect your mood.",
+          "translations": { "uk": "Погода може впливати на твій настрій." }
+        }
+      ]
+    },
+    {
+      "term": "effect",
+      "pos": "noun",
+      "translations": { "uk": ["вплив", "наслідок", "ефект"] },
+      "examples": [
+        {
+          "text": "The new rules had a positive effect on sales.",
+          "translations": { "uk": "Нові правила мали позитивний вплив на продажі." }
+        }
+      ]
+    },
+    {
+      "term": "worried",
+      "pos": "adjective",
+      "translations": { "uk": ["стурбований", "занепокоєний"] },
+      "examples": [
+        {
+          "text": "Don't look so worried — everything will be fine.",
+          "translations": { "uk": "Не будь таким стурбованим — усе буде добре." }
+        }
+      ]
+    }
+  ]
+}

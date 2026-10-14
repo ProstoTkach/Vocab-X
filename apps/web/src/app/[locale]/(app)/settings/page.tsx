@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { PageHeader } from '@/components/page-header';
+import { DataSettings } from '@/components/settings/data-settings';
 import { LocalePicker } from '@/components/settings/locale-picker';
 import { ThemePicker } from '@/components/settings/theme-picker';
 import { Card, CardText, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SettingsPage() {
   const t = await getTranslations('settings');
   const pages = await getTranslations('pages');
+  const data = await getTranslations('data');
   return (
     <>
       <PageHeader title={pages('settings.title')} intro={pages('settings.intro')} />
@@ -26,6 +28,11 @@ export default async function SettingsPage() {
           <CardTitle id="settings-language">{t('language')}</CardTitle>
           <CardText className="mt-1 mb-4">{t('languageHint')}</CardText>
           <LocalePicker />
+        </Card>
+        <Card aria-labelledby="settings-data">
+          <CardTitle id="settings-data">{data('title')}</CardTitle>
+          <CardText className="mt-1 mb-4">{data('hint')}</CardText>
+          <DataSettings />
         </Card>
       </div>
     </>

@@ -88,6 +88,8 @@ export interface DataPort {
   /** Replaces all user data. Throws ImportError on invalid input. */
   importAll(data: unknown): Promise<void>;
   reset(): Promise<void>;
+  /** Approximate space used by user data, and the limit when the backend has one. */
+  storageUsage(): Promise<{ usedBytes: number; quotaBytes: number | null }>;
 }
 
 export interface VocabXExport {
