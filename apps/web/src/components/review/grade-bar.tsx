@@ -19,6 +19,8 @@ const BUTTON_TONE: Record<Grade, string> = {
   3: 'border-success/40 text-success hover:bg-success hover:text-on-success',
   4: 'border-info/40 text-info hover:bg-info hover:text-on-info',
 };
+/** Colour of the swipe hint for each grade. */
+export const GRADE_SWIPE_TONE = { 1: 'danger', 2: 'warning', 3: 'success', 4: 'info' } as const;
 const ARROW = { left: '←', right: '→', up: '↑', down: '↓' } as const;
 
 export interface GradeBarProps {

@@ -53,13 +53,16 @@ export function OnboardingFlow() {
   const [nativeLang, setNativeLang] = useState<string>(initialNative);
   const [targets, setTargets] = useState<string[]>(() => [defaultTarget(initialNative)]);
   const [goal, setGoal] = useState<DailyGoalPreset>('regular');
-  const [excludedDecks, setExcludedDecks] = useState<string[]>([]);
+  /** Explicit choices; untouched decks fall back to the default (the first deck of a language). */
+  const [deckChoice, setDeckChoice] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
 
   const langName = (code: string) => tl(code as 'en');
   const targetOptions = learnableLanguages().filter((l) => l.code !== nativeLang);
   const decks = catalog.decks.filter((d) => targets.includes(d.lang));
-  const deckIds = decks.map((d) => d.id).filter((id) => !excludedDecks.includes(id));
+  const isStarter = (id: string) =>
+    decks.find((d) => d.lang === decks.find((x) => x.id === id)?.lang)?.id === id;
+  const deckIds = decks.map((d) => d.id).filter((id) => deckChoice[id] ?? isStarter(id));
   const checkIds = new Set(decks.filter((d) => deckIds.includes(d.id)).flatMap((d) => d.wordIds));
   const checkWords = catalog.words.filter((w) => checkIds.has(w.id)).slice(0, CHECK_SIZE);
 
@@ -232,11 +235,7 @@ export function OnboardingFlow() {
                   <CheckCard
                     key={d.id}
                     checked={deckIds.includes(d.id)}
-                    onCheckedChange={(on) =>
-                      setExcludedDecks((prev) =>
-                        on ? prev.filter((x) => x !== d.id) : [...prev, d.id],
-                      )
-                    }
+                    onCheckedChange={(on) => setDeckChoice((prev) => ({ ...prev, [d.id]: on }))}
                     label={d.titleI18n?.[locale] ?? d.title}
                     description={[
                       t('deckWords', { count: d.wordIds.length }),

@@ -50,6 +50,7 @@ function Format4Audio(p: FormatProps) {
           <Translations word={card.word} lang={nativeLang} />
           <ExampleBlock
             example={card.word.examples[0]}
+            term={card.word.term}
             wordLang={card.word.lang}
             nativeLang={nativeLang}
           />

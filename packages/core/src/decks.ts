@@ -1,7 +1,7 @@
 // Deck and word management. Decks are a secondary convenience: they decide which words take
 // part in the one big review deck (all active own decks) and allow reviewing a subset.
 import type { LangCode } from './language';
-import type { CardProgress, Deck, Example, Id, PartOfSpeech, Word } from './model';
+import type { CardProgress, Deck, Example, Id, PartOfSpeech, ReviewEvent, Word } from './model';
 import type { Repos } from './repos';
 
 interface Ctx {
@@ -188,4 +188,94 @@ export async function deckStats(
 /** Built-in decks already imported by the learner (to hide or mark them in the library). */
 export function importedBuiltinIds(own: readonly Deck[]): Set<Id> {
   return new Set(own.flatMap((d) => (d.builtinId ? [d.builtinId] : [])));
+}
+
+/**
+ * Adds words of a built-in deck to the learner's copy of it, creating the copy on first use.
+ * With all word ids this imports the whole deck; with a selection it builds a personal version.
+ */
+export async function addWordsFromBuiltin(
+  repos: DeckRepos,
+  builtin: Deck,
+  wordIds: readonly Id[],
+  uiLocale: LangCode,
+  ctx: Ctx,
+): Promise<Deck> {
+  const own = (await repos.decks.list({ includeArchived: true })).find(
+    (d) => d.origin === 'own' && d.builtinId === builtin.id,
+  );
+  // Keep the built-in study order for the chosen words.
+  const wanted = builtin.wordIds.filter((id) => wordIds.includes(id));
+  if (own) {
+    const merged = [...own.wordIds, ...wanted.filter((id) => !own.wordIds.includes(id))];
+    return updateDeck(repos, own, { wordIds: merged, archived: false }, ctx.now);
+  }
+  const deck: Deck = {
+    id: ctx.newId(),
+    title: builtin.titleI18n?.[uiLocale] ?? builtin.title,
+    ...(builtin.cefr ? { cefr: builtin.cefr } : {}),
+    lang: builtin.lang,
+    wordIds: wanted,
+    origin: 'own',
+    builtinId: builtin.id,
+    archived: false,
+    createdAt: ctx.now,
+    updatedAt: ctx.now,
+  };
+  await repos.decks.save(deck);
+  return deck;
+}
+
+/** The learner's default deck for a language ("My words"), created when first needed. */
+export async function ensurePersonalDeck(
+  repos: DeckRepos,
+  lang: LangCode,
+  title: string,
+  ctx: Ctx,
+): Promise<Deck> {
+  const existing = (await repos.decks.list({ lang, includeArchived: true })).find(
+    (d) => d.origin === 'own' && d.personal,
+  );
+  if (existing)
+    return existing.archived ? updateDeck(repos, existing, { archived: false }, ctx.now) : existing;
+  const deck: Deck = {
+    id: ctx.newId(),
+    title,
+    lang,
+    wordIds: [],
+    origin: 'own',
+    personal: true,
+    archived: false,
+    createdAt: ctx.now,
+    updatedAt: ctx.now,
+  };
+  await repos.decks.save(deck);
+  return deck;
+}
+
+export interface WordReviewStats {
+  correct: number;
+  wrong: number;
+  /** Correct answers in a row, counted back from the latest one. */
+  streak: number;
+  lastAt: number | null;
+}
+
+/** Answer history of one word from its review events (placement checks are not answers). */
+export function wordReviewStats(events: readonly ReviewEvent[]): WordReviewStats {
+  const answers = events.filter((e) => e.kind !== 'placement').sort((a, b) => a.at - b.at);
+  let streak = 0;
+  for (let i = answers.length - 1; i >= 0 && answers[i]!.grade >= 2; i--) streak++;
+  return {
+    correct: answers.filter((e) => e.grade >= 2).length,
+    wrong: answers.filter((e) => e.grade === 1).length,
+    streak,
+    lastAt: answers.at(-1)?.at ?? null,
+  };
+}
+
+/** How well a word is learned, 0…1: stability relative to the "mastered" threshold. */
+export function mastery(progress: CardProgress | null | undefined): number {
+  if (!progress) return 0;
+  return Math.min(1, progress.card.stability / MASTERED_STABILITY_DAYS);
 }

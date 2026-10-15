@@ -27,6 +27,7 @@ import {
   type Deck,
   type Profile,
   type Word,
+  type WordReviewStats,
   type WordStatus,
 } from '@vocabx/core';
 import { ArrowLeft, GripVertical, Pencil, Play, Plus, Search, Trash2 } from 'lucide-react';
@@ -43,6 +44,8 @@ import { cx } from '@/lib/cx';
 import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
 import { deckTitle } from './deck-list';
+import { useWordData } from '@/components/words/use-word-data';
+import { WordItem } from '@/components/words/word-item';
 import { WordFormDialog } from './word-form-dialog';
 
 const STATUS_TONE: Record<WordStatus, BadgeTone> = {
@@ -73,6 +76,7 @@ export function DeckDetail({ deckId }: { deckId: string }) {
   const [editing, setEditing] = useState<Word | 'new' | null>(null);
   const [removing, setRemoving] = useState<Word | null>(null);
   const reload = () => setVersion((v) => v + 1);
+  const wordData = useWordData(data && data !== 'missing' ? data.deck.lang : null, version);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -254,6 +258,8 @@ export function DeckDetail({ deckId }: { deckId: string }) {
                     word={w}
                     nativeLang={profile.nativeLang}
                     status={wordStatus(data.progress.get(w.id), now)}
+                    progress={data.progress.get(w.id)}
+                    stats={wordData?.stats.get(w.id)}
                     // Reordering a filtered list would be ambiguous.
                     sortable={!q}
                     onEdit={() => setEditing(w)}
@@ -309,6 +315,8 @@ function WordRow({
   word,
   nativeLang,
   status,
+  progress,
+  stats,
   sortable,
   onEdit,
   onRemove,
@@ -316,6 +324,8 @@ function WordRow({
   word: Word;
   nativeLang: string;
   status: WordStatus;
+  progress: CardProgress | undefined;
+  stats: WordReviewStats | undefined;
   sortable: boolean;
   onEdit: () => void;
   onRemove: () => void;
@@ -337,45 +347,51 @@ function WordRow({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cx(
-        'flex items-center gap-2 rounded-control border border-line/70 bg-surface p-2 pe-1 shadow-card',
-        isDragging && 'relative z-10 shadow-pop',
-      )}
+      className={cx(isDragging && 'relative z-10 [&>div]:shadow-pop')}
     >
-      {sortable && (
-        <button
-          ref={setActivatorNodeRef}
-          type="button"
-          aria-label={t('dragHandle', { word: word.term })}
-          className={cx(iconButton, 'cursor-grab touch-none active:cursor-grabbing')}
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical aria-hidden className="size-5" />
-        </button>
-      )}
-      <div className={cx('min-w-0 flex-1', !sortable && 'ps-2')}>
-        <p lang={word.lang} className="truncate font-semibold">
-          {word.term}
-        </p>
-        <p lang={nativeLang} className="truncate text-sm text-fg-muted">
-          {(word.translations[nativeLang] ?? []).join(', ')}
-        </p>
-      </div>
-      <Badge tone={STATUS_TONE[status]} className="hidden sm:inline-flex">
-        {t(`status.${status}`)}
-      </Badge>
-      <button type="button" onClick={onEdit} aria-label={t('editWord')} className={iconButton}>
-        <Pencil aria-hidden className="size-4" />
-      </button>
-      <button
-        type="button"
-        onClick={onRemove}
-        aria-label={t('removeWord')}
-        className={cx(iconButton, 'hover:text-danger')}
-      >
-        <Trash2 aria-hidden className="size-4" />
-      </button>
+      <WordItem
+        word={word}
+        nativeLang={nativeLang}
+        progress={progress}
+        stats={stats}
+        leading={
+          sortable && (
+            <button
+              ref={setActivatorNodeRef}
+              type="button"
+              aria-label={t('dragHandle', { word: word.term })}
+              className={cx(iconButton, 'cursor-grab touch-none active:cursor-grabbing')}
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical aria-hidden className="size-5" />
+            </button>
+          )
+        }
+        actions={
+          <>
+            <Badge tone={STATUS_TONE[status]} className="hidden sm:inline-flex">
+              {t(`status.${status}`)}
+            </Badge>
+            <button
+              type="button"
+              onClick={onEdit}
+              aria-label={t('editWord')}
+              className={iconButton}
+            >
+              <Pencil aria-hidden className="size-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onRemove}
+              aria-label={t('removeWord')}
+              className={cx(iconButton, 'hover:text-danger')}
+            >
+              <Trash2 aria-hidden className="size-4" />
+            </button>
+          </>
+        }
+      />
     </li>
   );
 }

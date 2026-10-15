@@ -1,0 +1,182 @@
+{
+  "id": "builtin:en-b2-advanced",
+  "lang": "en",
+  "cefr": "B2",
+  "title": "English B2: next level",
+  "titleI18n": {
+    "uk": "Англійська B2: новий рівень",
+    "en": "English B2: next level"
+  },
+  "descriptionI18n": {
+    "uk": "15 слів рівня B2 для роботи, навчання й переконливих розмов.",
+    "en": "15 B2 words for work, study and persuasive conversations."
+  },
+  "words": [
+    {
+      "term": "negotiate",
+      "pos": "verb",
+      "translations": { "uk": ["вести переговори", "домовлятися"] },
+      "examples": [
+        {
+          "text": "We need to negotiate a better price with the supplier.",
+          "translations": { "uk": "Нам треба домовитися з постачальником про кращу ціну." }
+        }
+      ]
+    },
+    {
+      "term": "consequence",
+      "pos": "noun",
+      "translations": { "uk": ["наслідок"] },
+      "examples": [
+        {
+          "text": "Every decision has its consequences.",
+          "translations": { "uk": "Кожне рішення має свої наслідки." }
+        }
+      ]
+    },
+    {
+      "term": "reluctant",
+      "pos": "adjective",
+      "translations": { "uk": ["неохочий", "який вагається"] },
+      "examples": [
+        {
+          "text": "She was reluctant to share her plans.",
+          "translations": { "uk": "Вона неохоче ділилася своїми планами." }
+        }
+      ]
+    },
+    {
+      "term": "significant",
+      "pos": "adjective",
+      "translations": { "uk": ["значний", "важливий"] },
+      "examples": [
+        {
+          "text": "There has been a significant increase in sales.",
+          "translations": { "uk": "Продажі значно зросли." }
+        }
+      ]
+    },
+    {
+      "term": "approach",
+      "pos": "noun",
+      "translations": { "uk": ["підхід"] },
+      "examples": [
+        {
+          "text": "We need a new approach to this problem.",
+          "translations": { "uk": "Нам потрібен новий підхід до цієї проблеми." }
+        }
+      ]
+    },
+    {
+      "term": "assume",
+      "pos": "verb",
+      "translations": { "uk": ["припускати", "вважати"] },
+      "examples": [
+        {
+          "text": "I assume you have already read the report.",
+          "translations": { "uk": "Припускаю, ти вже прочитав звіт." }
+        }
+      ]
+    },
+    {
+      "term": "sustainable",
+      "pos": "adjective",
+      "translations": { "uk": ["сталий", "екологічно збалансований"] },
+      "examples": [
+        {
+          "text": "The city is investing in sustainable transport.",
+          "translations": { "uk": "Місто інвестує в сталий транспорт." }
+        }
+      ]
+    },
+    {
+      "term": "emphasize",
+      "pos": "verb",
+      "variants": ["emphasise"],
+      "translations": { "uk": ["наголошувати", "підкреслювати"] },
+      "examples": [
+        {
+          "text": "The teacher emphasized the importance of practice.",
+          "translations": { "uk": "Вчителька наголосила на важливості практики." }
+        }
+      ]
+    },
+    {
+      "term": "inevitable",
+      "pos": "adjective",
+      "translations": { "uk": ["неминучий"] },
+      "examples": [
+        {
+          "text": "Some mistakes are inevitable when you learn something new.",
+          "translations": { "uk": "Деякі помилки неминучі, коли вчиш щось нове." }
+        }
+      ]
+    },
+    {
+      "term": "thorough",
+      "pos": "adjective",
+      "translations": { "uk": ["ретельний", "ґрунтовний"] },
+      "examples": [
+        {
+          "text": "The doctor gave me a thorough examination.",
+          "translations": { "uk": "Лікар провів ретельне обстеження." }
+        }
+      ]
+    },
+    {
+      "term": "comprehensive",
+      "pos": "adjective",
+      "translations": { "uk": ["всебічний", "вичерпний"] },
+      "examples": [
+        {
+          "text": "The guide gives a comprehensive overview of the city.",
+          "translations": { "uk": "Путівник дає вичерпний огляд міста." }
+        }
+      ]
+    },
+    {
+      "term": "acknowledge",
+      "pos": "verb",
+      "translations": { "uk": ["визнавати", "підтверджувати"] },
+      "examples": [
+        {
+          "text": "He acknowledged that he had made a mistake.",
+          "translations": { "uk": "Він визнав, що помилився." }
+        }
+      ]
+    },
+    {
+      "term": "fluctuate",
+      "pos": "verb",
+      "translations": { "uk": ["коливатися"] },
+      "examples": [
+        {
+          "text": "Prices fluctuate depending on the season.",
+          "translations": { "uk": "Ціни коливаються залежно від сезону." }
+        }
+      ]
+    },
+    {
+      "term": "ambiguous",
+      "pos": "adjective",
+      "translations": { "uk": ["неоднозначний", "двозначний"] },
+      "examples": [
+        {
+          "text": "The instructions were ambiguous, so we asked for help.",
+          "translations": { "uk": "Інструкції були неоднозначні, тож ми попросили допомоги." }
+        }
+      ]
+    },
+    {
+      "term": "persuade",
+      "pos": "verb",
+      "translations": { "uk": ["переконувати", "умовляти"] },
+      "examples": [
+        {
+          "text": "She persuaded me to join the course.",
+          "translations": { "uk": "Вона переконала мене записатися на курс." }
+        }
+      ]
+    }
+  ]
+}

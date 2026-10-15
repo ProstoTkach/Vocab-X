@@ -34,7 +34,7 @@ import { CardStage } from './card-stage';
 import { acceptedAnswers } from './formats/parts';
 import { formatOf, rendererFor } from './formats/registry';
 import type { TypedAnswer } from './formats/types';
-import { GradeBar } from './grade-bar';
+import { GRADE_NAME, GRADE_SWIPE_TONE, GradeBar } from './grade-bar';
 import { SessionAside } from './session-aside';
 import { SessionSummary } from './session-summary';
 import {
@@ -336,10 +336,18 @@ export function ReviewSession() {
                   side={side}
                   depth={session.queue.length - 1}
                   swipeEnabled={!busy && !(typing && !typed)}
-                  swipe={swipe}
                   exitDir={exitDir}
-                  onSwipe={(g, dir) => void grade(g, dir)}
-                  onFlip={flip}
+                  actionFor={(dir) => {
+                    const g = gradeForDirection(dir, swipe);
+                    return g
+                      ? { label: t(`grades.${GRADE_NAME[g]}`), tone: GRADE_SWIPE_TONE[g] }
+                      : null;
+                  }}
+                  onSwipe={(dir) => {
+                    const g = gradeForDirection(dir, swipe);
+                    if (g) void grade(g, dir);
+                  }}
+                  onTap={flip}
                 >
                   <renderer.Component
                     card={card}

@@ -53,6 +53,8 @@ export interface WordFormDialogProps {
   word: Word | null;
   wordLang: LangCode;
   nativeLang: LangCode;
+  /** Shown under the title, e.g. which deck the word goes to. */
+  hint?: string;
   onSubmit: (input: WordInput) => Promise<void>;
 }
 
@@ -63,6 +65,7 @@ export function WordFormDialog({
   word,
   wordLang,
   nativeLang,
+  hint,
   onSubmit,
 }: WordFormDialogProps) {
   const t = useTranslations('decks.form');
@@ -135,6 +138,7 @@ export function WordFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         title={word ? deckT('editWord') : deckT('addWord')}
+        {...(hint ? { description: hint } : {})}
         footer={
           <>
             <DialogClose asChild>

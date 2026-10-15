@@ -32,7 +32,7 @@ test('navigates between sections and marks the current one', async ({ page }) =>
   await page.goto('/uk');
   await mainNav(page).getByRole('link', { name: 'Колоди' }).click();
   await expect(page).toHaveURL(/\/uk\/decks$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Колоди' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Мої слова' })).toBeVisible();
   await expect(mainNav(page).getByRole('link', { name: 'Колоди' })).toHaveAttribute(
     'aria-current',
     'page',
@@ -91,7 +91,7 @@ test('the tab lights up on click, before the page arrives', async ({ page }) => 
   await expect(nav.getByRole('link', { name: 'Колоди' })).toHaveAttribute('aria-current', 'page', {
     timeout: 300,
   });
-  await expect(page.getByRole('heading', { level: 1, name: 'Колоди' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Мої слова' })).toBeVisible();
 });
 
 test('locked themes cannot be chosen', async ({ page }) => {

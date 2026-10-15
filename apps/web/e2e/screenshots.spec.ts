@@ -38,7 +38,21 @@ for (const vp of VIEWPORTS) {
 
     test('decks', async ({ page }) => {
       await onboard(page);
+      await page.goto('/uk/review');
+      await page.keyboard.press('3');
       await page.goto('/uk/decks');
+      await page.getByRole('button', { name: 'Подробиці про «achieve»' }).click();
+      await expect(page.getByText('До наступного повторення')).toBeVisible();
+      await page.screenshot({ path: `screenshots/words-${vp.name}.png` });
+      await page.goto('/uk/decks/library');
+      await expect(page.getByText('Уся колода додана')).toBeVisible();
+      await page.screenshot({ path: `screenshots/library-${vp.name}.png` });
+      await page.getByRole('listitem').filter({ hasText: 'B2' }).getByRole('link').click();
+      await page.getByRole('button', { name: 'Обрати слова' }).click();
+      await expect(page.getByTestId('picker-card')).toBeVisible();
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: `screenshots/picker-${vp.name}.png` });
+      await page.goto('/uk/decks/mine');
       await expect(page.getByRole('heading', { name: 'Уся колода' })).toBeVisible();
       await page.screenshot({ path: `screenshots/decks-${vp.name}.png`, fullPage: true });
       await page.getByRole('link', { name: 'Англійська B1: основне' }).click();

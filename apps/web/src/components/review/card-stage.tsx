@@ -1,6 +1,5 @@
 'use client';
 
-import type { Grade } from '@vocabx/core';
 import {
   AnimatePresence,
   motion,
@@ -9,17 +8,23 @@ import {
   useMotionValue,
   useTransform,
 } from 'motion/react';
-import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 import { cx } from '@/lib/cx';
-import { GRADE_NAME } from './grade-bar';
-import { directionFromDrag, gradeForDirection, type PhysicalDir, type SwipeOptions } from './swipe';
+import { directionFromDrag, type PhysicalDir } from './swipe';
 
-const OVERLAY: Record<Grade, string> = {
-  1: 'bg-danger/15 text-danger',
-  2: 'bg-warning/15 text-warning',
-  3: 'bg-success/15 text-success',
-  4: 'bg-info/15 text-info',
+export type SwipeTone = 'danger' | 'warning' | 'success' | 'info';
+
+/** What a swipe in one direction does: shown on the card while dragging. */
+export interface SwipeAction {
+  label: string;
+  tone: SwipeTone;
+}
+
+const OVERLAY: Record<SwipeTone, string> = {
+  danger: 'bg-danger/15 text-danger',
+  warning: 'bg-warning/15 text-warning',
+  success: 'bg-success/15 text-success',
+  info: 'bg-info/15 text-info',
 };
 const OFFSCREEN = 600;
 const exitFor = (dir: PhysicalDir | null) => ({
@@ -30,12 +35,15 @@ const exitFor = (dir: PhysicalDir | null) => ({
 
 interface CardProps {
   side: 'front' | 'back';
-  /** Swiping grades the card with any pointer (touch, pen or mouse), flipped or not. */
+  /** Swiping works with any pointer (touch, pen or mouse). */
   swipeEnabled: boolean;
-  swipe: SwipeOptions;
-  onSwipe: (grade: Grade, dir: PhysicalDir) => void;
-  /** Tap or click: flips the card (both ways, any number of times). */
-  onFlip: () => void;
+  /** The action for a direction, or null if that direction does nothing. */
+  actionFor: (dir: PhysicalDir) => SwipeAction | null;
+  onSwipe: (dir: PhysicalDir) => void;
+  /** Tap or click (e.g. flip the card). */
+  onTap?: () => void;
+  /** Test id of the top card. */
+  testId?: string;
   children: ReactNode;
 }
 
@@ -49,6 +57,7 @@ export interface CardStageProps extends CardProps {
 }
 
 /**
+ * A swipeable card on top of a visible deck. Used by the review session and the word picker.
  * The card area of the session. Its size comes from the layout, not from the content, so
  * switching formats or sides never shifts the page.
  */
@@ -79,16 +88,22 @@ export function CardStage({ cardKey, exitDir, depth, ...card }: CardStageProps) 
 }
 
 /**
- * One card with its own drag state. Gestures are enabled for touch and pen only; mouse and
- * keyboard users grade with buttons and shortcuts, which are always available too.
+ * One card with its own drag state. Buttons and keyboard shortcuts offer the same actions.
  */
-function SwipeCard({ side, swipeEnabled, swipe, onSwipe, onFlip, children }: CardProps) {
-  const t = useTranslations('review');
+function SwipeCard({
+  side,
+  swipeEnabled,
+  actionFor,
+  onSwipe,
+  onTap,
+  testId = 'review-card',
+  children,
+}: CardProps) {
   const controls = useDragControls();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-300, 300], [-8, 8]);
-  const [hint, setHint] = useState<Grade | null>(null);
+  const [hint, setHint] = useState<SwipeAction | null>(null);
   // The card flying out after a grade is decorative: hide it from assistive tech and queries.
   const present = useIsPresent();
 
@@ -114,25 +129,24 @@ function SwipeCard({ side, swipeEnabled, swipe, onSwipe, onFlip, children }: Car
       }}
       onDrag={(_, info) => {
         const dir = directionFromDrag(info.offset, { x: 0, y: 0 });
-        const g = dir ? gradeForDirection(dir, swipe) : null;
-        if (g !== hint) setHint(g);
+        const action = dir ? actionFor(dir) : null;
+        if (action?.label !== hint?.label) setHint(action);
       }}
       onDragEnd={(_, info) => {
         setHint(null);
         const dir = directionFromDrag(info.offset, info.velocity);
-        const g = dir ? gradeForDirection(dir, swipe) : null;
-        if (dir && g) onSwipe(g, dir);
+        if (dir && actionFor(dir)) onSwipe(dir);
       }}
       // onTap is recognized from pointer events (no movement): unlike click it is reliable right
       // after a swipe on touch screens, and it never fires at the end of a drag.
-      onTap={onFlip}
-      data-testid={present ? 'review-card' : undefined}
+      {...(onTap ? { onTap } : {})}
+      data-testid={present ? testId : undefined}
       aria-hidden={!present || undefined}
       inert={!present}
       data-side={side}
       className={cx(
         'absolute inset-0 flex flex-col overflow-hidden rounded-card border border-line/70 bg-surface surface-sheen shadow-pop select-none',
-        swipeEnabled ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer',
+        swipeEnabled ? 'cursor-grab active:cursor-grabbing' : onTap && 'cursor-pointer',
         // The leaving card may still overlap the new one; it must not swallow taps.
         !present && 'pointer-events-none',
       )}
@@ -164,10 +178,10 @@ function SwipeCard({ side, swipeEnabled, swipe, onSwipe, onFlip, children }: Car
           aria-hidden
           className={cx(
             'pointer-events-none absolute inset-0 flex items-start justify-center rounded-card pt-6 text-2xl font-bold',
-            OVERLAY[hint],
+            OVERLAY[hint.tone],
           )}
         >
-          {t(`grades.${GRADE_NAME[hint]}`)}
+          {hint.label}
         </div>
       )}
     </motion.div>

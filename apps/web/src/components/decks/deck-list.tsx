@@ -1,17 +1,9 @@
 'use client';
 
-import {
-  duplicateDeck,
-  importBuiltinDeck,
-  importedBuiltinIds,
-  updateDeck,
-  type Deck,
-  type DeckStats,
-} from '@vocabx/core';
+import { duplicateDeck, updateDeck, type Deck, type DeckStats } from '@vocabx/core';
 import {
   Archive,
   ArchiveRestore,
-  Check,
   Copy,
   FolderOpen,
   Layers,
@@ -24,11 +16,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonClass } from '@/components/ui/button';
-import { Card, CardText, CardTitle } from '@/components/ui/card';
+import { Card, CardText } from '@/components/ui/card';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { inputClass } from '@/components/ui/field';
 import { ActionMenu } from '@/components/ui/menu';
-import { useToast } from '@/components/ui/toast';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useClock } from '@/lib/clock';
 import { cx } from '@/lib/cx';
@@ -41,13 +32,11 @@ export const deckTitle = (d: Deck, locale: string) => d.titleI18n?.[locale] ?? d
 
 export function DeckList() {
   const t = useTranslations('decks');
-  const tl = useTranslations('languages');
   const common = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
   const repos = useRepos();
   const { clock } = useClock();
-  const toast = useToast();
   const { data, reload } = useDecks();
   const [query, setQuery] = useState('');
   const [showArchived, setShowArchived] = useState(false);
@@ -60,7 +49,6 @@ export function DeckList() {
   const matches = (d: Deck) => !q || deckTitle(d, locale).toLocaleLowerCase(locale).includes(q);
   const active = data.own.filter((d) => !d.archived && matches(d));
   const archived = data.own.filter((d) => d.archived && matches(d));
-  const imported = importedBuiltinIds(data.own);
   const totals = data.own
     .filter((d) => !d.archived)
     .reduce(
@@ -76,11 +64,6 @@ export function DeckList() {
     );
 
   const ctx = () => ({ now: clock.now(), newId });
-  const addBuiltin = async (d: Deck) => {
-    await importBuiltinDeck(repos, d, locale, ctx());
-    toast({ title: t('addedToast', { name: deckTitle(d, locale) }), tone: 'success' });
-    reload();
-  };
   const remove = async (d: Deck) => {
     await repos.decks.remove(d.id);
     setDeleting(null);
@@ -223,47 +206,6 @@ export function DeckList() {
             )}
           </div>
         )}
-      </section>
-
-      <section aria-labelledby="library" className="flex flex-col gap-4">
-        <div>
-          <h2 id="library" className="font-display text-title font-semibold">
-            {t('library')}
-          </h2>
-          <p className="mt-1 text-fg-muted">{t('libraryText')}</p>
-        </div>
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {data.builtin.map((d) => {
-            const has = imported.has(d.id);
-            return (
-              <li key={d.id}>
-                <Card className="flex h-full flex-col gap-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle as="h3">{deckTitle(d, locale)}</CardTitle>
-                    <Badge tone="neutral">
-                      {tl(d.lang as 'en')}
-                      {d.cefr ? ` · ${d.cefr}` : ''}
-                    </Badge>
-                  </div>
-                  <CardText className="flex-1">{d.descriptionI18n?.[locale]}</CardText>
-                  <Button
-                    variant={has ? 'ghost' : 'secondary'}
-                    disabled={has}
-                    onClick={() => void addBuiltin(d)}
-                    className="self-start"
-                  >
-                    {has ? (
-                      <Check aria-hidden className="size-4" />
-                    ) : (
-                      <Plus aria-hidden className="size-4" />
-                    )}
-                    {has ? t('added') : t('addToMine')}
-                  </Button>
-                </Card>
-              </li>
-            );
-          })}
-        </ul>
       </section>
 
       <CreateDeckDialog

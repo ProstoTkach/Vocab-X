@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { getLanguage, translationLanguages } from '../languages';
+import { highlightTerm } from '@vocabx/core';
 import { buildCatalog, DECK_FILES } from './index';
 
 const catalog = buildCatalog();
@@ -54,6 +55,15 @@ describe('built-in decks', () => {
       expect(w.translations.en?.length).toBeGreaterThan(0);
       expect(w.examples[0]?.translations?.en).toBeTruthy();
     }
+  });
+
+  test('every example highlights its word', () => {
+    for (const w of catalog.words)
+      for (const ex of w.examples)
+        expect(
+          highlightTerm(ex.text, w.term, w.lang).some((s) => s.match),
+          `${w.term}: ${ex.text}`,
+        ).toBe(true);
   });
 
   test('words shared between decks are stored once', () => {

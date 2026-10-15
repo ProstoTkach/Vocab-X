@@ -38,6 +38,7 @@ function Format2Recall(p: FormatProps) {
           </div>
           <ExampleBlock
             example={card.word.examples[0]}
+            term={card.word.term}
             wordLang={card.word.lang}
             nativeLang={nativeLang}
           />

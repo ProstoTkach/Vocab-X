@@ -54,6 +54,7 @@ export const deckSchema = z.object({
   wordIds: z.array(id).max(100_000),
   origin: z.enum(['own', 'builtin']),
   builtinId: id.optional(),
+  personal: z.boolean().optional(),
   archived: z.boolean(),
   createdAt: time,
   updatedAt: time,

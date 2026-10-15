@@ -6,6 +6,7 @@ import { Volume2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { HighlightedText } from '@/components/words/highlighted-text';
 import { cx } from '@/lib/cx';
 import type { FormatProps, TypedAnswer } from './types';
 
@@ -47,10 +48,13 @@ export function Translations({ word, lang }: { word: Word; lang: LangCode }) {
 
 export function ExampleBlock({
   example,
+  term,
   wordLang,
   nativeLang,
 }: {
   example: Example | undefined;
+  /** The studied word, highlighted wherever it appears in the sentence. */
+  term: string;
   wordLang: LangCode;
   nativeLang: LangCode;
 }) {
@@ -63,7 +67,7 @@ export function ExampleBlock({
         {t('example')}
       </figcaption>
       <p lang={wordLang} className="mt-1">
-        {example.text}
+        <HighlightedText text={example.text} term={term} lang={wordLang} />
       </p>
       {translation && (
         <p lang={nativeLang} className="mt-1 text-sm text-fg-muted">

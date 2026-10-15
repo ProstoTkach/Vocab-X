@@ -10,6 +10,7 @@ import type {
   Word,
 } from '@vocabx/core';
 import enB1Essentials from './en-b1-essentials.json';
+import enB2Advanced from './en-b2-advanced.json';
 import ukA2Essentials from './uk-a2-essentials.json';
 
 export interface DeckFileWord {
@@ -36,6 +37,7 @@ export interface DeckFile {
 
 export const DECK_FILES: readonly DeckFile[] = [
   enB1Essentials as DeckFile,
+  enB2Advanced as DeckFile,
   ukA2Essentials as DeckFile,
 ];
 

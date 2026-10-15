@@ -6,6 +6,7 @@ import type decks from '../../messages/uk/decks.json';
 import type dev from '../../messages/uk/dev.json';
 import type devui from '../../messages/uk/devui.json';
 import type languages from '../../messages/uk/languages.json';
+import type library from '../../messages/uk/library.json';
 import type meta from '../../messages/uk/meta.json';
 import type nav from '../../messages/uk/nav.json';
 import type onboarding from '../../messages/uk/onboarding.json';
@@ -13,6 +14,7 @@ import type pages from '../../messages/uk/pages.json';
 import type review from '../../messages/uk/review.json';
 import type settings from '../../messages/uk/settings.json';
 import type themes from '../../messages/uk/themes.json';
+import type words from '../../messages/uk/words.json';
 import type { Locale } from './locales';
 
 declare module 'next-intl' {
@@ -26,6 +28,7 @@ declare module 'next-intl' {
       dev: typeof dev;
       devui: typeof devui;
       languages: typeof languages;
+      library: typeof library;
       meta: typeof meta;
       nav: typeof nav;
       onboarding: typeof onboarding;
@@ -33,6 +36,7 @@ declare module 'next-intl' {
       review: typeof review;
       settings: typeof settings;
       themes: typeof themes;
+      words: typeof words;
     };
   }
 }

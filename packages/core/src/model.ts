@@ -62,6 +62,8 @@ export interface Deck {
   origin: 'own' | 'builtin';
   /** Set when an own deck was imported from a built-in one. */
   builtinId?: Id;
+  /** The learner's default deck for words added without choosing one (one per language). */
+  personal?: boolean;
   archived: boolean;
   createdAt: number;
   updatedAt: number;

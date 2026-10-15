@@ -6,6 +6,8 @@ import { ProgressAside } from './progress-aside';
 
 /** Sections that use the whole content area (the card must sit exactly in the middle). */
 const FULL_BLEED = ['/review'];
+/** The streak and daily-goal column is shown on the home page only. */
+const WITH_PROGRESS = ['/'];
 
 export function ShellContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -27,7 +29,7 @@ export function ShellContent({ children }: { children: ReactNode }) {
       >
         {children}
       </main>
-      <ProgressAside />
+      {WITH_PROGRESS.includes(pathname) && <ProgressAside />}
     </div>
   );
 }

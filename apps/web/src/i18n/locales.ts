@@ -39,5 +39,7 @@ export const NAMESPACES = [
   'review',
   'dev',
   'decks',
+  'words',
+  'library',
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];

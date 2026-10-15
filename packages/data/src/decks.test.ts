@@ -1,6 +1,10 @@
 import { builtinCatalog } from '@vocabx/content';
 import {
   addWord,
+  addWordsFromBuiltin,
+  ensurePersonalDeck,
+  mastery,
+  wordReviewStats,
   createDeck,
   DAY_MS,
   DEFAULT_SCHEDULER_PARAMS as params,
@@ -135,5 +139,69 @@ describe('deck management', () => {
     expect(wordStatus(p, NOW - 30 * DAY_MS)).toBe('learning');
     expect(wordStatus(null, NOW)).toBe('new');
     expect(importedBuiltinIds([own])).toEqual(new Set([B1.id]));
+  });
+
+  test('picking single words from a library deck builds a personal version', async () => {
+    const picked = await addWordsFromBuiltin(repo, B1, ['en:journey', 'en:achieve'], 'uk', ctx);
+    // Built-in order is kept, not the order of picking.
+    expect(picked).toMatchObject({
+      origin: 'own',
+      builtinId: B1.id,
+      wordIds: ['en:achieve', 'en:journey'],
+    });
+    const more = await addWordsFromBuiltin(repo, B1, ['en:journey', 'en:advice'], 'uk', ctx);
+    expect(more.id).toBe(picked.id);
+    expect(more.wordIds).toEqual(['en:achieve', 'en:journey', 'en:advice']);
+    expect((await repo.decks.list()).filter((d) => d.origin === 'own')).toHaveLength(1);
+    const all = await addWordsFromBuiltin(repo, B1, B1.wordIds, 'uk', ctx);
+    expect(new Set(all.wordIds)).toEqual(new Set(B1.wordIds));
+  });
+
+  test('the personal deck is created once per language', async () => {
+    const a = await ensurePersonalDeck(repo, 'en', 'Мої слова', ctx);
+    const b = await ensurePersonalDeck(repo, 'en', 'Мої слова', ctx);
+    expect(b.id).toBe(a.id);
+    expect(a).toMatchObject({ personal: true, title: 'Мої слова', lang: 'en' });
+    expect((await ensurePersonalDeck(repo, 'de', 'Meine Wörter', ctx)).id).not.toBe(a.id);
+  });
+
+  test('review stats and mastery', () => {
+    const e = (at: number, grade: 1 | 2 | 3 | 4, kind?: 'placement') => ({
+      id: String(at),
+      wordId: 'w',
+      at,
+      grade,
+      format: 'REC' as const,
+      responseMs: 1000,
+      wasNew: false,
+      retention: 0.9,
+      xp: 0,
+      ...(kind ? { kind } : {}),
+    });
+    expect(wordReviewStats([e(1, 4, 'placement'), e(2, 3), e(3, 1), e(4, 3), e(5, 2)])).toEqual({
+      correct: 3,
+      wrong: 1,
+      streak: 2,
+      lastAt: 5,
+    });
+    expect(wordReviewStats([])).toEqual({ correct: 0, wrong: 0, streak: 0, lastAt: null });
+    expect(mastery(null)).toBe(0);
+    const p = (stability: number) => ({
+      wordId: 'w',
+      lang: 'en',
+      dueAt: 0,
+      lastEventId: 'x',
+      card: {
+        stability,
+        difficulty: 5,
+        lastReviewAt: 0,
+        level: 1 as const,
+        levelStreak: 0,
+        lapses: 0,
+        reps: 1,
+      },
+    });
+    expect(mastery(p(15))).toBe(0.5);
+    expect(mastery(p(90))).toBe(1);
   });
 });

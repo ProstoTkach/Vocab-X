@@ -12,6 +12,7 @@ export * from './unload';
 export * from './language';
 export * from './grading';
 export * from './text/similarity';
+export * from './text/highlight';
 export * from './model';
 export * from './repos';
 export * from './providers';
