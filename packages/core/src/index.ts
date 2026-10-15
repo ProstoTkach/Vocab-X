@@ -22,3 +22,4 @@ export * from './schemas';
 export * from './onboarding';
 export * from './review';
 export * from './session';
+export * from './decks';

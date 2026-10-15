@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/page-header';
 import { DevToggle } from '@/components/dev/dev-toggle';
 import { DataSettings } from '@/components/settings/data-settings';
 import { LocalePicker } from '@/components/settings/locale-picker';
+import { StudySettingsForm } from '@/components/settings/study-settings';
 import { ThemePicker } from '@/components/settings/theme-picker';
 import { Card, CardText, CardTitle } from '@/components/ui/card';
 
@@ -18,8 +19,13 @@ export default async function SettingsPage() {
   const data = await getTranslations('data');
   return (
     <>
-      <PageHeader title={pages('settings.title')} intro={pages('settings.intro')} />
+      <PageHeader title={pages('settings.title')} />
       <div className="flex flex-col gap-6">
+        <Card aria-labelledby="settings-study">
+          <CardTitle id="settings-study">{t('study')}</CardTitle>
+          <CardText className="mt-1 mb-5">{t('studyHint')}</CardText>
+          <StudySettingsForm />
+        </Card>
         <Card aria-labelledby="settings-theme">
           <CardTitle id="settings-theme">{t('theme')}</CardTitle>
           <CardText className="mt-1 mb-4">{t('themeHint')}</CardText>

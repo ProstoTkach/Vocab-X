@@ -2,6 +2,7 @@
 import type aside from '../../messages/uk/aside.json';
 import type common from '../../messages/uk/common.json';
 import type data from '../../messages/uk/data.json';
+import type decks from '../../messages/uk/decks.json';
 import type dev from '../../messages/uk/dev.json';
 import type devui from '../../messages/uk/devui.json';
 import type languages from '../../messages/uk/languages.json';
@@ -21,6 +22,7 @@ declare module 'next-intl' {
       aside: typeof aside;
       common: typeof common;
       data: typeof data;
+      decks: typeof decks;
       dev: typeof dev;
       devui: typeof devui;
       languages: typeof languages;

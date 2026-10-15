@@ -44,12 +44,10 @@ export async function loadStudyStack(repos: StudyRepos, req: StackRequest): Prom
     repos.reviewLog.dailyStats(req.today, req.today),
   ]);
   const seen = new Map(progress.map((p) => [p.wordId, p]));
-  // With a deck filter, only that deck's words; otherwise every due card of the language
-  // (words may stay due after their deck was archived — they are still being learned).
-  const inScope = req.deckIds ? new Set(order) : null;
-  const dueProgress = progress.filter(
-    (p) => p.dueAt <= req.now && (!inScope || inScope.has(p.wordId)),
-  );
+  // The big deck is made of the words in active own decks (narrowed by a deck filter):
+  // archiving or deleting a deck pauses its words, including those already being learned.
+  const inScope = new Set(order);
+  const dueProgress = progress.filter((p) => p.dueAt <= req.now && inScope.has(p.wordId));
   const limits = remainingLimits(
     { maxReviews: req.settings.reviewsPerDay, maxNew: req.settings.newPerDay },
     { reviews: stats[0]?.reviews ?? 0, newCards: stats[0]?.newCards ?? 0 },

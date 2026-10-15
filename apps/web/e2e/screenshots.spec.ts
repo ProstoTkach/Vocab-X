@@ -36,6 +36,19 @@ for (const vp of VIEWPORTS) {
       await page.screenshot({ path: `screenshots/review-back-${vp.name}.png` });
     });
 
+    test('decks', async ({ page }) => {
+      await onboard(page);
+      await page.goto('/uk/decks');
+      await expect(page.getByRole('heading', { name: 'Уся колода' })).toBeVisible();
+      await page.screenshot({ path: `screenshots/decks-${vp.name}.png`, fullPage: true });
+      await page.getByRole('link', { name: 'Англійська B1: основне' }).click();
+      await expect(page.getByRole('heading', { name: 'Слова' })).toBeVisible();
+      await page.screenshot({ path: `screenshots/deck-${vp.name}.png` });
+      await page.goto('/uk/settings');
+      await expect(page.getByRole('slider')).toBeVisible();
+      await page.screenshot({ path: `screenshots/settings-study-${vp.name}.png`, fullPage: true });
+    });
+
     test('onboarding', async ({ page }) => {
       await page.goto('/uk/onboarding');
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

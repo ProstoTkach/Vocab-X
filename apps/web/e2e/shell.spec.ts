@@ -10,6 +10,14 @@ const mainNav = (page: Page) => page.getByRole('navigation', { name: 'Основ
 
 test.beforeEach(({ page }) => seedOnboarded(page));
 
+/** A click that lands before hydration is lost; retry until the theme is applied. */
+async function chooseTheme(page: Page, name: string, id: string) {
+  await expect(async () => {
+    await page.getByRole('radio', { name }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', id, { timeout: 1000 });
+  }).toPass();
+}
+
 test('shows the layout for the viewport', async ({ page }) => {
   await page.goto('/uk');
   await expect(page.getByRole('heading', { level: 1, name: 'Головна' })).toBeVisible();
@@ -48,7 +56,7 @@ test('applies the stored theme before hydration and keeps it after reload', asyn
     });
   });
   await page.goto('/uk/settings');
-  await page.getByRole('radio', { name: 'Океан' }).click();
+  await chooseTheme(page, 'Океан', 'ocean');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean');
 
   await page.reload();
@@ -62,7 +70,8 @@ test('applies the stored theme before hydration and keeps it after reload', asyn
 
 test('switching the language keeps the theme', async ({ page }) => {
   await page.goto('/uk/settings');
-  await page.getByRole('radio', { name: 'Океан' }).click();
+  await chooseTheme(page, 'Океан', 'ocean');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean');
   await page.getByRole('radio', { name: 'English' }).click();
   await expect(page).toHaveURL(/\/en\/settings$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();

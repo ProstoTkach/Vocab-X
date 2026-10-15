@@ -1,0 +1,191 @@
+// Deck and word management. Decks are a secondary convenience: they decide which words take
+// part in the one big review deck (all active own decks) and allow reviewing a subset.
+import type { LangCode } from './language';
+import type { CardProgress, Deck, Example, Id, PartOfSpeech, Word } from './model';
+import type { Repos } from './repos';
+
+interface Ctx {
+  now: number;
+  newId: () => string;
+}
+
+type DeckRepos = Pick<Repos, 'decks'>;
+
+export async function createDeck(
+  repos: DeckRepos,
+  input: { title: string; lang: LangCode },
+  ctx: Ctx,
+): Promise<Deck> {
+  const deck: Deck = {
+    id: ctx.newId(),
+    title: input.title.trim(),
+    lang: input.lang,
+    wordIds: [],
+    origin: 'own',
+    archived: false,
+    createdAt: ctx.now,
+    updatedAt: ctx.now,
+  };
+  await repos.decks.save(deck);
+  return deck;
+}
+
+export async function updateDeck(
+  repos: DeckRepos,
+  deck: Deck,
+  patch: Partial<Pick<Deck, 'title' | 'archived' | 'wordIds'>>,
+  now: number,
+): Promise<Deck> {
+  const next: Deck = { ...deck, ...patch, updatedAt: now };
+  await repos.decks.save(next);
+  return next;
+}
+
+/** A copy shares the words (and therefore their progress); only the list is duplicated. */
+export async function duplicateDeck(
+  repos: DeckRepos,
+  deck: Deck,
+  title: string,
+  ctx: Ctx,
+): Promise<Deck> {
+  const { builtinId: _builtin, titleI18n: _t, descriptionI18n: _d, ...rest } = deck;
+  const copy: Deck = {
+    ...rest,
+    id: ctx.newId(),
+    title,
+    origin: 'own',
+    archived: false,
+    wordIds: [...deck.wordIds],
+    createdAt: ctx.now,
+    updatedAt: ctx.now,
+  };
+  await repos.decks.save(copy);
+  return copy;
+}
+
+/** Moves the word at `from` to index `to` in the study order. */
+export function moveInOrder(ids: readonly Id[], from: number, to: number): Id[] {
+  const next = [...ids];
+  const [moved] = next.splice(from, 1);
+  if (moved === undefined) return next;
+  next.splice(Math.max(0, Math.min(next.length, to)), 0, moved);
+  return next;
+}
+
+export interface WordInput {
+  term: string;
+  translations: Partial<Record<LangCode, string[]>>;
+  pos?: PartOfSpeech;
+  examples?: Example[];
+  variants?: string[];
+}
+
+function cleanList(list: readonly string[] | undefined): string[] {
+  return [...new Set((list ?? []).map((s) => s.trim()).filter(Boolean))];
+}
+
+function buildWordFields(input: WordInput) {
+  const translations = Object.fromEntries(
+    Object.entries(input.translations)
+      .map(([lang, list]) => [lang, cleanList(list)] as const)
+      .filter(([, list]) => list.length > 0),
+  );
+  const variants = cleanList(input.variants);
+  return {
+    term: input.term.trim(),
+    lemma: input.term.trim().toLowerCase(),
+    translations,
+    examples: (input.examples ?? []).filter((e) => e.text.trim()),
+    ...(input.pos ? { pos: input.pos } : {}),
+    ...(variants.length ? { variants } : {}),
+  };
+}
+
+/** Creates a user word and appends it to the deck's study order. */
+export async function addWord(
+  repos: Pick<Repos, 'decks' | 'words'>,
+  deck: Deck,
+  input: WordInput,
+  ctx: Ctx,
+): Promise<{ deck: Deck; word: Word }> {
+  const word: Word = {
+    id: `${deck.lang}:u:${ctx.newId()}`,
+    lang: deck.lang,
+    ...buildWordFields(input),
+    source: 'manual',
+    createdAt: ctx.now,
+    updatedAt: ctx.now,
+  };
+  await repos.words.save(word);
+  const next = await updateDeck(repos, deck, { wordIds: [...deck.wordIds, word.id] }, ctx.now);
+  return { deck: next, word };
+}
+
+/** Edits a word; built-in words become a personal copy (copy-on-write in the repository). */
+export async function editWord(
+  repos: Pick<Repos, 'words'>,
+  word: Word,
+  input: WordInput,
+  now: number,
+): Promise<Word> {
+  const { pos: _pos, variants: _variants, ...base } = word;
+  const next: Word = { ...base, ...buildWordFields(input), updatedAt: now };
+  await repos.words.save(next);
+  return next;
+}
+
+/** Removes a word from one deck. The word and its progress stay (it may be in other decks). */
+export async function removeWordFromDeck(
+  repos: DeckRepos,
+  deck: Deck,
+  wordId: Id,
+  now: number,
+): Promise<Deck> {
+  return updateDeck(repos, deck, { wordIds: deck.wordIds.filter((id) => id !== wordId) }, now);
+}
+
+export type WordStatus = 'new' | 'due' | 'learning' | 'mastered';
+
+/** Stability (days) from which a word counts as mastered; matches the DB's generated status. */
+export const MASTERED_STABILITY_DAYS = 30;
+
+export function wordStatus(progress: CardProgress | undefined | null, now: number): WordStatus {
+  if (!progress) return 'new';
+  if (progress.dueAt <= now) return 'due';
+  return progress.card.stability >= MASTERED_STABILITY_DAYS ? 'mastered' : 'learning';
+}
+
+export interface DeckStats {
+  total: number;
+  fresh: number;
+  due: number;
+  learning: number;
+  mastered: number;
+}
+
+export async function deckStats(
+  repos: Pick<Repos, 'progress'>,
+  decks: readonly Deck[],
+  now: number,
+): Promise<Map<Id, DeckStats>> {
+  const langs = [...new Set(decks.map((d) => d.lang))];
+  const progress = new Map<Id, CardProgress>();
+  for (const lang of langs)
+    for (const p of await repos.progress.listByLang(lang)) progress.set(p.wordId, p);
+  return new Map(
+    decks.map((d) => {
+      const s: DeckStats = { total: d.wordIds.length, fresh: 0, due: 0, learning: 0, mastered: 0 };
+      for (const id of d.wordIds) {
+        const st = wordStatus(progress.get(id), now);
+        if (st === 'new') s.fresh++;
+        else s[st]++;
+      }
+      return [d.id, s];
+    }),
+  );
+}
+
+/** Built-in decks already imported by the learner (to hide or mark them in the library). */
+export function importedBuiltinIds(own: readonly Deck[]): Set<Id> {
+  return new Set(own.flatMap((d) => (d.builtinId ? [d.builtinId] : [])));
+}

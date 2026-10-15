@@ -1,12 +1,19 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { StubPage } from '@/components/stub-page';
+import { DeckList } from '@/components/decks/deck-list';
+import { PageHeader } from '@/components/page-header';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('pages');
-  return { title: t('decks.title') };
+  const t = await getTranslations('decks');
+  return { title: t('title') };
 }
 
-export default function Page() {
-  return <StubPage page="decks" stage="A5" />;
+export default async function DecksPage() {
+  const t = await getTranslations('decks');
+  return (
+    <>
+      <PageHeader title={t('title')} intro={t('intro')} />
+      <DeckList />
+    </>
+  );
 }
