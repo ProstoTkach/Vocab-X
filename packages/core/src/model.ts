@@ -105,8 +105,6 @@ export interface StudySettings {
 export interface AppSettings {
   themeId: string;
   study: StudySettings;
-  /** Desktop sidebar shows icons only. */
-  sidebarCollapsed: boolean;
   /** Demo/dev: offset applied to the clock, ms. */
   timeOffsetMs: number;
   /** Shows the developer panel (time travel for demos). */

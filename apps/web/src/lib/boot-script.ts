@@ -4,6 +4,7 @@
 // <html> (a locale switch clears its attributes). It reads localStorage directly because
 // it must be synchronous and repositories are not loaded yet.
 import { KEY_PREFIX } from '@vocabx/data';
+import { EXPANDED_SIDEBAR_ROUTES } from '@/components/shell/sidebar-config';
 import { SYSTEM_THEMES, THEMES } from '@/themes/registry';
 import { SYSTEM_THEME_ID } from '@/themes/types';
 
@@ -12,12 +13,14 @@ interface BootConfig {
   schemes: Record<string, string>;
   system: { light: string; dark: string };
   systemId: string;
+  /** Paths (without locale) where the sidebar starts expanded. */
+  expandedRoutes: readonly string[];
 }
 
 // Self-contained: serialized with toString(), so it must not reference outer scope.
 function boot(c: BootConfig) {
   const d = document.documentElement;
-  let s: { themeId?: string; sidebarCollapsed?: boolean } = {};
+  let s: { themeId?: string } = {};
   try {
     // eslint-disable-next-line no-restricted-globals -- runs before repositories exist
     s = JSON.parse(localStorage.getItem(c.key) ?? '{}') as typeof s;
@@ -35,7 +38,10 @@ function boot(c: BootConfig) {
   d.dataset.theme = id;
   d.dataset.themeChoice = choice;
   d.style.colorScheme = c.schemes[id] ?? 'light';
-  if (s.sidebarCollapsed) d.dataset.sidebar = 'collapsed';
+  // Sidebar: expanded only on the configured pages (path after the locale segment).
+  const path = '/' + location.pathname.split('/').slice(2).join('/');
+  if (c.expandedRoutes.includes(path)) delete d.dataset.sidebar;
+  else d.dataset.sidebar = 'collapsed';
 }
 
 interface GateConfig {
@@ -70,6 +76,7 @@ function config(): BootConfig {
     schemes: Object.fromEntries(THEMES.map((t) => [t.id, t.colorScheme])),
     system: SYSTEM_THEMES,
     systemId: SYSTEM_THEME_ID,
+    expandedRoutes: EXPANDED_SIDEBAR_ROUTES,
   };
 }
 

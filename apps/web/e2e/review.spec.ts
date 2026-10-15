@@ -124,9 +124,9 @@ test('desktop: swipes with the mouse', async ({ page, isMobile }) => {
   await expect(card(page)).toHaveAttribute('data-side', 'front');
   await expect(deckCount(page)).toHaveText('29 карток у колоді');
 
-  // Before the answer was seen, a drag does not grade.
-  await mouseSwipe(page, 240, 0);
-  await expect(deckCount(page)).toHaveText('29 карток у колоді');
+  // A card can be swiped away without flipping it.
+  await mouseSwipe(page, 240, 0); // → Good
+  await expect(deckCount(page)).toHaveText('28 карток у колоді');
 });
 
 test('mobile: tap to flip and swipe to grade', async ({ page, isMobile }) => {
@@ -150,6 +150,18 @@ test('mobile: tap to flip and swipe to grade', async ({ page, isMobile }) => {
 
   await page.getByRole('button', { name: /^Добре/ }).click();
   await expect(deckCount(page)).toHaveText('28 карток у колоді');
+
+  // Swiping without flipping first also grades.
+  await expect(card(page)).toHaveAttribute('data-side', 'front');
+  await touchSwipe(page, 220, 0); // → Good
+  await expect(deckCount(page)).toHaveText('27 карток у колоді');
+});
+
+test('keys grade without flipping', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'keyboard flow');
+  await expect(card(page)).toHaveAttribute('data-side', 'front');
+  await page.keyboard.press('4');
+  await expect(deckCount(page)).toHaveText('29 карток у колоді');
 });
 
 test('a review can be left halfway and continued later', async ({ page }) => {

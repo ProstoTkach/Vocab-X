@@ -30,7 +30,7 @@ const exitFor = (dir: PhysicalDir | null) => ({
 
 interface CardProps {
   side: 'front' | 'back';
-  /** Swiping grades once the answer has been revealed (with any pointer: touch, pen or mouse). */
+  /** Swiping grades the card with any pointer (touch, pen or mouse), flipped or not. */
   swipeEnabled: boolean;
   swipe: SwipeOptions;
   onSwipe: (grade: Grade, dir: PhysicalDir) => void;

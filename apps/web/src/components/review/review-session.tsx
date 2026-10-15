@@ -85,7 +85,7 @@ export function ReviewSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [side, setSide] = useState<'front' | 'back'>('front');
-  /** The answer was seen at least once: grading is available, flipping stays free. */
+  /** The answer was seen at least once: shows the grade buttons and gates auto-speech. */
   const [revealed, setRevealed] = useState(false);
   const [typed, setTyped] = useState<TypedAnswer | null>(null);
   const [exitDir, setExitDir] = useState<PhysicalDir | null>(null);
@@ -176,7 +176,8 @@ export function ReviewSession() {
   };
 
   const grade = async (g: Grade, dir?: PhysicalDir) => {
-    if (!card || !setup || !revealed || busy) return;
+    // A card can be graded (swiped away) without flipping it first.
+    if (!card || !setup || busy) return;
     setBusy(true);
     const now = clock.now();
     const outcome = await submitReview(repos, {
@@ -245,7 +246,6 @@ export function ReviewSession() {
         flip();
         return;
       }
-      if (!revealed) return;
       const dir = ARROW_DIRS[e.key];
       let g: Grade | null = dir ? gradeForDirection(dir, swipe) : null;
       if (/^[1-4]$/.test(e.key)) g = Number(e.key) as Grade;
@@ -335,7 +335,7 @@ export function ReviewSession() {
                   cardKey={`${card.id}:${session.reviewed}`}
                   side={side}
                   depth={session.queue.length - 1}
-                  swipeEnabled={revealed && !busy}
+                  swipeEnabled={!busy && !(typing && !typed)}
                   swipe={swipe}
                   exitDir={exitDir}
                   onSwipe={(g, dir) => void grade(g, dir)}

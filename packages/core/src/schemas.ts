@@ -87,7 +87,6 @@ export const studySettingsSchema = z.object({
 export const settingsPatchSchema = z.object({
   themeId: z.string().max(64).optional(),
   study: studySettingsSchema.partial().optional(),
-  sidebarCollapsed: z.boolean().optional(),
   timeOffsetMs: z.number().optional(),
   devTools: z.boolean().optional(),
 });

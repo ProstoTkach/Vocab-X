@@ -98,14 +98,27 @@ test('a locked theme from storage falls back to system', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-theme-choice', 'system');
 });
 
-test('sidebar collapse persists (desktop)', async ({ page }) => {
+test('sidebar: expanded on home, collapsed elsewhere, free space toggles it', async ({ page }) => {
   test.skip(isMobile(page), 'no sidebar on phones');
+  const html = page.locator('html');
   await page.goto('/uk');
+  await expect(html).not.toHaveAttribute('data-sidebar', 'collapsed');
+
+  // Other pages start collapsed, already on first paint.
+  await page.goto('/uk/decks');
+  await expect(html).toHaveAttribute('data-sidebar', 'collapsed');
+
+  // The free area of the sidebar is one big open/close button.
+  await page.getByRole('button', { name: 'Розгорнути панель' }).click();
+  await expect(html).not.toHaveAttribute('data-sidebar', 'collapsed');
   await page.getByRole('button', { name: 'Згорнути панель' }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-sidebar', 'collapsed');
-  await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-sidebar', 'collapsed');
-  await expect(page.getByRole('button', { name: 'Розгорнути панель' })).toBeVisible();
+  await expect(html).toHaveAttribute('data-sidebar', 'collapsed');
+
+  // Navigating returns to the page default.
+  await mainNav(page).getByRole('link', { name: 'Головна' }).click();
+  await expect(html).not.toHaveAttribute('data-sidebar', 'collapsed');
+  await mainNav(page).getByRole('link', { name: 'Рейтинг' }).click();
+  await expect(html).toHaveAttribute('data-sidebar', 'collapsed');
 });
 
 test('unknown paths show a localized 404', async ({ page }) => {
