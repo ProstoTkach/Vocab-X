@@ -18,6 +18,7 @@ const PAIRS: [ColorToken, ColorToken, number][] = [
   ['accent', 'bg', 4.5],
   ['on-accent', 'accent', 4.5],
   ['on-accent', 'accent-strong', 4.5],
+  ['on-accent', 'accent-2', 4.5],
   ['on-success', 'success', 4.5],
   ['on-warning', 'warning', 4.5],
   ['on-danger', 'danger', 4.5],

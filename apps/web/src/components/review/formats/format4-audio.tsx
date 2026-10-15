@@ -9,7 +9,6 @@ import {
   Term,
   Translations,
   TypedFeedback,
-  useAutoSpeak,
 } from './parts';
 import type { FormatProps, FormatRenderer } from './types';
 
@@ -18,7 +17,6 @@ function Format4Audio(p: FormatProps) {
   const { card, side, nativeLang } = p;
   const t = useTranslations('review');
   const voice = p.speech.canSpeak(p.speechLang);
-  useAutoSpeak(side === 'front', card.word.term, p);
   return (
     <div className="flex flex-col items-center gap-4 text-center">
       {side === 'front' && (
@@ -39,7 +37,7 @@ function Format4Audio(p: FormatProps) {
               <Translations word={card.word} lang={nativeLang} />
             </>
           )}
-          {p.typing && <AnswerInput lang={card.word.lang} onSubmit={p.onTypedSubmit} />}
+          {p.typing && !p.typed && <AnswerInput lang={card.word.lang} onSubmit={p.onTypedSubmit} />}
         </>
       )}
       {side === 'back' && (

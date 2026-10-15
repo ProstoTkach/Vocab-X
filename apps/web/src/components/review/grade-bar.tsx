@@ -12,6 +12,13 @@ export const GRADE_TONE: Record<Grade, string> = {
   3: 'bg-success text-on-success',
   4: 'bg-info text-on-info',
 };
+/** Buttons: tinted glass with the grade colour; solid on hover and when suggested. */
+const BUTTON_TONE: Record<Grade, string> = {
+  1: 'border-danger/40 text-danger hover:bg-danger hover:text-on-danger',
+  2: 'border-warning/40 text-warning hover:bg-warning hover:text-on-warning',
+  3: 'border-success/40 text-success hover:bg-success hover:text-on-success',
+  4: 'border-info/40 text-info hover:bg-info hover:text-on-info',
+};
 const ARROW = { left: '←', right: '→', up: '↑', down: '↓' } as const;
 
 export interface GradeBarProps {
@@ -50,8 +57,8 @@ export function GradeBar({
             aria-keyshortcuts={String(g)}
             className={cx(
               'flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-control px-1 py-2 font-semibold touch-manipulation',
-              'transition motion-fast active:scale-[0.97] disabled:opacity-60',
-              GRADE_TONE[g],
+              'glass border-2 shadow-card transition motion-fast active:scale-[0.97] disabled:opacity-60',
+              suggested === g ? GRADE_TONE[g] : BUTTON_TONE[g],
               suggested === g && 'ring-4 ring-focus ring-offset-2 ring-offset-bg',
             )}
           >

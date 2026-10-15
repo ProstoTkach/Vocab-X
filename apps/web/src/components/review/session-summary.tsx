@@ -36,9 +36,9 @@ export function SessionSummary({
         )}
       </span>
       <div>
-        <h1 id="summary-title" className="font-display text-display font-bold">
+        <h2 id="summary-title" className="font-display text-display font-bold">
           {empty ? t('empty') : t('summaryTitle')}
-        </h1>
+        </h2>
         <p className="mt-2 text-fg-muted">
           {empty ? t('emptyText') : t('summaryText', { count: session.total, minutes })}
         </p>

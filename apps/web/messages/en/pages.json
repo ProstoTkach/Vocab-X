@@ -3,10 +3,14 @@
     "title": "Home",
     "greeting": "Welcome to VocabX!",
     "intro": "Your stack for today.",
-    "continue": "Continue review ({count})",
-    "summary": "{fresh, plural, one {# new} other {# new}} · {due, plural, one {# review} other {# reviews}}",
     "empty": "All done for today! New cards arrive tomorrow.",
-    "learning": "Learning: {lang}"
+    "learning": "Learning: {lang}",
+    "deckLabel": "Your deck",
+    "cardsWaiting": "{count, plural, one {card is waiting for review} other {cards are waiting for review}}",
+    "breakdown": "{due} due · {fresh} new",
+    "start": "Review",
+    "deckEmpty": "The deck is empty — all reviewed",
+    "deckEmptyText": "Words come back as soon as it is time to review them."
   },
   "review": {
     "title": "Review",

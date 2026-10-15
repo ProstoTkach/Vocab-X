@@ -208,10 +208,7 @@ export function OnboardingFlow() {
                     key={g}
                     value={g}
                     label={t(`goal.${g}`)}
-                    description={t('goalDetails', {
-                      words: DAILY_GOAL_PRESETS[g].newPerDay,
-                      xp: DAILY_GOAL_PRESETS[g].dailyGoalXp,
-                    })}
+                    description={t('goalDetails', { xp: DAILY_GOAL_PRESETS[g].dailyGoalXp })}
                   />
                 ))}
               </RadioGroup.Root>

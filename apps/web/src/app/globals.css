@@ -21,11 +21,14 @@
   --text-title: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
   --text-title--line-height: 1.3;
 
-  --radius-control: 0.75rem;
-  --radius-card: 1.25rem;
+  --radius-control: 0.875rem;
+  --radius-card: 1.5rem;
 
-  --shadow-card: 0 1px 2px var(--vx-shadow), 0 4px 16px var(--vx-shadow);
-  --shadow-pop: 0 12px 40px var(--vx-shadow);
+  /* Layered, soft shadows: a tight contact shadow plus a wide ambient one. */
+  --shadow-card: 0 1px 2px var(--vx-shadow), 0 12px 32px -16px var(--vx-shadow);
+  --shadow-pop: 0 2px 6px var(--vx-shadow), 0 24px 60px -20px var(--vx-shadow);
+  /* Coloured glow under primary actions. */
+  --shadow-glow: 0 10px 28px -10px color-mix(in oklab, var(--vx-accent) 70%, transparent);
 
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(0.3, 0, 0, 1.2);
@@ -42,6 +45,7 @@
   --color-line-strong: var(--vx-line-strong);
   --color-accent: var(--vx-accent);
   --color-accent-strong: var(--vx-accent-strong);
+  --color-accent-2: var(--vx-accent-2);
   --color-on-accent: var(--vx-on-accent);
   --color-success: var(--vx-success);
   --color-on-success: var(--vx-on-success);
@@ -62,6 +66,9 @@
     --vx-motion-normal: 200ms;
     --vx-motion-slow: 320ms;
     --vx-motion-scale: 1;
+    /* Height of the phone chrome (top bar, bottom navigation); zero from md up. */
+    --vx-chrome-top: calc(3.5rem + env(safe-area-inset-top));
+    --vx-chrome-bottom: calc(4rem + env(safe-area-inset-bottom));
     /* Fallback glyphs for scripts the bundled fonts do not cover. */
     --vx-font-script: ui-sans-serif;
     -webkit-text-size-adjust: 100%;
@@ -81,6 +88,12 @@
   [data-script='Kore'] {
     --vx-font-script: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic';
   }
+  @media (width >= 48rem) {
+    :root {
+      --vx-chrome-top: 0px;
+      --vx-chrome-bottom: 0px;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     :root {
       --vx-motion-scale: 0;
@@ -88,9 +101,28 @@
   }
 
   body {
-    background-color: var(--color-bg);
+    /* Two faint washes of the brand hues over the theme background. */
+    background:
+      radial-gradient(
+        60rem 40rem at 0% -10%,
+        color-mix(in oklab, var(--vx-accent) 13%, transparent),
+        transparent 65%
+      ),
+      radial-gradient(
+        50rem 36rem at 100% 0%,
+        color-mix(in oklab, var(--vx-accent-2) 11%, transparent),
+        transparent 60%
+      ),
+      var(--vx-bg);
+    background-attachment: fixed;
     color: var(--color-fg);
     overscroll-behavior-y: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.015em;
   }
 
   :focus-visible {
@@ -112,6 +144,11 @@
   transition-timing-function: var(--ease-standard);
 }
 
+/* Exactly the visible area between the phone top bar and bottom navigation (full height on desktop). */
+@utility h-app {
+  height: calc(100dvh - var(--vx-chrome-top) - var(--vx-chrome-bottom));
+}
+
 /* Padding that keeps content clear of the mobile bottom bar and the home indicator. */
 @utility pb-bottom-nav {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom));
@@ -121,4 +158,29 @@
 }
 @utility pt-safe {
   padding-top: env(safe-area-inset-top);
+}
+
+/* Brand gradient for primary surfaces (buttons, hero, active navigation). */
+@utility bg-brand {
+  background-image: linear-gradient(135deg, var(--vx-accent), var(--vx-accent-2));
+}
+@utility text-brand {
+  background-image: linear-gradient(135deg, var(--vx-accent), var(--vx-accent-2));
+  background-clip: text;
+  color: transparent;
+}
+
+/* Frosted panels (navigation, top bars) that let the background washes show through. */
+@utility glass {
+  background-color: color-mix(in oklab, var(--vx-surface) 76%, transparent);
+  backdrop-filter: blur(18px) saturate(1.4);
+}
+
+/* Cards: a whisper of a top-down sheen on the surface colour. */
+@utility surface-sheen {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--vx-surface) 96%, var(--vx-accent)),
+    var(--vx-surface)
+  );
 }

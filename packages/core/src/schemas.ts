@@ -72,8 +72,8 @@ export const profileSchema = z.object({
 
 export const studySettingsSchema = z.object({
   retention: z.number().min(0.5).max(0.99),
-  newPerDay: z.number().int().min(0).max(1000),
-  reviewsPerDay: z.number().int().min(0).max(10_000),
+  newPerDay: z.number().int().min(0).max(1000).nullable(),
+  reviewsPerDay: z.number().int().min(0).max(10_000).nullable(),
   twoGrades: z.boolean(),
   typing: z.boolean(),
   autoSpeak: z.boolean(),

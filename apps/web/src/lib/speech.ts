@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export interface Speech {
   /** True when the device has a voice for the language (e.g. "en-US", falls back to "en"). */
@@ -33,21 +33,21 @@ export function useSpeech(): Speech {
     };
   }, []);
 
-  const canSpeak = useCallback((lang: string) => !!pickVoice(voices, lang), [voices]);
-
-  const speak = useCallback(
-    (text: string, lang: string) => {
-      const voice = pickVoice(voices, lang);
-      if (!voice) return;
-      speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.voice = voice;
-      u.lang = voice.lang;
-      u.rate = 0.95;
-      speechSynthesis.speak(u);
-    },
+  // One stable object per voice list: consumers can depend on it without re-running effects.
+  return useMemo<Speech>(
+    () => ({
+      canSpeak: (lang) => !!pickVoice(voices, lang),
+      speak: (text, lang) => {
+        const voice = pickVoice(voices, lang);
+        if (!voice) return;
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.voice = voice;
+        u.lang = voice.lang;
+        u.rate = 0.95;
+        speechSynthesis.speak(u);
+      },
+    }),
     [voices],
   );
-
-  return { canSpeak, speak };
 }

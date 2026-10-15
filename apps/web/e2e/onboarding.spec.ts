@@ -45,10 +45,10 @@ async function completeOnboarding(page: Page, { check }: { check: boolean }) {
 
 test('new learner goes through onboarding and lands on a ready stack', async ({ page }) => {
   await completeOnboarding(page, { check: true });
-  await expect(page.getByRole('heading', { name: 'Вивчаєте: Англійська' })).toBeVisible();
-  // "Regular" pace = 10 new words a day; the two known words are not among them.
-  await expect(page.getByText('10 нових · 0 повторень')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Продовжити повторення (10)' })).toBeVisible();
+  await expect(page.getByText('Вивчаєте: Англійська')).toBeVisible();
+  // No daily caps: the whole deck except the two known words.
+  await expect(page.getByRole('heading', { name: /^28 карток чекають/ })).toBeVisible();
+  await expect(page.getByText('0 до повторення · 28 нових')).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean');
 
   // Onboarding is not shown again.
@@ -72,8 +72,8 @@ test('an English speaker can learn Ukrainian', async ({ page }) => {
   );
   await page.getByRole('button', { name: 'Start learning' }).click();
   await expect(page).toHaveURL(/\/en$/);
-  await expect(page.getByRole('heading', { name: 'Learning: Ukrainian' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Continue review (10)' })).toBeVisible();
+  await expect(page.getByText('Learning: Ukrainian')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^30 cards are waiting/ })).toBeVisible();
 });
 
 test('export → reset → import restores the state', async ({ page }) => {
@@ -95,7 +95,7 @@ test('export → reset → import restores the state', async ({ page }) => {
   await page.getByTestId('import-file').setInputFiles(file);
   await page.getByRole('dialog').getByRole('button', { name: 'Імпортувати JSON' }).click();
   await expect(page).toHaveURL(/\/uk$/);
-  await expect(page.getByRole('link', { name: 'Продовжити повторення (10)' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^30 карток чекають/ })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean');
 });
 
@@ -113,5 +113,5 @@ test('a broken backup is rejected without touching data', async ({ page }) => {
   // Radix duplicates toast text for screen readers; the visible copy is the first one.
   await expect(page.getByText('Не вдалося імпортувати файл').first()).toBeVisible();
   await page.goto('/uk');
-  await expect(page.getByRole('link', { name: 'Продовжити повторення (10)' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^30 карток чекають/ })).toBeVisible();
 });

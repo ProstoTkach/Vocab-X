@@ -27,7 +27,7 @@ export function SessionAside({
   const t = useTranslations('review');
   const grades = swipe.twoGrades ? ([1, 3] as const) : ([1, 2, 3, 4] as const);
   return (
-    <aside className="hidden w-64 shrink-0 flex-col gap-6 py-6 lg:flex">
+    <aside className="hidden w-64 max-w-full flex-col gap-6 py-6 min-[90rem]:flex">
       <section>
         <h2 className="mb-3 text-sm font-semibold text-fg-muted">{t('hotkeys')}</h2>
         <dl className="flex flex-col gap-2 text-sm">

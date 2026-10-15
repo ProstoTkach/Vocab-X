@@ -2,7 +2,7 @@ import { Progress } from 'radix-ui';
 import { cx } from '@/lib/cx';
 
 const TONES = {
-  accent: 'bg-accent',
+  accent: 'bg-brand',
   success: 'bg-success',
   warning: 'bg-warning',
   danger: 'bg-danger',

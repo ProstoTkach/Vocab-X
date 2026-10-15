@@ -7,14 +7,14 @@ import type { Repos } from './repos';
 
 export type DailyGoalPreset = 'light' | 'regular' | 'intense';
 
-/** Daily pace presets offered during onboarding; fine-tuned later in settings. */
-export const DAILY_GOAL_PRESETS: Record<
-  DailyGoalPreset,
-  Pick<StudySettings, 'newPerDay' | 'dailyGoalXp'>
-> = {
-  light: { newPerDay: 5, dailyGoalXp: 20 },
-  regular: { newPerDay: 10, dailyGoalXp: 50 },
-  intense: { newPerDay: 20, dailyGoalXp: 100 },
+/**
+ * Daily goal presets offered during onboarding. They set a motivation target only: reviewing
+ * is never capped by default (see StudySettings.newPerDay).
+ */
+export const DAILY_GOAL_PRESETS: Record<DailyGoalPreset, Pick<StudySettings, 'dailyGoalXp'>> = {
+  light: { dailyGoalXp: 20 },
+  regular: { dailyGoalXp: 50 },
+  intense: { dailyGoalXp: 100 },
 };
 
 interface Ctx {

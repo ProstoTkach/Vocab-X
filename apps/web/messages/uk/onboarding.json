@@ -21,7 +21,7 @@
     "regular": "Звичайний",
     "intense": "Інтенсивний"
   },
-  "goalDetails": "{words, plural, one {# нове слово} few {# нові слова} many {# нових слів} other {# нового слова}} на день · {xp} XP",
+  "goalDetails": "Мета — {xp} XP на день",
   "themeLabel": "Тема",
   "decksTitle": "Стартові колоди",
   "decksHint": "Слова з обраних колод стануть вашими першими картками.",

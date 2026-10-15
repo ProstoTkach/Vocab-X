@@ -63,5 +63,10 @@
     "space": "Пробіл",
     "enter": "Enter",
     "undo": "Z"
-  }
+  },
+  "deckCount": "{count, plural, one {# картка в колоді} few {# картки в колоді} many {# карток у колоді} other {# картки в колоді}}",
+  "flipHint": "Торкніться картки, щоб перевернути",
+  "flipKeyHint": "Пробіл — перевернути",
+  "filtered": "Колода: {name}",
+  "allDecks": "Уся колода"
 }

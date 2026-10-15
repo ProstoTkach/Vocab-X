@@ -18,15 +18,21 @@ export interface StackRequest {
   today: string;
   settings: StudySettings;
   params: SchedulerParams;
+  /** Review only these decks (e.g. business vocabulary); all active decks when omitted. */
+  deckIds?: readonly Id[];
   stack?: Partial<StackParams>;
 }
 
 export type StudyRepos = Pick<Repos, 'decks' | 'words' | 'progress' | 'reviewLog'>;
 
 /** Word ids of the learner's active decks in study order, without duplicates. */
-export async function studyOrder(repos: StudyRepos, lang: LangCode): Promise<Id[]> {
+export async function studyOrder(
+  repos: StudyRepos,
+  lang: LangCode,
+  deckIds?: readonly Id[],
+): Promise<Id[]> {
   const decks = (await repos.decks.list({ lang }))
-    .filter((d) => d.origin === 'own')
+    .filter((d) => d.origin === 'own' && (!deckIds || deckIds.includes(d.id)))
     .sort((a, b) => a.createdAt - b.createdAt);
   return [...new Set(decks.flatMap((d) => d.wordIds))];
 }
@@ -34,11 +40,16 @@ export async function studyOrder(repos: StudyRepos, lang: LangCode): Promise<Id[
 export async function loadStudyStack(repos: StudyRepos, req: StackRequest): Promise<StudyCard[]> {
   const [progress, order, stats] = await Promise.all([
     repos.progress.listByLang(req.lang),
-    studyOrder(repos, req.lang),
+    studyOrder(repos, req.lang, req.deckIds),
     repos.reviewLog.dailyStats(req.today, req.today),
   ]);
   const seen = new Map(progress.map((p) => [p.wordId, p]));
-  const dueProgress = progress.filter((p) => p.dueAt <= req.now);
+  // With a deck filter, only that deck's words; otherwise every due card of the language
+  // (words may stay due after their deck was archived — they are still being learned).
+  const inScope = req.deckIds ? new Set(order) : null;
+  const dueProgress = progress.filter(
+    (p) => p.dueAt <= req.now && (!inScope || inScope.has(p.wordId)),
+  );
   const limits = remainingLimits(
     { maxReviews: req.settings.reviewsPerDay, maxNew: req.settings.newPerDay },
     { reviews: stats[0]?.reviews ?? 0, newCards: stats[0]?.newCards ?? 0 },

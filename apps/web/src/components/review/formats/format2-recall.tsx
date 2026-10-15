@@ -10,7 +10,6 @@ import {
   Translations,
   translationsOf,
   TypedFeedback,
-  useAutoSpeak,
 } from './parts';
 import type { FormatProps, FormatRenderer } from './types';
 
@@ -19,7 +18,6 @@ function Format2Recall(p: FormatProps) {
   const { card, side, nativeLang } = p;
   const tl = useTranslations('languages');
   const t = useTranslations('review');
-  useAutoSpeak(p.autoSpeak && side === 'back', card.word.term, p);
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <p className="text-sm text-fg-muted">
@@ -27,7 +25,7 @@ function Format2Recall(p: FormatProps) {
       </p>
       <Translations word={card.word} lang={nativeLang} />
       <PartOfSpeech word={card.word} />
-      {side === 'front' && p.typing && (
+      {side === 'front' && p.typing && !p.typed && (
         <AnswerInput lang={card.word.lang} onSubmit={p.onTypedSubmit} />
       )}
       {side === 'back' && (

@@ -16,6 +16,7 @@ export const dark: Theme = {
     'line-strong': '#6b7891',
     accent: '#8b87ff',
     'accent-strong': '#a5a1ff',
+    'accent-2': '#c08cff',
     'on-accent': '#0e1117',
     success: '#4ade80',
     'on-success': '#062b14',

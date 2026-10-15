@@ -48,7 +48,7 @@ export function ProgressAside() {
   return (
     <aside
       aria-label={t('label')}
-      className="sticky top-0 hidden h-dvh w-80 shrink-0 flex-col gap-4 overflow-y-auto border-s border-line p-6 lg:flex"
+      className="sticky top-0 hidden h-dvh w-80 shrink-0 flex-col gap-4 overflow-y-auto p-6 lg:flex"
     >
       <Card>
         <div className="flex items-center gap-3">
@@ -63,7 +63,7 @@ export function ProgressAside() {
       </Card>
       <Card>
         <div className="mb-3 flex items-center gap-3">
-          <span className="inline-flex size-11 items-center justify-center rounded-full bg-accent text-on-accent">
+          <span className="inline-flex size-11 items-center justify-center rounded-full bg-brand text-on-accent shadow-glow">
             <Target aria-hidden className="size-5" />
           </span>
           <div>

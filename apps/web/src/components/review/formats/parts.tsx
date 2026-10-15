@@ -87,6 +87,8 @@ export function SpeakButton({
       variant={size === 'big' ? 'primary' : 'ghost'}
       size="icon"
       aria-label={t('listen')}
+      // Pressing the button must neither flip nor start dragging the card around it.
+      onPointerDown={(e) => e.stopPropagation()}
       onClick={(e) => {
         e.stopPropagation();
         speech.speak(text, speechLang);
@@ -96,19 +98,6 @@ export function SpeakButton({
       <Volume2 aria-hidden className={size === 'big' ? 'size-9' : 'size-5'} />
     </Button>
   );
-}
-
-/** Speaks once when the given condition becomes true (e.g. on showing the answer). */
-export function useAutoSpeak(
-  when: boolean,
-  text: string,
-  p: Pick<FormatProps, 'speech' | 'speechLang'>,
-) {
-  const { speech, speechLang } = p;
-  const can = speech.canSpeak(speechLang);
-  useEffect(() => {
-    if (when && can) speech.speak(text, speechLang);
-  }, [when, can, text, speech, speechLang]);
 }
 
 export function NoVoiceNotice() {
@@ -136,6 +125,7 @@ export function AnswerInput({ onSubmit, lang }: { onSubmit: (v: string) => void;
   return (
     <form
       className="flex w-full max-w-sm gap-2"
+      onPointerDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
       onSubmit={(e) => {
         e.preventDefault();

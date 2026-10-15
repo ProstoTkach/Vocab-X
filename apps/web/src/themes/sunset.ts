@@ -17,6 +17,7 @@ export const sunset: Theme = {
     'line-strong': '#8a6a78',
     accent: '#ff8a5c',
     'accent-strong': '#ffa47f',
+    'accent-2': '#ff6f91',
     'on-accent': '#2a0f05',
     success: '#6fd39a',
     'on-success': '#0b2a18',

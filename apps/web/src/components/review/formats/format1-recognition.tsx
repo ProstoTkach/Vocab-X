@@ -1,12 +1,11 @@
 'use client';
 
-import { ExampleBlock, PartOfSpeech, SpeakButton, Term, Translations, useAutoSpeak } from './parts';
+import { ExampleBlock, PartOfSpeech, SpeakButton, Term, Translations } from './parts';
 import type { FormatProps, FormatRenderer } from './types';
 
 /** Level 1: see the word, recall its meaning. Always flip + self-grade. */
 function Format1Recognition(p: FormatProps) {
   const { card, side, nativeLang } = p;
-  useAutoSpeak(p.autoSpeak && side === 'back', card.word.term, p);
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <div className="flex items-center gap-2">

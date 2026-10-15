@@ -37,7 +37,7 @@ describe('completeOnboarding', () => {
     expect(await repo.profile.get()).toEqual(profile);
     const settings = await repo.settings.get();
     expect(settings.themeId).toBe('ocean');
-    expect(settings.study).toMatchObject({ newPerDay: 10, dailyGoalXp: 50 });
+    expect(settings.study).toMatchObject({ newPerDay: null, reviewsPerDay: null, dailyGoalXp: 50 });
 
     const own = (await repo.decks.list({ lang: 'en' })).filter((d) => d.origin === 'own');
     expect(own).toHaveLength(1);
@@ -51,7 +51,8 @@ describe('completeOnboarding', () => {
       settings: settings.study,
       params,
     });
-    expect(stack).toHaveLength(10);
+    // No daily caps: the whole deck except the two known words.
+    expect(stack).toHaveLength(28);
     expect(stack.map((c) => c.id)).not.toContain('en:achieve');
     expect(stack.every((c) => c.word.translations.uk?.length)).toBe(true);
   });

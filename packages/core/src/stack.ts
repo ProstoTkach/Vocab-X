@@ -24,9 +24,9 @@ export function priority(c: Candidate, now: number, w: readonly number[], beta: 
 export interface StackOptions {
   now: number;
   params: SchedulerParams;
-  /** N_rev: how many due cards to take. */
+  /** N_rev: how many due cards to take (Infinity = all). */
   maxReviews: number;
-  /** N_new: how many new cards to take. */
+  /** N_new: how many new cards to take (Infinity = all). */
   maxNew: number;
   stack?: Partial<StackParams>;
 }
@@ -44,8 +44,9 @@ export function buildStack<T extends Candidate>(
     .map((x) => x.c);
   const news = fresh.slice(0, o.maxNew);
 
-  // Interleave: one new card after every m = ⌈N_rev / N_new⌉ reviews.
-  const m = Math.max(1, Math.ceil(o.maxReviews / Math.max(1, o.maxNew)));
+  // Interleave: one new card after every m = ⌈N_rev / N_new⌉ reviews. Counted on the cards
+  // actually taken, so it also works without limits.
+  const m = Math.max(1, Math.ceil(rev.length / Math.max(1, news.length)));
   const seq: T[] = [];
   let ni = 0;
   for (let i = 0; i < rev.length; i++) {
@@ -81,17 +82,20 @@ export function buildStack<T extends Candidate>(
 }
 
 export interface DailyLimits {
-  maxReviews: number;
-  maxNew: number;
+  /** null = unlimited. */
+  maxReviews: number | null;
+  maxNew: number | null;
 }
 
-/** What is left of today's limits after the reviews already done. */
+/** What is left of today's limits after the reviews already done; Infinity when unlimited. */
 export function remainingLimits(
   limits: DailyLimits,
   doneToday: { reviews: number; newCards: number },
-): DailyLimits {
+): { maxReviews: number; maxNew: number } {
+  const left = (cap: number | null, used: number) =>
+    cap === null ? Infinity : Math.max(0, cap - used);
   return {
-    maxReviews: Math.max(0, limits.maxReviews - doneToday.reviews),
-    maxNew: Math.max(0, limits.maxNew - doneToday.newCards),
+    maxReviews: left(limits.maxReviews, doneToday.reviews),
+    maxNew: left(limits.maxNew, doneToday.newCards),
   };
 }

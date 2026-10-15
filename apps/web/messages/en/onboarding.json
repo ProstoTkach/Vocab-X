@@ -21,7 +21,7 @@
     "regular": "Regular",
     "intense": "Intense"
   },
-  "goalDetails": "{words, plural, one {# new word} other {# new words}} a day · {xp} XP",
+  "goalDetails": "Goal: {xp} XP a day",
   "themeLabel": "Theme",
   "decksTitle": "Starter decks",
   "decksHint": "Words from the selected decks become your first cards.",

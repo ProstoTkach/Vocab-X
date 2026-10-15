@@ -15,11 +15,9 @@ export interface FormatProps {
   /** Web Speech tag of the card's language. */
   speechLang: string;
   speech: Speech;
-  /** Speak the word automatically when the answer is shown. */
-  autoSpeak: boolean;
   /** The learner answers by typing (only for renderers that support it). */
   typing: boolean;
-  /** Set on the back side after a typed answer was checked. */
+  /** Set once a typed answer was checked (both sides may be shown again afterwards). */
   typed: TypedAnswer | null;
   /** Called with the typed text; the shell grades it. */
   onTypedSubmit: (input: string) => void;

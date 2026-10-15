@@ -13,7 +13,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label={t('main')}
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface pb-safe md:hidden"
+      className="glass fixed inset-x-0 bottom-0 z-30 border-t border-line/60 pb-safe md:hidden"
     >
       <ul className="mx-auto grid max-w-lg grid-cols-5">
         {PRIMARY_NAV.map((item) => {
@@ -25,14 +25,14 @@ export function BottomNav() {
                 onClick={() => navigateTo(item.href)}
                 aria-current={active ? 'page' : undefined}
                 className={cx(
-                  'flex min-h-16 flex-col items-center justify-center gap-1 px-0.5 text-[0.6875rem] leading-tight font-medium tracking-tight touch-manipulation',
+                  'flex h-16 flex-col items-center justify-center gap-1 px-0.5 text-[0.6875rem] leading-tight font-medium tracking-tight touch-manipulation',
                   'text-fg-muted transition-colors motion-fast aria-[current=page]:text-accent',
                 )}
               >
                 <span
                   className={cx(
                     'inline-flex h-7 w-12 items-center justify-center rounded-full transition-colors motion-fast',
-                    active && 'bg-accent text-on-accent',
+                    active && 'bg-brand text-on-accent shadow-glow',
                   )}
                 >
                   <item.icon aria-hidden className="size-5" />

@@ -10,6 +10,8 @@ export const COLOR_TOKENS = [
   'line-strong',
   'accent',
   'accent-strong',
+  /** Second brand hue for gradients (accent → accent-2); on-accent must read on both. */
+  'accent-2',
   'on-accent',
   'success',
   'on-success',

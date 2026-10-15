@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
 import { ReviewSession } from '@/components/review/review-session';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -8,5 +9,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function ReviewPage() {
-  return <ReviewSession />;
+  // The session reads ?deck= from the URL; a static page needs a Suspense boundary for that.
+  return (
+    <Suspense>
+      <ReviewSession />
+    </Suspense>
+  );
 }

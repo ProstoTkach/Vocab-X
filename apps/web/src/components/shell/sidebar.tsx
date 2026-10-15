@@ -15,7 +15,7 @@ import { useNavState } from './nav-state';
 const itemClass = cx(
   'flex min-h-11 items-center gap-3 rounded-control px-3 font-medium text-fg-muted',
   'transition-colors motion-fast hover:bg-surface-2 hover:text-fg',
-  'aria-[current=page]:bg-accent aria-[current=page]:text-on-accent',
+  'aria-[current=page]:bg-brand aria-[current=page]:text-on-accent aria-[current=page]:shadow-glow',
   'sidebar-collapsed:justify-center sidebar-collapsed:px-0',
 );
 const labelClass = 'truncate sidebar-collapsed:sr-only';
@@ -40,7 +40,7 @@ export function Sidebar() {
   return (
     <aside
       className={cx(
-        'sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-2 border-e border-line bg-surface p-3 md:flex',
+        'glass sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-2 border-e border-line/60 p-3 md:flex',
         'sidebar-collapsed:w-20 transition-[width] motion-normal',
       )}
     >

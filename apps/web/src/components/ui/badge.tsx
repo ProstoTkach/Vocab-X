@@ -3,7 +3,7 @@ import { cx } from '@/lib/cx';
 
 const TONES = {
   neutral: 'bg-surface-3 text-fg',
-  accent: 'bg-accent text-on-accent',
+  accent: 'bg-brand text-on-accent',
   success: 'bg-success text-on-success',
   warning: 'bg-warning text-on-warning',
   danger: 'bg-danger text-on-danger',

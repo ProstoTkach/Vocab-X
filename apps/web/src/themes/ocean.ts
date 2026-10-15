@@ -16,6 +16,7 @@ export const ocean: Theme = {
     'line-strong': '#6f95a3',
     accent: '#006d8f',
     'accent-strong': '#005a76',
+    'accent-2': '#1d4ed8',
     'on-accent': '#ffffff',
     success: '#127a49',
     'on-success': '#ffffff',

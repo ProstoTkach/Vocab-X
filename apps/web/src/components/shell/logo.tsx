@@ -13,7 +13,7 @@ export function Logo({ compact = false }: { compact?: boolean }) {
     >
       <span
         aria-hidden
-        className="inline-flex size-9 items-center justify-center rounded-xl bg-accent text-lg text-on-accent"
+        className="inline-flex size-9 items-center justify-center rounded-xl bg-brand text-lg text-on-accent shadow-glow"
       >
         {name.slice(0, 1)}
       </span>

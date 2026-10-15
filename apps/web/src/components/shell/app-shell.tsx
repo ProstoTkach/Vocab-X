@@ -5,7 +5,7 @@ import { DevRouteWarmup } from './dev-route-warmup';
 import { MobileTopBar } from './mobile-top-bar';
 import { NavStateProvider } from './nav-state';
 import { OnboardingGate } from './onboarding-gate';
-import { ProgressAside } from './progress-aside';
+import { ShellContent } from './shell-content';
 import { Sidebar } from './sidebar';
 
 /**
@@ -28,16 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <MobileTopBar />
-          <div className="flex min-w-0 flex-1">
-            <main
-              id="main"
-              tabIndex={-1}
-              className="mx-auto w-full max-w-3xl min-w-0 flex-1 px-4 py-6 pb-bottom-nav outline-none md:px-8 md:py-10 md:pb-10"
-            >
-              {children}
-            </main>
-            <ProgressAside />
-          </div>
+          <ShellContent>{children}</ShellContent>
         </div>
         <BottomNav />
       </div>

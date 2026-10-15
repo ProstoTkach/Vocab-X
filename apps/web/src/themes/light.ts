@@ -16,6 +16,7 @@ export const light: Theme = {
     'line-strong': '#868fa3',
     accent: '#4f46e5',
     'accent-strong': '#4338ca',
+    'accent-2': '#7c3aed',
     'on-accent': '#ffffff',
     success: '#15803d',
     'on-success': '#ffffff',

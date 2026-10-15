@@ -88,6 +88,44 @@ describe('loadStudyStack', () => {
     expect(new Set(st.map((c) => c.id))).toEqual(new Set(TERMS.slice(0, 5).map((t) => `en:${t}`)));
   });
 
+  test('без лімітів у стопці всі нові слова', async () => {
+    await repo.decks.save(ownDeck(catalog.decks[0]!.wordIds));
+    expect(await stack({ newPerDay: null, reviewsPerDay: null })).toHaveLength(TERMS.length);
+  });
+
+  test('фільтр за колодою: лише її слова, зокрема до повторення', async () => {
+    await repo.decks.save(ownDeck(['en:achieve', 'en:advice']));
+    await repo.decks.save(ownDeck(['en:journey', 'en:reduce'], { id: 'biz', createdAt: 2 }));
+    await markKnown(repo, [word('journey'), word('achieve')], {
+      now: NOW - 30 * DAY_MS,
+      retention: 0.9,
+      params,
+      newId,
+    });
+    const all = await loadStudyStack(repo, {
+      lang: 'en',
+      now: NOW,
+      today: TODAY,
+      settings: settings({ newPerDay: null }),
+      params,
+    });
+    expect(all.map((c) => c.id).sort()).toEqual([
+      'en:achieve',
+      'en:advice',
+      'en:journey',
+      'en:reduce',
+    ]);
+    const biz = await loadStudyStack(repo, {
+      lang: 'en',
+      now: NOW,
+      today: TODAY,
+      settings: settings({ newPerDay: null }),
+      params,
+      deckIds: ['biz'],
+    });
+    expect(biz.map((c) => c.id).sort()).toEqual(['en:journey', 'en:reduce']);
+  });
+
   test('архівні колоди та інші мови не потрапляють у стопку', async () => {
     await repo.decks.save(ownDeck(['en:achieve'], { archived: true }));
     await repo.decks.save(ownDeck(['es:hola'], { id: 'es', lang: 'es' }));

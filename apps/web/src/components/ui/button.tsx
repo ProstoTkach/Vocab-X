@@ -3,8 +3,8 @@ import type { ComponentProps } from 'react';
 import { cx } from '@/lib/cx';
 
 const VARIANTS = {
-  primary: 'bg-accent text-on-accent hover:bg-accent-strong shadow-card',
-  secondary: 'bg-surface-2 text-fg hover:bg-surface-3 border border-line',
+  primary: 'bg-brand text-on-accent shadow-glow hover:brightness-110',
+  secondary: 'glass text-fg border border-line hover:bg-surface-2',
   ghost: 'bg-transparent text-fg hover:bg-surface-2',
   danger: 'bg-danger text-on-danger hover:opacity-90',
 } as const;

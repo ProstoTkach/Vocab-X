@@ -63,8 +63,10 @@ describe('review flow', () => {
       reviews: 1,
       newCards: 1,
     });
-    // The new-card budget shrinks by one.
-    expect(await stackAt(T0 + 1000)).toHaveLength(settings.newPerDay - 1);
+    // The reviewed word leaves the deck until it is due again.
+    const after = await stackAt(T0 + 1000);
+    expect(after).toHaveLength(29);
+    expect(after.map((c) => c.id)).not.toContain(card!.id);
   });
 
   test('undo restores storage exactly', async () => {
@@ -106,9 +108,7 @@ describe('review flow', () => {
     expect(await stackAt(T0 + 60_000)).toHaveLength(0);
 
     // "Good" on a new card gives S₀ = w₂ ≈ 2.3 days → due in 2 days, not tomorrow.
-    const tomorrow = await stackAt(T0 + DAY_MS);
-    expect(tomorrow.filter((c) => !c.isNew)).toHaveLength(0);
-    expect(tomorrow.filter((c) => c.isNew)).toHaveLength(settings.newPerDay);
+    expect(await stackAt(T0 + DAY_MS)).toHaveLength(0);
     const inTwoDays = await stackAt(T0 + 2 * DAY_MS);
     expect(
       inTwoDays

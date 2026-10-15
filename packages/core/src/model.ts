@@ -84,8 +84,12 @@ export type SwipeLayout = 'default' | 'mirrored';
 export interface StudySettings {
   /** r_d, within RETENTION_RANGE. */
   retention: number;
-  newPerDay: number;
-  reviewsPerDay: number;
+  /**
+   * Optional daily caps; null = no limit (the default). The core idea is one big deck that can
+   * be reviewed until it is empty; caps are only for learners who want a fixed pace.
+   */
+  newPerDay: number | null;
+  reviewsPerDay: number | null;
   /** Only "Again" and "Good". */
   twoGrades: boolean;
   /** Type the word instead of flipping in recall formats. */

@@ -63,5 +63,10 @@
     "space": "Space",
     "enter": "Enter",
     "undo": "Z"
-  }
+  },
+  "deckCount": "{count, plural, one {# card in the deck} other {# cards in the deck}}",
+  "flipHint": "Tap the card to flip it",
+  "flipKeyHint": "Space — flip",
+  "filtered": "Deck: {name}",
+  "allDecks": "Whole deck"
 }

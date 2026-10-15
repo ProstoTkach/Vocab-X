@@ -5,8 +5,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   themeId: 'system',
   study: {
     retention: DEFAULT_RETENTION,
-    newPerDay: 10,
-    reviewsPerDay: 100,
+    newPerDay: null,
+    reviewsPerDay: null,
     twoGrades: false,
     typing: false,
     autoSpeak: true,

@@ -30,12 +30,12 @@ const exitFor = (dir: PhysicalDir | null) => ({
 
 interface CardProps {
   side: 'front' | 'back';
-  /** Swiping grades only after the answer is shown. */
+  /** Swiping grades once the answer has been revealed (with any pointer: touch, pen or mouse). */
   swipeEnabled: boolean;
   swipe: SwipeOptions;
   onSwipe: (grade: Grade, dir: PhysicalDir) => void;
-  /** Tap on the front side. */
-  onTap: () => void;
+  /** Tap or click: flips the card (both ways, any number of times). */
+  onFlip: () => void;
   children: ReactNode;
 }
 
@@ -44,15 +44,33 @@ export interface CardStageProps extends CardProps {
   cardKey: string;
   /** Direction the previous card left in, so the exit follows the gesture or the key. */
   exitDir: PhysicalDir | null;
+  /** Cards under the top one; drawn as a stack behind it (at most three layers). */
+  depth: number;
 }
 
 /**
  * The card area of the session. Its size comes from the layout, not from the content, so
  * switching formats or sides never shifts the page.
  */
-export function CardStage({ cardKey, exitDir, ...card }: CardStageProps) {
+export function CardStage({ cardKey, exitDir, depth, ...card }: CardStageProps) {
+  const layers = Math.min(3, Math.max(0, depth));
   return (
-    <div className="relative min-h-0 flex-1">
+    // Bottom margin leaves room for the deck peeking out under the card.
+    <div className="relative isolate mb-6 min-h-0 flex-1">
+      {Array.from({ length: layers }, (_, i) => (
+        <div
+          key={i}
+          aria-hidden
+          className="absolute inset-0 rounded-card border border-line/70 bg-surface shadow-card transition-transform motion-normal"
+          style={{
+            transform: `translateY(${(i + 1) * 9}px) scale(${1 - (i + 1) * 0.05})`,
+            opacity: 1 - (i + 1) * 0.22,
+            // Shrink toward the bottom edge so each layer peeks out below the one above.
+            transformOrigin: 'bottom center',
+            zIndex: -(i + 1),
+          }}
+        />
+      ))}
       <AnimatePresence initial={false} custom={exitDir} mode="popLayout">
         <SwipeCard key={cardKey} {...card} />
       </AnimatePresence>
@@ -64,7 +82,7 @@ export function CardStage({ cardKey, exitDir, ...card }: CardStageProps) {
  * One card with its own drag state. Gestures are enabled for touch and pen only; mouse and
  * keyboard users grade with buttons and shortcuts, which are always available too.
  */
-function SwipeCard({ side, swipeEnabled, swipe, onSwipe, onTap, children }: CardProps) {
+function SwipeCard({ side, swipeEnabled, swipe, onSwipe, onFlip, children }: CardProps) {
   const t = useTranslations('review');
   const controls = useDragControls();
   const x = useMotionValue(0);
@@ -91,8 +109,8 @@ function SwipeCard({ side, swipeEnabled, swipe, onSwipe, onTap, children }: Card
       dragElastic={0.6}
       style={{ x, y, rotate, touchAction: swipeEnabled ? 'none' : 'manipulation' }}
       onPointerDown={(e) => {
-        // A mouse drag must not grade a card by accident.
-        if (swipeEnabled && e.pointerType !== 'mouse') controls.start(e);
+        // Any pointer can swipe; a press without movement is still recognized as a tap below.
+        if (swipeEnabled) controls.start(e);
       }}
       onDrag={(_, info) => {
         const dir = directionFromDrag(info.offset, { x: 0, y: 0 });
@@ -107,20 +125,20 @@ function SwipeCard({ side, swipeEnabled, swipe, onSwipe, onTap, children }: Card
       }}
       // onTap is recognized from pointer events (no movement): unlike click it is reliable right
       // after a swipe on touch screens, and it never fires at the end of a drag.
-      onTap={() => {
-        if (side === 'front') onTap();
-      }}
+      onTap={onFlip}
       data-testid={present ? 'review-card' : undefined}
       aria-hidden={!present || undefined}
       inert={!present}
       data-side={side}
       className={cx(
-        'absolute inset-0 flex flex-col overflow-hidden rounded-card border border-line bg-surface shadow-card select-none',
-        side === 'front' && 'cursor-pointer',
+        'absolute inset-0 flex flex-col overflow-hidden rounded-card border border-line/70 bg-surface surface-sheen shadow-pop select-none',
+        swipeEnabled ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer',
         // The leaving card may still overlap the new one; it must not swallow taps.
         !present && 'pointer-events-none',
       )}
     >
+      {/* A hairline of the brand gradient along the top edge. */}
+      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-brand opacity-80" />
       <div
         className={cx(
           'flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto p-5 [@media(min-height:640px)]:p-8',
