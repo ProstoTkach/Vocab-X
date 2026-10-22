@@ -4,6 +4,12 @@
  */
 export const EXPANDED_SIDEBAR_ROUTES: readonly string[] = ['/'];
 
-export function sidebarExpandedByDefault(path: string): boolean {
-  return EXPANDED_SIDEBAR_ROUTES.includes(path === '' ? '/' : path);
+/** Below this window width the sidebar always starts collapsed, leaving room for the content. */
+export const SIDEBAR_AUTO_COLLAPSE_PX = 1200;
+
+export function sidebarExpandedByDefault(path: string, windowWidth = Infinity): boolean {
+  return (
+    windowWidth >= SIDEBAR_AUTO_COLLAPSE_PX &&
+    EXPANDED_SIDEBAR_ROUTES.includes(path === '' ? '/' : path)
+  );
 }

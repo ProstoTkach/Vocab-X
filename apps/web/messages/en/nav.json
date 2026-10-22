@@ -3,10 +3,11 @@
   "skipToContent": "Skip to content",
   "home": "Home",
   "review": "Review",
-  "decks": "Decks",
+  "decks": "My words",
   "league": "League",
   "profile": "Profile",
   "settings": "Settings",
+  "feedback": "Feedback",
   "collapse": "Collapse sidebar",
   "expand": "Expand sidebar"
 }

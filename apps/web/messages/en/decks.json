@@ -39,8 +39,6 @@
   "back": "All decks",
   "notFound": "Deck not found.",
   "words": "Words",
-  "orderHint": "Drag to change the order in which new words are learned.",
-  "dragHandle": "Drag “{word}”",
   "noWords": "This deck has no words yet.",
   "addWord": "Add word",
   "editWord": "Edit word",
@@ -72,5 +70,8 @@
     "required": "Enter the word and at least one translation."
   },
   "wordAdded": "Word “{word}” added",
-  "wordSaved": "Saved"
+  "wordSaved": "Saved",
+  "learningShare": "Words in learning",
+  "learningShareValue": "{learning} of {total} words in learning",
+  "wordReset": "“{word}” will come back more often"
 }

@@ -1,11 +1,11 @@
 import type { Theme } from './types';
 
-// A cosmetic theme: unlocked at level 3 to exercise the unlock mechanism.
+// A cosmetic theme and the top reward: opens at a high level.
 export const sunset: Theme = {
   id: 'sunset',
   nameKey: 'sunset',
   colorScheme: 'dark',
-  unlock: 'level:3',
+  unlock: 'level:8',
   colors: {
     bg: '#1a1016',
     surface: '#241820',

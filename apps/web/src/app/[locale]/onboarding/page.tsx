@@ -9,7 +9,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function OnboardingPage() {
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-4 pt-safe pb-safe md:py-10">
+    // Full height, nothing wider than the screen: a card swiped away in the level test must not
+    // widen the page.
+    <main className="flex h-dvh w-full flex-col overflow-x-clip pt-safe">
       <OnboardingFlow />
     </main>
   );

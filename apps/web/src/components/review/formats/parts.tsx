@@ -4,7 +4,7 @@
 import type { Example, LangCode, StudyCard, Word } from '@vocabx/core';
 import { Volume2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { HighlightedText } from '@/components/words/highlighted-text';
 import { cx } from '@/lib/cx';
@@ -21,9 +21,10 @@ export function Term({ word, size = 'xl' }: { word: Word; size?: 'xl' | 'lg' }) 
       lang={word.lang}
       className={cx(
         'font-display font-bold break-words text-balance',
+        // Smaller on phones, so a long word still fits on one line.
         size === 'xl'
-          ? 'text-[calc(2.5rem*var(--card-scale,1))]'
-          : 'text-[calc(1.75rem*var(--card-scale,1))]',
+          ? 'text-[calc(1.75rem*var(--card-scale,1))] sm:text-[calc(2.5rem*var(--card-scale,1))]'
+          : 'text-[calc(1.375rem*var(--card-scale,1))] sm:text-[calc(1.75rem*var(--card-scale,1))]',
       )}
     >
       {word.term}
@@ -31,18 +32,51 @@ export function Term({ word, size = 'xl' }: { word: Word; size?: 'xl' | 'lg' }) 
   );
 }
 
-export function PartOfSpeech({ word }: { word: Word }) {
-  const t = useTranslations('common');
-  if (!word.pos) return null;
-  return <p className="text-sm text-fg-muted">{t(`pos.${word.pos}`)}</p>;
-}
-
-export function Translations({ word, lang }: { word: Word; lang: LangCode }) {
+export function Translations({
+  word,
+  lang,
+  size = 'md',
+}: {
+  word: Word;
+  lang: LangCode;
+  /** xl: the answer in focus; lg: a prompt in focus; md: next to the word. */
+  size?: 'md' | 'lg' | 'xl';
+}) {
   const list = translationsOf(word, lang);
   return (
-    <p lang={lang} className="text-[calc(1.375rem*var(--card-scale,1))] font-semibold text-balance">
+    <p
+      lang={lang}
+      className={cx(
+        'break-words text-balance',
+        size === 'xl'
+          ? 'font-display text-[calc(1.75rem*var(--card-scale,1))] leading-tight font-bold sm:text-[calc(2.5rem*var(--card-scale,1))]'
+          : size === 'lg'
+            ? 'font-display text-[calc(1.5rem*var(--card-scale,1))] leading-tight font-bold sm:text-[calc(2rem*var(--card-scale,1))]'
+            : 'text-[calc(1.125rem*var(--card-scale,1))] font-semibold sm:text-[calc(1.375rem*var(--card-scale,1))]',
+      )}
+    >
       {list.join(', ')}
     </p>
+  );
+}
+
+/**
+ * The word exactly in the middle with the listen button at its side. The button sits in padding
+ * of the same width on both sides, so it never pushes the word off centre.
+ */
+export function SpokenTerm({
+  word,
+  size,
+  speechLang,
+  speech,
+}: Pick<FormatProps, 'speechLang' | 'speech'> & { word: Word; size?: 'xl' | 'lg' }) {
+  return (
+    <div className="relative max-w-full px-12">
+      <Term word={word} {...(size ? { size } : {})} />
+      <div className="absolute end-0 top-1/2 -translate-y-1/2">
+        <SpeakButton text={word.term} speechLang={speechLang} speech={speech} />
+      </div>
+    </div>
   );
 }
 
@@ -62,7 +96,7 @@ export function ExampleBlock({
   if (!example) return null;
   const translation = example.translations?.[nativeLang];
   return (
-    <figure className="mt-2 w-full max-w-md rounded-control bg-surface-2 px-4 py-3 text-start">
+    <figure className="w-full max-w-md rounded-control bg-surface-2 px-4 py-3 text-start">
       <figcaption className="text-xs font-semibold text-fg-muted uppercase">
         {t('example')}
       </figcaption>
@@ -75,6 +109,39 @@ export function ExampleBlock({
         </p>
       )}
     </figure>
+  );
+}
+
+/**
+ * Every card face: the thing to look at exactly in the middle of the card, a line above it
+ * (a prompt) and anything else below (a hint, the input, the example). The rows above and
+ * below take equal space, so the middle stays centred whatever else is on the card.
+ */
+export function CardLayout({
+  above,
+  children,
+  below,
+  belowAt = 'end',
+}: {
+  above?: ReactNode;
+  children: ReactNode;
+  below?: ReactNode;
+  /** 'end' pins it to the bottom edge (an example); 'start' keeps it close to the middle. */
+  belowAt?: 'start' | 'end';
+}) {
+  return (
+    <div className="grid w-full flex-1 grid-rows-[1fr_auto_1fr] justify-items-center gap-4 text-center">
+      <div className="flex w-full flex-col items-center justify-end gap-2">{above}</div>
+      <div className="flex w-full flex-col items-center gap-3">{children}</div>
+      <div
+        className={cx(
+          'flex w-full flex-col items-center gap-3',
+          belowAt === 'end' ? 'justify-end' : 'justify-start',
+        )}
+      >
+        {below}
+      </div>
+    </div>
   );
 }
 
@@ -107,18 +174,6 @@ export function SpeakButton({
 export function NoVoiceNotice() {
   const t = useTranslations('review');
   return <p className="max-w-sm text-sm text-fg-muted">{t('noVoice')}</p>;
-}
-
-/** Hides most letters but keeps the first, the last and separators (spaces, hyphens). */
-export function maskWord(term: string): string {
-  const chars = Array.from(term);
-  return chars
-    .map((c, i) => {
-      if (!/\p{L}/u.test(c)) return c;
-      const keep = i === 0 || (chars.length > 3 && i === chars.length - 1);
-      return keep ? c : '_';
-    })
-    .join(' ');
 }
 
 export function AnswerInput({ onSubmit, lang }: { onSubmit: (v: string) => void; lang: LangCode }) {

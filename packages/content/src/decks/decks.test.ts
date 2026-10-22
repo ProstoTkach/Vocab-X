@@ -36,6 +36,12 @@ describe('built-in decks', () => {
     }
   });
 
+  test('English has a deck for every CEFR level, A1 to C2', () => {
+    const en = catalog.decks.filter((d) => d.lang === 'en');
+    expect(en.map((d) => d.cefr)).toEqual(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+    for (const d of en) expect(d.wordIds.length).toBeGreaterThanOrEqual(15);
+  });
+
   test('English B1 deck has 30 words with Ukrainian translations', () => {
     const deck = catalog.decks.find((d) => d.id === 'builtin:en-b1-essentials')!;
     expect(deck.wordIds).toHaveLength(30);

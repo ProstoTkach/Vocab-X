@@ -69,3 +69,31 @@ export function validateEvent(
   if (c.eventsLastMinute >= p.maxEventsPerMinute) return { ok: false, reason: 'rate_limit' };
   return { ok: true };
 }
+
+/** XP to go from level L to L + 1 is LEVEL_XP_STEP × L: 100 to level 2, 200 more to level 3… */
+export const LEVEL_XP_STEP = 100;
+
+export interface LevelProgress {
+  level: number;
+  /** XP earned since the current level was reached. */
+  xpInLevel: number;
+  /** XP the current level takes in total. */
+  xpForNext: number;
+}
+
+/** Player level from lifetime XP. */
+export function levelProgress(xpTotal: number, step = LEVEL_XP_STEP): LevelProgress {
+  let level = 1;
+  let rest = Math.max(0, Math.floor(xpTotal));
+  while (rest >= step * level) {
+    rest -= step * level;
+    level++;
+  }
+  return { level, xpInLevel: rest, xpForNext: step * level };
+}
+
+/** Lifetime XP at which a level is reached (level 1 at 0). */
+export function xpForLevel(level: number, step = LEVEL_XP_STEP): number {
+  const l = Math.max(1, Math.floor(level));
+  return (step * l * (l - 1)) / 2;
+}

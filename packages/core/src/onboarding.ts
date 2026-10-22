@@ -12,9 +12,9 @@ export type DailyGoalPreset = 'light' | 'regular' | 'intense';
  * is never capped by default (see StudySettings.newPerDay).
  */
 export const DAILY_GOAL_PRESETS: Record<DailyGoalPreset, Pick<StudySettings, 'dailyGoalXp'>> = {
-  light: { dailyGoalXp: 20 },
-  regular: { dailyGoalXp: 50 },
-  intense: { dailyGoalXp: 100 },
+  light: { dailyGoalXp: 40 },
+  regular: { dailyGoalXp: 100 },
+  intense: { dailyGoalXp: 200 },
 };
 
 interface Ctx {
@@ -22,19 +22,27 @@ interface Ctx {
   newId: () => string;
 }
 
-/** Copies a built-in deck into the learner's own decks (words stay shared, read-only). */
+/**
+ * Copies a built-in deck into the learner's own decks (words stay shared, read-only). Words in
+ * `skip` (e.g. already known from the level check) are left out and recorded as skipped, so the
+ * library sees the deck as fully gone through rather than picked halfway.
+ */
 export async function importBuiltinDeck(
   repos: Pick<Repos, 'decks'>,
   builtin: Deck,
   uiLocale: LangCode,
   ctx: Ctx,
+  skip: ReadonlySet<Id> = new Set(),
 ): Promise<Deck> {
   const deck: Deck = {
     id: ctx.newId(),
     title: builtin.titleI18n?.[uiLocale] ?? builtin.title,
     ...(builtin.cefr ? { cefr: builtin.cefr } : {}),
     lang: builtin.lang,
-    wordIds: [...builtin.wordIds],
+    wordIds: builtin.wordIds.filter((id) => !skip.has(id)),
+    ...(builtin.wordIds.some((id) => skip.has(id))
+      ? { skippedIds: builtin.wordIds.filter((id) => skip.has(id)) }
+      : {}),
     origin: 'own',
     builtinId: builtin.id,
     archived: false,
@@ -52,7 +60,7 @@ export interface OnboardingChoices {
   goal: DailyGoalPreset;
   themeId: string;
   builtinDeckIds: Id[];
-  /** Words marked "I know it" in the level check. */
+  /** Words marked "I know it" in the level check: scheduled as known, left out of the decks. */
   knownWords: Word[];
 }
 
@@ -65,9 +73,11 @@ export async function completeOnboarding(
     themeId: c.themeId,
     study: DAILY_GOAL_PRESETS[c.goal],
   });
+  const known = new Set(c.knownWords.map((w) => w.id));
   for (const id of c.builtinDeckIds) {
     const builtin = await repos.decks.get(id);
-    if (builtin?.origin === 'builtin') await importBuiltinDeck(repos, builtin, c.uiLocale, ctx);
+    if (builtin?.origin === 'builtin')
+      await importBuiltinDeck(repos, builtin, c.uiLocale, ctx, known);
   }
   await markKnown(repos, c.knownWords, { ...ctx, retention: settings.study.retention });
   const profile: Profile = {

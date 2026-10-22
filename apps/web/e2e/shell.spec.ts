@@ -13,7 +13,7 @@ test.beforeEach(({ page }) => seedOnboarded(page));
 /** A click that lands before hydration is lost; retry until the theme is applied. */
 async function chooseTheme(page: Page, name: string, id: string) {
   await expect(async () => {
-    await page.getByRole('radio', { name }).click();
+    await page.getByRole('radio', { name, exact: true }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', id, { timeout: 1000 });
   }).toPass();
 }
@@ -23,17 +23,17 @@ test('shows the layout for the viewport', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'Головна' })).toBeVisible();
   await expect(mainNav(page)).toHaveCount(1);
   await expect(mainNav(page)).toBeVisible();
-  const aside = page.getByRole('complementary', { name: 'Ваш прогрес' });
-  if (isMobile(page)) await expect(aside).toBeHidden();
-  else await expect(aside).toBeVisible();
+  // Streak and today's goal are part of the home page on every screen size.
+  await expect(page.getByRole('region', { name: 'Ваш прогрес' })).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Календар серії' })).toBeVisible();
 });
 
 test('navigates between sections and marks the current one', async ({ page }) => {
   await page.goto('/uk');
-  await mainNav(page).getByRole('link', { name: 'Колоди' }).click();
+  await mainNav(page).getByRole('link', { name: 'Мої слова' }).click();
   await expect(page).toHaveURL(/\/uk\/decks$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Мої слова' })).toBeVisible();
-  await expect(mainNav(page).getByRole('link', { name: 'Колоди' })).toHaveAttribute(
+  await expect(mainNav(page).getByRole('link', { name: 'Мої слова' })).toHaveAttribute(
     'aria-current',
     'page',
   );
@@ -56,27 +56,33 @@ test('applies the stored theme before hydration and keeps it after reload', asyn
     });
   });
   await page.goto('/uk/settings');
-  await chooseTheme(page, 'Океан', 'ocean');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean');
+  await chooseTheme(page, 'Темна', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
   await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   const atParse = await page.evaluate(
     () => (window as unknown as { themeAtParse?: string | undefined }).themeAtParse,
   );
-  expect(atParse).toBe('ocean');
-  await expect(page.getByRole('radio', { name: 'Океан' })).toHaveAttribute('aria-checked', 'true');
+  expect(atParse).toBe('dark');
+  await expect(page.getByRole('radio', { name: 'Темна', exact: true })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
 });
 
 test('switching the language keeps the theme', async ({ page }) => {
   await page.goto('/uk/settings');
-  await chooseTheme(page, 'Океан', 'ocean');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean');
+  await chooseTheme(page, 'Темна', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.getByRole('radio', { name: 'English' }).click();
   await expect(page).toHaveURL(/\/en\/settings$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean');
-  await expect(page.getByRole('radio', { name: 'Ocean' })).toHaveAttribute('aria-checked', 'true');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.getByRole('radio', { name: 'Dark', exact: true })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
 });
 
 test('the tab lights up on click, before the page arrives', async ({ page }) => {
@@ -87,10 +93,14 @@ test('the tab lights up on click, before the page arrives', async ({ page }) => 
     await route.continue();
   });
   const nav = mainNav(page);
-  await nav.getByRole('link', { name: 'Колоди' }).click();
-  await expect(nav.getByRole('link', { name: 'Колоди' })).toHaveAttribute('aria-current', 'page', {
-    timeout: 300,
-  });
+  await nav.getByRole('link', { name: 'Мої слова' }).click();
+  await expect(nav.getByRole('link', { name: 'Мої слова' })).toHaveAttribute(
+    'aria-current',
+    'page',
+    {
+      timeout: 300,
+    },
+  );
   await expect(page.getByRole('heading', { level: 1, name: 'Мої слова' })).toBeVisible();
 });
 
@@ -156,7 +166,8 @@ for (const route of ROUTES) {
 }
 
 test('every theme passes axe on settings', async ({ page }) => {
-  for (const themeId of ['light', 'dark', 'ocean']) {
+  // Ocean and Sunset are locked for a new learner; their contrast is checked in themes.test.ts.
+  for (const themeId of ['light', 'dark']) {
     await page.addInitScript(
       (id) => localStorage.setItem('vocabx:v1:settings', JSON.stringify({ themeId: id })),
       themeId,

@@ -28,7 +28,8 @@ function Swatch({ themeId, className }: { themeId: string; className?: string })
   );
 }
 
-export function ThemePicker() {
+/** All themes, or only the ones listed in `only` (e.g. the basic ones during onboarding). */
+export function ThemePicker({ only }: { only?: readonly string[] } = {}) {
   const t = useTranslations();
   const { choice, setChoice } = useTheme();
   const themes = useTranslations('themes');
@@ -36,7 +37,9 @@ export function ThemePicker() {
   const themeName = (key: string) => themes(key as 'system');
   const level = usePlayerLevel();
   const ctx = { level, achievements: new Set<string>(), purchases: new Set<string>() };
-  const options = [SYSTEM_THEME_ID, ...THEMES.map((th) => th.id)];
+  const options = [SYSTEM_THEME_ID, ...THEMES.map((th) => th.id)].filter(
+    (id) => !only || only.includes(id),
+  );
 
   return (
     <RadioGroup.Root

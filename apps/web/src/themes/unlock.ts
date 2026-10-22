@@ -1,4 +1,4 @@
-import type { Theme, Unlock } from './types';
+import type { Unlock } from './types';
 
 export interface UnlockContext {
   level: number;
@@ -22,8 +22,9 @@ export function parseUnlock(u: Unlock): UnlockRequirement {
   return { kind: 'purchase', sku: value };
 }
 
-export function isUnlocked(theme: Theme, ctx: UnlockContext): boolean {
-  const r = parseUnlock(theme.unlock);
+/** Works for anything with an unlock rule: themes, character items. */
+export function isUnlocked(item: { unlock: Unlock }, ctx: UnlockContext): boolean {
+  const r = parseUnlock(item.unlock);
   switch (r.kind) {
     case 'free':
       return true;

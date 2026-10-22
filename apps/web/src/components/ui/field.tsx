@@ -62,6 +62,56 @@ export function TextField({
   );
 }
 
+/** Multi-line text with a length limit and a live "used / max" counter. */
+export function TextAreaField({
+  label,
+  hint,
+  error,
+  maxLength,
+  value,
+  className,
+  ...textarea
+}: Omit<ComponentProps<'textarea'>, 'id' | 'value' | 'maxLength'> & {
+  label: string;
+  hint?: string;
+  error?: string | null;
+  maxLength: number;
+  value: string;
+}) {
+  return (
+    <FieldShell
+      label={label}
+      {...(hint ? { hint } : {})}
+      error={error ?? null}
+      {...(className ? { className } : {})}
+    >
+      {(id, describedBy) => (
+        <div className="relative">
+          <textarea
+            id={id}
+            aria-describedby={describedBy}
+            aria-invalid={error ? true : undefined}
+            maxLength={maxLength}
+            value={value}
+            rows={3}
+            className={cx(inputClass, 'block resize-y py-2.5 pb-6')}
+            {...textarea}
+          />
+          <span
+            aria-hidden
+            className={cx(
+              'pointer-events-none absolute end-3 bottom-1.5 text-xs tabular-nums',
+              value.length >= maxLength ? 'text-warning' : 'text-fg-muted',
+            )}
+          >
+            {value.length}/{maxLength}
+          </span>
+        </div>
+      )}
+    </FieldShell>
+  );
+}
+
 export function SelectField({
   label,
   hint,

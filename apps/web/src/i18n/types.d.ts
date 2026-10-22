@@ -1,10 +1,12 @@
 // Message keys are type-checked against the default (Ukrainian) locale.
 import type aside from '../../messages/uk/aside.json';
+import type character from '../../messages/uk/character.json';
 import type common from '../../messages/uk/common.json';
 import type data from '../../messages/uk/data.json';
 import type decks from '../../messages/uk/decks.json';
 import type dev from '../../messages/uk/dev.json';
 import type devui from '../../messages/uk/devui.json';
+import type feedback from '../../messages/uk/feedback.json';
 import type languages from '../../messages/uk/languages.json';
 import type library from '../../messages/uk/library.json';
 import type meta from '../../messages/uk/meta.json';
@@ -22,11 +24,13 @@ declare module 'next-intl' {
     Locale: Locale;
     Messages: {
       aside: typeof aside;
+      character: typeof character;
       common: typeof common;
       data: typeof data;
       decks: typeof decks;
       dev: typeof dev;
       devui: typeof devui;
+      feedback: typeof feedback;
       languages: typeof languages;
       library: typeof library;
       meta: typeof meta;

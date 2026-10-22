@@ -8,6 +8,8 @@ import { restoreRootAttributes } from '@/lib/boot-script';
 import { DevPanel } from '@/components/dev/dev-panel';
 import { ClockProvider } from '@/lib/clock';
 import { DevToolsProvider } from '@/lib/dev-tools';
+import { GamificationProvider } from '@/lib/gamification';
+import { PlayerProvider } from '@/lib/player';
 import { ReposProvider } from '@/lib/repos';
 import { ThemeProvider } from '@/lib/theme';
 
@@ -19,16 +21,20 @@ export function Providers({ dir, children }: { dir: 'ltr' | 'rtl'; children: Rea
     <Direction.Provider dir={dir}>
       <ReposProvider>
         <ClockProvider>
-          <ThemeProvider>
-            <TooltipProvider delayDuration={300}>
-              <ToastProvider>
-                <DevToolsProvider>
-                  {children}
-                  <DevPanel />
-                </DevToolsProvider>
-              </ToastProvider>
-            </TooltipProvider>
-          </ThemeProvider>
+          <PlayerProvider>
+            <ThemeProvider>
+              <GamificationProvider>
+                <TooltipProvider delayDuration={300}>
+                  <ToastProvider>
+                    <DevToolsProvider>
+                      {children}
+                      <DevPanel />
+                    </DevToolsProvider>
+                  </ToastProvider>
+                </TooltipProvider>
+              </GamificationProvider>
+            </ThemeProvider>
+          </PlayerProvider>
         </ClockProvider>
       </ReposProvider>
     </Direction.Provider>

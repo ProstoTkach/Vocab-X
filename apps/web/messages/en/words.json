@@ -20,5 +20,12 @@
   "wrong": "Mistakes",
   "streak": "{count} correct in a row",
   "example": "Example",
-  "noExample": "No example yet."
+  "noExample": "No example yet.",
+  "reviewMore": "Review it more often",
+  "backupTitle": "Afraid of losing your data?",
+  "backupText": "Everything is stored in this browser only. Download a JSON file with your current progress and settings — you can restore from it at any time.",
+  "sortLabel": "Sort",
+  "showMore": "Show {count} more",
+  "sortSoonest": "Due soonest",
+  "sortLatest": "Due latest"
 }

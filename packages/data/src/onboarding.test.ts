@@ -1,5 +1,6 @@
 import { builtinCatalog } from '@vocabx/content';
 import {
+  builtinPickState,
   completeOnboarding,
   DAY_MS,
   DEFAULT_SCHEDULER_PARAMS as params,
@@ -37,12 +38,21 @@ describe('completeOnboarding', () => {
     expect(await repo.profile.get()).toEqual(profile);
     const settings = await repo.settings.get();
     expect(settings.themeId).toBe('ocean');
-    expect(settings.study).toMatchObject({ newPerDay: null, reviewsPerDay: null, dailyGoalXp: 50 });
+    expect(settings.study).toMatchObject({
+      newPerDay: null,
+      reviewsPerDay: null,
+      dailyGoalXp: 100,
+    });
 
     const own = (await repo.decks.list({ lang: 'en' })).filter((d) => d.origin === 'own');
     expect(own).toHaveLength(1);
     expect(own[0]).toMatchObject({ title: 'Англійська B1: основне', builtinId: deck.id });
-    expect(own[0]!.wordIds).toEqual(deck.wordIds);
+    // Known words are left out of the imported deck, as if skipped in the library.
+    expect(own[0]!.skippedIds).toEqual(['en:achieve', 'en:advice']);
+    expect(builtinPickState(deck, own)).toMatchObject({ added: 28, skipped: 2, inProgress: false });
+    expect(own[0]!.wordIds).toEqual(
+      deck.wordIds.filter((id) => !['en:achieve', 'en:advice'].includes(id)),
+    );
 
     const stack = await loadStudyStack(repo, {
       lang: 'en',

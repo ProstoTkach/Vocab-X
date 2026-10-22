@@ -1,15 +1,14 @@
 'use client';
 
 import { addWordsFromBuiltin, type Deck, type Profile, type Word } from '@vocabx/core';
-import { ArrowLeft, Check, Hand, Plus } from 'lucide-react';
+import { ArrowLeft, Check, CircleDashed, Hand, Plus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { deckTitle } from '@/components/decks/deck-list';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonClass } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
-import { HighlightedText } from '@/components/words/highlighted-text';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useClock } from '@/lib/clock';
 import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
@@ -21,19 +20,29 @@ interface Loaded {
   words: Word[];
   /** Word ids already in the learner's copy of this deck. */
   mine: Set<string>;
+  /** Word ids skipped while picking. */
+  skipped: Set<string>;
 }
 
 /** A library deck: its words, "add all", or picking single words card by card. */
-export function LibraryDeck({ deckId }: { deckId: string }) {
+export function LibraryDeck({
+  deckId,
+  startPicking = false,
+}: {
+  deckId: string;
+  /** Open the card picker as soon as the deck is loaded. */
+  startPicking?: boolean;
+}) {
   const t = useTranslations('library');
   const tl = useTranslations('languages');
   const locale = useLocale();
   const repos = useRepos();
   const { clock } = useClock();
   const toast = useToast();
+  const router = useRouter();
   const [data, setData] = useState<Loaded | null | 'missing'>(null);
   const [version, setVersion] = useState(0);
-  const [picking, setPicking] = useState(false);
+  const [picking, setPicking] = useState(startPicking);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -48,7 +57,13 @@ export function LibraryDeck({ deckId }: { deckId: string }) {
         (d) => d.builtinId === deck.id,
       );
       if (!ctrl.signal.aborted)
-        setData({ profile, deck, words, mine: new Set(copy?.wordIds ?? []) });
+        setData({
+          profile,
+          deck,
+          words,
+          mine: new Set(copy?.wordIds ?? []),
+          skipped: new Set(copy?.skippedIds ?? []),
+        });
     })();
     return () => ctrl.abort();
   }, [repos, deckId, version]);
@@ -65,23 +80,32 @@ export function LibraryDeck({ deckId }: { deckId: string }) {
     );
   }
 
-  const { deck, profile, words, mine } = data;
+  const { deck, profile, words, mine, skipped } = data;
   const name = deckTitle(deck, locale);
   const remaining = words.filter((w) => !mine.has(w.id));
+  const unseen = remaining.filter((w) => !skipped.has(w.id));
   const all = remaining.length === 0;
+  const added = words.length - remaining.length;
+  const reviewed = words.length - unseen.length;
+  const inProgress = reviewed > 0 && unseen.length > 0;
+  // Picking continues with words not looked at yet; once all were seen, the skipped ones again.
+  const pool = unseen.length > 0 ? unseen : remaining;
 
   const addAll = async () => {
     await addWordsFromBuiltin(repos, deck, deck.wordIds, locale, { now: clock.now(), newId });
     toast({ title: t('addedAllToast', { name }), tone: 'success' });
-    setVersion((v) => v + 1);
+    // Done with this deck: back to the library, where it now shows as saved.
+    router.push('/decks/library');
   };
 
-  if (picking) {
+  if (picking && pool.length > 0) {
     return (
       <WordPicker
         deck={deck}
         deckName={name}
-        words={remaining}
+        words={pool}
+        skipped={skipped}
+        initialAdded={added}
         nativeLang={profile.nativeLang}
         onClose={() => {
           setPicking(false);
@@ -107,10 +131,14 @@ export function LibraryDeck({ deckId }: { deckId: string }) {
             {deck.cefr ? ` · ${deck.cefr}` : ''}
           </Badge>
           <Badge tone={all ? 'success' : 'neutral'}>
-            {all
-              ? t('addedAll')
-              : t('addedSome', { added: words.length - remaining.length, total: words.length })}
+            {all ? t('addedAll') : t('addedSome', { added, total: words.length })}
           </Badge>
+          {inProgress && (
+            <Badge tone="warning">
+              <CircleDashed aria-hidden className="size-3.5" />
+              {t('inProgress')} · {t('reviewed', { done: reviewed, total: words.length })}
+            </Badge>
+          )}
         </div>
         <h1 className="font-display text-display font-bold text-balance">{name}</h1>
         <p className="text-fg-muted">{deck.descriptionI18n?.[locale]}</p>
@@ -121,37 +149,33 @@ export function LibraryDeck({ deckId }: { deckId: string }) {
           </Button>
           <Button variant="secondary" onClick={() => setPicking(true)} disabled={all}>
             <Hand aria-hidden className="size-4" />
-            {t('pick')}
+            {unseen.length === words.length
+              ? t('pick')
+              : unseen.length > 0
+                ? t('pickContinue')
+                : t('pickSkippedAgain')}
           </Button>
         </div>
       </header>
 
-      <ul className="flex flex-col gap-2">
+      {/* Compact cards as wide as their content: only the word and its translation. */}
+      <ul className="flex flex-wrap gap-2">
         {words.map((w) => (
           <li
             key={w.id}
-            className="rounded-control border border-line/70 bg-surface p-4 shadow-card"
+            className="relative flex max-w-full min-w-28 flex-col items-center rounded-control border border-line/70 bg-surface px-4 py-2.5 text-center shadow-card"
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p lang={w.lang} className="font-semibold">
-                  {w.term}
-                </p>
-                <p lang={profile.nativeLang} className="text-sm text-fg-muted">
-                  {(w.translations[profile.nativeLang] ?? []).join(', ')}
-                </p>
-              </div>
-              {mine.has(w.id) && (
-                <Badge tone="success">
-                  <Check aria-hidden className="size-3.5" />
-                  {t('alreadyAdded')}
-                </Badge>
-              )}
-            </div>
-            {w.examples[0] && (
-              <p lang={w.lang} className="mt-2 text-sm">
-                <HighlightedText text={w.examples[0].text} term={w.term} lang={w.lang} />
-              </p>
+            <span lang={w.lang} className="font-semibold break-words">
+              {w.term}
+            </span>
+            <span lang={profile.nativeLang} className="text-sm break-words text-fg-muted">
+              {(w.translations[profile.nativeLang] ?? []).join(', ')}
+            </span>
+            {mine.has(w.id) && (
+              <span className="absolute -end-1.5 -top-1.5 inline-flex size-5 items-center justify-center rounded-full bg-success text-on-success">
+                <Check aria-hidden className="size-3.5" />
+                <span className="sr-only">{t('alreadyAdded')}</span>
+              </span>
             )}
           </li>
         ))}

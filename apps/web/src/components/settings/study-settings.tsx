@@ -128,6 +128,11 @@ export function StudySettingsForm() {
           checked={study.autoSpeak}
           onCheckedChange={(autoSpeak) => update({ autoSpeak })}
         />
+        <Switch
+          label={t('gradeButtonsOnPhone')}
+          checked={study.gradeButtonsOnPhone}
+          onCheckedChange={(gradeButtonsOnPhone) => update({ gradeButtonsOnPhone })}
+        />
       </div>
 
       <Segmented

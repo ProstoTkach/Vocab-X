@@ -25,8 +25,6 @@ const ARROW = { left: '←', right: '→', up: '↑', down: '↓' } as const;
 
 export interface GradeBarProps {
   grades: readonly Grade[];
-  /** Days until the next review for each grade, shown under the label. */
-  intervals: Partial<Record<Grade, number>>;
   /** Pre-selected by typed-answer grading. */
   suggested: Grade | null;
   swipe: SwipeOptions;
@@ -34,22 +32,12 @@ export interface GradeBarProps {
   disabled: boolean;
 }
 
-export function GradeBar({
-  grades,
-  intervals,
-  suggested,
-  swipe,
-  onGrade,
-  disabled,
-}: GradeBarProps) {
+export function GradeBar({ grades, suggested, swipe, onGrade, disabled }: GradeBarProps) {
   const t = useTranslations('review');
-  const interval = (days: number) =>
-    days >= 60 ? t('intervalMonths', { months: Math.round(days / 30) }) : t('interval', { days });
   return (
     <div className={cx('grid gap-2', grades.length === 2 ? 'grid-cols-2' : 'grid-cols-4')}>
       {grades.map((g) => {
         const dir = directionForGrade(g, swipe);
-        const days = intervals[g];
         return (
           <button
             key={g}
@@ -58,16 +46,13 @@ export function GradeBar({
             onClick={() => onGrade(g)}
             aria-keyshortcuts={String(g)}
             className={cx(
-              'flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-control px-1 py-2 font-semibold touch-manipulation',
+              'flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-control px-1 py-2 font-semibold touch-manipulation',
               'glass border-2 shadow-card transition motion-fast active:scale-[0.97] disabled:opacity-60',
               suggested === g ? GRADE_TONE[g] : BUTTON_TONE[g],
               suggested === g && 'ring-4 ring-focus ring-offset-2 ring-offset-bg',
             )}
           >
             <span>{t(`grades.${GRADE_NAME[g]}`)}</span>
-            {days !== undefined && (
-              <span className="text-xs font-normal opacity-90">{interval(days)}</span>
-            )}
             <span aria-hidden className="text-xs font-normal opacity-80 pointer-coarse:hidden">
               {g}
               {dir && ` · ${ARROW[dir]}`}

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { PageHeader } from '@/components/page-header';
 import { MyWords } from '@/components/words/my-words';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -8,12 +7,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('title') };
 }
 
-export default async function WordsPage() {
-  const t = await getTranslations('words');
-  return (
-    <>
-      <PageHeader title={t('title')} intro={t('intro')} />
-      <MyWords />
-    </>
-  );
+export default function WordsPage() {
+  // The page heading is inside MyWords (for screen readers; no visible title).
+  return <MyWords />;
 }

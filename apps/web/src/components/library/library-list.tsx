@@ -1,21 +1,15 @@
 'use client';
 
-import type { Deck } from '@vocabx/core';
-import { Check } from 'lucide-react';
+import { Check, CircleDashed } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { deckTitle } from '@/components/decks/deck-list';
 import { useDecks } from '@/components/decks/use-decks';
 import { Badge } from '@/components/ui/badge';
 import { buttonClass } from '@/components/ui/button';
 import { Card, CardText, CardTitle } from '@/components/ui/card';
+import { ProgressBar } from '@/components/ui/progress-bar';
 import { Link } from '@/i18n/navigation';
 import { cx } from '@/lib/cx';
-
-/** How much of a built-in deck the learner already has in their copy of it. */
-export function addedFrom(builtin: Deck, own: readonly Deck[]): number {
-  const copy = own.find((d) => d.builtinId === builtin.id);
-  return copy ? builtin.wordIds.filter((id) => copy.wordIds.includes(id)).length : 0;
-}
 
 export function LibraryList() {
   const t = useTranslations('library');
@@ -27,8 +21,12 @@ export function LibraryList() {
   return (
     <ul className="grid gap-3 sm:grid-cols-2">
       {data.builtin.map((d) => {
-        const added = addedFrom(d, data.own);
         const total = d.wordIds.length;
+        const pick = data.picks.get(d.id);
+        const added = pick?.added ?? 0;
+        const reviewed = added + (pick?.skipped ?? 0);
+        // Picking stopped halfway: the deck is marked so the learner can come back to it.
+        const inProgress = !!pick?.inProgress;
         return (
           <li key={d.id}>
             <Card className="flex h-full flex-col gap-3">
@@ -42,6 +40,20 @@ export function LibraryList() {
                 </Badge>
               </div>
               <CardText className="flex-1">{d.descriptionI18n?.[locale]}</CardText>
+              {inProgress && (
+                <div className="flex flex-col gap-1.5">
+                  <ProgressBar
+                    value={reviewed}
+                    max={total}
+                    label={t('reviewed', { done: reviewed, total })}
+                    size="xs"
+                  />
+                  <span className="inline-flex items-center gap-1.5 text-sm font-medium text-warning">
+                    <CircleDashed aria-hidden className="size-4" />
+                    {t('inProgress')} · {t('reviewed', { done: reviewed, total })}
+                  </span>
+                </div>
+              )}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span
                   className={cx(
@@ -57,10 +69,10 @@ export function LibraryList() {
                       : t('words', { count: total })}
                 </span>
                 <Link
-                  href={`/decks/library/${encodeURIComponent(d.id)}`}
-                  className={buttonClass('secondary', 'sm')}
+                  href={`/decks/library/${encodeURIComponent(d.id)}${inProgress ? '?pick=1' : ''}`}
+                  className={buttonClass(inProgress ? 'primary' : 'secondary', 'sm')}
                 >
-                  {t('open')}
+                  {inProgress ? t('pickContinue') : t('open')}
                 </Link>
               </div>
             </Card>

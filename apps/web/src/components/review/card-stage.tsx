@@ -1,14 +1,17 @@
 'use client';
 
 import {
+  animate,
   AnimatePresence,
   motion,
+  MotionConfigContext,
   useDragControls,
   useIsPresent,
   useMotionValue,
+  useReducedMotion,
   useTransform,
 } from 'motion/react';
-import { useState, type ReactNode } from 'react';
+import { useContext, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { cx } from '@/lib/cx';
 import { directionFromDrag, type PhysicalDir } from './swipe';
 
@@ -27,6 +30,15 @@ const OVERLAY: Record<SwipeTone, string> = {
   info: 'bg-info/15 text-info',
 };
 const OFFSCREEN = 600;
+
+/** Moves focus off an element that is about to become inert (it must not stay inside). */
+function blurInside(el: HTMLElement | null) {
+  const active = document.activeElement;
+  if (el && active instanceof HTMLElement && el.contains(active)) active.blur();
+}
+/** Controls inside a card handle their own presses; tapping them must not flip the card. */
+const CONTROLS = 'button, a, input, textarea, select, label, [role="button"]';
+const onControl = (e: Event) => e.target instanceof Element && !!e.target.closest(CONTROLS);
 const exitFor = (dir: PhysicalDir | null) => ({
   x: dir === 'left' ? -OFFSCREEN : dir === 'right' ? OFFSCREEN : 0,
   y: dir === 'up' ? -OFFSCREEN : dir === 'down' ? OFFSCREEN : dir ? 0 : -16,
@@ -42,9 +54,14 @@ interface CardProps {
   onSwipe: (dir: PhysicalDir) => void;
   /** Tap or click (e.g. flip the card). */
   onTap?: () => void;
+  /** A quiet line at the bottom of the front side (e.g. how to flip it). */
+  footer?: ReactNode;
   /** Test id of the top card. */
   testId?: string;
+  /** Front side. */
   children: ReactNode;
+  /** Back side; the card turns over to it when `side` is "back". */
+  back?: ReactNode;
 }
 
 export interface CardStageProps extends CardProps {
@@ -64,8 +81,9 @@ export interface CardStageProps extends CardProps {
 export function CardStage({ cardKey, exitDir, depth, ...card }: CardStageProps) {
   const layers = Math.min(3, Math.max(0, depth));
   return (
-    // Bottom margin leaves room for the deck peeking out under the card.
-    <div className="relative isolate mb-6 min-h-0 flex-1">
+    // Bottom margin leaves room for the deck peeking out under the card. z-10 lifts a dragged
+    // card above everything after it (grade bar, aside with its progress bars).
+    <div className="relative z-10 mb-6 min-h-0 flex-1">
       {Array.from({ length: layers }, (_, i) => (
         <div
           key={i}
@@ -96,8 +114,10 @@ function SwipeCard({
   actionFor,
   onSwipe,
   onTap,
+  footer,
   testId = 'review-card',
   children,
+  back,
 }: CardProps) {
   const controls = useDragControls();
   const x = useMotionValue(0);
@@ -106,6 +126,42 @@ function SwipeCard({
   const [hint, setHint] = useState<SwipeAction | null>(null);
   // The card flying out after a grade is decorative: hide it from assistive tech and queries.
   const present = useIsPresent();
+  // A full turn takes two of the session's steps (the user's animation speed applies).
+  const { transition } = useContext(MotionConfigContext);
+  const turn = (transition?.duration ?? 0.22) * 2;
+  const flipped = side === 'back' && back !== undefined;
+  // The side the card last came to rest on. While it differs from `flipped` the card is turning
+  // over in 3D; at rest the visible face is drawn flat. 3D layers (perspective, preserve-3d,
+  // hidden backfaces) make phone browsers render the text blurry, so they only exist mid-turn.
+  const [restingFlipped, setRestingFlipped] = useState(flipped);
+  const turning = flipped !== restingFlipped;
+  const rotateY = useMotionValue(0);
+  const inner = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  // Runs before paint, so the switch between the flat and the 3D drawing never shows a frame
+  // with the wrong angle (a mirrored face).
+  useLayoutEffect(() => {
+    const el = inner.current;
+    if (!turning) {
+      rotateY.jump(0);
+      if (el) el.style.transform = 'none';
+      return;
+    }
+    const [from, to] = flipped ? [0, 180] : [180, 0];
+    rotateY.jump(from);
+    if (el) el.style.transform = `rotateY(${from}deg)`;
+    const controls = animate(rotateY, to, {
+      duration: reduced ? 0 : turn,
+      ease: [0.4, 0, 0.2, 1],
+      onComplete: () => setRestingFlipped(flipped),
+    });
+    return () => controls.stop();
+  }, [turning, flipped, rotateY, reduced, turn]);
+  const card = useRef<HTMLDivElement>(null);
+  // A button pressed on the card keeps focus; the leaving card gives it up before going inert.
+  useLayoutEffect(() => {
+    if (!present) blurInside(card.current);
+  }, [present]);
 
   return (
     <motion.div
@@ -125,7 +181,7 @@ function SwipeCard({
       style={{ x, y, rotate, touchAction: swipeEnabled ? 'none' : 'manipulation' }}
       onPointerDown={(e) => {
         // Any pointer can swipe; a press without movement is still recognized as a tap below.
-        if (swipeEnabled) controls.start(e);
+        if (swipeEnabled && !onControl(e.nativeEvent)) controls.start(e);
       }}
       onDrag={(_, info) => {
         const dir = directionFromDrag(info.offset, { x: 0, y: 0 });
@@ -139,40 +195,37 @@ function SwipeCard({
       }}
       // onTap is recognized from pointer events (no movement): unlike click it is reliable right
       // after a swipe on touch screens, and it never fires at the end of a drag.
-      {...(onTap ? { onTap } : {})}
+      // Motion listens to native pointer events, so a button's React stopPropagation comes too late:
+      // presses on controls (e.g. the listen button) are filtered here instead.
+      {...(onTap ? { onTap: (e: Event) => !onControl(e) && onTap() } : {})}
+      ref={card}
       data-testid={present ? testId : undefined}
-      aria-hidden={!present || undefined}
       inert={!present}
       data-side={side}
       className={cx(
-        'absolute inset-0 flex flex-col overflow-hidden rounded-card border border-line/70 bg-surface surface-sheen shadow-pop select-none',
+        'absolute inset-0 select-none',
+        turning && 'perspective-distant',
         swipeEnabled ? 'cursor-grab active:cursor-grabbing' : onTap && 'cursor-pointer',
         // The leaving card may still overlap the new one; it must not swallow taps.
         !present && 'pointer-events-none',
       )}
     >
-      {/* A hairline of the brand gradient along the top edge. */}
-      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-brand opacity-80" />
-      <div
-        className={cx(
-          'flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto p-5 [@media(min-height:640px)]:p-8',
-          // touch-action does not cross into a scroll container: without this the browser
-          // claims the gesture as a scroll and cancels the swipe.
-          swipeEnabled && 'touch-none',
-        )}
+      {/* A real two-sided card: both faces stay mounted and the whole card turns over, so a
+          gesture that starts mid-flip is never cut off. Reduced motion turns it instantly. */}
+      <motion.div
+        ref={inner}
+        style={{ rotateY }}
+        className={cx('absolute inset-0', turning && 'transform-3d')}
       >
-        <AnimatePresence initial={false} mode="wait">
-          <motion.div
-            key={side}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="w-full"
-          >
-            {children}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+        <Face hidden={flipped} swipeEnabled={swipeEnabled} footer={footer} turning={turning}>
+          {children}
+        </Face>
+        {back !== undefined && (
+          <Face hidden={!flipped} swipeEnabled={swipeEnabled} turned turning={turning}>
+            {back}
+          </Face>
+        )}
+      </motion.div>
       {hint && (
         <div
           aria-hidden
@@ -185,5 +238,62 @@ function SwipeCard({
         </div>
       )}
     </motion.div>
+  );
+}
+
+/** One side of the card. The side facing away is hidden from assistive tech and focus. */
+function Face({
+  hidden,
+  turned = false,
+  turning,
+  swipeEnabled,
+  footer,
+  children,
+}: {
+  hidden: boolean;
+  /** The back: pre-rotated so it faces the viewer once the card is turned over. */
+  turned?: boolean;
+  /** Mid-turn the faces are 3D (back pre-rotated, backfaces hidden); at rest they are flat. */
+  turning: boolean;
+  swipeEnabled: boolean;
+  footer?: ReactNode;
+  children: ReactNode;
+}) {
+  const face = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (hidden) blurInside(face.current);
+  }, [hidden]);
+  return (
+    <div
+      ref={face}
+      inert={hidden}
+      className={cx(
+        'absolute inset-0 flex flex-col overflow-hidden rounded-card border border-line/70 bg-surface surface-sheen shadow-pop',
+        turning ? 'backface-hidden' : hidden && 'invisible',
+        turning && turned && 'rotate-y-180',
+      )}
+    >
+      {/* A hairline of the brand gradient along the top edge. */}
+      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-brand opacity-80" />
+      <div
+        className={cx(
+          'z-10 flex min-h-0 flex-1 flex-col overflow-y-auto p-5 [@media(min-height:640px)]:p-8',
+          // Same space above and below, so the content stays centred above the footer.
+          !!footer && 'py-12 [@media(min-height:640px)]:py-14',
+          // touch-action does not cross into a scroll container: without this the browser
+          // claims the gesture as a scroll and cancels the swipe.
+          swipeEnabled && 'touch-none',
+        )}
+      >
+        {/* Grows to the card height: content is centred, or pinned (e.g. an example at the
+            bottom) by the format itself. */}
+        <div className="flex w-full flex-1 flex-col justify-center">{children}</div>
+      </div>
+      {!!footer && (
+        <p className="pointer-events-none absolute inset-x-0 bottom-0 px-6 pb-4 text-center text-xs text-balance text-fg-muted">
+          {footer}
+        </p>
+      )}
+    </div>
   );
 }

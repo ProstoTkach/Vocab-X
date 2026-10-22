@@ -32,6 +32,38 @@
 
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(0.3, 0, 0, 1.2);
+
+  /* A faint, slow glow that breathes, e.g. around a streak about to go out. */
+  --animate-ember: vx-ember 3.2s ease-in-out infinite;
+  @keyframes vx-ember {
+    0%,
+    100% {
+      opacity: 0.25;
+      scale: 0.9;
+    }
+    50% {
+      opacity: 0.6;
+      scale: 1.15;
+    }
+  }
+
+  /* A little shake; uses `rotate`/`translate`, so it adds to an element's own transform. */
+  --animate-jiggle: vx-jiggle 0.45s ease-in-out infinite;
+  @keyframes vx-jiggle {
+    0%,
+    100% {
+      rotate: 0deg;
+      translate: 0 0;
+    }
+    25% {
+      rotate: -5deg;
+      translate: 0 -2px;
+    }
+    75% {
+      rotate: 5deg;
+      translate: 0 1px;
+    }
+  }
 }
 
 @theme inline {
@@ -72,6 +104,32 @@
     /* Fallback glyphs for scripts the bundled fonts do not cover. */
     --vx-font-script: ui-sans-serif;
     -webkit-text-size-adjust: 100%;
+  }
+  /* Everything that can be clicked shows the hand; disabled controls do not. */
+  :where(
+    a[href],
+    button,
+    summary,
+    select,
+    label[for],
+    [role='button'],
+    [role='link'],
+    [role='tab'],
+    [role='radio'],
+    [role='checkbox'],
+    [role='switch'],
+    [role='menuitem'],
+    [role='menuitemradio'],
+    [role='option'],
+    input[type='checkbox'],
+    input[type='radio'],
+    input[type='range'],
+    input[type='file']
+  ) {
+    cursor: pointer;
+  }
+  :where(:disabled, [aria-disabled='true'], [data-disabled]) {
+    cursor: not-allowed;
   }
   [data-script='Arab'] {
     --vx-font-script: 'Noto Naskh Arabic', 'Segoe UI', Tahoma;
@@ -183,4 +241,39 @@
     color-mix(in oklab, var(--vx-surface) 96%, var(--vx-accent)),
     var(--vx-surface)
   );
+}
+
+/* A soft highlight sweeping across a brand surface now and then (e.g. a goal just reached). */
+@utility shine {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      110deg,
+      transparent 30%,
+      color-mix(in oklab, var(--vx-on-accent) 10%, transparent) 50%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    animation: vx-shine 3.2s var(--ease-standard) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      animation: none;
+      opacity: 0;
+    }
+  }
+}
+@keyframes vx-shine {
+  0%,
+  45% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }

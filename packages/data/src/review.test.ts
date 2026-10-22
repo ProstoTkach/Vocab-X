@@ -89,7 +89,7 @@ describe('review flow', () => {
     expect({ ...after, exportedAt: 0 }).toEqual({ ...JSON.parse(before), exportedAt: 0 });
   });
 
-  test('after "+1 day" the reviewed cards are due again', async () => {
+  test('new cards start a learning phase: back in minutes, then after hours', async () => {
     const today = await stackAt(T0);
     for (const card of today) {
       await submitReview(repo, {
@@ -107,11 +107,10 @@ describe('review flow', () => {
     }
     expect(await stackAt(T0 + 60_000)).toHaveLength(0);
 
-    // "Good" on a new card gives S₀ = w₂ ≈ 2.3 days → due in 2 days, not tomorrow.
-    expect(await stackAt(T0 + DAY_MS)).toHaveLength(0);
-    const inTwoDays = await stackAt(T0 + 2 * DAY_MS);
+    // A first appearance sets S₀ = introMinutes: every card is due again in 10 minutes.
+    const back = T0 + params.introMinutes * 60_000;
     expect(
-      inTwoDays
+      (await stackAt(back))
         .filter((c) => !c.isNew)
         .map((c) => c.id)
         .sort(),

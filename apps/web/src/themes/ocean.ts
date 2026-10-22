@@ -4,7 +4,8 @@ export const ocean: Theme = {
   id: 'ocean',
   nameKey: 'ocean',
   colorScheme: 'light',
-  unlock: 'free',
+  // The first theme reward.
+  unlock: 'level:4',
   colors: {
     bg: '#edf6f9',
     surface: '#ffffff',

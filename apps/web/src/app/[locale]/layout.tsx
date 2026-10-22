@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { localeInfo } from '@/i18n/locales';
 import { routing } from '@/i18n/routing';
 import { bootScript } from '@/lib/boot-script';
+import { BootScriptTag } from '@/lib/boot-script-tag';
 import { themesCss } from '@/themes/css';
 import { DEFAULT_THEME, THEMES } from '@/themes/registry';
 import { inter, manrope } from '../fonts';
@@ -61,7 +62,7 @@ export default async function LocaleLayout({
     >
       <head>
         <style dangerouslySetInnerHTML={{ __html: themesCss(THEMES) }} />
-        <script dangerouslySetInnerHTML={{ __html: bootScript() }} />
+        <BootScriptTag code={bootScript()} />
       </head>
       <body className="min-h-dvh font-sans antialiased">
         <NextIntlClientProvider>

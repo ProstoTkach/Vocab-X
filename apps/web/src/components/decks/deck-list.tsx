@@ -20,6 +20,7 @@ import { Card, CardText } from '@/components/ui/card';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { inputClass } from '@/components/ui/field';
 import { ActionMenu } from '@/components/ui/menu';
+import { ProgressBar } from '@/components/ui/progress-bar';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useClock } from '@/lib/clock';
 import { cx } from '@/lib/cx';
@@ -267,12 +268,13 @@ function DeckCard({
         </div>
         <CardText>{t('stats', { total, due: stats?.due ?? 0, fresh: stats?.fresh ?? 0 })}</CardText>
         {/* Share of words already in learning. */}
-        <div className="h-1.5 overflow-hidden rounded-full bg-surface-3">
-          <div
-            className="h-full rounded-full bg-brand"
-            style={{ width: `${total ? (mastered / total) * 100 : 0}%` }}
-          />
-        </div>
+        <ProgressBar
+          value={mastered}
+          max={total}
+          label={t('learningShare')}
+          valueText={t('learningShareValue', { learning: mastered, total })}
+          size="xs"
+        />
         {!deck.archived && (
           <Link
             href={`/review?deck=${encodeURIComponent(deck.id)}`}

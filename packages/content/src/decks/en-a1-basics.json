@@ -1,0 +1,241 @@
+{
+  "id": "builtin:en-a1-basics",
+  "lang": "en",
+  "cefr": "A1",
+  "title": "English A1: first words",
+  "titleI18n": {
+    "uk": "Англійська A1: перші слова",
+    "en": "English A1: first words"
+  },
+  "descriptionI18n": {
+    "uk": "15 найпотрібніших слів для самого початку: дім, родина, їжа й щоденні дії.",
+    "en": "15 must-have words to start with: home, family, food and daily actions."
+  },
+  "words": [
+    {
+      "term": "family",
+      "pos": "noun",
+      "translations": {
+        "uk": ["сім'я", "родина"]
+      },
+      "examples": [
+        {
+          "text": "My family lives in a small town.",
+          "translations": {
+            "uk": "Моя родина живе в маленькому містечку."
+          }
+        }
+      ]
+    },
+    {
+      "term": "house",
+      "pos": "noun",
+      "translations": {
+        "uk": ["будинок", "дім"]
+      },
+      "examples": [
+        {
+          "text": "Their house has a red door.",
+          "translations": {
+            "uk": "Їхній будинок має червоні двері."
+          }
+        }
+      ]
+    },
+    {
+      "term": "water",
+      "pos": "noun",
+      "translations": {
+        "uk": ["вода"]
+      },
+      "examples": [
+        {
+          "text": "Can I have a glass of water?",
+          "translations": {
+            "uk": "Можна мені склянку води?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "friend",
+      "pos": "noun",
+      "translations": {
+        "uk": ["друг", "подруга"]
+      },
+      "examples": [
+        {
+          "text": "She is my best friend.",
+          "translations": {
+            "uk": "Вона моя найкраща подруга."
+          }
+        }
+      ]
+    },
+    {
+      "term": "morning",
+      "pos": "noun",
+      "translations": {
+        "uk": ["ранок"]
+      },
+      "examples": [
+        {
+          "text": "I drink coffee every morning.",
+          "translations": {
+            "uk": "Я п'ю каву щоранку."
+          }
+        }
+      ]
+    },
+    {
+      "term": "happy",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["щасливий", "радий"]
+      },
+      "examples": [
+        {
+          "text": "The children are happy today.",
+          "translations": {
+            "uk": "Діти сьогодні щасливі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "big",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["великий"]
+      },
+      "examples": [
+        {
+          "text": "They live in a big city.",
+          "translations": {
+            "uk": "Вони живуть у великому місті."
+          }
+        }
+      ]
+    },
+    {
+      "term": "cold",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["холодний"]
+      },
+      "examples": [
+        {
+          "text": "It is cold outside, take a jacket.",
+          "translations": {
+            "uk": "Надворі холодно, візьми куртку."
+          }
+        }
+      ]
+    },
+    {
+      "term": "cheap",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["дешевий"]
+      },
+      "examples": [
+        {
+          "text": "This shop sells cheap clothes.",
+          "translations": {
+            "uk": "Цей магазин продає дешевий одяг."
+          }
+        }
+      ]
+    },
+    {
+      "term": "eat",
+      "pos": "verb",
+      "translations": {
+        "uk": ["їсти"]
+      },
+      "examples": [
+        {
+          "text": "We eat lunch at one o'clock.",
+          "translations": {
+            "uk": "Ми обідаємо о першій."
+          }
+        }
+      ]
+    },
+    {
+      "term": "drink",
+      "pos": "verb",
+      "translations": {
+        "uk": ["пити"]
+      },
+      "examples": [
+        {
+          "text": "Do you drink tea or coffee?",
+          "translations": {
+            "uk": "Ти п'єш чай чи каву?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "read",
+      "pos": "verb",
+      "translations": {
+        "uk": ["читати"]
+      },
+      "examples": [
+        {
+          "text": "I like to read before bed.",
+          "translations": {
+            "uk": "Я люблю читати перед сном."
+          }
+        }
+      ]
+    },
+    {
+      "term": "speak",
+      "pos": "verb",
+      "translations": {
+        "uk": ["говорити", "розмовляти"]
+      },
+      "examples": [
+        {
+          "text": "Do you speak English?",
+          "translations": {
+            "uk": "Ти розмовляєш англійською?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "always",
+      "pos": "adverb",
+      "translations": {
+        "uk": ["завжди"]
+      },
+      "examples": [
+        {
+          "text": "He is always late.",
+          "translations": {
+            "uk": "Він завжди запізнюється."
+          }
+        }
+      ]
+    },
+    {
+      "term": "today",
+      "pos": "adverb",
+      "translations": {
+        "uk": ["сьогодні"]
+      },
+      "examples": [
+        {
+          "text": "What are you doing today?",
+          "translations": {
+            "uk": "Що ти робиш сьогодні?"
+          }
+        }
+      ]
+    }
+  ]
+}

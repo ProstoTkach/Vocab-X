@@ -30,7 +30,7 @@ for (const vp of VIEWPORTS) {
       await expect(card).toBeVisible();
       await page.waitForTimeout(400);
       await page.screenshot({ path: `screenshots/review-front-${vp.name}.png` });
-      await page.getByRole('button', { name: 'Показати відповідь' }).click();
+      await card.click();
       await expect(card).toHaveAttribute('data-side', 'back');
       await page.waitForTimeout(400);
       await page.screenshot({ path: `screenshots/review-back-${vp.name}.png` });
@@ -41,6 +41,7 @@ for (const vp of VIEWPORTS) {
       await page.goto('/uk/review');
       await page.keyboard.press('3');
       await page.goto('/uk/decks');
+      await page.getByRole('searchbox', { name: 'Пошук слів' }).fill('achieve');
       await page.getByRole('button', { name: 'Подробиці про «achieve»' }).click();
       await expect(page.getByText('До наступного повторення')).toBeVisible();
       await page.screenshot({ path: `screenshots/words-${vp.name}.png` });

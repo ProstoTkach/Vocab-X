@@ -11,3 +11,5 @@ playwright-report/
 test-results/
 screenshots/
 next-env.d.ts
+# Copied from /public by apps/web/scripts/sync-media.mjs
+/apps/web/public/

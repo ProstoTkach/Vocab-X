@@ -9,11 +9,10 @@ import {
 import { format1 } from './format1-recognition';
 import { format2 } from './format2-recall';
 import { format3 } from './format3-partial-audio';
-import { format4 } from './format4-audio';
 import type { FormatRenderer } from './types';
 
 const RENDERERS = new Map<ExerciseFormat, FormatRenderer>(
-  [format1, format2, format3, format4].map((r) => [r.format, r]),
+  [format1, format2, format3].map((r) => [r.format, r]),
 );
 
 export function rendererFor(format: ExerciseFormat): FormatRenderer {

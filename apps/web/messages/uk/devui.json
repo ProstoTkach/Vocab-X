@@ -14,7 +14,7 @@
   "iconButton": "Додати",
   "badges": "Позначки",
   "badgeNew": "Нове",
-  "badgeDue": "До повторення",
+  "badgeDue": "В пам'яті",
   "badgeMastered": "Вивчено",
   "badgeHard": "Важко",
   "cards": "Картки",
@@ -41,6 +41,6 @@
   "toastTitle": "Збережено",
   "toastText": "Налаштування застосовано.",
   "tooltip": "Підказка",
-  "tooltipText": "Клавіша 3 — «Добре»",
+  "tooltipText": "Клавіша 3 — «Згадав»",
   "tooltipTrigger": "Наведіть на мене"
 }

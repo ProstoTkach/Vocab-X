@@ -33,7 +33,7 @@ export async function createDeck(
 export async function updateDeck(
   repos: DeckRepos,
   deck: Deck,
-  patch: Partial<Pick<Deck, 'title' | 'archived' | 'wordIds'>>,
+  patch: Partial<Pick<Deck, 'title' | 'archived' | 'wordIds' | 'skippedIds'>>,
   now: number,
 ): Promise<Deck> {
   const next: Deck = { ...deck, ...patch, updatedAt: now };
@@ -48,7 +48,13 @@ export async function duplicateDeck(
   title: string,
   ctx: Ctx,
 ): Promise<Deck> {
-  const { builtinId: _builtin, titleI18n: _t, descriptionI18n: _d, ...rest } = deck;
+  const {
+    builtinId: _builtin,
+    skippedIds: _skipped,
+    titleI18n: _t,
+    descriptionI18n: _d,
+    ...rest
+  } = deck;
   const copy: Deck = {
     ...rest,
     id: ctx.newId(),
@@ -144,6 +150,31 @@ export async function removeWordFromDeck(
   return updateDeck(repos, deck, { wordIds: deck.wordIds.filter((id) => id !== wordId) }, now);
 }
 
+/**
+ * "Review this more often": forgets what was learned about a word, so it comes back as a new
+ * card (format level 1, short intervals). The review history, its stats and XP are kept.
+ */
+export async function resetWordProgress(repos: Pick<Repos, 'progress'>, wordId: Id) {
+  await repos.progress.remove(wordId);
+}
+
+/**
+ * Words by the time left until their next review, soonest first: words not studied yet (ready
+ * to learn now) come first in their own order, then by due time. `latest` turns it around.
+ */
+export function dueOrder<T extends { id: Id }>(
+  words: readonly T[],
+  progress: ReadonlyMap<Id, CardProgress>,
+  direction: 'soonest' | 'latest' = 'soonest',
+): T[] {
+  const due = (w: T) => progress.get(w.id)?.dueAt ?? -Infinity;
+  const sorted = words
+    .map((w, i) => ({ w, i, d: due(w) }))
+    .sort((a, b) => a.d - b.d || a.i - b.i)
+    .map((x) => x.w);
+  return direction === 'soonest' ? sorted : sorted.reverse();
+}
+
 export type WordStatus = 'new' | 'due' | 'learning' | 'mastered';
 
 /** Stability (days) from which a word counts as mastered; matches the DB's generated status. */
@@ -190,9 +221,32 @@ export function importedBuiltinIds(own: readonly Deck[]): Set<Id> {
   return new Set(own.flatMap((d) => (d.builtinId ? [d.builtinId] : [])));
 }
 
+/** The learner's copy of a built-in deck, if any. */
+async function builtinCopy(repos: DeckRepos, builtin: Deck): Promise<Deck | undefined> {
+  return (await repos.decks.list({ includeArchived: true })).find(
+    (d) => d.origin === 'own' && d.builtinId === builtin.id,
+  );
+}
+
+function newBuiltinCopy(builtin: Deck, uiLocale: LangCode, ctx: Ctx): Deck {
+  return {
+    id: ctx.newId(),
+    title: builtin.titleI18n?.[uiLocale] ?? builtin.title,
+    ...(builtin.cefr ? { cefr: builtin.cefr } : {}),
+    lang: builtin.lang,
+    wordIds: [],
+    origin: 'own',
+    builtinId: builtin.id,
+    archived: false,
+    createdAt: ctx.now,
+    updatedAt: ctx.now,
+  };
+}
+
 /**
  * Adds words of a built-in deck to the learner's copy of it, creating the copy on first use.
  * With all word ids this imports the whole deck; with a selection it builds a personal version.
+ * Added words are no longer counted as skipped.
  */
 export async function addWordsFromBuiltin(
   repos: DeckRepos,
@@ -201,30 +255,62 @@ export async function addWordsFromBuiltin(
   uiLocale: LangCode,
   ctx: Ctx,
 ): Promise<Deck> {
-  const own = (await repos.decks.list({ includeArchived: true })).find(
-    (d) => d.origin === 'own' && d.builtinId === builtin.id,
-  );
+  const own = (await builtinCopy(repos, builtin)) ?? newBuiltinCopy(builtin, uiLocale, ctx);
   // Keep the built-in study order for the chosen words.
   const wanted = builtin.wordIds.filter((id) => wordIds.includes(id));
-  if (own) {
-    const merged = [...own.wordIds, ...wanted.filter((id) => !own.wordIds.includes(id))];
-    return updateDeck(repos, own, { wordIds: merged, archived: false }, ctx.now);
-  }
-  const deck: Deck = {
-    id: ctx.newId(),
-    title: builtin.titleI18n?.[uiLocale] ?? builtin.title,
-    ...(builtin.cefr ? { cefr: builtin.cefr } : {}),
-    lang: builtin.lang,
-    wordIds: wanted,
-    origin: 'own',
-    builtinId: builtin.id,
-    archived: false,
-    createdAt: ctx.now,
-    updatedAt: ctx.now,
-  };
-  await repos.decks.save(deck);
-  return deck;
+  const merged = [...own.wordIds, ...wanted.filter((id) => !own.wordIds.includes(id))];
+  const skipped = own.skippedIds?.filter((id) => !wanted.includes(id));
+  return updateDeck(
+    repos,
+    own,
+    { wordIds: merged, archived: false, ...(skipped ? { skippedIds: skipped } : {}) },
+    ctx.now,
+  );
 }
+
+/**
+ * Remembers that the learner skipped words while picking from a built-in deck, so picking can
+ * be continued later. Words already in the copy are not marked.
+ */
+export async function skipBuiltinWords(
+  repos: DeckRepos,
+  builtin: Deck,
+  wordIds: readonly Id[],
+  uiLocale: LangCode,
+  ctx: Ctx,
+): Promise<Deck> {
+  const own = (await builtinCopy(repos, builtin)) ?? newBuiltinCopy(builtin, uiLocale, ctx);
+  const prev = own.skippedIds ?? [];
+  const add = builtin.wordIds.filter(
+    (id) => wordIds.includes(id) && !own.wordIds.includes(id) && !prev.includes(id),
+  );
+  return updateDeck(repos, own, { skippedIds: [...prev, ...add] }, ctx.now);
+}
+
+export interface BuiltinPickState {
+  total: number;
+  /** Words of the built-in deck in the learner's copy. */
+  added: number;
+  /** Words looked at and skipped while picking. */
+  skipped: number;
+  /** Some words were looked at, but not all of them: picking can be continued. */
+  inProgress: boolean;
+}
+
+/** How far the learner got with a built-in deck (added and skipped words). */
+export function builtinPickState(builtin: Deck, own: readonly Deck[]): BuiltinPickState {
+  const copy = own.find((d) => d.origin === 'own' && d.builtinId === builtin.id);
+  const inCopy = new Set(copy?.wordIds);
+  const skippedSet = new Set(copy?.skippedIds);
+  const added = builtin.wordIds.filter((id) => inCopy.has(id)).length;
+  const skipped = builtin.wordIds.filter((id) => !inCopy.has(id) && skippedSet.has(id)).length;
+  const total = builtin.wordIds.length;
+  return { total, added, skipped, inProgress: added + skipped > 0 && added + skipped < total };
+}
+
+/** A copy that holds only skipped words (nothing added yet) is picking state, not a deck. */
+export const isPickOnlyCopy = (d: Deck) =>
+  !!d.builtinId && d.wordIds.length === 0 && (d.skippedIds?.length ?? 0) > 0;
 
 /** The learner's default deck for a language ("My words"), created when first needed. */
 export async function ensurePersonalDeck(

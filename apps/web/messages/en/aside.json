@@ -4,5 +4,12 @@
   "streakDays": "{count, plural, one {# day} other {# days}}",
   "goalTitle": "Today’s goal",
   "goalProgress": "{current} of {goal} XP",
-  "demoNote": "Prototype: data is stored only in this browser."
+  "demoNote": "Prototype: data is stored only in this browser.",
+  "calendarLabel": "Streak calendar",
+  "dayDone": "{date}: goal met",
+  "dayMissed": "{date}: goal missed",
+  "today": "Today",
+  "scrollBack": "Earlier days",
+  "scrollForward": "Later days",
+  "streakAtRisk": "Don’t let your streak break!"
 }

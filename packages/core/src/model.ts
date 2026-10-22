@@ -62,6 +62,8 @@ export interface Deck {
   origin: 'own' | 'builtin';
   /** Set when an own deck was imported from a built-in one. */
   builtinId?: Id;
+  /** Words of the built-in deck the learner looked at while picking and chose not to add. */
+  skippedIds?: Id[];
   /** The learner's default deck for words added without choosing one (one per language). */
   personal?: boolean;
   archived: boolean;
@@ -102,15 +104,30 @@ export interface StudySettings {
   cardFontScale: number;
   swipeLayout: SwipeLayout;
   dailyGoalXp: number;
+  /** Show the grade buttons under the card on phones too (there swiping is the default). */
+  gradeButtonsOnPhone: boolean;
 }
+
+/**
+ * How playful the app is. `max`: animated rewards and character, aimed at children; `medium`:
+ * the same rewards and character without animations that hold the learner up; `off`: none.
+ */
+export type GamificationMode = 'off' | 'medium' | 'max';
 
 export interface AppSettings {
   themeId: string;
   study: StudySettings;
+  gamification: GamificationMode;
   /** Demo/dev: offset applied to the clock, ms. */
   timeOffsetMs: number;
   /** Shows the developer panel (time travel for demos). */
   devTools: boolean;
+  /** One-time tips already shown (e.g. 'four-grades'). */
+  tipsSeen: string[];
+  /** The highest player level already congratulated on. */
+  levelSeen: number;
+  /** Demo/dev: XP added to the earned total (e.g. to show a high level). */
+  xpBonus: number;
 }
 
 /** Materialized card state; can always be rebuilt from the review log. */
@@ -160,6 +177,8 @@ export interface GamificationState {
   achievements: Record<Id, number>;
   inventory: Id[];
   equipped: Partial<Record<string, Id>>;
+  /** Unlockable cosmetics the learner has already seen opened (the rest are shown as new). */
+  wardrobeSeen: Id[];
 }
 
 /** Read-only content shipped with the app: built-in decks and their words. */

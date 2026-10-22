@@ -2,13 +2,15 @@
 import type { SchedulerParams } from './config/params';
 import type { ReviewEvent } from './model';
 import { rngForEvent } from './rng';
-import { review, type CardState, type ReviewResult } from './scheduler';
+import { placeKnown, review, type CardState, type ReviewResult } from './scheduler';
 
 export function applyEvent(
   card: CardState | null,
-  e: Pick<ReviewEvent, 'id' | 'grade' | 'at' | 'retention'>,
+  e: Pick<ReviewEvent, 'id' | 'grade' | 'at' | 'retention' | 'kind'>,
   p: SchedulerParams,
 ): ReviewResult {
+  // "I know it" from the level check skips the learning phase of a new card.
+  if (e.kind === 'placement' && !card) return placeKnown(e.at, p, e.retention, rngForEvent(e.id));
   return review(card, e.grade, e.at, p, e.retention, rngForEvent(e.id));
 }
 

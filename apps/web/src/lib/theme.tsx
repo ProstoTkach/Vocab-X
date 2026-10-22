@@ -4,7 +4,7 @@ import { getTheme, SYSTEM_THEMES } from '@/themes/registry';
 import { SYSTEM_THEME_ID } from '@/themes/types';
 import { isUnlocked } from '@/themes/unlock';
 import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from 'react';
-import { usePlayerLevel } from './player';
+import { usePlayer } from './player';
 import { useRepos } from './repos';
 import { useRootAttribute } from './root-attribute';
 
@@ -40,7 +40,7 @@ function apply(choice: string) {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const repos = useRepos();
-  const level = usePlayerLevel();
+  const { level, ready } = usePlayer();
   const choice = useRootAttribute('theme-choice', SYSTEM_THEME_ID) ?? SYSTEM_THEME_ID;
   const resolved = useRootAttribute('theme', SYSTEM_THEMES.light) ?? SYSTEM_THEMES.light;
 
@@ -62,10 +62,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     [repos, allowed],
   );
 
-  // A cosmetic theme that is not unlocked (edited storage, lost progress) falls back.
+  // A cosmetic theme that is not unlocked (edited storage, lost progress) falls back, once the
+  // real level is known.
   useEffect(() => {
-    if (!allowed(choice)) setChoice(SYSTEM_THEME_ID);
-  }, [allowed, choice, setChoice]);
+    if (ready && !allowed(choice)) setChoice(SYSTEM_THEME_ID);
+  }, [ready, allowed, choice, setChoice]);
 
   useEffect(() => {
     if (choice !== SYSTEM_THEME_ID) return;

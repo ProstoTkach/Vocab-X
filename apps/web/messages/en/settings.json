@@ -16,7 +16,7 @@
   "newLimit": "New words per day",
   "reviewLimit": "Reviews per day",
   "unlimited": "Unlimited",
-  "twoGrades": "Only two grades (“Again” / “Good”)",
+  "twoGrades": "Only two grades (“Forgot” / “Remembered”)",
   "typing": "Type the word instead of flipping",
   "autoSpeak": "Speak the word on the first flip",
   "animation": "Animation speed",
@@ -30,8 +30,19 @@
   "fontLarge": "Larger",
   "fontHuge": "Large",
   "swipeLayout": "Swipe layout",
-  "swipeDefault": "← Again · → Good",
-  "swipeMirrored": "← Good · → Again",
+  "swipeDefault": "← Forgot · → Remembered",
+  "swipeMirrored": "← Remembered · → Forgot",
   "dailyGoal": "Daily goal",
-  "dailyGoalValue": "{xp} XP"
+  "dailyGoalValue": "{xp} XP",
+  "gamification": "Game mode",
+  "gamificationHint": "Rewards, the character and celebrations. Applies right away.",
+  "gamificationModes": {
+    "max": "Maximum",
+    "maxHint": "Animations, confetti and a lively character. Bright and fun — great for children.",
+    "medium": "Medium",
+    "mediumHint": "Rewards, achievements and the character stay, without animations that make you wait.",
+    "off": "Off",
+    "offHint": "Just learning: no character and no celebrations."
+  },
+  "gradeButtonsOnPhone": "Grade buttons under the card on phones"
 }

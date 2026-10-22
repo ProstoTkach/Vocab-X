@@ -4,5 +4,12 @@
   "streakDays": "{count, plural, one {# день} few {# дні} many {# днів} other {# дня}}",
   "goalTitle": "Ціль на сьогодні",
   "goalProgress": "{current} з {goal} XP",
-  "demoNote": "Прототип: дані зберігаються лише в цьому браузері."
+  "demoNote": "Прототип: дані зберігаються лише в цьому браузері.",
+  "calendarLabel": "Календар серії",
+  "dayDone": "{date}: ціль виконано",
+  "dayMissed": "{date}: ціль не виконано",
+  "today": "Сьогодні",
+  "scrollBack": "Раніші дні",
+  "scrollForward": "Пізніші дні",
+  "streakAtRisk": "Не дайте серії перерватися!"
 }

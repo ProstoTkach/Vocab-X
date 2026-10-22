@@ -3,48 +3,49 @@
 import { useTranslations } from 'next-intl';
 import {
   AnswerInput,
+  CardLayout,
   ExampleBlock,
-  PartOfSpeech,
-  SpeakButton,
-  Term,
+  SpokenTerm,
   Translations,
   translationsOf,
   TypedFeedback,
 } from './parts';
 import type { FormatProps, FormatRenderer } from './types';
 
-/** Level 2: see the translation, produce the word (flip or type). */
+/**
+ * Level 3: see the translation, produce the word (flip or type). The translation is in the
+ * middle of the front, the word in the middle of the back, with the example at the bottom.
+ */
 function Format2Recall(p: FormatProps) {
   const { card, side, nativeLang } = p;
-  const tl = useTranslations('languages');
   const t = useTranslations('review');
-  return (
-    <div className="flex flex-col items-center gap-3 text-center">
-      <p className="text-sm text-fg-muted">
-        {t('translateTo', { lang: tl(card.word.lang as 'en') })}
-      </p>
-      <Translations word={card.word} lang={nativeLang} />
-      <PartOfSpeech word={card.word} />
-      {side === 'front' && p.typing && !p.typed && (
-        <AnswerInput lang={card.word.lang} onSubmit={p.onTypedSubmit} />
-      )}
-      {side === 'back' && (
-        <>
-          <hr className="my-1 w-16 border-line" />
-          {p.typed && <TypedFeedback typed={p.typed} />}
-          <div className="flex items-center gap-2">
-            <Term word={card.word} />
-            <SpeakButton text={card.word.term} speechLang={p.speechLang} speech={p.speech} />
-          </div>
+  if (side === 'back') {
+    return (
+      <CardLayout
+        above={p.typed && <TypedFeedback typed={p.typed} />}
+        below={
           <ExampleBlock
             example={card.word.examples[0]}
             term={card.word.term}
             wordLang={card.word.lang}
             nativeLang={nativeLang}
           />
-        </>
-      )}
-    </div>
+        }
+      >
+        <SpokenTerm word={card.word} speechLang={p.speechLang} speech={p.speech} />
+      </CardLayout>
+    );
+  }
+  return (
+    <CardLayout
+      above={<p className="text-sm text-fg-muted">{t('translateTo', { lang: card.word.lang })}</p>}
+      below={
+        p.typing && !p.typed && <AnswerInput lang={card.word.lang} onSubmit={p.onTypedSubmit} />
+      }
+      belowAt="start"
+    >
+      <Translations word={card.word} lang={nativeLang} size="lg" />
+    </CardLayout>
   );
 }
 

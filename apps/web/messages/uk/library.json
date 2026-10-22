@@ -9,7 +9,7 @@
   "addedAll": "Уся колода додана",
   "addedSome": "Додано {added} з {total}",
   "alreadyAdded": "Уже в моїх",
-  "addedAllToast": "Колоду «{name}» додано",
+  "addedAllToast": "Колоду «{name}» збережено до ваших слів",
   "pickTitle": "Обираєте слова",
   "pickHint": "Вправо — додати до вивчення, вліво — пропустити.",
   "pickAdd": "Додати",
@@ -20,5 +20,12 @@
   "pickSummaryTitle": "{count, plural, =0 {Нічого не додано} one {Додано # слово} few {Додано # слова} many {Додано # слів} other {Додано # слова}}",
   "pickSummaryText": "Слова потрапили в колоду «{name}» і вже чекають у вашій колоді.",
   "toWords": "До моїх слів",
-  "notFound": "Колоду не знайдено."
+  "notFound": "Колоду не знайдено.",
+  "pickContinue": "Продовжити відбір",
+  "pickSkippedAgain": "Переглянути пропущені",
+  "inProgress": "Відбір не завершено",
+  "reviewed": "Переглянуто {done} з {total}",
+  "pickAddedCount": "Додано: {count}",
+  "pickSkippedCount": "Пропущено: {count}",
+  "pickSaveError": "Не вдалося зберегти вибір. Спробуйте ще раз."
 }

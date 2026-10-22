@@ -4,7 +4,10 @@
 // <html> (a locale switch clears its attributes). It reads localStorage directly because
 // it must be synchronous and repositories are not loaded yet.
 import { KEY_PREFIX } from '@vocabx/data';
-import { EXPANDED_SIDEBAR_ROUTES } from '@/components/shell/sidebar-config';
+import {
+  EXPANDED_SIDEBAR_ROUTES,
+  SIDEBAR_AUTO_COLLAPSE_PX,
+} from '@/components/shell/sidebar-config';
 import { SYSTEM_THEMES, THEMES } from '@/themes/registry';
 import { SYSTEM_THEME_ID } from '@/themes/types';
 
@@ -15,6 +18,8 @@ interface BootConfig {
   systemId: string;
   /** Paths (without locale) where the sidebar starts expanded. */
   expandedRoutes: readonly string[];
+  /** Narrower windows always start with the sidebar collapsed. */
+  autoCollapsePx: number;
 }
 
 // Self-contained: serialized with toString(), so it must not reference outer scope.
@@ -38,9 +43,10 @@ function boot(c: BootConfig) {
   d.dataset.theme = id;
   d.dataset.themeChoice = choice;
   d.style.colorScheme = c.schemes[id] ?? 'light';
-  // Sidebar: expanded only on the configured pages (path after the locale segment).
+  // Sidebar: expanded only on the configured pages (path after the locale segment), and only in
+  // a wide enough window.
   const path = '/' + location.pathname.split('/').slice(2).join('/');
-  if (c.expandedRoutes.includes(path)) delete d.dataset.sidebar;
+  if (c.expandedRoutes.includes(path) && innerWidth >= c.autoCollapsePx) delete d.dataset.sidebar;
   else d.dataset.sidebar = 'collapsed';
 }
 
@@ -77,6 +83,7 @@ function config(): BootConfig {
     system: SYSTEM_THEMES,
     systemId: SYSTEM_THEME_ID,
     expandedRoutes: EXPANDED_SIDEBAR_ROUTES,
+    autoCollapsePx: SIDEBAR_AUTO_COLLAPSE_PX,
   };
 }
 

@@ -8,9 +8,11 @@ import {
   type Word,
   type WordReviewStats,
 } from '@vocabx/core';
-import { ChevronDown, CircleCheck, CircleX, Flame } from 'lucide-react';
+import { ChevronDown, CircleCheck, CircleX, Flame, RotateCcw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId, useState, type ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
+import { ProgressBar } from '@/components/ui/progress-bar';
 import { cx } from '@/lib/cx';
 import { useNow } from '@/lib/use-now';
 import { HighlightedText } from './highlighted-text';
@@ -21,21 +23,7 @@ const MINUTE = 60_000;
 
 export function MasteryBar({ value, label }: { value: number; label: string }) {
   const pct = Math.round(value * 100);
-  return (
-    <div
-      role="meter"
-      aria-label={label}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={pct}
-      className="h-1.5 w-full overflow-hidden rounded-full bg-surface-3"
-    >
-      <div
-        className="h-full rounded-full bg-brand transition-[width] motion-slow"
-        style={{ width: `${pct}%` }}
-      />
-    </div>
-  );
+  return <ProgressBar value={pct} label={label} valueText={`${pct}%`} size="xs" />;
 }
 
 /** Live countdown to the next review. */
@@ -61,11 +49,13 @@ function WordDetails({
   nativeLang,
   progress,
   stats,
+  onReset,
 }: {
   word: Word;
   nativeLang: LangCode;
   progress: CardProgress | undefined;
   stats: WordReviewStats | undefined;
+  onReset: (() => void) | undefined;
 }) {
   const t = useTranslations('words');
   const example = word.examples[0];
@@ -97,6 +87,13 @@ function WordDetails({
             <p className="text-sm text-fg-muted">{t('noExample')}</p>
           )}
         </div>
+        {/* Only a word already being learned has something to reset. */}
+        {progress && onReset && (
+          <Button variant="secondary" size="sm" onClick={onReset} className="self-start">
+            <RotateCcw aria-hidden className="size-4" />
+            {t('reviewMore')}
+          </Button>
+        )}
       </div>
       <dl className="flex flex-wrap gap-2 self-start @md:flex-col">
         <div className="flex items-center gap-2 rounded-control bg-success/10 px-3 py-2">
@@ -125,14 +122,14 @@ export interface WordItemProps {
   nativeLang: LangCode;
   progress: CardProgress | undefined;
   stats: WordReviewStats | undefined;
-  /** Leading control (e.g. a drag handle). */
-  leading?: ReactNode;
   /** Trailing controls (e.g. edit, remove). */
   actions?: ReactNode;
+  /** "Review this more often": resets what was learned; shown for words being learned. */
+  onReset?: () => void;
 }
 
 /** A word with its learning bar; opens to show timing, example and answer history. */
-export function WordItem({ word, nativeLang, progress, stats, leading, actions }: WordItemProps) {
+export function WordItem({ word, nativeLang, progress, stats, actions, onReset }: WordItemProps) {
   const t = useTranslations('words');
   const [open, setOpen] = useState(false);
   const panelId = useId();
@@ -141,7 +138,6 @@ export function WordItem({ word, nativeLang, progress, stats, leading, actions }
   return (
     <div className="@container overflow-hidden rounded-control border border-line/70 bg-surface shadow-card">
       <div className="flex items-center gap-1 p-1.5">
-        {leading}
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
@@ -152,8 +148,11 @@ export function WordItem({ word, nativeLang, progress, stats, leading, actions }
         >
           <span className="flex min-w-0 flex-1 flex-col gap-1.5">
             <span className="flex items-baseline gap-2">
-              <span lang={word.lang} className="truncate font-semibold">
+              <span lang={word.lang} className="max-w-[70%] shrink-0 truncate font-semibold">
                 {word.term}
+              </span>
+              <span aria-hidden className="shrink-0 text-fg-muted">
+                —
               </span>
               <span lang={nativeLang} className="truncate text-sm text-fg-muted">
                 {(word.translations[nativeLang] ?? []).join(', ')}
@@ -173,7 +172,13 @@ export function WordItem({ word, nativeLang, progress, stats, leading, actions }
       </div>
       {open && (
         <div id={panelId}>
-          <WordDetails word={word} nativeLang={nativeLang} progress={progress} stats={stats} />
+          <WordDetails
+            word={word}
+            nativeLang={nativeLang}
+            progress={progress}
+            stats={stats}
+            onReset={onReset}
+          />
         </div>
       )}
     </div>

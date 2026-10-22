@@ -15,6 +15,7 @@ import {
 import { beforeEach, describe, expect, test } from 'vitest';
 import { MemoryStorage } from '../storage';
 import { LocalStorageRepo } from './local-storage-repo';
+import { MIGRATIONS, migrate, SCHEMA_VERSION } from './schema';
 import { KEY_PREFIX } from './store';
 
 const word = (id: string, lang = 'en'): Word => ({
@@ -232,11 +233,25 @@ describe('LocalStorageRepo', () => {
     const s = new MemoryStorage();
     await new LocalStorageRepo(s).settings.update({ themeId: 'dark' });
     const upgraded = new LocalStorageRepo(s, {
-      schemaVersion: 2,
-      migrations: [{ to: 2, migrate: (d) => ({ ...d, gamification: { xpTotal: 42 } }) }],
+      schemaVersion: SCHEMA_VERSION + 1,
+      migrations: [
+        ...MIGRATIONS,
+        { to: SCHEMA_VERSION + 1, migrate: (d) => ({ ...d, gamification: { xpTotal: 42 } }) },
+      ],
     });
     expect((await upgraded.gamification.get()).xpTotal).toBe(42);
     expect((await upgraded.settings.get()).themeId).toBe('dark');
+  });
+
+  test('v2: рівні 2 і 3 міняються місцями, рівень 4 стає 3', () => {
+    const card = (level: number) => ({ wordId: 'w', card: { level, levelStreak: 1 } });
+    const out = migrate(
+      { 'progress:en': { a: card(1), b: card(2), c: card(3), d: card(4) }, profile: { x: 1 } },
+      1,
+    ) as { 'progress:en': Record<string, { card: { level: number; levelStreak: number } }> };
+    const levels = Object.values(out['progress:en']).map((p) => p.card.level);
+    expect(levels).toEqual([1, 3, 2, 3]);
+    expect(out['progress:en'].b!.card.levelStreak).toBe(0);
   });
 
   test('дані новішої версії схеми не перезаписуються', () => {

@@ -54,6 +54,7 @@ export const deckSchema = z.object({
   wordIds: z.array(id).max(100_000),
   origin: z.enum(['own', 'builtin']),
   builtinId: id.optional(),
+  skippedIds: z.array(id).max(100_000).optional(),
   personal: z.boolean().optional(),
   archived: z.boolean(),
   createdAt: time,
@@ -82,21 +83,26 @@ export const studySettingsSchema = z.object({
   cardFontScale: z.number().min(0.5).max(3),
   swipeLayout: z.enum(['default', 'mirrored']),
   dailyGoalXp: z.number().int().min(1).max(10_000),
+  gradeButtonsOnPhone: z.boolean(),
 });
 
 /** Stored settings are partial: missing fields fall back to defaults. */
 export const settingsPatchSchema = z.object({
   themeId: z.string().max(64).optional(),
   study: studySettingsSchema.partial().optional(),
+  gamification: z.enum(['off', 'medium', 'max']).optional(),
   timeOffsetMs: z.number().optional(),
   devTools: z.boolean().optional(),
+  tipsSeen: z.array(z.string().max(64)).max(100).optional(),
+  levelSeen: z.number().int().min(1).optional(),
+  xpBonus: z.number().int().nonnegative().optional(),
 });
 
 export const cardStateSchema = z.object({
   stability: z.number().positive(),
   difficulty: z.number().min(1).max(10),
   lastReviewAt: time,
-  level: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+  level: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   levelStreak: z.number().int().nonnegative(),
   lapses: z.number().int().nonnegative(),
   reps: z.number().int().nonnegative(),
@@ -126,4 +132,5 @@ export const gamificationSchema = z.object({
   achievements: z.record(id, time),
   inventory: z.array(id),
   equipped: z.record(z.string(), id),
+  wardrobeSeen: z.array(id),
 });

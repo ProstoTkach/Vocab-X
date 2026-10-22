@@ -14,8 +14,11 @@ export type StudyStackState =
   | { status: 'loading' }
   | { status: 'ready'; lang: LangCode; cards: StudyCard[]; fresh: number; due: number };
 
-/** Today's stack for the active language; recomputed when the (demo) clock moves. */
-export function useStudyStack(): StudyStackState {
+/**
+ * Today's stack for the active language; recomputed when the (demo) clock moves or `version`
+ * changes (e.g. after adding a word).
+ */
+export function useStudyStack(version = 0): StudyStackState {
   const repos = useRepos();
   const { clock, dayOf, offsetMs } = useClock();
   const [state, setState] = useState<StudyStackState>({ status: 'loading' });
@@ -44,7 +47,7 @@ export function useStudyStack(): StudyStackState {
       });
     })();
     return () => ctrl.abort();
-  }, [repos, clock, dayOf, offsetMs]);
+  }, [repos, clock, dayOf, offsetMs, version]);
 
   return state;
 }

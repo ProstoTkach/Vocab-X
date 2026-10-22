@@ -6,9 +6,10 @@ import {
   DEFAULT_SCHEDULER_PARAMS,
   gradeTypedAnswer,
   loadStudyStack,
-  review,
+  nextReturnAt,
   sessionDone,
   sessionReducer,
+  sessionReturnAt,
   startSession,
   submitReview,
   undoReview,
@@ -23,13 +24,18 @@ import {
 import { MotionConfig } from 'motion/react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { localeInfo } from '@/i18n/locales';
 import { useClock } from '@/lib/clock';
+import { useGamification } from '@/lib/gamification';
 import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
+import { cx } from '@/lib/cx';
 import { useSpeech } from '@/lib/speech';
 import { createStopwatch } from '@/lib/stopwatch';
+import { Celebration } from './celebration';
+import { FOUR_GRADES_TIP, FOUR_GRADES_TIP_STREAK, FourGradesTip } from './four-grades-tip';
+import { REVIEW_INTRO, ReviewIntro } from './review-intro';
 import { CardStage } from './card-stage';
 import { acceptedAnswers } from './formats/parts';
 import { formatOf, rendererFor } from './formats/registry';
@@ -45,6 +51,7 @@ import {
   type SwipeOptions,
 } from './swipe';
 import { SessionTopBar } from './top-bar';
+import { WaitingPanel } from './waiting-panel';
 
 type Session = SessionState<StudyCard, ReviewOutcome>;
 interface Setup {
@@ -53,6 +60,10 @@ interface Setup {
   /** Set when reviewing a single deck (?deck=…). */
   deck: Deck | null;
   startedAt: number;
+  /** XP earned today before this session, for the daily goal. */
+  xpBefore: number;
+  /** One-time tips already shown. */
+  tipsSeen: string[];
 }
 
 const ALL_GRADES: readonly Grade[] = [1, 2, 3, 4];
@@ -80,17 +91,25 @@ export function ReviewSession() {
   const repos = useRepos();
   const { clock, dayOf } = useClock();
   const speech = useSpeech();
+  const gamification = useGamification();
 
   const [setup, setSetup] = useState<Setup | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [side, setSide] = useState<'front' | 'back'>('front');
-  /** The answer was seen at least once: shows the grade buttons and gates auto-speech. */
+  /** The answer was seen at least once: gates auto-speech. */
   const [revealed, setRevealed] = useState(false);
   const [typed, setTyped] = useState<TypedAnswer | null>(null);
   const [exitDir, setExitDir] = useState<PhysicalDir | null>(null);
   const [busy, setBusy] = useState(false);
   const [endedAt, setEndedAt] = useState<number | null>(null);
+  /** The daily goal was reached during this session: shows the celebration once. */
+  const [celebrate, setCelebrate] = useState(false);
+  /** Correct answers in a row in this session, for the four-grades tip. */
+  const [run, setRun] = useState(0);
+  const [tipOpen, setTipOpen] = useState(false);
+  /** The first-visit instructions were closed in this session. */
+  const [introClosed, setIntroClosed] = useState(false);
   /** Time since the current card was shown, for response times. */
   const [watch] = useState(createStopwatch);
 
@@ -102,6 +121,7 @@ export function ReviewSession() {
       if (!profile) return;
       const deck = deckParam ? await repos.decks.get(deckParam) : null;
       const now = clock.now();
+      const [todayStats] = await repos.reviewLog.dailyStats(dayOf(now), dayOf(now));
       const cards = await loadStudyStack(repos, {
         lang: deck?.lang ?? profile.activeTargetLang,
         now,
@@ -112,7 +132,14 @@ export function ReviewSession() {
       });
       if (ctrl.signal.aborted) return;
       watch.reset();
-      setSetup({ profile, settings: settings.study, deck, startedAt: now });
+      setSetup({
+        profile,
+        settings: settings.study,
+        deck,
+        startedAt: now,
+        xpBefore: todayStats?.xp ?? 0,
+        tipsSeen: settings.tipsSeen,
+      });
       setSession(startSession<StudyCard, ReviewOutcome>(cards));
       setSide('front');
       setRevealed(false);
@@ -123,6 +150,14 @@ export function ReviewSession() {
   }, [repos, clock, dayOf, reloadKey, watch, deckParam]);
 
   const card = session?.queue[0];
+  const introOpen = !!setup && !introClosed && !setup.tipsSeen.includes(REVIEW_INTRO);
+  const closeIntro = () => {
+    setIntroClosed(true);
+    if (!setup) return;
+    const tipsSeen = [...setup.tipsSeen, REVIEW_INTRO];
+    setSetup((s) => s && { ...s, tipsSeen });
+    void repos.settings.update({ tipsSeen });
+  };
   const settings = setup?.settings;
   const swipe: SwipeOptions = {
     rtl: localeInfo(locale).dir === 'rtl',
@@ -134,11 +169,24 @@ export function ReviewSession() {
   const renderer = rendererFor(format);
   const typing = !!settings?.typing && renderer.supportsTyping;
   const speechLang = card ? (getLanguage(card.word.lang)?.speechLang ?? card.word.lang) : '';
+  // A listening card plays its word as soon as it shows up: hearing it is the exercise.
+  const cardKey = card ? `${card.id}:${session.reviewed}` : null;
+  const listenTerm = format === 'AUD_PART' && card ? card.word.term : null;
+  // Once per card, as soon as a voice is there (voices load a moment after the page).
+  const spokenFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!cardKey || !listenTerm || spokenFor.current === cardKey) return;
+    if (!speech.canSpeak(speechLang)) return;
+    spokenFor.current = cardKey;
+    speech.speak(listenTerm, speechLang);
+  }, [cardKey, listenTerm, speech, speechLang]);
 
   /** The first reveal of a card speaks the word once; later flips are silent. */
   const reveal = () => {
     if (!card) return;
-    if (!revealed && settings?.autoSpeak) speech.speak(card.word.term, speechLang);
+    // A listening card has spoken already.
+    if (!revealed && settings?.autoSpeak && format !== 'AUD_PART')
+      speech.speak(card.word.term, speechLang);
     setRevealed(true);
   };
 
@@ -200,6 +248,8 @@ export function ReviewSession() {
       difficulty: outcome.progress.card.difficulty,
       lastReviewAt: outcome.progress.card.lastReviewAt,
     };
+    // A card in its learning phase (due again within minutes) comes back in this session.
+    const back = sessionReturnAt(now, outcome.progress.dueAt);
     setSession((s) => {
       if (!s) return s;
       return sessionReducer(s, {
@@ -207,11 +257,30 @@ export function ReviewSession() {
         grade: g,
         xp: outcome.event.xp,
         updated,
+        returnAt: back,
+        now,
         token: outcome,
       });
     });
-    // The last card done (nothing requeued): remember when, for the summary.
-    if (session.queue.length === 1 && g !== 1) setEndedAt(now);
+    // The last card done (nothing comes back): remember when, for the summary.
+    if (session.queue.length === 1 && session.waiting.length === 0 && back === null)
+      setEndedAt(now);
+    const goal = setup.settings.dailyGoalXp;
+    const before = setup.xpBefore + session.xp;
+    if (before < goal && before + outcome.event.xp >= goal) setCelebrate(true);
+    // The first good run with two grades brings the tip about Hard and Easy, once.
+    const nextRun = g >= 2 ? run + 1 : 0;
+    setRun(nextRun);
+    if (
+      nextRun >= FOUR_GRADES_TIP_STREAK &&
+      setup.settings.twoGrades &&
+      !setup.tipsSeen.includes(FOUR_GRADES_TIP)
+    ) {
+      const tipsSeen = [...setup.tipsSeen, FOUR_GRADES_TIP];
+      setSetup((s) => s && { ...s, tipsSeen });
+      void repos.settings.update({ tipsSeen });
+      setTipOpen(true);
+    }
     setExitDir(dir ?? directionForGrade(g, swipe));
     nextCard();
     setBusy(false);
@@ -229,10 +298,20 @@ export function ReviewSession() {
     setBusy(false);
   };
 
+  // Waiting cards come back on their own once due (the demo clock may jump, so poll gently).
+  const returnAt = session ? nextReturnAt(session) : null;
+  useEffect(() => {
+    if (returnAt === null) return;
+    const release = () =>
+      setSession((s) => s && sessionReducer(s, { type: 'release', upTo: clock.now() }));
+    const id = window.setInterval(release, 1000);
+    return () => window.clearInterval(id);
+  }, [returnAt, clock]);
+
   // Keyboard: Space/Enter flip (any number of times), 1–4 and arrows grade, Z undoes.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || tipOpen || introOpen) return;
       if (isTextInput(e.target)) return;
       if (e.key === 'z' || e.key === 'Z') {
         e.preventDefault();
@@ -270,22 +349,7 @@ export function ReviewSession() {
       ? toTwoGrades(typed.result.grade)
       : typed.result.grade
     : null;
-  // Interval preview with neutral fuzz; the real interval is computed on submit.
-  const intervals = card
-    ? Object.fromEntries(
-        grades.map((g) => [
-          g,
-          review(
-            card.progress?.card ?? null,
-            g,
-            setup.startedAt,
-            DEFAULT_SCHEDULER_PARAMS,
-            setup.settings.retention,
-            () => 0.5,
-          ).intervalDays,
-        ]),
-      )
-    : {};
+  const goal = { xp: setup.xpBefore + session.xp, target: setup.settings.dailyGoalXp };
   const front = card ? (renderer.frontText(card, nativeLang) ?? t('listenPrompt')) : '';
   const deckName = setup.deck ? (setup.deck.titleI18n?.[locale] ?? setup.deck.title) : null;
 
@@ -311,7 +375,15 @@ export function ReviewSession() {
               canUndo={session.history.length > 0 && !busy}
               onUndo={() => void undo()}
             />
-            {!card ? (
+            {!card && returnAt !== null ? (
+              <WaitingPanel
+                returnAt={returnAt}
+                waiting={session.waiting.length}
+                onShowNow={() =>
+                  setSession((s) => s && sessionReducer(s, { type: 'release', upTo: returnAt }))
+                }
+              />
+            ) : !card ? (
               <SessionSummary
                 session={session}
                 minutes={Math.max(
@@ -348,10 +420,22 @@ export function ReviewSession() {
                     if (g) void grade(g, dir);
                   }}
                   onTap={flip}
+                  back={
+                    <renderer.Component
+                      card={card}
+                      side="back"
+                      nativeLang={nativeLang}
+                      speechLang={speechLang}
+                      speech={speech}
+                      typing={typing}
+                      typed={typed}
+                      onTypedSubmit={submitTyped}
+                    />
+                  }
                 >
                   <renderer.Component
                     card={card}
-                    side={side}
+                    side="front"
                     nativeLang={nativeLang}
                     speechLang={speechLang}
                     speech={speech}
@@ -360,37 +444,44 @@ export function ReviewSession() {
                     onTypedSubmit={submitTyped}
                   />
                 </CardStage>
-                {/* Fixed height: switching between "show" and the grades never moves the card. */}
-                <div className="flex h-24 shrink-0 flex-col justify-end">
-                  {revealed ? (
-                    <GradeBar
-                      grades={grades}
-                      intervals={intervals}
-                      suggested={suggested}
-                      swipe={swipe}
-                      onGrade={(g) => void grade(g)}
-                      disabled={busy}
-                    />
-                  ) : typing ? null : (
-                    <button
-                      type="button"
-                      onClick={flip}
-                      className="flex min-h-16 w-full flex-col items-center justify-center rounded-control bg-brand font-semibold text-on-accent shadow-glow transition motion-fast hover:brightness-110 active:scale-[0.98]"
-                    >
-                      {t('show')}
-                      <span className="text-xs font-normal opacity-85">
-                        <span className="pointer-coarse:hidden">{t('showHint')}</span>
-                        <span className="hidden pointer-coarse:inline">{t('flipHint')}</span>
-                      </span>
-                    </button>
-                  )}
+                {/* The grades are always there on wide screens: a card can be graded with or
+                    without flipping. Phones swipe; the buttons there are a setting. */}
+                <div
+                  className={cx('shrink-0', !setup.settings.gradeButtonsOnPhone && 'max-md:hidden')}
+                >
+                  <GradeBar
+                    grades={grades}
+                    suggested={suggested}
+                    swipe={swipe}
+                    onGrade={(g) => void grade(g)}
+                    // A typed answer is checked first; it then suggests the grade.
+                    disabled={busy || (typing && !typed)}
+                  />
                 </div>
               </>
             )}
           </section>
-          <SessionAside session={session} swipe={swipe} />
+          <SessionAside session={session} swipe={swipe} goal={goal} />
         </div>
       </div>
+      <ReviewIntro
+        open={introOpen}
+        mirrored={swipe.mirrored}
+        rtl={swipe.rtl}
+        onClose={closeIntro}
+      />
+      <FourGradesTip
+        open={tipOpen}
+        onClose={() => setTipOpen(false)}
+        onEnable={() => {
+          setTipOpen(false);
+          setSetup((s) => s && { ...s, settings: { ...s.settings, twoGrades: false } });
+          void repos.settings.update({ study: { twoGrades: false } });
+        }}
+      />
+      {celebrate && gamification.enabled && (
+        <Celebration animated={gamification.animated} onDone={() => setCelebrate(false)} />
+      )}
     </MotionConfig>
   );
 }

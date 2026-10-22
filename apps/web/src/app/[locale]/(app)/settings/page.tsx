@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { PageHeader } from '@/components/page-header';
 import { DevToggle } from '@/components/dev/dev-toggle';
 import { DataSettings } from '@/components/settings/data-settings';
+import { GamificationSettings } from '@/components/settings/gamification-settings';
 import { LocalePicker } from '@/components/settings/locale-picker';
 import { StudySettingsForm } from '@/components/settings/study-settings';
 import { ThemePicker } from '@/components/settings/theme-picker';
@@ -25,6 +26,11 @@ export default async function SettingsPage() {
           <CardTitle id="settings-study">{t('study')}</CardTitle>
           <CardText className="mt-1 mb-5">{t('studyHint')}</CardText>
           <StudySettingsForm />
+        </Card>
+        <Card aria-labelledby="settings-gamification">
+          <CardTitle id="settings-gamification">{t('gamification')}</CardTitle>
+          <CardText className="mt-1 mb-4">{t('gamificationHint')}</CardText>
+          <GamificationSettings />
         </Card>
         <Card aria-labelledby="settings-theme">
           <CardTitle id="settings-theme">{t('theme')}</CardTitle>

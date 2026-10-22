@@ -10,7 +10,16 @@
     "breakdown": "{due} due · {fresh} new",
     "start": "Review",
     "deckEmpty": "The deck is empty — all reviewed",
-    "deckEmptyText": "Words come back as soon as it is time to review them."
+    "deckEmptyText": "Words come back as soon as it is time to review them.",
+    "libraryTitle": "Library",
+    "addWordTitle": "Add a new word",
+    "addWordTip": "Found a word you want to learn? Add it to your set right away!",
+    "addWordAction": "Add a word",
+    "libraryTip": "Learned almost every word you had? Add new ones from ready-made sets!",
+    "cardsWaitingShort": "{count, plural, one {card waiting} other {cards waiting}}",
+    "breakdownShort": "{due} due · {fresh} new",
+    "deckEmptyShort": "All reviewed",
+    "deckEmptyTextShort": "Words will be back soon"
   },
   "review": {
     "title": "Review",

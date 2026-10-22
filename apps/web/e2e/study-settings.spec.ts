@@ -28,7 +28,7 @@ test('two grades', async ({ page }) => {
   await page.getByRole('switch', { name: /Лише дві оцінки/ }).click();
   await openReview(page);
   await page.keyboard.press('Space');
-  await expect(page.getByRole('button', { name: /^(Знову|Важко|Добре|Легко)/ })).toHaveCount(2);
+  await expect(page.getByRole('button', { name: /^(Забув|Важко|Згадав|Легко)/ })).toHaveCount(2);
 });
 
 test('typing the word', async ({ page }) => {
@@ -84,7 +84,7 @@ test('auto-speak off', async ({ page }) => {
 });
 
 test('mirrored swipe layout swaps Again and Good on arrows', async ({ page }) => {
-  await page.getByRole('radio', { name: '← Добре · → Знову' }).click();
+  await page.getByRole('radio', { name: '← Згадав · → Забув' }).click();
   await openReview(page);
   await page.keyboard.press('ArrowLeft'); // now "Good": the card leaves the deck
   await expect(deckCount(page)).toHaveText('29 карток у колоді');
@@ -107,21 +107,32 @@ test('daily new-word limit', async ({ page }) => {
 });
 
 test('target retention changes the next intervals', async ({ page }) => {
-  await openReview(page);
-  await page.keyboard.press('Space');
-  await expect(page.getByRole('button', { name: /^Добре/ })).toContainText('2 дні');
+  // Grades the top card "Good" and reads its countdown on the words page.
+  const gradeAndReadCountdown = async () => {
+    await openReview(page);
+    const word = await card(page).locator('[lang="en"]').first().textContent();
+    await page.keyboard.press('3');
+    await expect(deckCount(page)).toBeVisible();
+    await page.goto('/uk/decks');
+    await page.getByRole('searchbox', { name: 'Пошук слів' }).fill(word ?? '');
+    await page.getByRole('button', { name: `Подробиці про «${word}»` }).click();
+    return page.getByText(/^0 год \d+ хв \d+ с$/);
+  };
+  // A new word's first step is S₀ = 10 minutes, the interval at 90%.
+  await expect(await gradeAndReadCountdown()).toHaveText(/^0 год (9|10) хв/);
 
   await page.goto('/uk/settings');
   await page.getByRole('slider', { name: 'Цільова ймовірність пригадування' }).focus();
   await page.keyboard.press('Home'); // 80%
   await expect(page.getByText('Зараз 80%.')).toBeVisible();
-  await openReview(page);
-  await page.keyboard.press('Space');
-  await expect(page.getByRole('button', { name: /^Добре/ })).toContainText('8 днів');
+  await expect(await gradeAndReadCountdown()).toHaveText(/^0 год 3[23] хв/);
 });
 
 test('animations off still reviews', async ({ page }) => {
-  await page.getByRole('radio', { name: 'Вимкнено' }).click();
+  await page
+    .getByRole('radiogroup', { name: 'Швидкість анімацій' })
+    .getByRole('radio', { name: 'Вимкнено' })
+    .click();
   await openReview(page);
   await page.keyboard.press('Space');
   await page.keyboard.press('3');

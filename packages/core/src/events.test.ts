@@ -4,7 +4,7 @@ import { applyEvent, replayCard } from './events';
 import type { ReviewEvent } from './model';
 import { mulberry32, rngForEvent } from './rng';
 import { review, type ReviewResult } from './scheduler';
-import { DAY_MS, MINUTE_MS } from './time';
+import { MINUTE_MS } from './time';
 import type { Grade } from './types';
 
 const event = (i: number, at: number, grade: Grade, retention = 0.9): ReviewEvent => ({
@@ -36,7 +36,7 @@ function simulate(seed: number, length: number) {
     now =
       kind < 0.25
         ? now + Math.floor(rnd() * 120) * MINUTE_MS
-        : live.dueAt + Math.round((rnd() - 0.5) * live.intervalDays) * DAY_MS;
+        : live.dueAt + Math.round((rnd() - 0.5) * live.intervalMs);
     // Real reviews never share a timestamp (responses take > 0 ms).
     now = Math.max(now, live.card.lastReviewAt + MINUTE_MS);
   }

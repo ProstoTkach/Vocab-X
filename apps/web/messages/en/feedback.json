@@ -1,0 +1,72 @@
+{
+  "title": "Help make VocabX better",
+  "text": "VocabX is still very young, and your impressions decide what it becomes next.",
+  "inviteTitle": "Level {level} already — you know VocabX inside out!",
+  "inviteText": "You have got to know the app well, so your opinion matters especially now. Spare a minute — it will help the development enormously.",
+  "valuable": "Every piece of feedback is incredibly valuable to us: we read everything ourselves, and your answers decide what we improve and add first.",
+  "mostImportant": "Most important",
+  "orElse": "Or pick something else:",
+  "characterHint": "Leave feedback",
+  "anonymous": "Everything is sent anonymously: no name, e-mail or IP address is collected — only your answers, the interface language and your level.",
+  "optional": "Optional",
+  "platformLabel": "Where did it happen?",
+  "platformPhone": "Phone",
+  "platformDesktop": "Computer",
+  "bugTextLabel": "What went wrong?",
+  "bugTextPlaceholder": "What you did and what you saw instead of what you expected",
+  "emptyText": "Please write at least a few words.",
+  "kinds": {
+    "survey": {
+      "title": "Short survey",
+      "text": "4 ratings and a few words — about a minute. Helps the most."
+    },
+    "bug": {
+      "title": "Found a bug?",
+      "text": "Something not working right? Tell us where — we will fix it.",
+      "label": "Bug description",
+      "placeholder": "What you did, what happened and what should have happened"
+    },
+    "review": {
+      "title": "Short review",
+      "text": "A few sentences about your impressions of VocabX.",
+      "label": "Your review",
+      "placeholder": "What do you like, and what not?"
+    },
+    "idea": {
+      "title": "Suggest an idea",
+      "text": "What are you missing? The best ideas make it into the next versions.",
+      "label": "Your idea",
+      "placeholder": "It would be great if VocabX…"
+    }
+  },
+  "survey": {
+    "text": "Just 4 ratings from 1 to 5 — takes about a minute. Thank you for helping!",
+    "progress": "Rated {rated} of {total}",
+    "questions": {
+      "overall": "How do you like VocabX overall?",
+      "ease": "How easy is it to use?",
+      "usefulness": "How well does it help you remember words?",
+      "motivation": "How much do you want to come back every day?"
+    },
+    "low": "1 — poor",
+    "high": "5 — great",
+    "noteLabel": "Describe in a couple of words what you did not like",
+    "notePlaceholder": "For example: too few words, confusing menu",
+    "commentLabel": "What would you improve or add?",
+    "commentPlaceholder": "Any thoughts, wishes or impressions",
+    "bugToggle": "I noticed a bug",
+    "missing": "Please rate every item — it is just a few taps."
+  },
+  "back": "Back",
+  "send": "Send",
+  "sending": "Sending…",
+  "later": "Later",
+  "errorSend": "Could not send. Check your connection and try again — your answers are still in the form.",
+  "errorRate": "Too much feedback in a short time. Please try again a little later.",
+  "thanks": {
+    "title": "Thank you so much!",
+    "text": "Your feedback is in. Answers like yours are what make VocabX better — you have just done a lot for it.",
+    "more": "Leave something else",
+    "done": "Done"
+  }
+}

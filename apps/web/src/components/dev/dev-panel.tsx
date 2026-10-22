@@ -1,22 +1,32 @@
 'use client';
 
 import { DAY_MS } from '@vocabx/core';
-import { Clock, X } from 'lucide-react';
+import { Clock, Crown, X } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { useClock } from '@/lib/clock';
 import { useDevTools } from '@/lib/dev-tools';
+import { usePlayer } from '@/lib/player';
+import { useTheme } from '@/lib/theme';
+import { getTheme, SYSTEM_THEMES } from '@/themes/registry';
 
 /**
  * Demo helper: moves the app clock forward so spaced repetition can be shown without waiting.
  * Only the in-app clock moves; stored timestamps and the system time are untouched.
  */
+/** The level the demo button jumps to: everything in the wardrobe and every theme opens. */
+const DEMO_LEVEL = 15;
+
 export function DevPanel() {
   const t = useTranslations('dev');
   const format = useFormatter();
   const { enabled, setEnabled } = useDevTools();
   const { clock, offsetMs, setOffsetMs } = useClock();
+  const { resolved, setChoice } = useTheme();
+  const { reachLevel, level } = usePlayer();
   if (!enabled) return null;
+  const dark = getTheme(resolved)?.colorScheme === 'dark';
 
   return (
     <section
@@ -57,6 +67,23 @@ export function DevPanel() {
           {t('resetTime')}
         </Button>
       </div>
+      {/* Quick light / dark switch for checking both looks; Settings has every theme. */}
+      <Switch
+        label={t('darkTheme')}
+        checked={dark}
+        onCheckedChange={(on) => setChoice(on ? SYSTEM_THEMES.dark : SYSTEM_THEMES.light)}
+        className="mt-3 border-t border-line/70 pt-2"
+      />
+      <Button
+        size="sm"
+        variant="secondary"
+        className="mt-2 w-full justify-center"
+        disabled={level >= DEMO_LEVEL}
+        onClick={() => reachLevel(DEMO_LEVEL)}
+      >
+        <Crown aria-hidden className="size-4" />
+        {t('reachLevel', { level: DEMO_LEVEL })}
+      </Button>
       <p className="mt-3 text-xs text-fg-muted pointer-coarse:hidden">{t('hint')}</p>
     </section>
   );

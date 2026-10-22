@@ -1,0 +1,241 @@
+{
+  "id": "builtin:en-c2-mastery",
+  "lang": "en",
+  "cefr": "C2",
+  "title": "English C2: mastery",
+  "titleI18n": {
+    "uk": "Англійська C2: майстерність",
+    "en": "English C2: mastery"
+  },
+  "descriptionI18n": {
+    "uk": "15 рідкісних слів рівня C2 для тонкої, виразної мови.",
+    "en": "15 rare C2 words for subtle, expressive language."
+  },
+  "words": [
+    {
+      "term": "ubiquitous",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["всюдисущий", "повсюдний"]
+      },
+      "examples": [
+        {
+          "text": "Smartphones have become ubiquitous.",
+          "translations": {
+            "uk": "Смартфони стали всюдисущими."
+          }
+        }
+      ]
+    },
+    {
+      "term": "ephemeral",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["швидкоплинний", "ефемерний"]
+      },
+      "examples": [
+        {
+          "text": "Fame on social media is often ephemeral.",
+          "translations": {
+            "uk": "Слава в соцмережах часто швидкоплинна."
+          }
+        }
+      ]
+    },
+    {
+      "term": "meticulous",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["ретельний", "скрупульозний"]
+      },
+      "examples": [
+        {
+          "text": "She keeps meticulous notes.",
+          "translations": {
+            "uk": "Вона веде ретельні нотатки."
+          }
+        }
+      ]
+    },
+    {
+      "term": "pragmatic",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["прагматичний"]
+      },
+      "examples": [
+        {
+          "text": "We need a pragmatic solution.",
+          "translations": {
+            "uk": "Нам потрібне прагматичне рішення."
+          }
+        }
+      ]
+    },
+    {
+      "term": "eloquent",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["красномовний"]
+      },
+      "examples": [
+        {
+          "text": "He gave an eloquent speech.",
+          "translations": {
+            "uk": "Він виголосив красномовну промову."
+          }
+        }
+      ]
+    },
+    {
+      "term": "juxtapose",
+      "pos": "verb",
+      "translations": {
+        "uk": ["зіставляти", "протиставляти"]
+      },
+      "examples": [
+        {
+          "text": "The artist likes to juxtapose old and new.",
+          "translations": {
+            "uk": "Митець любить зіставляти старе й нове."
+          }
+        }
+      ]
+    },
+    {
+      "term": "quintessential",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["найтиповіший", "класичний"]
+      },
+      "examples": [
+        {
+          "text": "It is the quintessential English pub.",
+          "translations": {
+            "uk": "Це найтиповіший англійський паб."
+          }
+        }
+      ]
+    },
+    {
+      "term": "serendipity",
+      "pos": "noun",
+      "translations": {
+        "uk": ["щаслива випадковість"]
+      },
+      "examples": [
+        {
+          "text": "We met by pure serendipity.",
+          "translations": {
+            "uk": "Ми зустрілися завдяки щасливій випадковості."
+          }
+        }
+      ]
+    },
+    {
+      "term": "conundrum",
+      "pos": "noun",
+      "translations": {
+        "uk": ["головоломка", "складна проблема"]
+      },
+      "examples": [
+        {
+          "text": "Funding remains a conundrum.",
+          "translations": {
+            "uk": "Фінансування лишається складною проблемою."
+          }
+        }
+      ]
+    },
+    {
+      "term": "exacerbate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["загострювати", "посилювати"]
+      },
+      "examples": [
+        {
+          "text": "Stress can exacerbate the pain.",
+          "translations": {
+            "uk": "Стрес може посилити біль."
+          }
+        }
+      ]
+    },
+    {
+      "term": "magnanimous",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["великодушний"]
+      },
+      "examples": [
+        {
+          "text": "She was magnanimous in victory.",
+          "translations": {
+            "uk": "Вона була великодушною у перемозі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "obfuscate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["заплутувати", "затуманювати"]
+      },
+      "examples": [
+        {
+          "text": "Jargon can obfuscate the meaning.",
+          "translations": {
+            "uk": "Жаргон може затуманити зміст."
+          }
+        }
+      ]
+    },
+    {
+      "term": "scrupulous",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["сумлінний", "прискіпливий"]
+      },
+      "examples": [
+        {
+          "text": "He is scrupulous about details.",
+          "translations": {
+            "uk": "Він прискіпливий до деталей."
+          }
+        }
+      ]
+    },
+    {
+      "term": "tenacious",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["наполегливий", "завзятий"]
+      },
+      "examples": [
+        {
+          "text": "She is a tenacious negotiator.",
+          "translations": {
+            "uk": "Вона наполеглива учасниця переговорів."
+          }
+        }
+      ]
+    },
+    {
+      "term": "insidious",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["підступний"]
+      },
+      "examples": [
+        {
+          "text": "It is an insidious disease.",
+          "translations": {
+            "uk": "Це підступна хвороба."
+          }
+        }
+      ]
+    }
+  ]
+}

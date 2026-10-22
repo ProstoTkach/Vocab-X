@@ -1,0 +1,241 @@
+{
+  "id": "builtin:en-a2-everyday",
+  "lang": "en",
+  "cefr": "A2",
+  "title": "English A2: everyday life",
+  "titleI18n": {
+    "uk": "Англійська A2: щоденне життя",
+    "en": "English A2: everyday life"
+  },
+  "descriptionI18n": {
+    "uk": "15 слів для подорожей, покупок і розмов із сусідами.",
+    "en": "15 words for travel, shopping and chats with neighbours."
+  },
+  "words": [
+    {
+      "term": "weather",
+      "pos": "noun",
+      "translations": {
+        "uk": ["погода"]
+      },
+      "examples": [
+        {
+          "text": "The weather is lovely this week.",
+          "translations": {
+            "uk": "Цього тижня чудова погода."
+          }
+        }
+      ]
+    },
+    {
+      "term": "ticket",
+      "pos": "noun",
+      "translations": {
+        "uk": ["квиток"]
+      },
+      "examples": [
+        {
+          "text": "I bought a train ticket online.",
+          "translations": {
+            "uk": "Я купив квиток на потяг онлайн."
+          }
+        }
+      ]
+    },
+    {
+      "term": "neighbour",
+      "pos": "noun",
+      "translations": {
+        "uk": ["сусід", "сусідка"]
+      },
+      "examples": [
+        {
+          "text": "Our neighbour has a friendly dog.",
+          "translations": {
+            "uk": "У нашого сусіда привітний пес."
+          }
+        }
+      ]
+    },
+    {
+      "term": "recipe",
+      "pos": "noun",
+      "translations": {
+        "uk": ["рецепт"]
+      },
+      "examples": [
+        {
+          "text": "This recipe needs three eggs.",
+          "translations": {
+            "uk": "Для цього рецепта потрібно три яйця."
+          }
+        }
+      ]
+    },
+    {
+      "term": "luggage",
+      "pos": "noun",
+      "translations": {
+        "uk": ["багаж"]
+      },
+      "examples": [
+        {
+          "text": "Please keep your luggage with you.",
+          "translations": {
+            "uk": "Будь ласка, тримайте свій багаж при собі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "healthy",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["здоровий", "корисний"]
+      },
+      "examples": [
+        {
+          "text": "Fruit is a healthy snack.",
+          "translations": {
+            "uk": "Фрукти — корисний перекус."
+          }
+        }
+      ]
+    },
+    {
+      "term": "expensive",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["дорогий"]
+      },
+      "examples": [
+        {
+          "text": "The hotel was too expensive.",
+          "translations": {
+            "uk": "Готель був надто дорогий."
+          }
+        }
+      ]
+    },
+    {
+      "term": "crowded",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["переповнений", "людний"]
+      },
+      "examples": [
+        {
+          "text": "The bus was crowded this morning.",
+          "translations": {
+            "uk": "Зранку автобус був переповнений."
+          }
+        }
+      ]
+    },
+    {
+      "term": "lazy",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["лінивий"]
+      },
+      "examples": [
+        {
+          "text": "I feel lazy on Sundays.",
+          "translations": {
+            "uk": "По неділях я почуваюся лінивим."
+          }
+        }
+      ]
+    },
+    {
+      "term": "borrow",
+      "pos": "verb",
+      "translations": {
+        "uk": ["позичати (у когось)"]
+      },
+      "examples": [
+        {
+          "text": "Can I borrow your pen?",
+          "translations": {
+            "uk": "Можна позичити твою ручку?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "invite",
+      "pos": "verb",
+      "translations": {
+        "uk": ["запрошувати"]
+      },
+      "examples": [
+        {
+          "text": "We want to invite you to dinner.",
+          "translations": {
+            "uk": "Ми хочемо запросити тебе на вечерю."
+          }
+        }
+      ]
+    },
+    {
+      "term": "forget",
+      "pos": "verb",
+      "translations": {
+        "uk": ["забувати"]
+      },
+      "examples": [
+        {
+          "text": "Don't forget your keys!",
+          "translations": {
+            "uk": "Не забудь ключі!"
+          }
+        }
+      ]
+    },
+    {
+      "term": "return",
+      "pos": "verb",
+      "translations": {
+        "uk": ["повертати", "повертатися"]
+      },
+      "examples": [
+        {
+          "text": "I will return the book tomorrow.",
+          "translations": {
+            "uk": "Я поверну книжку завтра."
+          }
+        }
+      ]
+    },
+    {
+      "term": "already",
+      "pos": "adverb",
+      "translations": {
+        "uk": ["вже"]
+      },
+      "examples": [
+        {
+          "text": "She has already left.",
+          "translations": {
+            "uk": "Вона вже пішла."
+          }
+        }
+      ]
+    },
+    {
+      "term": "nearly",
+      "pos": "adverb",
+      "translations": {
+        "uk": ["майже"]
+      },
+      "examples": [
+        {
+          "text": "It is nearly midnight.",
+          "translations": {
+            "uk": "Вже майже північ."
+          }
+        }
+      ]
+    }
+  ]
+}

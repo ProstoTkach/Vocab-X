@@ -7,27 +7,32 @@ import { cx } from '@/lib/cx';
 import { useStudyStack } from '@/lib/study';
 
 /** Home hero: the one big deck — how many cards wait and a button to start reviewing. */
-export function StudySummary() {
+export function StudySummary({ className, version = 0 }: { className?: string; version?: number }) {
   const t = useTranslations('pages.home');
   const tl = useTranslations('languages');
-  const stack = useStudyStack();
+  const stack = useStudyStack(version);
   const ready = stack.status === 'ready';
   const total = ready ? stack.cards.length : 0;
   const empty = ready && total === 0;
 
-  return (
-    <section
-      aria-busy={!ready}
-      aria-labelledby="deck-hero-title"
-      className="relative isolate overflow-hidden rounded-card bg-brand p-6 text-on-accent shadow-glow md:p-8"
-    >
-      {/* Decorative cards fanned in the corner, echoing the deck. */}
-      <div aria-hidden className="pointer-events-none absolute -end-6 -top-6 -z-10 hidden sm:block">
+  const body = (
+    <>
+      {/* Decorative cards fanned in the corner, echoing the deck; each shakes on hover. */}
+      {/* Smaller on phones, where the card itself is shorter. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -end-6 -top-6 -z-10 max-sm:scale-[0.6] ltr:origin-top-right rtl:origin-top-left"
+      >
         {[12, 0, -12].map((deg, i) => (
           <span
             key={deg}
-            className="absolute end-0 top-0 h-36 w-28 rounded-2xl border border-on-accent/30 bg-on-accent/10"
-            style={{ transform: `rotate(${deg}deg) translate(${-i * 18}px, ${i * 10}px)` }}
+            className="absolute end-0 top-0 h-36 w-28 rounded-2xl border border-on-accent/30 bg-on-accent/10 motion-safe:group-hover:animate-jiggle"
+            style={{
+              transform: `rotate(${deg}deg) translate(${-i * 18}px, ${i * 10}px)`,
+              // Out of step, so the cards shake one by one rather than as a block.
+              animationDelay: `${i * 90}ms`,
+              animationDuration: `${420 + i * 70}ms`,
+            }}
           />
         ))}
       </div>
@@ -37,27 +42,51 @@ export function StudySummary() {
         {ready ? t('learning', { lang: tl(stack.lang as 'en') }) : t('deckLabel')}
       </p>
 
-      <h2 id="deck-hero-title" className="mt-4 flex items-baseline gap-3">
-        <span className="font-display text-6xl font-bold tracking-tight tabular-nums md:text-7xl">
+      {/* Phones get short phrases that each fit on one line. */}
+      <h2 id="deck-hero-title" className="flex items-center gap-3 sm:gap-4">
+        <span className="font-display text-5xl leading-none font-bold tracking-tight tabular-nums sm:text-6xl md:text-7xl">
           {ready ? total : '·'}
         </span>
-        <span className="max-w-48 text-lg leading-tight font-medium opacity-95">
-          {empty ? t('deckEmpty') : t('cardsWaiting', { count: total })}
+        <span className="flex min-w-0 flex-col">
+          <span className="leading-tight font-semibold text-balance sm:text-lg md:text-xl">
+            <span className="sm:hidden">
+              {empty ? t('deckEmptyShort') : t('cardsWaitingShort', { count: total })}
+            </span>
+            <span className="max-sm:hidden">
+              {empty ? t('deckEmpty') : t('cardsWaiting', { count: total })}
+            </span>
+          </span>
+          <span className="mt-0.5 min-h-5 text-sm font-normal opacity-90 sm:mt-1 sm:min-h-6 sm:text-base">
+            {ready && (
+              <>
+                <span className="sm:hidden">
+                  {empty
+                    ? t('deckEmptyTextShort')
+                    : t('breakdownShort', { due: stack.due, fresh: stack.fresh })}
+                </span>
+                <span className="max-sm:hidden">
+                  {empty
+                    ? t('deckEmptyText')
+                    : t('breakdown', { due: stack.due, fresh: stack.fresh })}
+                </span>
+              </>
+            )}
+          </span>
         </span>
       </h2>
 
-      <p className="mt-2 min-h-6 opacity-90">
-        {ready &&
-          (empty ? t('deckEmptyText') : t('breakdown', { due: stack.due, fresh: stack.fresh }))}
-      </p>
-
-      <Link
-        href="/review"
-        aria-disabled={empty}
+      {/* Phones: the whole card is the button; a play icon in the corner says so. */}
+      {!empty && (
+        <span className="absolute end-4 bottom-4 inline-flex size-10 items-center justify-center rounded-full bg-surface text-accent shadow-pop transition motion-fast group-hover:scale-105 sm:hidden">
+          <Play aria-hidden className="size-5" />
+          <span className="sr-only">{t('start')}</span>
+        </span>
+      )}
+      <span
         className={cx(
-          'mt-6 inline-flex min-h-13 items-center gap-2 rounded-control bg-surface px-6 text-lg font-semibold text-accent shadow-pop',
-          'transition motion-fast hover:-translate-y-0.5 active:scale-[0.98]',
-          empty && 'pointer-events-none opacity-60',
+          'mt-auto inline-flex min-h-13 items-center justify-center gap-2 rounded-control bg-surface px-6 text-lg font-semibold text-accent shadow-pop max-sm:hidden',
+          'transition motion-fast group-hover:-translate-y-0.5 group-active:scale-[0.98]',
+          empty && 'opacity-60',
         )}
       >
         {empty ? (
@@ -66,7 +95,25 @@ export function StudySummary() {
           <Play aria-hidden className="size-5" />
         )}
         {t('start')}
-      </Link>
+      </span>
+    </>
+  );
+
+  const shell = cx(
+    'group relative isolate flex flex-col gap-2 overflow-hidden rounded-card bg-brand p-4 text-on-accent shadow-glow sm:gap-4 sm:p-6 md:p-7',
+    className,
+  );
+  // The whole card starts the review; with nothing to review it is not a link.
+  return empty || !ready ? (
+    <section aria-busy={!ready} aria-labelledby="deck-hero-title" className={shell}>
+      {body}
     </section>
+  ) : (
+    <Link
+      href="/review"
+      className={cx(shell, 'transition motion-fast hover:-translate-y-0.5 hover:brightness-105')}
+    >
+      {body}
+    </Link>
   );
 }

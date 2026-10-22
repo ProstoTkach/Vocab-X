@@ -51,12 +51,17 @@ test.beforeEach(async ({ page }) => {
 test('my words: list with learning bars and details', async ({ page }) => {
   // Answer the first card so it has history.
   await page.goto('/uk/review');
+  await expect(page.getByTestId('review-card')).toBeVisible();
   await page.keyboard.press('3');
+  await expect(page.getByText('29 карток у колоді')).toBeVisible();
   await page.goto('/uk/decks');
   await expect(page.getByText('30 слів', { exact: true })).toBeVisible();
   // Streak and daily goal live on the home page only.
-  await expect(page.getByRole('complementary', { name: 'Ваш прогрес' })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Ваш прогрес' })).toHaveCount(0);
 
+  // The answered word is the only one with a review ahead: first when the latest come first.
+  await page.getByLabel('Сортування').selectOption({ label: 'Нескоро повторювати' });
+  await expect(page.getByRole('main').getByRole('listitem').first()).toContainText('achieve');
   await wordButton(page, 'achieve').click();
   await expect(page.getByText('До наступного повторення')).toBeVisible();
   await expect(page.getByText(/\d+ год \d+ хв \d+ с/)).toBeVisible();
@@ -65,6 +70,11 @@ test('my words: list with learning bars and details', async ({ page }) => {
   const correct = page.getByText('Правильно', { exact: true }).locator('..');
   await expect(correct).toContainText('1');
 
+  // Ten words at a time: back to the soonest first, where the new words are.
+  await page.getByLabel('Сортування').selectOption({ label: 'Скоро повторювати' });
+  // Drawn ten at a time as the end comes into view (how many depends on the screen height).
+  await expect(page.getByRole('button', { name: /^Показати ще/ })).toBeVisible();
+  expect(await page.getByRole('main').getByRole('listitem').count()).toBeLessThan(30);
   await wordButton(page, 'advice').click();
   await expect(page.getByText("Ще не вивчалося — з'явиться серед нових.")).toBeVisible();
 });
@@ -81,6 +91,8 @@ test('add a word from my words goes to "My words"', async ({ page }) => {
   await dialog.getByRole('button', { name: 'Додати', exact: true }).click();
 
   await expect(page.getByText('31 слово', { exact: true })).toBeVisible();
+  // Long lists show ten words at a time: find the new one by searching.
+  await page.getByRole('searchbox', { name: 'Пошук слів' }).fill('revenue');
   await wordButton(page, 'revenue').click();
   await expect(page.locator('mark', { hasText: 'Revenue' })).toBeVisible();
 
@@ -97,7 +109,9 @@ test('library: pick single words by swiping, then add the rest', async ({ page }
     .getByRole('link', { name: 'Відкрити' })
     .click();
   await expect(page.getByRole('heading', { name: 'Англійська B2: новий рівень' })).toBeVisible();
-  await expect(page.locator('mark', { hasText: 'negotiate' })).toBeVisible();
+  // Compact cards: the word and its translation, no example sentences.
+  await expect(page.getByRole('listitem').filter({ hasText: 'negotiate' })).toBeVisible();
+  await expect(page.locator('mark', { hasText: 'negotiate' })).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Обрати слова' }).click();
   await expect(page.getByTestId('picker-card')).toContainText('negotiate');
@@ -111,17 +125,27 @@ test('library: pick single words by swiping, then add the rest', async ({ page }
 
   await page.getByRole('button', { name: 'Бібліотека' }).click();
   await expect(page.getByText('Додано 2 з 15')).toBeVisible();
+  await expect(page.getByText('Відбір не завершено · Переглянуто 3 з 15')).toBeVisible();
   await page.goto('/uk');
   await expect(heroCount(page, 32)).toBeVisible();
 
+  // Each choice was saved at once: picking continues after the three words seen.
   await page.goto('/uk/decks/library');
   await page
     .getByRole('listitem')
     .filter({ hasText: 'Англійська B2' })
-    .getByRole('link', { name: 'Відкрити' })
+    .getByRole('link', { name: 'Продовжити відбір' })
     .click();
+  await expect(page.getByTestId('picker-card')).toBeVisible();
+  await expect(page.getByTestId('picker-card')).not.toContainText('reluctant');
+  await expect(page.getByText('Додано: 2')).toBeVisible();
+  await expect(page.getByText('Пропущено: 1')).toBeVisible();
+  await page.getByRole('button', { name: 'Готово' }).click();
+  await page.getByRole('button', { name: 'Бібліотека' }).click();
   await page.getByRole('button', { name: 'Додати всю колоду' }).click();
-  await expect(page.getByText('Уся колода додана')).toBeVisible();
+  // Saving the whole deck goes back to the library with a notice.
+  await expect(page).toHaveURL(/\/uk\/decks\/library$/);
+  await expect(page.getByText(/збережено до ваших слів/).first()).toBeVisible();
   await page.goto('/uk');
   await expect(heroCount(page, 45)).toBeVisible();
 });
@@ -151,20 +175,13 @@ test('my decks: create a deck, add a word, review only that deck', async ({ page
   await expect(page.getByText('1 картка в колоді')).toBeVisible();
 });
 
-test('deck page: edit, remove and reorder words', async ({ page }) => {
+test('deck page: edit and remove words', async ({ page }) => {
   await page.goto('/uk/decks/mine');
   await page.getByRole('link', { name: 'Англійська B1: основне' }).click();
   const rows = page.getByRole('listitem');
   await expect(rows.first()).toContainText('achieve');
-
-  await page.getByRole('button', { name: 'Перетягнути «device»' }).focus();
-  await page.keyboard.press('Space');
-  await page.keyboard.press('ArrowUp');
-  await page.keyboard.press('ArrowUp');
-  await page.keyboard.press('Space');
-  await expect(rows.first()).toContainText('device');
-  await page.reload();
-  await expect(rows.first()).toContainText('device');
+  // Words are sorted by how well they are remembered, not moved by hand.
+  await expect(page.getByRole('button', { name: /Перетягнути/ })).toHaveCount(0);
 
   const achieve = rows.filter({ hasText: 'achieve' });
   await achieve.getByRole('button', { name: 'Редагувати слово' }).click();
@@ -188,5 +205,5 @@ test('archiving pauses a deck', async ({ page }) => {
   await page.getByRole('menuitem', { name: 'В архів' }).click();
   await expect(page.getByRole('button', { name: 'Показати архів (1)' })).toBeVisible();
   await page.goto('/uk');
-  await expect(page.getByRole('heading', { name: /Колода порожня/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Колода порожня|Усе повторено/ })).toBeVisible();
 });

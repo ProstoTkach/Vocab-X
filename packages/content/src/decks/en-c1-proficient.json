@@ -1,0 +1,241 @@
+{
+  "id": "builtin:en-c1-proficient",
+  "lang": "en",
+  "cefr": "C1",
+  "title": "English C1: confident speaker",
+  "titleI18n": {
+    "uk": "Англійська C1: впевнений рівень",
+    "en": "English C1: confident speaker"
+  },
+  "descriptionI18n": {
+    "uk": "15 слів C1 для аргументованих дискусій, звітів і переговорів.",
+    "en": "15 C1 words for reasoned debates, reports and negotiations."
+  },
+  "words": [
+    {
+      "term": "elaborate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["детально пояснювати", "розвивати думку"]
+      },
+      "examples": [
+        {
+          "text": "Could you elaborate on your idea?",
+          "translations": {
+            "uk": "Чи могли б ви детальніше пояснити свою ідею?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "coherent",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["послідовний", "зв'язний"]
+      },
+      "examples": [
+        {
+          "text": "She gave a clear and coherent answer.",
+          "translations": {
+            "uk": "Вона дала чітку й послідовну відповідь."
+          }
+        }
+      ]
+    },
+    {
+      "term": "mitigate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["пом'якшувати", "зменшувати"]
+      },
+      "examples": [
+        {
+          "text": "New rules should mitigate the risks.",
+          "translations": {
+            "uk": "Нові правила мають зменшити ризики."
+          }
+        }
+      ]
+    },
+    {
+      "term": "prevalent",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["поширений"]
+      },
+      "examples": [
+        {
+          "text": "This view is prevalent among young people.",
+          "translations": {
+            "uk": "Ця думка поширена серед молоді."
+          }
+        }
+      ]
+    },
+    {
+      "term": "deteriorate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["погіршуватися"]
+      },
+      "examples": [
+        {
+          "text": "His health began to deteriorate.",
+          "translations": {
+            "uk": "Його здоров'я почало погіршуватися."
+          }
+        }
+      ]
+    },
+    {
+      "term": "substantial",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["значний", "суттєвий"]
+      },
+      "examples": [
+        {
+          "text": "They received a substantial grant.",
+          "translations": {
+            "uk": "Вони отримали значний грант."
+          }
+        }
+      ]
+    },
+    {
+      "term": "undermine",
+      "pos": "verb",
+      "translations": {
+        "uk": ["підривати"]
+      },
+      "examples": [
+        {
+          "text": "Rumours can undermine trust.",
+          "translations": {
+            "uk": "Чутки можуть підірвати довіру."
+          }
+        }
+      ]
+    },
+    {
+      "term": "feasible",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["здійсненний", "реальний"]
+      },
+      "examples": [
+        {
+          "text": "The plan is ambitious but feasible.",
+          "translations": {
+            "uk": "План амбітний, але здійсненний."
+          }
+        }
+      ]
+    },
+    {
+      "term": "advocate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["обстоювати", "виступати за"]
+      },
+      "examples": [
+        {
+          "text": "Doctors advocate regular exercise.",
+          "translations": {
+            "uk": "Лікарі виступають за регулярні фізичні вправи."
+          }
+        }
+      ]
+    },
+    {
+      "term": "notion",
+      "pos": "noun",
+      "translations": {
+        "uk": ["уявлення", "поняття"]
+      },
+      "examples": [
+        {
+          "text": "I have no notion of what happened.",
+          "translations": {
+            "uk": "Я не маю уявлення, що сталося."
+          }
+        }
+      ]
+    },
+    {
+      "term": "compelling",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["переконливий"]
+      },
+      "examples": [
+        {
+          "text": "She made a compelling argument.",
+          "translations": {
+            "uk": "Вона навела переконливий аргумент."
+          }
+        }
+      ]
+    },
+    {
+      "term": "discrepancy",
+      "pos": "noun",
+      "translations": {
+        "uk": ["розбіжність", "невідповідність"]
+      },
+      "examples": [
+        {
+          "text": "There is a discrepancy in the figures.",
+          "translations": {
+            "uk": "У цифрах є розбіжність."
+          }
+        }
+      ]
+    },
+    {
+      "term": "endorse",
+      "pos": "verb",
+      "translations": {
+        "uk": ["схвалювати", "підтримувати"]
+      },
+      "examples": [
+        {
+          "text": "The minister refused to endorse the plan.",
+          "translations": {
+            "uk": "Міністр відмовився схвалити план."
+          }
+        }
+      ]
+    },
+    {
+      "term": "versatile",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["універсальний", "різнобічний"]
+      },
+      "examples": [
+        {
+          "text": "He is a versatile actor.",
+          "translations": {
+            "uk": "Він різнобічний актор."
+          }
+        }
+      ]
+    },
+    {
+      "term": "consensus",
+      "pos": "noun",
+      "translations": {
+        "uk": ["згода", "консенсус"]
+      },
+      "examples": [
+        {
+          "text": "The team reached a consensus.",
+          "translations": {
+            "uk": "Команда дійшла згоди."
+          }
+        }
+      ]
+    }
+  ]
+}

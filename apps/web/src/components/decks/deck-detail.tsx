@@ -1,39 +1,21 @@
 'use client';
 
 import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import {
   addWord,
   editWord,
-  moveInOrder,
+  dueOrder,
   removeWordFromDeck,
+  resetWordProgress,
   updateDeck,
   wordStatus,
   type CardProgress,
   type Deck,
   type Profile,
   type Word,
-  type WordReviewStats,
-  type WordStatus,
 } from '@vocabx/core';
-import { ArrowLeft, GripVertical, Pencil, Play, Plus, Search, Trash2 } from 'lucide-react';
+import { ArrowLeft, Play, Plus, Search } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { Badge, type BadgeTone } from '@/components/ui/badge';
 import { Button, buttonClass } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { inputClass } from '@/components/ui/field';
@@ -45,21 +27,17 @@ import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
 import { deckTitle } from './deck-list';
 import { useWordData } from '@/components/words/use-word-data';
-import { WordItem } from '@/components/words/word-item';
+import { ShowMore, useIncremental } from '@/components/words/show-more';
+import { WordRow } from '@/components/words/word-row';
 import { WordFormDialog } from './word-form-dialog';
-
-const STATUS_TONE: Record<WordStatus, BadgeTone> = {
-  new: 'neutral',
-  due: 'warning',
-  learning: 'info',
-  mastered: 'success',
-};
 
 interface Loaded {
   profile: Profile;
   deck: Deck;
   words: Map<string, Word>;
   progress: Map<string, CardProgress>;
+  /** Load time: the list is sorted once per load, so it does not reshuffle while read. */
+  at: number;
 }
 
 export function DeckDetail({ deckId }: { deckId: string }) {
@@ -77,6 +55,8 @@ export function DeckDetail({ deckId }: { deckId: string }) {
   const [removing, setRemoving] = useState<Word | null>(null);
   const reload = () => setVersion((v) => v + 1);
   const wordData = useWordData(data && data !== 'missing' ? data.deck.lang : null, version);
+  // Long decks are drawn ten words at a time (the count is checked against the list below).
+  const page = useIncremental(Number.MAX_SAFE_INTEGER, `${query}|${version}`);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -99,15 +79,11 @@ export function DeckDetail({ deckId }: { deckId: string }) {
         deck,
         words: new Map(words.map((w) => [w.id, w])),
         progress: new Map(progress.map((p) => [p.wordId, p])),
+        at: clock.now(),
       });
     })();
     return () => ctrl.abort();
-  }, [repos, deckId, version]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
+  }, [repos, deckId, version, clock]);
 
   if (data === null) return <div aria-busy className="h-64" />;
   if (data === 'missing') {
@@ -124,17 +100,22 @@ export function DeckDetail({ deckId }: { deckId: string }) {
   const { deck, profile } = data;
   const now = clock.now();
   const q = query.trim().toLocaleLowerCase();
-  const ordered = deck.wordIds.flatMap((id) => {
-    const w = data.words.get(id);
-    return w ? [w] : [];
-  });
-  const visible = q
+  // By the time left until the next review, soonest first (new words lead).
+  const ordered = dueOrder(
+    deck.wordIds.flatMap((id) => {
+      const w = data.words.get(id);
+      return w ? [w] : [];
+    }),
+    data.progress,
+  );
+  const matching = q
     ? ordered.filter(
         (w) =>
           w.term.toLocaleLowerCase().includes(q) ||
           (w.translations[profile.nativeLang] ?? []).some((x) => x.toLocaleLowerCase().includes(q)),
       )
     : ordered;
+  const visible = matching.slice(0, page.visible);
 
   const saveTitle = async () => {
     if (title === null) return;
@@ -146,16 +127,6 @@ export function DeckDetail({ deckId }: { deckId: string }) {
     }
   };
 
-  const onDragEnd = async ({ active, over }: DragEndEvent) => {
-    if (!over || active.id === over.id) return;
-    const from = deck.wordIds.indexOf(String(active.id));
-    const to = deck.wordIds.indexOf(String(over.id));
-    const wordIds = moveInOrder(deck.wordIds, from, to);
-    // Optimistic: the list must not jump back while the write happens.
-    setData({ ...data, deck: { ...deck, wordIds } });
-    await updateDeck(repos, deck, { wordIds }, clock.now());
-  };
-
   const submitWord = async (input: Parameters<typeof addWord>[2]) => {
     if (editing === 'new') {
       await addWord(repos, deck, input, { now: clock.now(), newId });
@@ -164,6 +135,12 @@ export function DeckDetail({ deckId }: { deckId: string }) {
       await editWord(repos, editing, input, clock.now());
       toast({ title: t('wordSaved'), tone: 'success' });
     }
+    reload();
+  };
+
+  const reset = async (word: Word) => {
+    await resetWordProgress(repos, word.id);
+    toast({ title: t('wordReset', { word: word.term }), tone: 'success' });
     reload();
   };
 
@@ -233,42 +210,38 @@ export function DeckDetail({ deckId }: { deckId: string }) {
             />
           </div>
         </div>
-        {!q && ordered.length > 1 && <p className="text-sm text-fg-muted">{t('orderHint')}</p>}
 
         {ordered.length === 0 ? (
           <p className="rounded-card border border-dashed border-line-strong/60 p-6 text-center text-fg-muted">
             {t('noWords')}
           </p>
-        ) : visible.length === 0 ? (
+        ) : matching.length === 0 ? (
           <p className="text-fg-muted">{t('noMatches')}</p>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={(e) => void onDragEnd(e)}
-          >
-            <SortableContext
-              items={visible.map((w) => w.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <ul className="flex flex-col gap-2">
-                {visible.map((w) => (
-                  <WordRow
-                    key={w.id}
-                    word={w}
-                    nativeLang={profile.nativeLang}
-                    status={wordStatus(data.progress.get(w.id), now)}
-                    progress={data.progress.get(w.id)}
-                    stats={wordData?.stats.get(w.id)}
-                    // Reordering a filtered list would be ambiguous.
-                    sortable={!q}
-                    onEdit={() => setEditing(w)}
-                    onRemove={() => setRemoving(w)}
-                  />
-                ))}
-              </ul>
-            </SortableContext>
-          </DndContext>
+          <>
+            <ul className="flex flex-col gap-2">
+              {visible.map((w) => (
+                <WordRow
+                  key={w.id}
+                  word={w}
+                  nativeLang={profile.nativeLang}
+                  progress={data.progress.get(w.id)}
+                  stats={wordData?.stats.get(w.id)}
+                  now={now}
+                  onEdit={() => setEditing(w)}
+                  onRemove={() => setRemoving(w)}
+                  onReset={() => void reset(w)}
+                />
+              ))}
+            </ul>
+            {visible.length < matching.length && (
+              <ShowMore
+                key={visible.length}
+                onMore={page.more}
+                left={matching.length - visible.length}
+              />
+            )}
+          </>
         )}
       </section>
 
@@ -308,90 +281,5 @@ export function DeckDetail({ deckId }: { deckId: string }) {
         />
       </Dialog>
     </div>
-  );
-}
-
-function WordRow({
-  word,
-  nativeLang,
-  status,
-  progress,
-  stats,
-  sortable,
-  onEdit,
-  onRemove,
-}: {
-  word: Word;
-  nativeLang: string;
-  status: WordStatus;
-  progress: CardProgress | undefined;
-  stats: WordReviewStats | undefined;
-  sortable: boolean;
-  onEdit: () => void;
-  onRemove: () => void;
-}) {
-  const t = useTranslations('decks');
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    setActivatorNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: word.id, disabled: !sortable });
-  const iconButton =
-    'inline-flex size-11 shrink-0 items-center justify-center rounded-control text-fg-muted transition-colors motion-fast hover:bg-surface-2 hover:text-fg';
-
-  return (
-    <li
-      ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cx(isDragging && 'relative z-10 [&>div]:shadow-pop')}
-    >
-      <WordItem
-        word={word}
-        nativeLang={nativeLang}
-        progress={progress}
-        stats={stats}
-        leading={
-          sortable && (
-            <button
-              ref={setActivatorNodeRef}
-              type="button"
-              aria-label={t('dragHandle', { word: word.term })}
-              className={cx(iconButton, 'cursor-grab touch-none active:cursor-grabbing')}
-              {...attributes}
-              {...listeners}
-            >
-              <GripVertical aria-hidden className="size-5" />
-            </button>
-          )
-        }
-        actions={
-          <>
-            <Badge tone={STATUS_TONE[status]} className="hidden sm:inline-flex">
-              {t(`status.${status}`)}
-            </Badge>
-            <button
-              type="button"
-              onClick={onEdit}
-              aria-label={t('editWord')}
-              className={iconButton}
-            >
-              <Pencil aria-hidden className="size-4" />
-            </button>
-            <button
-              type="button"
-              onClick={onRemove}
-              aria-label={t('removeWord')}
-              className={cx(iconButton, 'hover:text-danger')}
-            >
-              <Trash2 aria-hidden className="size-4" />
-            </button>
-          </>
-        }
-      />
-    </li>
   );
 }

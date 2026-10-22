@@ -2,6 +2,10 @@ import { builtinCatalog } from '@vocabx/content';
 import {
   addWord,
   addWordsFromBuiltin,
+  builtinPickState,
+  isPickOnlyCopy,
+  memoryOrder,
+  skipBuiltinWords,
   ensurePersonalDeck,
   mastery,
   wordReviewStats,
@@ -18,8 +22,11 @@ import {
   markKnown,
   moveInOrder,
   removeWordFromDeck,
+  resetWordProgress,
   updateDeck,
   wordStatus,
+  dueOrder,
+  type CardProgress,
 } from '@vocabx/core';
 import { beforeEach, describe, expect, test } from 'vitest';
 import { LocalStorageRepo } from './local/local-storage-repo';
@@ -27,6 +34,8 @@ import { MemoryStorage } from './storage';
 
 const catalog = builtinCatalog();
 const B1 = catalog.decks.find((d) => d.id === 'builtin:en-b1-essentials')!;
+/** Words of the B1 deck, in deck order (the catalog itself starts with A1). */
+const B1_WORDS = B1.wordIds.map((id) => catalog.words.find((w) => w.id === id)!);
 const NOW = 400 * DAY_MS;
 const day = (t: number) => new Date(t).toISOString().slice(0, 10);
 let n = 0;
@@ -89,7 +98,7 @@ describe('deck management', () => {
 
   test('archiving pauses a deck, including words already being learned', async () => {
     const own = await importBuiltinDeck(repo, B1, 'uk', ctx);
-    await markKnown(repo, catalog.words.slice(0, 2), {
+    await markKnown(repo, B1_WORDS.slice(0, 2), {
       ...ctx,
       now: NOW - 30 * DAY_MS,
       retention: 0.9,
@@ -100,6 +109,17 @@ describe('deck management', () => {
     expect(await stack()).toHaveLength(0);
     await updateDeck(repo, archived, { archived: false }, NOW);
     expect(await stack()).toHaveLength(30);
+  });
+
+  test('resetting a word makes it new again and keeps its history', async () => {
+    await importBuiltinDeck(repo, B1, 'uk', ctx);
+    const word = B1_WORDS[0]!;
+    await markKnown(repo, [word], { ...ctx, now: NOW - 30 * DAY_MS, retention: 0.9, params });
+    expect(wordStatus(await repo.progress.get(word.id), NOW)).not.toBe('new');
+    await resetWordProgress(repo, word.id);
+    expect(await repo.progress.get(word.id)).toBeNull();
+    expect(await repo.reviewLog.listForWord(word.id)).toHaveLength(1);
+    expect((await stack()).find((c) => c.id === word.id)?.isNew).toBe(true);
   });
 
   test('a duplicate shares words and progress; removing a word keeps it elsewhere', async () => {
@@ -127,7 +147,7 @@ describe('deck management', () => {
 
   test('stats and statuses', async () => {
     const own = await importBuiltinDeck(repo, B1, 'uk', ctx);
-    await markKnown(repo, catalog.words.slice(0, 3), {
+    await markKnown(repo, B1_WORDS.slice(0, 3), {
       ...ctx,
       now: NOW - 30 * DAY_MS,
       retention: 0.9,
@@ -135,7 +155,7 @@ describe('deck management', () => {
     });
     const stats = (await deckStats(repo, [own], NOW)).get(own.id)!;
     expect(stats).toEqual({ total: 30, fresh: 27, due: 3, learning: 0, mastered: 0 });
-    const p = await repo.progress.get(catalog.words[0]!.id);
+    const p = await repo.progress.get(B1_WORDS[0]!.id);
     expect(wordStatus(p, NOW - 30 * DAY_MS)).toBe('learning');
     expect(wordStatus(null, NOW)).toBe('new');
     expect(importedBuiltinIds([own])).toEqual(new Set([B1.id]));
@@ -155,6 +175,62 @@ describe('deck management', () => {
     expect((await repo.decks.list()).filter((d) => d.origin === 'own')).toHaveLength(1);
     const all = await addWordsFromBuiltin(repo, B1, B1.wordIds, 'uk', ctx);
     expect(new Set(all.wordIds)).toEqual(new Set(B1.wordIds));
+  });
+
+  test('picking saves skipped words and resumes where it stopped', async () => {
+    const [a, b, c] = B1.wordIds;
+    const skipped = await skipBuiltinWords(repo, B1, [a!], 'uk', ctx);
+    expect(skipped).toMatchObject({ builtinId: B1.id, wordIds: [], skippedIds: [a] });
+    expect(isPickOnlyCopy(skipped)).toBe(true);
+    const own = async () => (await repo.decks.list()).filter((d) => d.origin === 'own');
+    expect(builtinPickState(B1, await own())).toMatchObject({
+      added: 0,
+      skipped: 1,
+      inProgress: true,
+    });
+    await addWordsFromBuiltin(repo, B1, [b!], 'uk', ctx);
+    await skipBuiltinWords(repo, B1, [c!, b!], 'uk', ctx);
+    expect(builtinPickState(B1, await own())).toMatchObject({ added: 1, skipped: 2 });
+    // Adding a skipped word later takes it off the skipped list.
+    const copy = await addWordsFromBuiltin(repo, B1, [a!], 'uk', ctx);
+    expect(copy.skippedIds).toEqual([c]);
+    expect(isPickOnlyCopy(copy)).toBe(false);
+    const done = await skipBuiltinWords(repo, B1, B1.wordIds, 'uk', ctx);
+    expect(builtinPickState(B1, [done])).toMatchObject({
+      added: 2,
+      skipped: B1.wordIds.length - 2,
+      inProgress: false,
+    });
+  });
+
+  test('memory order puts new words first, then the most forgotten', () => {
+    const card = (stability: number, daysAgo: number) => ({
+      wordId: '',
+      lang: 'en' as const,
+      dueAt: 0,
+      lastEventId: '',
+      card: {
+        stability,
+        difficulty: 5,
+        lastReviewAt: NOW - daysAgo * DAY_MS,
+        level: 1 as const,
+        levelStreak: 0,
+        lapses: 0,
+        reps: 1,
+      },
+    });
+    const progress = new Map([
+      ['strong', card(60, 1)],
+      ['weak', card(1, 10)],
+      ['mid', card(10, 5)],
+    ]);
+    const ids = ['strong', 'new', 'weak', 'mid'].map((id) => ({ id }));
+    expect(memoryOrder(ids, progress, NOW, params).map((w) => w.id)).toEqual([
+      'new',
+      'weak',
+      'mid',
+      'strong',
+    ]);
   });
 
   test('the personal deck is created once per language', async () => {
@@ -203,5 +279,18 @@ describe('deck management', () => {
     });
     expect(mastery(p(15))).toBe(0.5);
     expect(mastery(p(90))).toBe(1);
+  });
+});
+
+describe('dueOrder', () => {
+  const prog = (wordId: string, dueAt: number) =>
+    [wordId, { wordId, lang: 'en', dueAt } as unknown as CardProgress] as const;
+  const words = ['a', 'b', 'c', 'd'].map((id) => ({ id }));
+  const progress = new Map([prog('a', 300), prog('c', 100), prog('d', 200)]);
+  test('new words first, then by the time left, soonest first', () => {
+    expect(dueOrder(words, progress).map((w) => w.id)).toEqual(['b', 'c', 'd', 'a']);
+  });
+  test('latest first is the reverse', () => {
+    expect(dueOrder(words, progress, 'latest').map((w) => w.id)).toEqual(['a', 'd', 'c', 'b']);
   });
 });

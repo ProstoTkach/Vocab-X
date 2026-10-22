@@ -1,10 +1,10 @@
 // Builds today's study stack from repositories. Pure orchestration over the repo interfaces,
 // so it runs unchanged on localStorage now and on IndexedDB / the server later.
-import type { SchedulerParams, StackParams } from './config/params';
+import { DEFAULT_STACK_PARAMS, type SchedulerParams, type StackParams } from './config/params';
 import type { LangCode } from './language';
 import type { CardProgress, Id, StudySettings, Word } from './model';
 import type { Repos } from './repos';
-import { buildStack, remainingLimits, type Candidate } from './stack';
+import { buildStack, priority, remainingLimits, type Candidate } from './stack';
 
 export interface StudyCard extends Candidate {
   word: Word;
@@ -100,4 +100,32 @@ export async function loadStudyStack(repos: StudyRepos, req: StackRequest): Prom
     maxNew: limits.maxNew,
     ...(req.stack ? { stack: req.stack } : {}),
   });
+}
+
+/**
+ * Words ordered like the review stack ranks them: the least remembered first. Words not studied
+ * yet come first (in study order), then studied ones by stack priority (forgotten-er and harder
+ * first), so the best-remembered words end up at the bottom.
+ */
+export function memoryOrder<T extends { id: Id }>(
+  words: readonly T[],
+  progress: ReadonlyMap<Id, CardProgress>,
+  now: number,
+  params: SchedulerParams,
+): T[] {
+  const { beta } = DEFAULT_STACK_PARAMS;
+  const fresh: T[] = [];
+  const seen: { w: T; s: number; i: number }[] = [];
+  words.forEach((w, i) => {
+    const card = progress.get(w.id)?.card;
+    if (!card) {
+      fresh.push(w);
+      return;
+    }
+    const { stability, difficulty, lastReviewAt } = card;
+    const c = { id: w.id, lemma: '', isNew: false, stability, difficulty, lastReviewAt };
+    seen.push({ w, i, s: priority(c, now, params.w, beta) });
+  });
+  seen.sort((a, b) => b.s - a.s || a.i - b.i);
+  return [...fresh, ...seen.map((x) => x.w)];
 }

@@ -7,16 +7,22 @@ import type { ExerciseFormat } from '../types';
 export interface SchedulerParams {
   /** FSRS-6 weights w₀…w₂₀. */
   w: readonly number[];
-  /** ρ: stability transfer when promoted to format level 2, 3, 4. */
-  rho: readonly [number, number, number];
-  /** τ⁰: base stability thresholds (days) to reach format level 2, 3, 4. */
-  tau0: readonly [number, number, number];
+  /** ρ: stability transfer when promoted to format level 2, 3. */
+  rho: readonly [number, number];
+  /** τ⁰: base stability thresholds (days) to reach format level 2, 3. */
+  tau0: readonly [number, number];
   /** β_τ: how strongly difficulty D shifts the promotion threshold τ(D). */
   betaTau: number;
   /** k₀: consecutive successes required for promotion. */
   k0: number;
   /** I_max: interval cap, days. */
   maxInterval: number;
+  /** S0 of a card's first appearance, minutes: new words start in a learning phase. */
+  introMinutes: number;
+  /** Shortest interval, minutes. */
+  minIntervalMinutes: number;
+  /** A success counts toward promotion only after a pause of at least this many days. */
+  streakMinGapDays: number;
   /** Intervals of at least this many days get fuzz so that cards added together spread out. */
   fuzzMinDays: number;
   /** Fuzz amplitude: interval × (1 ± fuzzRatio). */
@@ -31,11 +37,16 @@ export const FSRS6_DEFAULT_W: readonly number[] = [
 
 export const DEFAULT_SCHEDULER_PARAMS: SchedulerParams = {
   w: FSRS6_DEFAULT_W,
-  rho: [0.4, 0.5, 0.5],
-  tau0: [7, 21, 60],
-  betaTau: 0.5,
+  // Formats change after two successes in a row, whatever the stability or the pause: the
+  // level is about variety, so it does not cut the interval either.
+  rho: [1, 1],
+  tau0: [0, 0],
+  betaTau: 0.3,
   k0: 2,
   maxInterval: 36_500,
+  introMinutes: 10,
+  minIntervalMinutes: 1,
+  streakMinGapDays: 0,
   fuzzMinDays: 3,
   fuzzRatio: 0.05,
 };
@@ -93,9 +104,10 @@ export interface XpParams {
 export const DEFAULT_XP_PARAMS: XpParams = {
   base: [2, 8, 10, 10],
   formatMultiplier: {
+    // Levels in order of difficulty: recognition, listening, recall.
     REC: 1,
-    PROD: 1.5,
-    AUD_PART: 1.75,
+    AUD_PART: 1.5,
+    PROD: 1.75,
     AUD_FULL: 2,
     MCQ: 1,
     MAT: 1,
