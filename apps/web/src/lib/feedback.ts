@@ -7,9 +7,46 @@
 export type FeedbackKind = 'survey' | 'bug' | 'review' | 'idea';
 export type Platform = 'phone' | 'desktop';
 
-/** Survey questions, each rated 1–5; the order is the order on screen. */
-export const SURVEY_QUESTIONS = ['overall', 'ease', 'usefulness', 'motivation'] as const;
-export type SurveyQuestion = (typeof SURVEY_QUESTIONS)[number];
+/** Survey questions, each rated 1–5, grouped in sections; the order is the order on screen. */
+export const SURVEY_SECTIONS = {
+  general: ['overall', 'ease', 'recommend'],
+  learning: ['usefulness', 'exercises', 'content', 'motivation'],
+  tech: ['speed', 'display', 'audio'],
+} as const;
+export type SurveySection = keyof typeof SURVEY_SECTIONS;
+export type SurveyQuestion = (typeof SURVEY_SECTIONS)[SurveySection][number];
+export const SURVEY_QUESTIONS: readonly SurveyQuestion[] = Object.values(SURVEY_SECTIONS).flat();
+
+/** "What do you like most" and "what to improve first": up to CHOICE_MAX of each. */
+export const LIKE_OPTIONS = [
+  'cards',
+  'exercises',
+  'character',
+  'streak',
+  'library',
+  'wordPicker',
+  'audio',
+  'design',
+] as const;
+export const IMPROVE_OPTIONS = [
+  'speed',
+  'moreWords',
+  'translations',
+  'exercises',
+  'explanations',
+  'character',
+  'design',
+  'audio',
+] as const;
+export type LikeOption = (typeof LIKE_OPTIONS)[number];
+export type ImproveOption = (typeof IMPROVE_OPTIONS)[number];
+export const CHOICE_MAX = 3;
+
+/** Context of the answers: where and how often the learner studies (both optional). */
+export const DEVICES = ['phone', 'desktop', 'both'] as const;
+export const FREQUENCIES = ['daily', 'weekly', 'rarely', 'first'] as const;
+export type Device = (typeof DEVICES)[number];
+export type Frequency = (typeof FREQUENCIES)[number];
 
 export const RATING_MAX = 5;
 /** "What exactly did you not like" under a rating below 5. */
@@ -28,6 +65,10 @@ export type Feedback =
   | {
       kind: 'survey';
       answers: Record<SurveyQuestion, SurveyAnswer>;
+      likes: LikeOption[];
+      improve: ImproveOption[];
+      device?: Device;
+      frequency?: Frequency;
       comment?: string;
       bug?: { platform: Platform; text: string };
     }
@@ -59,6 +100,17 @@ function text(v: unknown, max: number): string | null {
 const isRating = (v: unknown): v is number =>
   typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= RATING_MAX;
 const isPlatform = (v: unknown): v is Platform => PLATFORMS.includes(v as Platform);
+const oneOf =
+  <T extends string>(list: readonly T[]) =>
+  (v: unknown): v is T =>
+    list.includes(v as T);
+
+/** Distinct options from `list`, at most CHOICE_MAX; null for anything else. Missing = []. */
+function choices<T extends string>(v: unknown, list: readonly T[]): T[] | null {
+  if (v === undefined) return [];
+  if (!Array.isArray(v) || v.length > CHOICE_MAX || !v.every(oneOf(list))) return null;
+  return [...new Set(v)];
+}
 
 function parseSurvey(f: Obj): Feedback | null {
   if (!isObj(f.answers)) return null;
@@ -71,6 +123,11 @@ function parseSurvey(f: Obj): Feedback | null {
     // A note only makes sense under a rating below the top.
     answers[q] = note && a.rating < RATING_MAX ? { rating: a.rating, note } : { rating: a.rating };
   }
+  const likes = choices(f.likes, LIKE_OPTIONS);
+  const improve = choices(f.improve, IMPROVE_OPTIONS);
+  if (!likes || !improve) return null;
+  if (f.device !== undefined && !oneOf(DEVICES)(f.device)) return null;
+  if (f.frequency !== undefined && !oneOf(FREQUENCIES)(f.frequency)) return null;
   const comment = text(f.comment, TEXT_MAX);
   if (comment === null) return null;
   let bug: { platform: Platform; text: string } | undefined;
@@ -83,6 +140,10 @@ function parseSurvey(f: Obj): Feedback | null {
   return {
     kind: 'survey',
     answers,
+    likes,
+    improve,
+    ...(f.device ? { device: f.device } : {}),
+    ...(f.frequency ? { frequency: f.frequency } : {}),
     ...(comment ? { comment } : {}),
     ...(bug ? { bug } : {}),
   };
@@ -153,43 +214,120 @@ const TITLES: Record<FeedbackKind, string> = {
   review: '💬 Відгук',
   idea: '💡 Ідея',
 };
+const SECTION_LABELS: Record<SurveySection, string> = {
+  general: '🌟 Загальне враження',
+  learning: '📚 Навчання',
+  tech: '⚙️ Технічна частина',
+};
 const QUESTION_LABELS: Record<SurveyQuestion, string> = {
   overall: 'Загалом',
   ease: 'Зручність',
-  usefulness: 'Користь',
+  recommend: 'Порадив(-ла) б',
+  usefulness: 'Користь для запамʼятовування',
+  exercises: 'Вправи',
+  content: 'Слова, переклади, приклади',
   motivation: 'Мотивація',
+  speed: 'Швидкість і плавність',
+  display: 'Відображення на екрані',
+  audio: 'Озвучення',
+};
+const LIKE_LABELS: Record<LikeOption, string> = {
+  cards: 'картки зі свайпами',
+  exercises: 'різні вправи',
+  character: 'персонаж і гардероб',
+  streak: 'серія і щоденна ціль',
+  library: 'бібліотека наборів',
+  wordPicker: 'вибір слів стопкою',
+  audio: 'озвучення',
+  design: 'дизайн і теми',
+};
+const IMPROVE_LABELS: Record<ImproveOption, string> = {
+  speed: 'швидкість роботи',
+  moreWords: 'більше слів і наборів',
+  translations: 'точність перекладів',
+  exercises: 'більше видів вправ',
+  explanations: 'зрозуміліші підказки',
+  character: 'персонаж і нагороди',
+  design: 'дизайн',
+  audio: 'озвучення',
+};
+const DEVICE_LABELS: Record<Device, string> = {
+  phone: '📱 телефон',
+  desktop: '🖥 компʼютер',
+  both: '📱+🖥 обидва',
+};
+const FREQUENCY_LABELS: Record<Frequency, string> = {
+  daily: 'щодня',
+  weekly: 'кілька разів на тиждень',
+  rarely: 'рідко',
+  first: 'вперше',
 };
 const PLATFORM_LABELS: Record<Platform, string> = { phone: '📱 телефон', desktop: '🖥 компʼютер' };
 
 const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(RATING_MAX - n);
 const quote = (s: string) => `<blockquote>${escapeHtml(s)}</blockquote>`;
+const average = (qs: readonly SurveyQuestion[], answers: Record<SurveyQuestion, SurveyAnswer>) =>
+  (qs.reduce((s, q) => s + answers[q].rating, 0) / qs.length).toFixed(2);
 
-/** The message as Telegram HTML (parse_mode=HTML). */
-export function formatFeedback({ feedback: f, locale, level }: FeedbackPayload): string {
-  const lines = [`<b>${TITLES[f.kind]}</b> · VocabX`];
+/** Telegram refuses messages over 4096 characters of text (counted without the markup). */
+export const MESSAGE_MAX = 4000;
+
+/** Length of a message as Telegram counts it: tags removed, entities as one character. */
+export const visibleLength = (html: string) =>
+  html.replace(/<[^>]+>/g, '').replace(/&(?:amp|lt|gt);/g, '_').length;
+
+/**
+ * The feedback as Telegram HTML (parse_mode=HTML), in one or more messages. It is built from
+ * blocks that are valid HTML on their own, so a long survey is split between blocks only.
+ */
+export function formatFeedback({ feedback: f, locale, level }: FeedbackPayload): string[] {
+  const blocks = [`<b>${TITLES[f.kind]}</b> · VocabX`];
   switch (f.kind) {
     case 'survey': {
-      for (const q of SURVEY_QUESTIONS) {
-        const a = f.answers[q];
-        lines.push(`${QUESTION_LABELS[q]}: ${stars(a.rating)} <b>${a.rating}/${RATING_MAX}</b>`);
-        if (a.note) lines.push(quote(a.note));
+      for (const [section, qs] of Object.entries(SURVEY_SECTIONS) as [
+        SurveySection,
+        readonly SurveyQuestion[],
+      ][]) {
+        const lines = [`\n<b>${SECTION_LABELS[section]}</b> · ${average(qs, f.answers)}`];
+        for (const q of qs) {
+          const a = f.answers[q];
+          lines.push(`${QUESTION_LABELS[q]}: ${stars(a.rating)} <b>${a.rating}</b>`);
+          if (a.note) lines.push(quote(a.note));
+        }
+        blocks.push(lines.join('\n'));
       }
-      const avg =
-        SURVEY_QUESTIONS.reduce((s, q) => s + f.answers[q].rating, 0) / SURVEY_QUESTIONS.length;
-      lines.push(`Середня: <b>${avg.toFixed(2)}</b>`);
-      if (f.comment) lines.push('', '<b>Коментар:</b>', quote(f.comment));
+      blocks.push(`\nСередня за все: <b>${average(SURVEY_QUESTIONS, f.answers)}</b>`);
+      const extra: string[] = [];
+      if (f.likes.length)
+        extra.push(`👍 Подобається: ${f.likes.map((x) => LIKE_LABELS[x]).join(', ')}`);
+      if (f.improve.length)
+        extra.push(`🛠 Покращити: ${f.improve.map((x) => IMPROVE_LABELS[x]).join(', ')}`);
+      if (f.device) extra.push(`Пристрій: ${DEVICE_LABELS[f.device]}`);
+      if (f.frequency) extra.push(`Займається: ${FREQUENCY_LABELS[f.frequency]}`);
+      if (extra.length) blocks.push('\n' + extra.join('\n'));
+      if (f.comment) blocks.push(`\n<b>Коментар:</b>\n${quote(f.comment)}`);
       if (f.bug)
-        lines.push('', `<b>Баг</b> (${PLATFORM_LABELS[f.bug.platform]}):`, quote(f.bug.text));
+        blocks.push(`\n<b>Баг</b> (${PLATFORM_LABELS[f.bug.platform]}):\n${quote(f.bug.text)}`);
       break;
     }
     case 'bug':
-      lines.push(`Пристрій: ${PLATFORM_LABELS[f.platform]}`, quote(f.text));
+      blocks.push(`Пристрій: ${PLATFORM_LABELS[f.platform]}\n${quote(f.text)}`);
       break;
     case 'review':
     case 'idea':
-      lines.push(quote(f.text));
+      blocks.push(quote(f.text));
       break;
   }
-  lines.push('', `<i>мова: ${escapeHtml(locale)} · рівень: ${level ?? '—'}</i>`);
-  return lines.join('\n');
+  blocks.push(`\n<i>мова: ${escapeHtml(locale)} · рівень: ${level ?? '—'}</i>`);
+
+  const messages: string[] = [];
+  let current = '';
+  for (const b of blocks) {
+    if (current && visibleLength(current) + 1 + visibleLength(b) > MESSAGE_MAX) {
+      messages.push(current);
+      current = b.replace(/^\n/, '');
+    } else current = current ? `${current}\n${b}` : b;
+  }
+  messages.push(current);
+  return messages;
 }

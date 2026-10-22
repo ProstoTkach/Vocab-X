@@ -40,18 +40,21 @@ export async function POST(request: Request): Promise<Response> {
   if (!payload) return Response.json({ error: 'invalid' }, { status: 400 });
 
   try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: formatFeedback(payload),
-        parse_mode: 'HTML',
-        disable_web_page_preview: true,
-      }),
-      signal: AbortSignal.timeout(10_000),
-    });
-    if (!res.ok) return Response.json({ error: 'upstream' }, { status: 502 });
+    // A long survey comes as several messages, in order.
+    for (const text of formatFeedback(payload)) {
+      const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text,
+          parse_mode: 'HTML',
+          disable_web_page_preview: true,
+        }),
+        signal: AbortSignal.timeout(10_000),
+      });
+      if (!res.ok) return Response.json({ error: 'upstream' }, { status: 502 });
+    }
   } catch {
     return Response.json({ error: 'upstream' }, { status: 502 });
   }

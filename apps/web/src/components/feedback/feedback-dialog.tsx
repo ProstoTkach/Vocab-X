@@ -21,20 +21,33 @@ import { Button } from '@/components/ui/button';
 import { CheckCard } from '@/components/ui/choice';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { TextAreaField, TextField } from '@/components/ui/field';
+import { ChipGroup } from '@/components/ui/chips';
+import { ProgressBar } from '@/components/ui/progress-bar';
 import { RatingScale } from '@/components/ui/rating';
 import { Segmented } from '@/components/ui/segmented';
 import { cx } from '@/lib/cx';
 import {
+  CHOICE_MAX,
+  DEVICES,
+  FREQUENCIES,
+  IMPROVE_OPTIONS,
+  LIKE_OPTIONS,
   NOTE_MAX,
   RATING_MAX,
   REVIEW_MAX,
   sendFeedback,
   SURVEY_QUESTIONS,
+  SURVEY_SECTIONS,
   TEXT_MAX,
+  type Device,
   type Feedback,
   type FeedbackKind,
+  type Frequency,
+  type ImproveOption,
+  type LikeOption,
   type Platform,
   type SurveyQuestion,
+  type SurveySection,
 } from '@/lib/feedback';
 import { usePlayer } from '@/lib/player';
 
@@ -179,15 +192,35 @@ type Draft = Record<SurveyQuestion, { rating: number | null; note: string }>;
 const emptyDraft = () =>
   Object.fromEntries(SURVEY_QUESTIONS.map((q) => [q, { rating: null, note: '' }])) as Draft;
 
+/** A numbered part of the survey. */
+function SurveyPart({ n, title, children }: { n: number; title: string; children: ReactNode }) {
+  return (
+    <section className="flex flex-col gap-5 border-t border-line/70 pt-5 first:border-t-0 first:pt-0">
+      <h3 className="flex items-center gap-2.5 font-display font-semibold">
+        <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-sm text-on-accent">
+          {n}
+        </span>
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
+}
+
 function SurveyForm({ onSubmit }: { onSubmit: (f: Feedback) => void }) {
   const t = useTranslations('feedback');
   const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [likes, setLikes] = useState<LikeOption[]>([]);
+  const [improve, setImprove] = useState<ImproveOption[]>([]);
+  const [device, setDevice] = useState<Device | ''>('');
+  const [frequency, setFrequency] = useState<Frequency | ''>('');
   const [comment, setComment] = useState('');
   const [bugOn, setBugOn] = useState(false);
   const [platform, setPlatform] = useState<Platform>(guessPlatform);
   const [bugText, setBugText] = useState('');
   const [missing, setMissing] = useState(false);
   const rated = SURVEY_QUESTIONS.filter((q) => draft[q].rating !== null).length;
+  const progress = t('survey.progress', { rated, total: SURVEY_QUESTIONS.length });
 
   const setAnswer = (q: SurveyQuestion, patch: Partial<Draft[SurveyQuestion]>) =>
     setDraft((d) => ({ ...d, [q]: { ...d[q], ...patch } }));
@@ -206,77 +239,128 @@ function SurveyForm({ onSubmit }: { onSubmit: (f: Feedback) => void }) {
     onSubmit({
       kind: 'survey',
       answers,
+      likes,
+      improve,
+      ...(device ? { device } : {}),
+      ...(frequency ? { frequency } : {}),
       ...(comment.trim() ? { comment: comment.trim() } : {}),
       ...(bugOn && bugText.trim() ? { bug: { platform, text: bugText.trim() } } : {}),
     });
   };
 
+  const sections = Object.entries(SURVEY_SECTIONS) as [SurveySection, readonly SurveyQuestion[]][];
+
   return (
-    <form id={FORM_ID} onSubmit={submit} noValidate className="flex flex-col gap-5">
-      <p className="text-xs font-semibold text-fg-muted tabular-nums" aria-live="polite">
-        {t('survey.progress', { rated, total: SURVEY_QUESTIONS.length })}
-      </p>
-      {SURVEY_QUESTIONS.map((q) => {
-        const { rating, note } = draft[q];
-        return (
-          <div key={q} className="flex flex-col gap-2">
-            <RatingScale
-              label={t(`survey.questions.${q}`)}
-              value={rating}
-              onChange={(r) => {
-                setAnswer(q, { rating: r });
-                setMissing(false);
-              }}
-              lowLabel={t('survey.low')}
-              highLabel={t('survey.high')}
-            />
-            <Reveal shown={rating !== null && rating < RATING_MAX}>
-              <TextField
-                label={t('survey.noteLabel')}
-                value={note}
-                maxLength={NOTE_MAX}
-                placeholder={t('survey.notePlaceholder')}
-                onChange={(e) => setAnswer(q, { note: e.target.value })}
-              />
-            </Reveal>
-          </div>
-        );
-      })}
-
-      <TextAreaField
-        label={t('survey.commentLabel')}
-        hint={t('optional')}
-        value={comment}
-        maxLength={TEXT_MAX}
-        placeholder={t('survey.commentPlaceholder')}
-        onChange={(e) => setComment(e.target.value)}
-      />
-
-      <div className="flex flex-col gap-3">
-        <CheckCard
-          checked={bugOn}
-          onCheckedChange={setBugOn}
-          icon={<Bug aria-hidden className="size-5 shrink-0 text-accent" />}
-          label={t('survey.bugToggle')}
-          description={t('optional')}
+    <form id={FORM_ID} onSubmit={submit} noValidate className="flex flex-col gap-6">
+      <div className="flex flex-col gap-1.5">
+        <ProgressBar
+          value={rated}
+          max={SURVEY_QUESTIONS.length}
+          label={t('survey.progressLabel')}
+          valueText={progress}
+          tone={rated === SURVEY_QUESTIONS.length ? 'success' : 'accent'}
+          size="xs"
         />
-        <Reveal shown={bugOn}>
-          <div className="flex flex-col gap-3">
-            <PlatformPicker value={platform} onChange={setPlatform} />
-            <TextAreaField
-              label={t('bugTextLabel')}
-              value={bugText}
-              maxLength={TEXT_MAX}
-              placeholder={t('bugTextPlaceholder')}
-              onChange={(e) => setBugText(e.target.value)}
-            />
-          </div>
-        </Reveal>
+        <p className="text-xs font-semibold text-fg-muted tabular-nums" aria-hidden>
+          {progress}
+        </p>
       </div>
+
+      {sections.map(([section, questions], i) => (
+        <SurveyPart key={section} n={i + 1} title={t(`survey.sections.${section}`)}>
+          {questions.map((q) => {
+            const { rating, note } = draft[q];
+            return (
+              <div key={q} className="flex flex-col gap-2">
+                <RatingScale
+                  label={t(`survey.questions.${q}`)}
+                  value={rating}
+                  onChange={(r) => {
+                    setAnswer(q, { rating: r });
+                    setMissing(false);
+                  }}
+                  lowLabel={t('survey.low')}
+                  highLabel={t('survey.high')}
+                />
+                <Reveal shown={rating !== null && rating < RATING_MAX}>
+                  <TextField
+                    label={t('survey.noteLabel')}
+                    value={note}
+                    maxLength={NOTE_MAX}
+                    placeholder={t(`survey.notePlaceholders.${q}`)}
+                    onChange={(e) => setAnswer(q, { note: e.target.value })}
+                  />
+                </Reveal>
+              </div>
+            );
+          })}
+        </SurveyPart>
+      ))}
+
+      <SurveyPart n={sections.length + 1} title={t('survey.sections.specifics')}>
+        <ChipGroup
+          label={t('survey.likesLabel')}
+          hint={t('survey.choiceHint', { max: CHOICE_MAX })}
+          value={likes}
+          options={LIKE_OPTIONS.map((o) => ({ value: o, label: t(`survey.likes.${o}`) }))}
+          onChange={setLikes}
+          max={CHOICE_MAX}
+        />
+        <ChipGroup
+          label={t('survey.improveLabel')}
+          hint={t('survey.choiceHint', { max: CHOICE_MAX })}
+          value={improve}
+          options={IMPROVE_OPTIONS.map((o) => ({ value: o, label: t(`survey.improve.${o}`) }))}
+          onChange={setImprove}
+          max={CHOICE_MAX}
+        />
+        <Segmented<Device | ''>
+          label={t('survey.deviceLabel')}
+          value={device}
+          options={DEVICES.map((d) => ({ value: d, label: t(`survey.devices.${d}`) }))}
+          onChange={setDevice}
+        />
+        <Segmented<Frequency | ''>
+          label={t('survey.frequencyLabel')}
+          value={frequency}
+          options={FREQUENCIES.map((f) => ({ value: f, label: t(`survey.frequencies.${f}`) }))}
+          onChange={setFrequency}
+        />
+        <TextAreaField
+          label={t('survey.commentLabel')}
+          hint={t('optional')}
+          value={comment}
+          maxLength={TEXT_MAX}
+          placeholder={t('survey.commentPlaceholder')}
+          onChange={(e) => setComment(e.target.value)}
+        />
+
+        <div className="flex flex-col gap-3">
+          <CheckCard
+            checked={bugOn}
+            onCheckedChange={setBugOn}
+            icon={<Bug aria-hidden className="size-5 shrink-0 text-accent" />}
+            label={t('survey.bugToggle')}
+            description={t('optional')}
+          />
+          <Reveal shown={bugOn}>
+            <div className="flex flex-col gap-3">
+              <PlatformPicker value={platform} onChange={setPlatform} />
+              <TextAreaField
+                label={t('bugTextLabel')}
+                value={bugText}
+                maxLength={TEXT_MAX}
+                placeholder={t('bugTextPlaceholder')}
+                onChange={(e) => setBugText(e.target.value)}
+              />
+            </div>
+          </Reveal>
+        </div>
+      </SurveyPart>
 
       {missing && (
         <p role="alert" className="text-sm font-medium text-danger">
-          {t('survey.missing')}
+          {t('survey.missing', { left: SURVEY_QUESTIONS.length - rated })}
         </p>
       )}
       <AnonymousNote />

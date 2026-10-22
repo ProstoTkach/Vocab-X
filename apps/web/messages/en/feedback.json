@@ -18,7 +18,7 @@
   "kinds": {
     "survey": {
       "title": "Short survey",
-      "text": "4 ratings and a few words — about a minute. Helps the most."
+      "text": "10 ratings and a few taps — about two minutes. Helps the most."
     },
     "bug": {
       "title": "Found a bug?",
@@ -40,22 +40,82 @@
     }
   },
   "survey": {
-    "text": "Just 4 ratings from 1 to 5 — takes about a minute. Thank you for helping!",
+    "text": "10 quick ratings from 1 to 5 and a few taps — about two minutes. Every answer shows us exactly what to improve.",
     "progress": "Rated {rated} of {total}",
+    "progressLabel": "Survey progress",
+    "sections": {
+      "general": "Overall impression",
+      "learning": "Learning",
+      "tech": "Technical side",
+      "specifics": "What exactly you like and what not"
+    },
     "questions": {
       "overall": "How do you like VocabX overall?",
       "ease": "How easy is it to use?",
+      "recommend": "How likely are you to recommend VocabX to a friend?",
       "usefulness": "How well does it help you remember words?",
-      "motivation": "How much do you want to come back every day?"
+      "exercises": "How clear and interesting are the exercises (cards, typing, listening)?",
+      "content": "How do you find the words, translations and examples?",
+      "motivation": "How much do you want to come back every day (streak, character, rewards)?",
+      "speed": "How fast and smooth does everything work?",
+      "display": "Does everything look right on your screen?",
+      "audio": "How do you like the word pronunciation?"
     },
     "low": "1 — poor",
     "high": "5 — great",
     "noteLabel": "Describe in a couple of words what you did not like",
-    "notePlaceholder": "For example: too few words, confusing menu",
+    "notePlaceholders": {
+      "overall": "For example: unclear where to start",
+      "ease": "For example: confusing menu, small buttons",
+      "recommend": "For example: too few words for now",
+      "usefulness": "For example: words are forgotten quickly",
+      "exercises": "For example: unclear how to grade a card",
+      "content": "For example: inaccurate translation, few examples",
+      "motivation": "For example: rewards are not interesting",
+      "speed": "For example: the card stutters when swiping",
+      "display": "For example: text is cut off, things overlap",
+      "audio": "For example: too quiet, wrong pronunciation"
+    },
+    "likesLabel": "What do you like most?",
+    "improveLabel": "What should be improved first?",
+    "choiceHint": "Choose up to {max}",
+    "likes": {
+      "cards": "Swipeable cards",
+      "exercises": "Different exercises",
+      "character": "Character and wardrobe",
+      "streak": "Streak and daily goal",
+      "library": "Deck library",
+      "wordPicker": "Picking words from a stack",
+      "audio": "Pronunciation",
+      "design": "Design and themes"
+    },
+    "improve": {
+      "speed": "Speed",
+      "moreWords": "More words and decks",
+      "translations": "Translation accuracy",
+      "exercises": "More kinds of exercises",
+      "explanations": "Clearer hints",
+      "character": "Character and rewards",
+      "design": "Design",
+      "audio": "Pronunciation"
+    },
+    "deviceLabel": "Where do you study most often?",
+    "devices": {
+      "phone": "Phone",
+      "desktop": "Computer",
+      "both": "Both"
+    },
+    "frequencyLabel": "How often do you study?",
+    "frequencies": {
+      "daily": "Daily",
+      "weekly": "A few times a week",
+      "rarely": "Rarely",
+      "first": "First time"
+    },
     "commentLabel": "What would you improve or add?",
     "commentPlaceholder": "Any thoughts, wishes or impressions",
     "bugToggle": "I noticed a bug",
-    "missing": "Please rate every item — it is just a few taps."
+    "missing": "Still to rate: {left}. Just a few taps and your answers will be complete."
   },
   "back": "Back",
   "send": "Send",
