@@ -4,6 +4,7 @@ import type { ReviewOutcome, SessionState, StudyCard } from '@vocabx/core';
 import { CircleCheck, Coffee } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Button, buttonClass } from '@/components/ui/button';
+import { LibraryShortcut } from '@/components/library/library-shortcut';
 import { Link } from '@/i18n/navigation';
 import { GRADE_NAME, GRADE_TONE } from './grade-bar';
 
@@ -71,6 +72,11 @@ export function SessionSummary({
           </Button>
         )}
       </div>
+      <LibraryShortcut
+        title={t('libraryTitle')}
+        text={t('libraryText')}
+        className="mt-2 w-full max-w-md"
+      />
     </section>
   );
 }

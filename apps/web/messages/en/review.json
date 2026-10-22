@@ -88,5 +88,7 @@
   "introRemembered": "{direction, select, right {Swipe right} other {Swipe left}} — “Remembered”: the word comes back later.",
   "introForgot": "{direction, select, right {Swipe right} other {Swipe left}} — “Forgot”: the word comes back again soon.",
   "introFlip": "Not sure? Tap the card to turn it over and check the answer, then swipe.",
-  "introStart": "Got it, let’s start"
+  "introStart": "Got it, let’s start",
+  "libraryTitle": "New words are in the library",
+  "libraryText": "Ready-made decks by topic and level: quickly pick words and add them to your study right away."
 }

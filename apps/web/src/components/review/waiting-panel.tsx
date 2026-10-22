@@ -2,6 +2,7 @@
 
 import { Hourglass } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { LibraryShortcut } from '@/components/library/library-shortcut';
 import { Button } from '@/components/ui/button';
 import { useNow } from '@/lib/use-now';
 
@@ -42,6 +43,11 @@ export function WaitingPanel({
       <Button variant="secondary" onClick={onShowNow}>
         {t('showNow')}
       </Button>
+      <LibraryShortcut
+        title={t('libraryTitle')}
+        text={t('libraryText')}
+        className="mt-2 w-full max-w-md"
+      />
     </section>
   );
 }

@@ -9,7 +9,17 @@
 //  5) stability after a lapse never exceeds the previous one: S′ = min(S, S′_f);
 //  6) the promotion streak grows only after a pause of at least streakMinGapDays;
 //  7) the grade counts as in FSRS: Again resets, Hard and Easy shape stability and difficulty
-//     around Good; with two grades only (the default) it is Again or Good.
+//     around Good; with two grades only (the default) it is Again or Good;
+//  8) no "difficulty hell": in FSRS a Good answer never lowers D, so after a few lapses D sticks
+//     near 10 and intervals grow only ~1.4× per answer. Every success now pulls D part of the
+//     way back to its starting value (difficultyRecovery), and for a word that has lapsed,
+//     successes in a row add a growing bonus to the stability gain (streakBoost, up to
+//     streakBoostMax), so a word that was hard but is now known climbs out within a few reviews. Both are weighted by min(1, t in days),
+//     like the difficulty update, so answers minutes apart in a session change little;
+//  9) in the learning phase (S under a day) a success counts at least as one given on time:
+//     after a lapse a card comes back within minutes and "Show now" brings it even sooner, when
+//     R is still ≈ 1 and plain FSRS grows S by almost nothing. Without this, a word forgotten a
+//     few times in a row stayed at a minute or two however often it was then recalled.
 // Time and randomness are inputs, model constants come from SchedulerParams.
 import type { SchedulerParams } from './config/params';
 import type { Rng } from './rng';
@@ -25,6 +35,8 @@ export interface CardState {
   levelStreak: number;
   lapses: number;
   reps: number;
+  /** Successes in a row since the last lapse (missing in snapshots made before it existed). */
+  streak?: number;
 }
 
 export interface ReviewResult {
@@ -62,8 +74,11 @@ const nextD = (d: number, g: number, w: readonly number[]) => {
   return clamp(at(w, 7) * d0(4, w) + (1 - at(w, 7)) * dd, 1, 10);
 };
 
-/** FSRS stability after a success; Hard (g = 2) grows it less (w₁₅), Easy (g = 4) more (w₁₆). */
-const sSuccess = (d: number, s: number, r: number, g: number, w: readonly number[]) =>
+/**
+ * FSRS stability after a success; Hard (g = 2) grows it less (w₁₅), Easy (g = 4) more (w₁₆).
+ * `boost` multiplies the gain (the streak bonus; 1 = plain FSRS).
+ */
+const sSuccess = (d: number, s: number, r: number, g: number, w: readonly number[], boost = 1) =>
   s *
   (1 +
     Math.exp(at(w, 8)) *
@@ -71,7 +86,12 @@ const sSuccess = (d: number, s: number, r: number, g: number, w: readonly number
       Math.pow(s, -at(w, 9)) *
       (Math.exp(at(w, 10) * (1 - r)) - 1) *
       (g === 2 ? at(w, 15) : 1) *
-      (g === 4 ? at(w, 16) : 1));
+      (g === 4 ? at(w, 16) : 1) *
+      boost);
+
+/** Gain multiplier for the n-th success in a row (n ≥ 1), weighted by the pause in days. */
+export const streakBoost = (n: number, t: number, p: SchedulerParams) =>
+  1 + p.streakBoost * Math.min(Math.max(0, n - 1), p.streakBoostMax) * Math.min(1, t);
 
 const sLapse = (d: number, s: number, r: number, w: readonly number[]) =>
   Math.min(
@@ -146,6 +166,7 @@ export function reviewGraded(
       levelStreak: 0,
       lapses: recalled ? 0 : 1,
       reps: 1,
+      streak: recalled ? 1 : 0,
     };
     return schedule(c, null, now, p, rd, rng);
   }
@@ -153,15 +174,25 @@ export function reviewGraded(
   const t = Math.max(0, (now - card.lastReviewAt) / DAY_MS);
   const r = retrievability(t, card.stability, w);
   const c: CardState = { ...card, reps: card.reps + 1, lastReviewAt: now };
-  const dNew = nextD(card.difficulty, g, w);
-  c.difficulty = card.difficulty + (dNew - card.difficulty) * Math.min(1, t);
+  const weight = Math.min(1, t);
+  let dNew = nextD(card.difficulty, g, w);
+  // A success also pulls the difficulty back toward a first Good answer's (see 8 above).
+  if (recalled) dNew -= p.difficultyRecovery * Math.max(0, dNew - d0(3, w));
+  c.difficulty = clamp(card.difficulty + (dNew - card.difficulty) * weight, 1, 10);
   if (recalled) {
-    c.stability = sSuccess(card.difficulty, card.stability, r, g, w);
+    c.streak = (card.streak ?? 0) + 1;
+    // The bonus is for words climbing out after lapses; a word never forgotten keeps the plain
+    // FSRS curve, which is already calibrated for it.
+    const boost = card.lapses > 0 ? streakBoost(c.streak, t, p) : 1;
+    // An early success in the learning phase gains as much as one on time (see 9 above).
+    const rGain = card.stability < 1 ? Math.min(r, rd) : r;
+    c.stability = sSuccess(card.difficulty, card.stability, rGain, g, w, boost);
     if (t >= p.streakMinGapDays) c.levelStreak += 1;
   } else {
     c.stability = sLapse(card.difficulty, card.stability, r, w);
     c.lapses += 1;
     c.levelStreak = 0;
+    c.streak = 0;
   }
 
   // Format level: k0 successes in a row move the card on; after the last level the formats
@@ -209,6 +240,7 @@ export function placeKnown(now: number, p: SchedulerParams, rd: number, rng: Rng
     levelStreak: 0,
     lapses: 0,
     reps: 1,
+    streak: 1,
   };
   return schedule(c, null, now, p, rd, rng);
 }

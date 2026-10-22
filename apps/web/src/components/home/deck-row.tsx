@@ -1,12 +1,12 @@
 'use client';
 
 import { addWord, ensurePersonalDeck, type Profile } from '@vocabx/core';
-import { ChevronRight, Library, Plus } from 'lucide-react';
+import { ChevronRight, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { WordFormDialog } from '@/components/decks/word-form-dialog';
+import { LibraryShortcut } from '@/components/library/library-shortcut';
 import { useToast } from '@/components/ui/toast';
-import { Link } from '@/i18n/navigation';
 import { useClock } from '@/lib/clock';
 import { cx } from '@/lib/cx';
 import { newId } from '@/lib/ids';
@@ -51,32 +51,6 @@ function AddWordCard({ onClick, disabled }: { onClick: () => void; disabled: boo
   );
 }
 
-/** The library: a small, plain shortcut with a tip. */
-function LibraryCard() {
-  const t = useTranslations('pages.home');
-  return (
-    <Link
-      href="/decks/library"
-      className={cx(
-        'group flex items-center gap-3 rounded-card border border-line/70 bg-surface/60 p-3.5 hover:border-accent/50',
-        lift,
-      )}
-    >
-      <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-2 text-accent">
-        <Library aria-hidden className="size-4" />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold">{t('libraryTitle')}</span>
-        <span className="block text-xs text-pretty text-fg-muted">{t('libraryTip')}</span>
-      </span>
-      <ChevronRight
-        aria-hidden
-        className="size-4 shrink-0 text-fg-muted transition-transform motion-fast group-hover:translate-x-0.5 group-hover:text-accent rtl:-scale-x-100"
-      />
-    </Link>
-  );
-}
-
 /**
  * The deck hero between two shortcuts: adding a word of one's own and the library of ready-made
  * decks. A word added here lands in the personal deck and shows up in the hero at once.
@@ -84,6 +58,7 @@ function LibraryCard() {
 export function DeckRow() {
   const words = useTranslations('words');
   const decks = useTranslations('decks');
+  const home = useTranslations('pages.home');
   const repos = useRepos();
   const { clock } = useClock();
   const toast = useToast();
@@ -115,7 +90,7 @@ export function DeckRow() {
     <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1fr)] md:items-center md:gap-6">
       <AddWordCard onClick={() => setAdding(true)} disabled={!profile} />
       <StudySummary version={version} />
-      <LibraryCard />
+      <LibraryShortcut title={home('libraryTitle')} text={home('libraryTip')} />
 
       {adding && profile && (
         <WordFormDialog

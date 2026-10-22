@@ -106,6 +106,7 @@ export const cardStateSchema = z.object({
   levelStreak: z.number().int().nonnegative(),
   lapses: z.number().int().nonnegative(),
   reps: z.number().int().nonnegative(),
+  streak: z.number().int().nonnegative().optional(),
 });
 
 export const cardProgressSchema = z.object({

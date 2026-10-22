@@ -123,11 +123,13 @@ describe('four grades', () => {
     expect(at10(4)).toBeGreaterThan(at10(3));
     expect(at10(3)).toBeGreaterThan(at10(2));
   });
-  test('Easy lowers difficulty, Hard raises it, Good keeps it', () => {
-    const d = (g: Grade) => review(learnt(), g, 10 * DAY, p, 0.9, nf).card.difficulty;
-    expect(d(4)).toBeLessThan(5);
+  test('Easy lowers difficulty most, Good a little (recovery), Hard raises it', () => {
+    const d = (g: Grade, q = p) => review(learnt(), g, 10 * DAY, q, 0.9, nf).card.difficulty;
+    expect(d(4)).toBeLessThan(d(3));
+    expect(d(3)).toBeLessThan(5);
     expect(d(2)).toBeGreaterThan(5);
-    expect(Math.abs(d(3) - 5)).toBeLessThan(0.01);
+    // Without recovery Good keeps D, as in plain FSRS.
+    expect(Math.abs(d(3, { ...p, difficultyRecovery: 0 }) - 5)).toBeLessThan(0.01);
   });
 });
 
@@ -185,7 +187,8 @@ describe('format levels', () => {
 
 describe('interval', () => {
   test('менше доби — у хвилинах, не менше minIntervalMinutes', () => {
-    const r = reviewBinary(state({ stability: 0.0001 }), true, 0, p, 0.9, nf);
+    // A lapse of a card already at seconds: its interval cannot drop below the minimum.
+    const r = reviewBinary(state({ stability: 0.0001 }), false, 0, p, 0.9, nf);
     expect(r.intervalMs).toBe(p.minIntervalMinutes * MIN);
   });
   test('від доби — цілі доби, не більше I_max', () => {
@@ -221,5 +224,93 @@ describe('placement', () => {
     const r = placeKnown(0, p, 0.9, nf);
     expect(r.card.stability).toBe(w[3]);
     expect(r.intervalMs).toBeGreaterThanOrEqual(DAY);
+  });
+});
+
+describe('climbing out after lapses', () => {
+  /** Answers each review exactly when due; returns the last result. */
+  const answer = (grades: Grade[], params = p) => {
+    let card: CardState | null = null;
+    let now = 0;
+    let last = review(null, grades[0]!, now, params, 0.9, nf);
+    for (const g of grades) {
+      last = review(card, g, now, params, 0.9, nf);
+      card = last.card;
+      now = last.dueAt;
+    }
+    return last;
+  };
+  const plain = { ...p, difficultyRecovery: 0, streakBoost: 0 };
+  const lapsing: Grade[] = [3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 1];
+  const then = (n: number): Grade[] => [...lapsing, ...Array<Grade>(n).fill(3)];
+
+  test('a word never forgotten keeps the plain FSRS intervals', () => {
+    const good = Array<Grade>(8).fill(3);
+    expect(answer(good).intervalMs).toBe(answer(good, plain).intervalMs);
+  });
+
+  test('successes bring the difficulty back down', () => {
+    const before = answer(lapsing).card.difficulty;
+    expect(before).toBeGreaterThan(8);
+    expect(answer(then(4)).card.difficulty).toBeLessThan(before - 2);
+    // Plain FSRS: Good never lowers D, the card stays "hard" forever.
+    expect(answer(then(4), plain).card.difficulty).toBeGreaterThan(9);
+  });
+
+  test('a run of correct answers grows the interval much faster than plain FSRS', () => {
+    const days = (ms: number) => ms / DAY;
+    expect(days(answer(then(5)).intervalMs)).toBeGreaterThan(90);
+    expect(days(answer(then(5), plain).intervalMs)).toBeLessThan(15);
+    // Every answer of the run takes the interval further, by more and more.
+    const runs = [1, 2, 3, 4, 5].map((n) => answer(then(n)).intervalMs);
+    for (let i = 1; i < runs.length; i++) expect(runs[i]!).toBeGreaterThan(runs[i - 1]! * 2);
+  });
+
+  test('a lapse resets the streak', () => {
+    expect(answer(then(3)).card.streak).toBe(3);
+    expect(answer([...then(3), 1]).card.streak).toBe(0);
+  });
+
+  test('answers minutes apart barely change the difficulty', () => {
+    const c = state({ difficulty: 9, lapses: 2, streak: 1 });
+    const soon = review(c, 3, 5 * MIN, p, 0.9, nf).card;
+    expect(soon.difficulty).toBeGreaterThan(8.9);
+  });
+
+  test('after lapses in a row, early successes in a session still grow the interval fast', () => {
+    // Forgotten four times, each time answered right away ("Show now"), then recalled the same
+    // way, seconds after the previous answer: R is ≈ 1, which plain FSRS barely rewards.
+    let card: CardState | null = null;
+    let now = 0;
+    let last = review(null, 1, now, p, 0.9, nf);
+    for (const g of [1, 1, 1, 1, 3, 3, 3] as Grade[]) {
+      last = review(card, g, now, p, 0.9, nf);
+      card = last.card;
+      now += 5_000;
+    }
+    // Three successes take it past the session's hour; before, it stayed at about a minute.
+    expect(last.intervalMs).toBeGreaterThan(60 * MIN);
+    const plainEarly = review(
+      state({ stability: 0.5 / 1440, lapses: 4, difficulty: 6.4 }),
+      3,
+      5_000,
+      { ...p },
+      0.9,
+      nf,
+    );
+    expect(plainEarly.intervalMs).toBeGreaterThanOrEqual(3 * MIN);
+  });
+
+  test('an early success after the learning phase gains little, as in FSRS', () => {
+    const c = state({ stability: 10, lastReviewAt: 0 });
+    const early = review(c, 3, DAY, p, 0.9, nf).card.stability;
+    expect(early).toBeLessThan(15);
+  });
+
+  test('a snapshot without a streak (older data) still works', () => {
+    const c = state({ lapses: 1, lastReviewAt: 0 });
+    const r = review(c, 3, 5 * DAY, p, 0.9, nf);
+    expect(r.card.streak).toBe(1);
+    expect(Number.isFinite(r.intervalMs)).toBe(true);
   });
 });

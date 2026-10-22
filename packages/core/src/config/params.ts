@@ -27,6 +27,15 @@ export interface SchedulerParams {
   fuzzMinDays: number;
   /** Fuzz amplitude: interval × (1 ± fuzzRatio). */
   fuzzRatio: number;
+  /**
+   * Share of the way back to the starting difficulty that one success (a day or more after the
+   * previous answer) takes the card: lapses push D up, correct answers now bring it back down.
+   */
+  difficultyRecovery: number;
+  /** Extra stability gain per success in a row: the n-th one gains × (1 + streakBoost·(n − 1)). */
+  streakBoost: number;
+  /** The streak bonus stops growing after this many successes in a row (beyond the first). */
+  streakBoostMax: number;
 }
 
 /** FSRS-6 default weights (open-spaced-repetition reference parameters). */
@@ -49,6 +58,9 @@ export const DEFAULT_SCHEDULER_PARAMS: SchedulerParams = {
   streakMinGapDays: 0,
   fuzzMinDays: 3,
   fuzzRatio: 0.05,
+  difficultyRecovery: 0.25,
+  streakBoost: 0.2,
+  streakBoostMax: 4,
 };
 
 /** r_d: target probability of recall. User-adjustable within RETENTION_RANGE. */
