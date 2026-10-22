@@ -329,12 +329,12 @@ export class LocalStorageRepo implements Repos, DataPort {
         writeStats(e, 1);
       },
       remove: async (eventId) => {
+        // The log read is shared with the store's cache: build a new one, never splice it.
         const log = readLog();
-        const i = log.findIndex((p) => p[0] === eventId);
-        if (i < 0) return;
-        const [packed] = log.splice(i, 1);
-        writeLog(log);
-        writeStats(unpackEvent(packed!), -1);
+        const packed = log.find((p) => p[0] === eventId);
+        if (!packed) return;
+        writeLog(log.filter((p) => p !== packed));
+        writeStats(unpackEvent(packed), -1);
       },
       listForWord: (wordId) =>
         Promise.resolve(

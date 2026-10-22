@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { CANVAS_SIZE, type Area, type Mood } from '@/character/config';
 import { layersOf, type Layer, type Look } from '@/character/look';
 import { cx } from '@/lib/cx';
+import { IMAGE_QUALITY } from '@/lib/images';
 
 const pct = (v: number) => `${(v / CANVAS_SIZE) * 100}%`;
 
@@ -49,7 +50,7 @@ function Picture({ layer, move, pop }: { layer: Layer; move: boolean; pop: boole
         alt=""
         width={layer.width}
         height={layer.height}
-        unoptimized
+        quality={IMAGE_QUALITY}
         // The character is the main picture of the page.
         loading="eager"
         draggable={false}
@@ -98,20 +99,16 @@ export function CharacterView({
       dir="ltr"
       className={cx('relative aspect-square', className)}
     >
+      {/* A soft gradient, not a blurred shape: no filter to redraw while things move. */}
       <div
         aria-hidden
-        className="absolute rounded-full bg-fg/20 blur-md"
+        className="absolute rounded-full bg-radial from-fg/30 to-transparent to-70%"
         style={place(layers.shadow)}
       />
       <div ref={scope} className="absolute inset-0 origin-bottom">
-        {/* The whole figure sways gently, as one; nothing at all in "medium" or reduced motion. */}
-        <motion.div
-          className="absolute inset-0 origin-bottom"
-          animate={move ? { y: [0, -6, 0], scaleY: [1, 1.012, 1] } : { y: 0, scaleY: 1 }}
-          transition={
-            move ? { duration: 3.4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }
-          }
-        >
+        {/* The whole figure sways gently, as one; nothing at all in "medium" or reduced motion.
+            A CSS animation, so it runs on the compositor and never holds up the page. */}
+        <div className={cx('absolute inset-0 origin-bottom', move && 'motion-safe:animate-sway')}>
           <AnimatePresence initial={false}>
             {layers.body.map((layer) => (
               <Picture key={layer.key} layer={layer} move={move} pop={isItem(layer)} />
@@ -140,7 +137,7 @@ export function CharacterView({
               <Picture key={layer.key} layer={layer} move={move} pop={isItem(layer)} />
             ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

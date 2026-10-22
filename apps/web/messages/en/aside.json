@@ -11,5 +11,7 @@
   "today": "Today",
   "scrollBack": "Earlier days",
   "scrollForward": "Later days",
-  "streakAtRisk": "Don’t let your streak break!"
+  "streakAtRisk": "Don’t let your streak break!",
+  "streakAtRiskText": "Today's goal is not met yet. Go through a few cards before the day ends and the streak goes on.",
+  "streakAtRiskAction": "Review now"
 }

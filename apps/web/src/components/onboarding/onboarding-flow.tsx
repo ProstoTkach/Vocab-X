@@ -24,6 +24,7 @@ import { Logo } from '@/components/shell/logo';
 import { useRouter } from '@/i18n/navigation';
 import { useClock } from '@/lib/clock';
 import { cx } from '@/lib/cx';
+import { IMAGE_QUALITY } from '@/lib/images';
 import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
 import { useTheme } from '@/lib/theme';
@@ -219,7 +220,7 @@ export function OnboardingFlow() {
                     alt=""
                     width={286}
                     height={369}
-                    unoptimized
+                    quality={IMAGE_QUALITY}
                     loading="eager"
                     className="h-32 w-auto shrink-0 drop-shadow-xl sm:h-40"
                   />

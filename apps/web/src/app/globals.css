@@ -47,6 +47,39 @@
     }
   }
 
+  /*
+   * The character's idle life (gamification "max"). Plain CSS transform/opacity animations run
+   * on the compositor, off the main thread, so they never compete with taps and swipes.
+   */
+  --animate-sway: vx-sway 3.4s ease-in-out infinite;
+  @keyframes vx-sway {
+    0%,
+    100% {
+      transform: translateY(0) scaleY(1);
+    }
+    50% {
+      transform: translateY(-1.5%) scaleY(1.012);
+    }
+  }
+  --animate-breathe: vx-breathe 4s ease-in-out infinite;
+  @keyframes vx-breathe {
+    0%,
+    100% {
+      opacity: 0.7;
+      transform: scale(0.95);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.06);
+    }
+  }
+  --animate-turn: vx-turn 14s linear infinite;
+  @keyframes vx-turn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   /* A little shake; uses `rotate`/`translate`, so it adds to an element's own transform. */
   --animate-jiggle: vx-jiggle 0.45s ease-in-out infinite;
   @keyframes vx-jiggle {
@@ -159,7 +192,21 @@
   }
 
   body {
-    /* Two faint washes of the brand hues over the theme background. */
+    background: var(--vx-bg);
+    color: var(--color-fg);
+    overscroll-behavior-y: none;
+  }
+  /*
+   * Two faint washes of the brand hues over the theme background. A fixed layer of its own
+   * (not background-attachment: fixed, which makes phones repaint the whole screen on every
+   * scroll and animation frame).
+   */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background:
       radial-gradient(
         60rem 40rem at 0% -10%,
@@ -170,11 +217,7 @@
         50rem 36rem at 100% 0%,
         color-mix(in oklab, var(--vx-accent-2) 11%, transparent),
         transparent 60%
-      ),
-      var(--vx-bg);
-    background-attachment: fixed;
-    color: var(--color-fg);
-    overscroll-behavior-y: none;
+      );
   }
 
   h1,
@@ -228,10 +271,23 @@
   color: transparent;
 }
 
-/* Frosted panels (navigation, top bars) that let the background washes show through. */
+/*
+ * Frosted panels (navigation, top bars) that let the background washes show through. A live
+ * backdrop blur is redrawn whenever anything behind it moves, which stutters on phones, so
+ * touch screens get a nearly opaque panel instead.
+ */
 @utility glass {
   background-color: color-mix(in oklab, var(--vx-surface) 76%, transparent);
   backdrop-filter: blur(18px) saturate(1.4);
+  @media (pointer: coarse) {
+    background-color: color-mix(in oklab, var(--vx-surface) 94%, transparent);
+    backdrop-filter: none;
+  }
+}
+
+/* Softens the outer edge of a glow without a blur filter (cheap to animate). */
+@utility glow-mask {
+  mask-image: radial-gradient(closest-side, #000 35%, transparent);
 }
 
 /* Cards: a whisper of a top-down sheen on the surface colour. */

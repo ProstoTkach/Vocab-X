@@ -1,9 +1,12 @@
 'use client';
 
 import { DAY_MS, shiftDateKey } from '@vocabx/core';
-import { ChevronLeft, ChevronRight, Flame } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flame, Repeat2 } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useLayoutEffect, useRef } from 'react';
+import { buttonClass } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Link } from '@/i18n/navigation';
 import { cx } from '@/lib/cx';
 import { MAX_PAST_DAYS, type DailyProgress } from './use-daily-progress';
 
@@ -14,6 +17,98 @@ const FUTURE_DAYS = 6;
 
 /** Noon of a calendar date in local time (safe from DST edges) for formatting. */
 const dateOf = (key: string) => new Date(`${key}T12:00:00`);
+
+/** The flame and the number of days. */
+function StreakBody({ streak, atRisk }: { streak: number; atRisk: boolean }) {
+  const t = useTranslations('aside');
+  return (
+    <>
+      <span
+        className={cx(
+          'relative isolate inline-flex size-9 shrink-0 items-center justify-center rounded-full md:size-12',
+          atRisk
+            ? 'bg-warning/10 text-warning/80'
+            : streak > 0
+              ? 'bg-warning/15 text-warning'
+              : 'bg-surface-2 text-fg-muted',
+        )}
+      >
+        {/* A dying ember: a faint glow breathing around a half-lit flame. */}
+        {atRisk && (
+          <>
+            <span
+              aria-hidden
+              className="absolute inset-0 -z-10 rounded-full bg-radial from-warning/60 to-transparent to-70% motion-safe:animate-ember"
+            />
+            <span
+              aria-hidden
+              className="absolute -end-0.5 -top-0.5 inline-flex size-4 items-center justify-center rounded-full bg-warning text-[0.625rem] font-bold text-on-warning"
+            >
+              !
+            </span>
+          </>
+        )}
+        <Flame
+          aria-hidden
+          className="size-5 md:size-6"
+          fill={streak > 0 ? 'currentColor' : 'none'}
+          fillOpacity={atRisk ? 0.3 : 1}
+        />
+      </span>
+      <span className="block text-start">
+        <span className="hidden text-sm text-fg-muted md:block">{t('streakTitle')}</span>
+        <span className="block font-display text-sm leading-tight font-bold md:text-xl">
+          {t('streakDays', { count: streak })}
+        </span>
+      </span>
+    </>
+  );
+}
+
+/**
+ * The streak. When it is about to go out, the whole block opens a small window with what to do,
+ * instead of a warning line that would make the panel taller.
+ */
+function Streak({ streak, atRisk }: { streak: number; atRisk: boolean }) {
+  const t = useTranslations('aside');
+  const row = 'flex items-center gap-2 ps-1 md:gap-3 md:ps-0';
+  if (!atRisk)
+    return (
+      <div className={row}>
+        <StreakBody streak={streak} atRisk={false} />
+      </div>
+    );
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={`${t('streakDays', { count: streak })}. ${t('streakAtRisk')}`}
+          className={cx(
+            row,
+            'min-h-11 rounded-control pe-2 transition-colors motion-fast hover:bg-surface-2',
+          )}
+        >
+          <StreakBody streak={streak} atRisk />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent label={t('streakAtRisk')} side="bottom" align="start">
+        <p className="flex items-center gap-2 font-semibold text-warning">
+          <Flame aria-hidden className="size-4" fill="currentColor" />
+          {t('streakAtRisk')}
+        </p>
+        <p className="mt-1.5 text-sm text-fg-muted">{t('streakAtRiskText')}</p>
+        <Link
+          href="/review"
+          className={cx(buttonClass('primary', 'sm'), 'mt-3 w-full justify-center')}
+        >
+          <Repeat2 aria-hidden className="size-4" />
+          {t('streakAtRiskAction')}
+        </Link>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 /**
  * Home: the streak, next to a single row of calendar days that scrolls sideways; a lit flame
@@ -67,43 +162,7 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
     >
       {/* One row everywhere: the streak, then the days; both shrink on phones. */}
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 md:grid-cols-[12rem_minmax(0,1fr)] md:gap-4">
-        <div className="flex items-center gap-2 ps-1 md:gap-3 md:ps-0">
-          <span
-            className={cx(
-              'relative isolate inline-flex size-9 shrink-0 items-center justify-center rounded-full md:size-12',
-              atRisk
-                ? 'bg-warning/10 text-warning/80'
-                : streak > 0
-                  ? 'bg-warning/15 text-warning'
-                  : 'bg-surface-2 text-fg-muted',
-            )}
-          >
-            {/* A dying ember: a faint glow breathing around a half-lit flame. */}
-            {atRisk && (
-              <span
-                aria-hidden
-                className="absolute inset-0 -z-10 rounded-full bg-warning/40 opacity-40 blur-md motion-safe:animate-ember"
-              />
-            )}
-            <Flame
-              aria-hidden
-              className="size-5 md:size-6"
-              fill={streak > 0 ? 'currentColor' : 'none'}
-              fillOpacity={atRisk ? 0.3 : 1}
-            />
-          </span>
-          <div>
-            <p className="hidden text-sm text-fg-muted md:block">{t('streakTitle')}</p>
-            <p className="font-display text-sm leading-tight font-bold md:text-xl">
-              {t('streakDays', { count: streak })}
-            </p>
-            {atRisk && (
-              <p className="hidden text-xs font-medium text-warning md:block">
-                {t('streakAtRisk')}
-              </p>
-            )}
-          </div>
-        </div>
+        <Streak streak={streak} atRisk={atRisk} />
 
         <div className="relative">
           <ol
@@ -186,9 +245,6 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
           </div>
         </div>
       </div>
-      {atRisk && (
-        <p className="-mt-2 ps-1 text-xs font-medium text-warning md:hidden">{t('streakAtRisk')}</p>
-      )}
     </section>
   );
 }

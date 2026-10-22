@@ -31,6 +31,15 @@ const OVERLAY: Record<SwipeTone, string> = {
 };
 const OFFSCREEN = 600;
 
+/**
+ * While a finger moves the card, it gets a compositor layer of its own: the GPU then only
+ * slides a ready picture instead of redrawing the text, shadow and gradients on every frame.
+ * At rest the layer is dropped again, so the text is drawn crisp and memory is freed.
+ */
+const lift = (el: HTMLElement | null, on: boolean) => {
+  if (el) el.style.willChange = on ? 'transform' : '';
+};
+
 /** Moves focus off an element that is about to become inert (it must not stay inside). */
 function blurInside(el: HTMLElement | null) {
   const active = document.activeElement;
@@ -158,6 +167,7 @@ function SwipeCard({
     return () => controls.stop();
   }, [turning, flipped, rotateY, reduced, turn]);
   const card = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
   // A button pressed on the card keeps focus; the leaving card gives it up before going inert.
   useLayoutEffect(() => {
     if (!present) blurInside(card.current);
@@ -183,13 +193,25 @@ function SwipeCard({
         // Any pointer can swipe; a press without movement is still recognized as a tap below.
         if (swipeEnabled && !onControl(e.nativeEvent)) controls.start(e);
       }}
+      // Entering and flying out (after a grade by button or key) are animations too.
+      onAnimationStart={() => lift(card.current, true)}
+      onAnimationComplete={() => !dragging.current && lift(card.current, false)}
+      onDragStart={() => {
+        dragging.current = true;
+        lift(card.current, true);
+      }}
+      // After a release without a swipe the card springs back; then it is at rest again.
+      onDragTransitionEnd={() => {
+        dragging.current = false;
+        lift(card.current, false);
+      }}
       onDrag={(_, info) => {
         const dir = directionFromDrag(info.offset, { x: 0, y: 0 });
         const action = dir ? actionFor(dir) : null;
         if (action?.label !== hint?.label) setHint(action);
       }}
       onDragEnd={(_, info) => {
-        setHint(null);
+        if (hint) setHint(null);
         const dir = directionFromDrag(info.offset, info.velocity);
         if (dir && actionFor(dir)) onSwipe(dir);
       }}

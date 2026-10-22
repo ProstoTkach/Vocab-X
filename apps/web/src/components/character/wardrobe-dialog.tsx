@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { Tooltip } from '@/components/ui/tooltip';
 import { cx } from '@/lib/cx';
+import { IMAGE_QUALITY } from '@/lib/images';
 import { useGamification } from '@/lib/gamification';
 import { parseUnlock } from '@/themes/unlock';
 import type { Unlock } from '@/themes/types';
@@ -104,7 +105,7 @@ function Thumb({ sprite, filter }: { sprite: Sprite; filter?: string | undefined
       alt=""
       fill
       sizes="6rem"
-      unoptimized
+      quality={IMAGE_QUALITY}
       draggable={false}
       className="object-contain select-none"
       style={filter ? { filter } : undefined}

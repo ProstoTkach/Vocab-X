@@ -7,8 +7,12 @@ import { fileURLToPath } from 'node:url';
 const source = fileURLToPath(new URL('../../../public/', import.meta.url));
 const target = fileURLToPath(new URL('../public/', import.meta.url));
 
-if (existsSync(source)) {
-  mkdirSync(target, { recursive: true });
-  cpSync(source, target, { recursive: true });
-  console.log('media: synced /public → apps/web/public');
+if (!existsSync(source)) {
+  // Without it the app would deploy with no character pictures; fail the build instead. On
+  // Vercel keep "Include files outside the Root Directory" on (the default for monorepos).
+  console.error(`media: ${source} not found — the character pictures would be missing`);
+  process.exit(1);
 }
+mkdirSync(target, { recursive: true });
+cpSync(source, target, { recursive: true });
+console.log('media: synced /public → apps/web/public');

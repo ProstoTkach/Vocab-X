@@ -379,19 +379,23 @@ export function HomeDashboard() {
             <GoalPanel progress={progress} />
           </div>
           <div className="relative mx-auto w-full max-w-[400px]">
-            {ready && progress ? (
-              <CharacterFigure
-                mood={progress.mood}
-                success={success}
-                onTap={() => {
-                  if (speaking) return;
-                  setTurn((n) => n + 1);
-                  setSpeaking(true);
-                }}
-              />
-            ) : (
-              <div className="aspect-square w-full" />
-            )}
+            {/* On phones the figure is a third smaller, so it leaves room for the rest of the
+                page; the buttons stay in the corners of the full-width window around it. */}
+            <div className="mx-auto w-2/3 lg:w-full">
+              {ready && progress ? (
+                <CharacterFigure
+                  mood={progress.mood}
+                  success={success}
+                  onTap={() => {
+                    if (speaking) return;
+                    setTurn((n) => n + 1);
+                    setSpeaking(true);
+                  }}
+                />
+              ) : (
+                <div className="aspect-square w-full" />
+              )}
+            </div>
             {ready && (
               <>
                 <div className="absolute start-0 top-0 z-10 flex flex-col items-start gap-2 lg:hidden">

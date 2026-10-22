@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { AVATARS, ITEMS, type AvatarConfig, type ItemConfig } from '@/character/config';
 import { isOpen } from '@/character/look';
 import { cx } from '@/lib/cx';
+import { IMAGE_QUALITY } from '@/lib/images';
 import { useGamification } from '@/lib/gamification';
 import { THEMES } from '@/themes/registry';
 import type { Theme } from '@/themes/types';
@@ -94,7 +95,7 @@ export function RewardChips({ reward, className }: { reward: LevelReward; classN
                 alt=""
                 fill
                 sizes="2.5rem"
-                unoptimized
+                quality={IMAGE_QUALITY}
                 className={cx('object-contain p-0.5', !open && 'opacity-50')}
                 style={{
                   // Colour variants keep their tint; locked ones turn grey.

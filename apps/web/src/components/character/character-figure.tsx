@@ -11,20 +11,13 @@ import { CharacterView } from './character-view';
 /** How long a tap keeps the character smiling and the aura bright, ms. */
 const TAP_MS = 1400;
 
-/** Aura colour per mood: warm success when happy, cool when sad. */
-const AURA = {
-  joy: 'from-success/70 via-success/25',
-  sad: 'from-info/60 via-info/20',
-  calm: 'from-accent/60 via-accent/20',
-} as const;
-/** A slowly turning shimmer over the glow, in the same colour. */
-const SHIMMER = {
-  joy: 'from-success/45 via-transparent to-success/45',
-  sad: 'from-info/40 via-transparent to-info/40',
-  calm: 'from-accent/40 via-transparent to-accent/40',
-} as const;
-const BREATH_S = 4;
-const TURN_S = 14;
+/**
+ * The aura is drawn in the theme's own colours (accent → accent-2) whatever the mood; the mood
+ * and the day's success only change how strongly it glows.
+ */
+const AURA = 'from-accent/60 via-accent-2/25';
+const SHIMMER = 'from-accent-2/45 via-transparent to-accent/45';
+const FLARE = 'from-accent-2/70 via-accent/25';
 /** How long the flare of a tap takes to fade out, s. */
 const FADE_S = 1.4;
 
@@ -56,8 +49,6 @@ export function CharacterFigure({ mood, success, onTap }: CharacterFigureProps) 
   }, [tapped, hop]);
 
   const shown: Mood | null = tapped ? (mood === 'sad' ? null : 'joy') : mood;
-  // The glow keeps the mood's colour; a tap adds a separate flare on top.
-  const tone = mood ?? 'calm';
   const strength = mood === 'joy' ? 0.85 : 0.35 + 0.4 * Math.min(1, Math.max(0, success));
 
   return (
@@ -72,40 +63,41 @@ export function CharacterFigure({ mood, success, onTap }: CharacterFigureProps) 
       aria-label={t('pet')}
       className="relative isolate block w-full rounded-card"
     >
-      {/* The mood's glow: breathes gently, stronger the better the day goes. */}
-      <motion.span
+      {/* The glow: breathes gently, stronger the better the day goes. Soft radial gradients
+          and CSS animations only — no blur filters, nothing for the main thread to do. */}
+      <span
         aria-hidden
-        className={cx(
-          'pointer-events-none absolute inset-[4%] -z-10 rounded-full bg-radial to-transparent to-70% blur-2xl transition-colors motion-slow',
-          AURA[tone],
-        )}
-        initial={false}
-        animate={
-          move
-            ? { opacity: [strength * 0.7, strength, strength * 0.7], scale: [0.95, 1.06, 0.95] }
-            : { opacity: strength, scale: 1 }
-        }
-        transition={
-          move ? { duration: BREATH_S, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }
-        }
-      />
-      {move && (
-        <motion.span
-          aria-hidden
+        className="pointer-events-none absolute inset-[4%] -z-10 transition-opacity motion-slow"
+        style={{ opacity: strength }}
+      >
+        <span
           className={cx(
-            'pointer-events-none absolute inset-[12%] -z-10 rounded-full bg-conic blur-2xl',
-            SHIMMER[tone],
+            'absolute inset-0 rounded-full bg-radial to-transparent to-70%',
+            AURA,
+            move && 'motion-safe:animate-breathe',
           )}
-          animate={{ rotate: 360, opacity: strength }}
-          transition={{ rotate: { duration: TURN_S, repeat: Infinity, ease: 'linear' } }}
         />
+      </span>
+      {move && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-[12%] -z-10 transition-opacity motion-slow"
+          style={{ opacity: strength }}
+        >
+          <span
+            className={cx(
+              'glow-mask absolute inset-0 rounded-full bg-conic motion-safe:animate-turn',
+              SHIMMER,
+            )}
+          />
+        </span>
       )}
       {/* A tap's flare: lights up quickly, then fades away slowly back into the mood's glow. */}
       <motion.span
         aria-hidden
         className={cx(
-          'pointer-events-none absolute inset-[2%] -z-10 rounded-full bg-radial to-transparent to-70% blur-2xl',
-          AURA[mood === 'sad' ? 'calm' : 'joy'],
+          'pointer-events-none absolute inset-[2%] -z-10 rounded-full bg-radial to-transparent to-70%',
+          FLARE,
         )}
         initial={false}
         animate={tapped ? { opacity: 1, scale: 1.15 } : { opacity: 0, scale: 1 }}
