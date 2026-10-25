@@ -195,7 +195,7 @@ export function WordItem({
         {/* The status where the badge stands; phones get its coloured dot, the badge is in the details. */}
         {status && (
           <>
-            <Badge tone={status.tone} className="hidden sm:inline-flex">
+            <Badge tone={status.tone} className="hidden sm:inline-flex max-sm:hidden">
               {status.label}
             </Badge>
             <BadgeDot tone={status.tone} label={status.label} className="mx-1.5 sm:hidden" />
