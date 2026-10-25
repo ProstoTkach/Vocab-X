@@ -16,7 +16,7 @@ export function MobileTopBar() {
       <div className="flex items-center gap-1">
         <button
           type="button"
-          onClick={feedback.open}
+          onClick={() => feedback.open('topbar')}
           aria-label={t('feedback')}
           className="inline-flex size-11 items-center justify-center rounded-control text-accent transition-colors motion-fast hover:bg-surface-2"
         >

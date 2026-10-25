@@ -5,6 +5,7 @@ import {
   completeOnboarding,
   DAILY_GOAL_PRESETS,
   DEFAULT_SCHEDULER_PARAMS,
+  systemClock,
   type DailyGoalPreset,
   type PlacementLevel,
   type Word,
@@ -14,6 +15,9 @@ import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { RadioGroup } from 'radix-ui';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useAnalytics } from '@/components/analytics/analytics-provider';
+import { track, writeKey } from '@/lib/analytics';
+import { KEYS } from '@/lib/analytics/identity';
 import { LocalePicker } from '@/components/settings/locale-picker';
 import { ImportBackup } from '@/components/settings/import-backup';
 import { ThemePicker } from '@/components/settings/theme-picker';
@@ -78,6 +82,9 @@ export function OnboardingFlow() {
   const [goal, setGoal] = useState<DailyGoalPreset>('regular');
   const [result, setResult] = useState<PlacementResult | null>(null);
   const [saving, setSaving] = useState(false);
+  const { requestConsent } = useAnalytics();
+  /** When the onboarding and the current step began (real time), for the statistics. */
+  const timing = useRef({ started: 0, step: 0 });
 
   const langName = (code: string) => tl(code as 'en');
   const targetOptions = learnableLanguages().filter((l) => l.code !== nativeLang);
@@ -97,6 +104,21 @@ export function OnboardingFlow() {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus(), [step]);
 
+  // Each step shown, and the last one reached (to tell where an unfinished onboarding stopped).
+  useEffect(() => {
+    const now = systemClock.now();
+    if (!timing.current.started) timing.current.started = now;
+    timing.current.step = now;
+    track('onboarding_step_shown', { step });
+    writeKey(KEYS.onboardingStep, step);
+  }, [step]);
+  const stepDone = (extra: Record<string, string | number> = {}) =>
+    track('onboarding_step_done', {
+      step,
+      duration_s: Math.round((systemClock.now() - timing.current.step) / 1000),
+      ...extra,
+    });
+
   const finish = async (knownWords: Word[], deckIds: string[]) => {
     setSaving(true);
     await completeOnboarding(
@@ -112,6 +134,9 @@ export function OnboardingFlow() {
       },
       { now: clock.now(), newId, params: DEFAULT_SCHEDULER_PARAMS },
     );
+    track('onboarding_done', {
+      duration_s: Math.round((systemClock.now() - timing.current.started) / 1000),
+    });
     router.replace('/');
   };
 
@@ -124,7 +149,19 @@ export function OnboardingFlow() {
     setTargets((prev) => (on ? [...prev, code] : prev.filter((c) => c !== code)));
 
   const index = step === 'check' || step === 'result' ? STEPS.length - 1 : STEPS.indexOf(step);
-  const go = (delta: 1 | -1) => setStep(STEPS[index + delta] ?? step);
+  const go = (delta: 1 | -1) => {
+    if (delta < 0) track('onboarding_back', { from: step });
+    else {
+      stepDone();
+      if (step === 'languages')
+        track('onboarding_langs', { count: targets.length, native: nativeLang });
+      if (step === 'goal')
+        track('onboarding_goal', { count: DAILY_GOAL_PRESETS[goal].dailyGoalXp });
+      // The interface language is chosen: now the learner is asked about the statistics.
+      if (step === 'welcome') requestConsent();
+    }
+    setStep(STEPS[index + delta] ?? step);
+  };
 
   if (saving) {
     return (
@@ -141,10 +178,20 @@ export function OnboardingFlow() {
           levels={levels}
           words={wordsById}
           onDone={(r) => {
+            track('level_test_done', {
+              to: r.level.cefr,
+              count: r.known.length,
+              duration_s: Math.round((systemClock.now() - timing.current.step) / 1000),
+            });
             setResult(r);
             setStep('result');
           }}
-          onSkip={() => void finish([], [])}
+          onSkip={() => {
+            track('level_test_quit', {
+              duration_s: Math.round((systemClock.now() - timing.current.step) / 1000),
+            });
+            void finish([], []);
+          }}
         />
       </div>
     );
@@ -248,7 +295,12 @@ export function OnboardingFlow() {
                   <LocalePicker />
                 </Field>
                 <Field label={t('restoreTitle')} hint={t('restoreHint')}>
-                  <ImportBackup onImported={() => window.location.assign('/' + locale)} />
+                  <ImportBackup
+                    onImported={() => {
+                      track('onboarding_restore');
+                      window.location.assign('/' + locale);
+                    }}
+                  />
                 </Field>
               </div>
             </div>
@@ -344,7 +396,11 @@ export function OnboardingFlow() {
                     text={t('testText', { lang: langName(testLang) })}
                     action={t('testAction')}
                     primary
-                    onClick={() => setStep('check')}
+                    onClick={() => {
+                      stepDone();
+                      track('onboarding_start_choice', { to: 'test' });
+                      setStep('check');
+                    }}
                   />
                 )}
                 <StartOption
@@ -352,7 +408,11 @@ export function OnboardingFlow() {
                   title={t('scratchTitle')}
                   text={t('scratchText')}
                   action={t('scratchAction')}
-                  onClick={() => void finish([], [])}
+                  onClick={() => {
+                    stepDone();
+                    track('onboarding_start_choice', { to: 'scratch' });
+                    void finish([], []);
+                  }}
                 />
               </div>
             </>

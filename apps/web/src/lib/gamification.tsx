@@ -17,6 +17,7 @@ import {
   type Look,
   type UnlockState,
 } from '@/character/look';
+import { sinceFirstVisit, track } from './analytics';
 import { usePlayer } from './player';
 import { useRepos } from './repos';
 
@@ -24,7 +25,8 @@ interface GamificationValue {
   /** False until settings are read; the character waits so it never flashes. */
   ready: boolean;
   mode: GamificationMode;
-  setMode: (mode: GamificationMode) => void;
+  /** `source`: where it was changed (settings, the home button), for the statistics. */
+  setMode: (mode: GamificationMode, source: string) => void;
   /** Rewards, character and achievements are shown at all. */
   enabled: boolean;
   /** Decorative motion (idle character, confetti); `medium` keeps rewards but drops it. */
@@ -86,11 +88,21 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   }, [fresh, state, repos]);
 
   const setMode = useCallback(
-    (next: GamificationMode) => {
+    (next: GamificationMode, source: string) => {
+      if (next !== mode) {
+        const since = sinceFirstVisit();
+        track('game_mode_change', {
+          from: mode,
+          to: next,
+          source,
+          days_since_first: since.days,
+          sessions_since_first: since.sessions,
+        });
+      }
       setModeState(next);
       void repos.settings.update({ gamification: next });
     },
-    [repos],
+    [repos, mode],
   );
 
   const setLook = useCallback(

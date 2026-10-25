@@ -28,6 +28,7 @@ import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
 import { CreateDeckDialog } from './create-deck-dialog';
 import { useDecks } from './use-decks';
+import { track } from '@/lib/analytics';
 
 export const deckTitle = (d: Deck, locale: string) => d.titleI18n?.[locale] ?? d.title;
 
@@ -66,6 +67,7 @@ export function DeckList() {
 
   const ctx = () => ({ now: clock.now(), newId });
   const remove = async (d: Deck) => {
+    track('deck_delete', { count: d.wordIds.length });
     await repos.decks.remove(d.id);
     setDeleting(null);
     reload();
@@ -82,26 +84,34 @@ export function DeckList() {
       key: 'duplicate',
       label: t('duplicate'),
       icon: Copy,
-      onSelect: () =>
+      onSelect: () => {
+        track('deck_duplicate', { count: d.wordIds.length });
         void duplicateDeck(
           repos,
           d,
           t('duplicateName', { name: deckTitle(d, locale) }),
           ctx(),
-        ).then(reload),
+        ).then(reload);
+      },
     },
     d.archived
       ? {
           key: 'unarchive',
           label: t('unarchive'),
           icon: ArchiveRestore,
-          onSelect: () => void updateDeck(repos, d, { archived: false }, clock.now()).then(reload),
+          onSelect: () => {
+            track('deck_archive', { to: 'restored' });
+            void updateDeck(repos, d, { archived: false }, clock.now()).then(reload);
+          },
         }
       : {
           key: 'archive',
           label: t('archive'),
           icon: Archive,
-          onSelect: () => void updateDeck(repos, d, { archived: true }, clock.now()).then(reload),
+          onSelect: () => {
+            track('deck_archive', { to: 'archived' });
+            void updateDeck(repos, d, { archived: true }, clock.now()).then(reload);
+          },
         },
     {
       key: 'delete',

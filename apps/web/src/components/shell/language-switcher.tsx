@@ -7,6 +7,7 @@ import { useTransition } from 'react';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { LOCALES, type Locale } from '@/i18n/locales';
 import { cx } from '@/lib/cx';
+import { track } from '@/lib/analytics';
 
 export function LanguageSwitcher({ className }: { className?: string }) {
   const t = useTranslations('settings');
@@ -16,6 +17,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   const [pending, startTransition] = useTransition();
 
   const change = (next: string) => {
+    track('ui_lang_change', { from: locale, to: next, source: 'switcher' });
     startTransition(() => router.replace(pathname, { locale: next as Locale }));
   };
 

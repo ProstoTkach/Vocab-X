@@ -29,6 +29,7 @@ import { cx } from '@/lib/cx';
 import {
   CHOICE_MAX,
   DEVICES,
+  DISAPPOINTMENTS,
   FREQUENCIES,
   IMPROVE_OPTIONS,
   LIKE_OPTIONS,
@@ -41,6 +42,7 @@ import {
   SURVEY_SECTIONS,
   TEXT_MAX,
   type Device,
+  type Disappointment,
   type Feedback,
   type FeedbackKind,
   type Frequency,
@@ -50,6 +52,7 @@ import {
   type SurveyQuestion,
   type SurveySection,
 } from '@/lib/feedback';
+import { analyticsIds, track } from '@/lib/analytics';
 import { usePlayer } from '@/lib/player';
 
 /** `invite`: opened by the app on reaching a level, not by the learner. */
@@ -216,6 +219,7 @@ function SurveyForm({ onSubmit }: { onSubmit: (f: Feedback) => void }) {
   const [improve, setImprove] = useState<ImproveOption[]>([]);
   const [device, setDevice] = useState<Device | ''>('');
   const [frequency, setFrequency] = useState<Frequency | ''>('');
+  const [disappointment, setDisappointment] = useState<Disappointment | ''>('');
   const [comment, setComment] = useState('');
   const [bugOn, setBugOn] = useState(false);
   const [platform, setPlatform] = useState<Platform>(guessPlatform);
@@ -245,6 +249,7 @@ function SurveyForm({ onSubmit }: { onSubmit: (f: Feedback) => void }) {
       improve,
       ...(device ? { device } : {}),
       ...(frequency ? { frequency } : {}),
+      ...(disappointment ? { disappointment } : {}),
       ...(comment.trim() ? { comment: comment.trim() } : {}),
       ...(bugOn && bugText.trim() ? { bug: { platform, text: bugText.trim() } } : {}),
     });
@@ -327,6 +332,15 @@ function SurveyForm({ onSubmit }: { onSubmit: (f: Feedback) => void }) {
           value={frequency}
           options={FREQUENCIES.map((f) => ({ value: f, label: t(`survey.frequencies.${f}`) }))}
           onChange={setFrequency}
+        />
+        <Segmented<Disappointment | ''>
+          label={t('survey.disappointmentLabel')}
+          value={disappointment}
+          options={DISAPPOINTMENTS.map((d) => ({
+            value: d,
+            label: t(`survey.disappointments.${d}`),
+          }))}
+          onChange={setDisappointment}
         />
         <TextAreaField
           label={t('survey.commentLabel')}
@@ -456,15 +470,28 @@ export function FeedbackDialog({ open, reason, onOpenChange, onSurveySent }: Fee
   const [error, setError] = useState<string | null>(null);
 
   const go = (s: Step) => {
+    if (s !== 'menu' && s !== 'thanks') track('feedback_kind', { to: s });
     setStep(s);
     setError(null);
+  };
+  // Closed before sending: where the learner gave up.
+  const changeOpen = (next: boolean) => {
+    if (!next && step !== 'thanks') track('feedback_abandoned', { step });
+    onOpenChange(next);
   };
 
   const submit = async (feedback: Feedback) => {
     setSending(true);
     setError(null);
-    const result = await sendFeedback({ feedback, locale, level: ready ? level : null });
+    const result = await sendFeedback({
+      feedback,
+      locale,
+      level: ready ? level : null,
+      ...analyticsIds(),
+    });
     setSending(false);
+    track('feedback_sent', { to: feedback.kind, ok: result === 'ok' });
+    if (result !== 'ok') track('api_error', { source: 'feedback', to: result });
     if (result === 'ok') {
       if (feedback.kind === 'survey') onSurveySent();
       setStep('thanks');
@@ -532,7 +559,7 @@ export function FeedbackDialog({ open, reason, onOpenChange, onSurveySent }: Fee
     );
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={changeOpen}>
       <DialogContent
         title={title}
         {...(description ? { description } : {})}

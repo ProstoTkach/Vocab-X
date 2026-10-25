@@ -52,5 +52,10 @@
     "freeDictionary": "example sentences and synonyms (English)",
     "wiktionary": "translations, definitions and examples",
     "tatoeba": "real example sentences in many languages"
+  },
+  "studyMode": "Study mode",
+  "studyModes": {
+    "cards": "Flash cards",
+    "quiz": "Four-choice test"
   }
 }

@@ -23,6 +23,7 @@ import { localeInfo } from '@/i18n/locales';
 import { useClock } from '@/lib/clock';
 import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
+import { track } from '@/lib/analytics';
 
 /**
  * Picking single words from a library deck, card by card like the review: swipe (or press)
@@ -78,7 +79,15 @@ export function WordPicker({
   };
 
   // The summary waits for the saves in flight, so "Back" shows the deck with them applied.
-  const finish = (added: number) => enqueue(async () => setSaved(added));
+  const finish = (added: number, seen: number) => {
+    track('library_pick', {
+      source: deck.id,
+      count: added,
+      skipped_n: seen - added,
+      finished: seen >= words.length,
+    });
+    enqueue(async () => setSaved(added));
+  };
 
   const decide = (add: boolean, dir: PhysicalDir) => {
     if (!word || saved !== null) return;
@@ -95,7 +104,7 @@ export function WordPicker({
     setAddedNow(nextAdded);
     setExitDir(dir);
     setIndex(index + 1);
-    if (index + 1 >= words.length) finish(nextAdded);
+    if (index + 1 >= words.length) finish(nextAdded, index + 1);
   };
 
   useEffect(() => {
@@ -146,7 +155,7 @@ export function WordPicker({
         <header className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-3">
             <h1 className="font-display text-title font-semibold">{t('pickTitle')}</h1>
-            <Button variant="ghost" size="sm" onClick={() => finish(addedNow)}>
+            <Button variant="ghost" size="sm" onClick={() => finish(addedNow, index)}>
               {t('pickDone')}
             </Button>
           </div>

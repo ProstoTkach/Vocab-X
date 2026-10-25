@@ -1,5 +1,26 @@
-import { FEEDBACK_COLUMNS, feedbackRow, formatFeedback, parsePayload } from '@/lib/feedback';
-import { appendRow, sheetsConfigFromEnv } from '@/lib/google-sheets';
+import {
+  FEEDBACK_COLUMNS,
+  FEEDBACK_DATE_COLUMNS,
+  feedbackRow,
+  formatFeedback,
+  parsePayload,
+} from '@/lib/feedback';
+import { appendRow, appendRows, ensureSheet, sheetsConfigFromEnv } from '@/lib/google-sheets';
+
+/** The feedback sheet of the analytics spreadsheet, next to the usage statistics. */
+const ANALYTICS_SHEET = 'Відгуки';
+
+async function copyToAnalytics(row: ReturnType<typeof feedbackRow>) {
+  const analytics = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
+  if (!analytics) return;
+  try {
+    await ensureSheet(analytics, ANALYTICS_SHEET, FEEDBACK_COLUMNS, FEEDBACK_DATE_COLUMNS);
+    await appendRows(analytics, ANALYTICS_SHEET, [row]);
+  } catch (e) {
+    // A copy only: the feedback itself went to the polls table or the chat.
+    console.error('feedback: analytics copy', e instanceof Error ? e.message : e);
+  }
+}
 
 /** Requests per address in a window; kept in memory, so it resets with the server. */
 const LIMIT = 5;
@@ -20,7 +41,8 @@ function tooMany(key: string): boolean {
 
 /**
  * Forwards learner feedback to the developer: for now as a row of the "Vocab-X polls" Google
- * spreadsheet when its service account is set up, otherwise to the Telegram chat. Keys stay on
+ * spreadsheet when its service account is set up, otherwise to the Telegram chat; a copy goes
+ * to the "Відгуки" sheet of the analytics spreadsheet. Keys stay on
  * the server. The sender's address is used only for the in-memory rate limit above and is never
  * forwarded or stored, so the feedback stays anonymous.
  */
@@ -43,9 +65,11 @@ export async function POST(request: Request): Promise<Response> {
   const payload = parsePayload(body);
   if (!payload) return Response.json({ error: 'invalid' }, { status: 400 });
 
+  const row = feedbackRow(payload, new Date());
+  await copyToAnalytics(row);
   if (sheets) {
     try {
-      await appendRow(sheets, FEEDBACK_COLUMNS, feedbackRow(payload, new Date()));
+      await appendRow(sheets, FEEDBACK_COLUMNS, row, FEEDBACK_DATE_COLUMNS);
       return Response.json({ ok: true });
     } catch (e) {
       // The spreadsheet is down or not set up yet: the chat still gets it, if there is one.

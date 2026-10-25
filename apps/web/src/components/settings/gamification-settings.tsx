@@ -21,7 +21,7 @@ export function GamificationSettings() {
   return (
     <RadioGroup.Root
       value={mode}
-      onValueChange={(v) => setMode(v as GamificationMode)}
+      onValueChange={(v) => setMode(v as GamificationMode, 'settings')}
       aria-label={t('gamification')}
       className="flex flex-col gap-2"
     >

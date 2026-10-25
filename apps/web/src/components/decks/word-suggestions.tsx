@@ -1,6 +1,6 @@
 'use client';
 
-import { splitTranslations, type LangCode } from '@vocabx/core';
+import { splitTranslations, systemClock, type LangCode } from '@vocabx/core';
 import { Check, EyeOff, Plus, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -10,6 +10,7 @@ import { HighlightedText } from '@/components/words/highlighted-text';
 import { cx } from '@/lib/cx';
 import { suggestWord, type WordSuggestions } from '@/lib/lexicon/suggest';
 import type { Lexicon } from '@/lib/lexicon/use-lexicon';
+import { track } from '@/lib/analytics';
 
 export const EXAMPLE_MAX = 500;
 
@@ -24,7 +25,14 @@ export function useWordSuggest(lexicon: Lexicon, wordLang: LangCode, nativeLang:
     const term = raw.trim();
     if (!term) return;
     setLookup({ state: 'loading' });
+    const started = systemClock.now();
     const found = await suggestWord(lexicon, { term, from: wordLang, to: nativeLang });
+    track('word_suggest', {
+      count: found.translations.length,
+      examples_n: found.examples.length,
+      ok: found.translations.length + found.examples.length > 0,
+      duration_s: Math.round((systemClock.now() - started) / 100) / 10,
+    });
     setLookup({ state: 'done', term, hidden: false, ...found });
   };
   const hide = () => setLookup((l) => (l.state === 'done' ? { ...l, hidden: true } : l));

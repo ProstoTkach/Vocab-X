@@ -5,6 +5,7 @@ import { useLayoutEffect, type ReactNode } from 'react';
 import { ToastProvider } from '@/components/ui/toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { restoreRootAttributes } from '@/lib/boot-script';
+import { AnalyticsProvider } from '@/components/analytics/analytics-provider';
 import { DevPanel } from '@/components/dev/dev-panel';
 import { ClockProvider } from '@/lib/clock';
 import { DevToolsProvider } from '@/lib/dev-tools';
@@ -27,8 +28,10 @@ export function Providers({ dir, children }: { dir: 'ltr' | 'rtl'; children: Rea
                 <TooltipProvider delayDuration={300}>
                   <ToastProvider>
                     <DevToolsProvider>
-                      {children}
-                      <DevPanel />
+                      <AnalyticsProvider>
+                        {children}
+                        <DevPanel />
+                      </AnalyticsProvider>
                     </DevToolsProvider>
                   </ToastProvider>
                 </TooltipProvider>

@@ -13,6 +13,7 @@ import { useClock } from '@/lib/clock';
 import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
 import { WordPicker } from './word-picker';
+import { track } from '@/lib/analytics';
 
 interface Loaded {
   profile: Profile;
@@ -56,14 +57,15 @@ export function LibraryDeck({
       const copy = (await repos.decks.list({ includeArchived: true })).find(
         (d) => d.builtinId === deck.id,
       );
-      if (!ctrl.signal.aborted)
-        setData({
-          profile,
-          deck,
-          words,
-          mine: new Set(copy?.wordIds ?? []),
-          skipped: new Set(copy?.skippedIds ?? []),
-        });
+      if (ctrl.signal.aborted) return;
+      track('library_open_deck', { source: deck.id, to: deck.cefr ?? null });
+      setData({
+        profile,
+        deck,
+        words,
+        mine: new Set(copy?.wordIds ?? []),
+        skipped: new Set(copy?.skippedIds ?? []),
+      });
     })();
     return () => ctrl.abort();
   }, [repos, deckId, version]);
@@ -92,6 +94,7 @@ export function LibraryDeck({
   const pool = unseen.length > 0 ? unseen : remaining;
 
   const addAll = async () => {
+    track('library_add_all', { source: deck.id, count: deck.wordIds.length });
     await addWordsFromBuiltin(repos, deck, deck.wordIds, locale, { now: clock.now(), newId });
     toast({ title: t('addedAllToast', { name }), tone: 'success' });
     // Done with this deck: back to the library, where it now shows as saved.

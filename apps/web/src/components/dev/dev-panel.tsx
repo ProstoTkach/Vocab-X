@@ -6,6 +6,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useClock } from '@/lib/clock';
+import { isInternal, track } from '@/lib/analytics';
 import { useDevTools } from '@/lib/dev-tools';
 import { usePlayer } from '@/lib/player';
 import { useTheme } from '@/lib/theme';
@@ -25,7 +26,7 @@ export function DevPanel() {
   const { clock, offsetMs, setOffsetMs } = useClock();
   const { resolved, setChoice } = useTheme();
   const { reachLevel, level } = usePlayer();
-  if (!enabled) return null;
+  if (!enabled || !isInternal()) return null;
   const dark = getTheme(resolved)?.colorScheme === 'dark';
 
   return (
@@ -71,11 +72,19 @@ export function DevPanel() {
       <Switch
         label={t('darkTheme')}
         checked={dark}
-        onCheckedChange={(on) => setChoice(on ? SYSTEM_THEMES.dark : SYSTEM_THEMES.light)}
+        onCheckedChange={(on) => {
+          const next = on ? SYSTEM_THEMES.dark : SYSTEM_THEMES.light;
+          track('theme_change', { to: next, source: 'dev_panel' });
+          setChoice(next);
+        }}
         className="mt-3 border-t border-line/70 pt-2"
       />
       {/* Reviews as a four-choice test instead of flash cards (same words, same progress). */}
-      <Switch label={t('quizMode')} checked={quiz} onCheckedChange={setQuiz} />
+      <Switch
+        label={t('quizMode')}
+        checked={quiz}
+        onCheckedChange={(on) => setQuiz(on, 'dev_panel')}
+      />
       <Button
         size="sm"
         variant="secondary"

@@ -7,7 +7,7 @@
   "mostImportant": "Most important",
   "orElse": "Or pick something else:",
   "characterHint": "Leave feedback",
-  "anonymous": "Everything is sent anonymously: no name, e-mail or IP address is collected — only your answers, the interface language and your level.",
+  "anonymous": "We never collect your name, e-mail or IP address — only your answers, the interface language, your level and a random anonymous browser number, to put the answers next to the usage statistics.",
   "optional": "Optional",
   "platformLabel": "Where did it happen?",
   "platformPhone": "Phone",
@@ -115,7 +115,14 @@
     "commentLabel": "What would you improve or add?",
     "commentPlaceholder": "Any thoughts, wishes or impressions",
     "bugToggle": "I noticed a bug",
-    "missing": "Still to rate: {left}. Just a few taps and your answers will be complete."
+    "missing": "Still to rate: {left}. Just a few taps and your answers will be complete.",
+    "disappointmentLabel": "How would you feel if you could no longer use VocabX?",
+    "disappointments": {
+      "very": "Very disappointed",
+      "somewhat": "Somewhat disappointed",
+      "not": "Not disappointed",
+      "stopped": "I no longer use it"
+    }
   },
   "back": "Back",
   "send": "Send",

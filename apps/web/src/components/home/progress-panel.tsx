@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Link } from '@/i18n/navigation';
 import { cx } from '@/lib/cx';
 import { MAX_PAST_DAYS, type DailyProgress } from './use-daily-progress';
+import { track } from '@/lib/analytics';
 
 /** At least this many past days are shown, even before there is any history. */
 const MIN_PAST_DAYS = 29;
@@ -79,7 +80,7 @@ function Streak({ streak, atRisk }: { streak: number; atRisk: boolean }) {
       </div>
     );
   return (
-    <Popover>
+    <Popover onOpenChange={(open) => track('streak_risk', { to: open ? 'shown' : 'closed' })}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -100,6 +101,7 @@ function Streak({ streak, atRisk }: { streak: number; atRisk: boolean }) {
         <p className="mt-1.5 text-sm text-fg-muted">{t('streakAtRiskText')}</p>
         <Link
           href="/review"
+          onClick={() => track('streak_risk', { to: 'review_now' })}
           className={cx(buttonClass('primary', 'sm'), 'mt-3 w-full justify-center')}
         >
           <Repeat2 aria-hidden className="size-4" />

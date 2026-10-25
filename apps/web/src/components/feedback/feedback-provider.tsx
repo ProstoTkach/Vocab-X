@@ -12,6 +12,7 @@ import {
 import { usePathname } from '@/i18n/navigation';
 import { useGamification } from '@/lib/gamification';
 import { usePlayer } from '@/lib/player';
+import { track } from '@/lib/analytics';
 import { useRepos } from '@/lib/repos';
 import { FeedbackDialog, type FeedbackReason } from './feedback-dialog';
 export { QUIZ_INVITE_AFTER, QUIZ_INVITE_TIP } from '@/lib/feedback';
@@ -27,9 +28,12 @@ export const SURVEY_SENT_TIP = 'feedback-survey';
 /** A pause after the page settles, so the invitation never pops up mid-click. ms. */
 const INVITE_DELAY_MS = 1500;
 
+/** Where the feedback window was opened from (for the statistics). */
+export type FeedbackSource = 'sidebar' | 'topbar' | 'character' | 'level_up';
+
 interface FeedbackValue {
   /** Opens the feedback window (from a button). */
-  open: () => void;
+  open: (source: FeedbackSource) => void;
   /** Settings changed elsewhere (e.g. a level-up window closed): look for a due invite again. */
   recheck: () => void;
   /** Invites to the survey about the four-choice test, once per tip (never after the survey was sent). */
@@ -72,7 +76,8 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     return () => ctrl.abort();
   }, [repos, pathname, nonce]);
 
-  const show = useCallback((reason: FeedbackReason) => {
+  const show = useCallback((reason: FeedbackReason, source: string) => {
+    track('feedback_open', { source });
     setState((s) => ({ open: true, reason, key: s.key + 1 }));
   }, []);
 
@@ -89,7 +94,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!canInvite) return;
     const id = window.setTimeout(() => {
-      show('invite');
+      show('invite', `invite_level_${level}`);
       void repos.settings.get().then((s) => {
         // Every invitation up to this level counts as made: a jump of levels asks only once.
         const tips = INVITE_LEVELS.filter((l) => l <= level).map(inviteTip);
@@ -114,7 +119,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     (tip: string) => {
       void repos.settings.get().then((s) => {
         if (s.tipsSeen.includes(SURVEY_SENT_TIP) || s.tipsSeen.includes(tip)) return;
-        show('quiz');
+        show('quiz', 'invite_quiz');
         const tipsSeen = [...s.tipsSeen, tip];
         setSettings({ tipsSeen, levelSeen: s.levelSeen });
         return repos.settings.update({ tipsSeen });
@@ -125,7 +130,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<FeedbackValue>(
     () => ({
-      open: () => show('manual'),
+      open: (source: FeedbackSource) => show('manual', source),
       recheck: () => setNonce((n) => n + 1),
       inviteOnce,
       isOpen: state.open,

@@ -1,0 +1,12 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3100",
+      "localStorage": [
+        { "name": "vocabx:analytics:variant", "value": "{\"v\":\"g1c\",\"by\":\"link\"}" },
+        { "name": "vocabx:analytics:consent", "value": "denied" }
+      ]
+    }
+  ]
+}

@@ -31,6 +31,7 @@ import { useWordData } from '@/components/words/use-word-data';
 import { ShowMore, useIncremental } from '@/components/words/show-more';
 import { WordRow } from '@/components/words/word-row';
 import { WordFormDialog } from './word-form-dialog';
+import { track } from '@/lib/analytics';
 
 interface Loaded {
   profile: Profile;
@@ -124,6 +125,7 @@ export function DeckDetail({ deckId }: { deckId: string }) {
     const next = title.trim();
     setTitle(null);
     if (next && next !== deck.title) {
+      track('deck_rename', { source: 'deck' });
       await updateDeck(repos, deck, { title: next }, clock.now());
       reload();
     }
@@ -155,6 +157,7 @@ export function DeckDetail({ deckId }: { deckId: string }) {
       .join('\n');
     try {
       await navigator.clipboard.writeText(text);
+      track('deck_copy_text', { count: ordered.length });
       toast({ title: t('copied', { count: ordered.length }), tone: 'success' });
     } catch {
       toast({ title: t('copyFailed'), tone: 'danger' });
@@ -162,6 +165,7 @@ export function DeckDetail({ deckId }: { deckId: string }) {
   };
 
   const learn = async (word: Word) => {
+    track('word_learned', { source: 'deck' });
     const learned = await markWordLearned(repos, word, words('learnedDeck'), {
       now: clock.now(),
       newId,
@@ -174,6 +178,7 @@ export function DeckDetail({ deckId }: { deckId: string }) {
   };
 
   const reset = async (word: Word) => {
+    track('word_reset', { source: 'deck' });
     await resetWordProgress(repos, word.id);
     toast({ title: t('wordReset', { word: word.term }), tone: 'success' });
     reload();
@@ -303,6 +308,7 @@ export function DeckDetail({ deckId }: { deckId: string }) {
           open
           onOpenChange={(o) => !o && setEditing(null)}
           word={editing === 'new' ? null : editing}
+          source="deck"
           wordLang={deck.lang}
           nativeLang={profile.nativeLang}
           onSubmit={submitWord}
@@ -321,6 +327,7 @@ export function DeckDetail({ deckId }: { deckId: string }) {
                 variant="danger"
                 onClick={() => {
                   if (!removing) return;
+                  track('word_delete', { source: 'deck' });
                   void removeWordFromDeck(repos, deck, removing.id, clock.now()).then(() => {
                     setRemoving(null);
                     reload();

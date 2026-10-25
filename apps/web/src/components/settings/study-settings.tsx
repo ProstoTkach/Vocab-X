@@ -8,6 +8,8 @@ import { SelectField, TextField } from '@/components/ui/field';
 import { Segmented } from '@/components/ui/segmented';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { track } from '@/lib/analytics';
+import { useDevTools } from '@/lib/dev-tools';
 import { useRepos } from '@/lib/repos';
 
 const ANIMATION = [
@@ -31,6 +33,7 @@ export function StudySettingsForm() {
   const repos = useRepos();
   const [study, setStudy] = useState<StudySettings | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const { quiz, setQuiz } = useDevTools();
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -44,7 +47,17 @@ export function StudySettingsForm() {
 
   if (!study || !profile) return <div aria-busy className="h-40" />;
 
-  const update = (patch: Partial<StudySettings>) => {
+  /** Saves a change; `silent` leaves it out of the statistics (counted on blur instead). */
+  const update = (patch: Partial<StudySettings>, silent = false) => {
+    if (!silent)
+      for (const [key, to] of Object.entries(patch) as [keyof StudySettings, unknown][]) {
+        const from = study[key];
+        if (from === to) continue;
+        const value = (v: unknown) => (v === null || typeof v === 'object' ? null : (v as string));
+        track('setting_change', { source: key, from: value(from), to: value(to) });
+        if (key === 'twoGrades' && to === false) track('four_grades_on', { source: 'settings' });
+        if (key === 'typing') track('typing_toggle', { to: to === true });
+      }
     setStudy({ ...study, ...patch });
     void repos.settings.update({ study: patch });
   };
@@ -56,6 +69,7 @@ export function StudySettingsForm() {
         ? profile.targetLangs
         : [...profile.targetLangs, lang],
     };
+    track('setting_change', { source: 'targetLang', from: profile.activeTargetLang, to: lang });
     setProfile(next);
     void repos.profile.save(next);
   };
@@ -66,6 +80,16 @@ export function StudySettingsForm() {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Flash cards or the four-choice test (the same words, levels and progress). */}
+      <Segmented
+        label={t('studyMode')}
+        value={quiz ? 'quiz' : 'cards'}
+        onChange={(v) => setQuiz(v === 'quiz', 'settings')}
+        options={[
+          { value: 'cards', label: t('studyModes.cards') },
+          { value: 'quiz', label: t('studyModes.quiz') },
+        ]}
+      />
       <SelectField
         label={t('targetLang')}
         value={profile.activeTargetLang}
@@ -98,7 +122,8 @@ export function StudySettingsForm() {
             min={1}
             placeholder={t('unlimited')}
             value={study.newPerDay ?? ''}
-            onChange={(e) => update({ newPerDay: limit(e.target.value) })}
+            onChange={(e) => update({ newPerDay: limit(e.target.value) }, true)}
+            onBlur={() => track('setting_change', { source: 'newPerDay', to: study.newPerDay })}
           />
           <TextField
             label={t('reviewLimit')}
@@ -107,7 +132,10 @@ export function StudySettingsForm() {
             min={1}
             placeholder={t('unlimited')}
             value={study.reviewsPerDay ?? ''}
-            onChange={(e) => update({ reviewsPerDay: limit(e.target.value) })}
+            onChange={(e) => update({ reviewsPerDay: limit(e.target.value) }, true)}
+            onBlur={() =>
+              track('setting_change', { source: 'reviewsPerDay', to: study.reviewsPerDay })
+            }
           />
         </div>
       </fieldset>

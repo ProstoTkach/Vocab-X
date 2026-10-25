@@ -41,6 +41,8 @@ export interface QuizCardProps {
   onPick: (index: number) => void;
   /** `hinted`: the letters hint was opened before answering. */
   onTyped: (input: string, hinted: boolean) => void;
+  /** A hint was opened: the letters of the typed word, or the heard word written out. */
+  onHint?: (kind: 'letters' | 'show_word') => void;
 }
 
 /**
@@ -86,7 +88,10 @@ export function QuizCard(p: QuizCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShownFor(card.id)}
+            onClick={() => {
+              setShownFor(card.id);
+              p.onHint?.('show_word');
+            }}
             className="text-fg-muted hover:text-warning"
           >
             <Eye aria-hidden className="size-5" />
@@ -127,7 +132,10 @@ export function QuizCard(p: QuizCardProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setHintFor(card.id)}
+                onClick={() => {
+                  setHintFor(card.id);
+                  p.onHint?.('letters');
+                }}
                 className="text-fg-muted hover:text-warning"
               >
                 <Lightbulb aria-hidden className="size-5" />

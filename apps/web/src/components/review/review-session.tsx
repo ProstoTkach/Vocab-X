@@ -3,7 +3,10 @@
 import { adapterFor, builtinCatalog, getLanguage } from '@vocabx/content';
 import {
   DEFAULT_GRADING_PARAMS,
+  DAY_MS,
   DEFAULT_SCHEDULER_PARAMS,
+  DEFAULT_XP_PARAMS,
+  systemClock,
   gradeTypedAnswer,
   loadStudyStack,
   nextReturnAt,
@@ -29,10 +32,11 @@ import {
 import { MotionConfig } from 'motion/react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { localeInfo } from '@/i18n/locales';
 import { useClock } from '@/lib/clock';
 import { useDevTools } from '@/lib/dev-tools';
+import { track } from '@/lib/analytics';
 import { useFeedback } from '@/components/feedback/feedback-provider';
 import {
   QUIZ_INVITE_AFTER,
@@ -99,6 +103,9 @@ const TWO_GRADES: readonly Grade[] = [1, 3];
 /** In two-grade mode a typo still passes and a fast answer is just "Good". */
 const toTwoGrades = (g: Grade): Grade => (g === 1 ? 1 : 3);
 
+/** How a grade was given, for the statistics. */
+type AnswerInput = 'swipe' | 'button' | 'key' | 'option' | 'typed' | 'skip';
+
 function isTextInput(target: EventTarget | null) {
   return (
     target instanceof HTMLElement &&
@@ -118,7 +125,27 @@ export function ReviewSession() {
   const deckParam = useSearchParams().get('deck');
   const repos = useRepos();
   const { clock, dayOf } = useClock();
-  const speech = useSpeech();
+  const rawSpeech = useSpeech();
+  /** Per card: how often it was turned over and whether its word was heard. */
+  const cardStats = useRef({ key: '', flips: 0, audio: false });
+  /** The card on screen, for the counters above. */
+  const shownKey = useRef('');
+  const statsOf = useCallback((key: string) => {
+    if (cardStats.current.key !== key) cardStats.current = { key, flips: 0, audio: false };
+    return cardStats.current;
+  }, []);
+  const speech = useMemo(
+    () => ({
+      canSpeak: rawSpeech.canSpeak,
+      speak: (text: string, lang: string) => {
+        statsOf(shownKey.current).audio = true;
+        rawSpeech.speak(text, lang);
+      },
+    }),
+    [rawSpeech, statsOf],
+  );
+  /** The review in the statistics: real time (not the demo clock) and whether it was summed up. */
+  const reviewStats = useRef({ startedAt: 0, ended: true, reviewsBefore: 0 });
   const gamification = useGamification();
   // Dev: the four-choice test replaces flash cards (same words, levels and progress).
   const { quiz } = useDevTools();
@@ -193,6 +220,16 @@ export function ReviewSession() {
         pool,
       });
       setSession(startSession<StudyCard, ReviewOutcome>(cards));
+      reviewStats.current = {
+        startedAt: systemClock.now(),
+        ended: cards.length === 0,
+        reviewsBefore: todayStats?.reviews ?? 0,
+      };
+      track(cards.length ? 'review_start' : 'review_empty', {
+        count: cards.length,
+        new_n: cards.filter((c) => c.isNew).length,
+        deck_filter: !!deck,
+      });
       setSide('front');
       setRevealed(false);
       setTyped(null);
@@ -203,9 +240,38 @@ export function ReviewSession() {
   }, [repos, clock, dayOf, reloadKey, watch, deckParam]);
 
   const card = session?.queue[0];
+  /** Sums the review up once: when the stack is done or the learner leaves it. */
+  const endReviewRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    endReviewRef.current = () => {
+      const r = reviewStats.current;
+      if (r.ended || !session) return;
+      r.ended = true;
+      track('review_end', {
+        count: session.reviewed,
+        correct_n: session.reviewed - session.counts.again,
+        finished_stack: session.queue.length === 0 && session.waiting.length === 0,
+        duration_s: Math.round((systemClock.now() - r.startedAt) / 1000),
+      });
+    };
+  });
+  useEffect(() => {
+    const onHide = () => endReviewRef.current();
+    window.addEventListener('pagehide', onHide);
+    return () => {
+      window.removeEventListener('pagehide', onHide);
+      onHide();
+    };
+  }, []);
+  // The stack is done: summed up at once.
+  const finished = !!session && session.queue.length === 0 && session.waiting.length === 0;
+  useEffect(() => {
+    if (finished) endReviewRef.current();
+  }, [finished]);
   const introOpen = !!setup && !introClosed && !setup.tipsSeen.includes(REVIEW_INTRO);
   const closeIntro = () => {
     setIntroClosed(true);
+    track('review_intro_closed');
     if (!setup) return;
     const tipsSeen = [...setup.tipsSeen, REVIEW_INTRO];
     setSetup((s) => s && { ...s, tipsSeen });
@@ -250,6 +316,20 @@ export function ReviewSession() {
   // levels of the test speak only when their listen button is pressed.
   const listenTerm =
     (format === 'AUD_PART' || format === 'MCQ_AUD') && card ? card.word.term : null;
+  // The counters follow the card on screen (read and reset in handlers, never while rendering).
+  useEffect(() => {
+    shownKey.current = cardKey ?? '';
+  }, [cardKey]);
+  // A device without a voice for the language: noted once per review (voices load late).
+  const voiceChecked = useRef(false);
+  useEffect(() => {
+    if (!speechLang || voiceChecked.current) return;
+    const id = window.setTimeout(() => {
+      voiceChecked.current = true;
+      if (!rawSpeech.canSpeak(speechLang)) track('voice_missing', { to: speechLang });
+    }, 3000);
+    return () => window.clearTimeout(id);
+  }, [speechLang, rawSpeech]);
   // Once per card, as soon as a voice is there (voices load a moment after the page).
   const spokenFor = useRef<string | null>(null);
   useEffect(() => {
@@ -272,6 +352,7 @@ export function ReviewSession() {
     if (!card) return;
     // Before a typed answer is checked, the card waits for the input instead of flipping.
     if (typing && !typed) return;
+    statsOf(shownKey.current).flips += 1;
     if (side === 'front') {
       reveal();
       setSide('back');
@@ -290,6 +371,7 @@ export function ReviewSession() {
       params: DEFAULT_GRADING_PARAMS,
     });
     setTyped({ input, result });
+    track('typed_answer', { mode: 'card', to: result.verdict, hint_used: false });
     reveal();
     setSide('back');
   };
@@ -321,6 +403,7 @@ export function ReviewSession() {
     });
     // With the letters shown, a right answer is at most "Hard".
     const g = hinted ? (Math.min(result.grade, 2) as Grade) : result.grade;
+    track('typed_answer', { mode: 'quiz', to: result.verdict, hint_used: hinted });
     answerQuiz(
       { typed: { input, result } },
       swipe.twoGrades ? toTwoGrades(g) : g,
@@ -341,6 +424,7 @@ export function ReviewSession() {
     dir?: PhysicalDir,
     responseMs = watch.elapsedMs(),
     quizAnswer?: QuizResult,
+    input: AnswerInput = dir ? 'swipe' : 'button',
   ) => {
     // A card can be graded (swiped away) without flipping it first.
     if (!card || !setup || busy) return;
@@ -367,6 +451,26 @@ export function ReviewSession() {
       lastReviewAt: outcome.progress.card.lastReviewAt,
     };
     if (quizAnswer) quizAnswers.current.set(outcome.event.id, quizAnswer);
+    const p = card.progress;
+    track('answer', {
+      mode: quizFormat ? 'quiz' : 'card',
+      card_level: p?.card.level ?? 1,
+      format,
+      grade: g,
+      correct: g >= 2,
+      response_ms: Math.round(responseMs),
+      flipped: statsOf(shownKey.current).flips > 0,
+      flips_n: statsOf(shownKey.current).flips,
+      audio_played: statsOf(shownKey.current).audio,
+      input,
+      is_new: card.isNew,
+      // The interval the card was due after (from its last answer to its due time), days.
+      interval_days: p ? Math.round(((p.dueAt - p.card.lastReviewAt) / DAY_MS) * 100) / 100 : null,
+      xp: outcome.event.xp,
+    });
+    // Past the daily number of reviews XP starts to shrink.
+    if (reviewStats.current.reviewsBefore + session.reviewed + 1 === DEFAULT_XP_PARAMS.dailyDecayN0)
+      track('xp_decay_reached', { count: DEFAULT_XP_PARAMS.dailyDecayN0 });
     // After enough answers in the test, ask once what the learner thinks of it.
     if (isQuizFormat(format) && quizAnswered.current !== null) {
       quizAnswered.current += 1;
@@ -394,7 +498,11 @@ export function ReviewSession() {
       setEndedAt(now);
     const goal = setup.settings.dailyGoalXp;
     const before = setup.xpBefore + session.xp;
-    if (before < goal && before + outcome.event.xp >= goal) setCelebrate(true);
+    if (before < goal && before + outcome.event.xp >= goal) {
+      setCelebrate(true);
+      track('goal_reached', { count: goal });
+      if (gamification.enabled) track('celebration_shown');
+    }
     // The first good run with two grades brings the tip about Hard and Easy, once.
     const nextRun = g >= 2 ? run + 1 : 0;
     setRun(nextRun);
@@ -409,6 +517,7 @@ export function ReviewSession() {
       setSetup((s) => s && { ...s, tipsSeen });
       void repos.settings.update({ tipsSeen });
       setTipOpen(true);
+      track('four_grades_tip', { to: 'shown' });
     }
     setExitDir(dir ?? directionForGrade(g, swipe));
     nextCard();
@@ -420,6 +529,7 @@ export function ReviewSession() {
     if (!last || busy) return;
     setBusy(true);
     await undoReview(repos, last.token);
+    track('undo', { mode: quizFormat ? 'quiz' : 'card' });
     setExitDir(null);
     setSession((s) => s && sessionReducer(s, { type: 'undo' }));
     setEndedAt(null);
@@ -430,8 +540,12 @@ export function ReviewSession() {
     setBusy(false);
   };
 
-  const nextQuiz = () => {
-    if (quizResult) void grade(quizResult.grade, undefined, quizResult.responseMs, quizResult);
+  const nextQuiz = (auto = false) => {
+    if (!quizResult) return;
+    track('quiz_next', { auto, card_level: card?.progress?.card.level ?? 1 });
+    const input: AnswerInput =
+      'typed' in quizResult.answer ? 'typed' : quizResult.answer.picked < 0 ? 'skip' : 'option';
+    void grade(quizResult.grade, undefined, quizResult.responseMs, quizResult, input);
   };
   // The result shows for a moment, then the next card comes by itself.
   const nextQuizRef = useRef(nextQuiz);
@@ -441,7 +555,7 @@ export function ReviewSession() {
   const autoMs = quizResult?.autoMs ?? null;
   useEffect(() => {
     if (autoMs === null || busy) return;
-    const id = window.setTimeout(() => nextQuizRef.current(), autoMs);
+    const id = window.setTimeout(() => nextQuizRef.current(true), autoMs);
     return () => window.clearTimeout(id);
   }, [autoMs, busy, cardKey]);
 
@@ -495,7 +609,7 @@ export function ReviewSession() {
       }
       if (g && grades.includes(g)) {
         e.preventDefault();
-        void grade(g, dir);
+        void grade(g, dir, undefined, undefined, 'key');
       }
     };
     window.addEventListener('keydown', onKey);
@@ -540,9 +654,10 @@ export function ReviewSession() {
               <WaitingPanel
                 returnAt={returnAt}
                 waiting={session.waiting.length}
-                onShowNow={() =>
-                  setSession((s) => s && sessionReducer(s, { type: 'release', upTo: returnAt }))
-                }
+                onShowNow={() => {
+                  track('review_show_now', { count: session.waiting.length });
+                  setSession((s) => s && sessionReducer(s, { type: 'release', upTo: returnAt }));
+                }}
               />
             ) : !card ? (
               <SessionSummary
@@ -552,7 +667,10 @@ export function ReviewSession() {
                   Math.round(((endedAt ?? setup.startedAt) - setup.startedAt) / 60_000),
                 )}
                 grades={grades}
-                onMore={() => setReloadKey((k) => k + 1)}
+                onMore={() => {
+                  track('review_more');
+                  setReloadKey((k) => k + 1);
+                }}
               />
             ) : (
               <>
@@ -591,14 +709,18 @@ export function ReviewSession() {
                         speech={speech}
                         onPick={pickOption}
                         onTyped={typeQuiz}
+                        onHint={(kind) => track('quiz_hint', { to: kind })}
                       />
                     </CardStage>
                     <QuizBar
                       answered={!!quizResult}
                       disabled={busy}
                       autoMs={quizResult?.autoMs ?? null}
-                      onSkip={() => answerQuiz({ picked: -1 }, 1, false)}
-                      onNext={nextQuiz}
+                      onSkip={() => {
+                        track('quiz_skip', { card_level: card.progress?.card.level ?? 1 });
+                        answerQuiz({ picked: -1 }, 1, false);
+                      }}
+                      onNext={() => nextQuiz()}
                     />
                   </>
                 ) : (
@@ -677,9 +799,14 @@ export function ReviewSession() {
       />
       <FourGradesTip
         open={tipOpen}
-        onClose={() => setTipOpen(false)}
+        onClose={() => {
+          setTipOpen(false);
+          track('four_grades_tip', { to: 'closed' });
+        }}
         onEnable={() => {
           setTipOpen(false);
+          track('four_grades_tip', { to: 'enabled' });
+          track('four_grades_on', { source: 'tip' });
           setSetup((s) => s && { ...s, settings: { ...s.settings, twoGrades: false } });
           void repos.settings.update({ study: { twoGrades: false } });
         }}

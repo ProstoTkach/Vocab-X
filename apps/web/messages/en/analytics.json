@@ -1,0 +1,10 @@
+{
+  "title": "Help us make VocabX better",
+  "text": "We collect anonymous usage statistics: which screens you open, how many cards you review and how long you study. We never collect your name, e-mail, IP address or the words you learn.",
+  "where": "You can change this any time in Settings → Data.",
+  "accept": "OK, I agree",
+  "decline": "Don't send",
+  "localhostAlert": "Note: you are testing the app on localhost. All events from this device are recorded as internal (internal = TRUE) and stay out of the statistics of real users.",
+  "setting": "Send anonymous statistics",
+  "settingHint": "Which screens you open, how many cards you review and how long you study — without your name, e-mail, IP address or the words themselves. Helps make VocabX better."
+}

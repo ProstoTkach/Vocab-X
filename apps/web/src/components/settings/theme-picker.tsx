@@ -9,6 +9,7 @@ import { useTheme } from '@/lib/theme';
 import { getTheme, SYSTEM_THEMES, THEMES } from '@/themes/registry';
 import { SYSTEM_THEME_ID } from '@/themes/types';
 import { isUnlocked, parseUnlock } from '@/themes/unlock';
+import { track } from '@/lib/analytics';
 
 /** Miniature of a theme drawn with its own tokens (scoped by data-theme). */
 function Swatch({ themeId, className }: { themeId: string; className?: string }) {
@@ -44,7 +45,10 @@ export function ThemePicker({ only }: { only?: readonly string[] } = {}) {
   return (
     <RadioGroup.Root
       value={choice}
-      onValueChange={setChoice}
+      onValueChange={(next) => {
+        track('theme_change', { from: choice, to: next, source: 'settings' });
+        setChoice(next);
+      }}
       aria-label={t('settings.theme')}
       className="grid grid-cols-2 gap-3 @lg:grid-cols-3"
     >

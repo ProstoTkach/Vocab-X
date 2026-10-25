@@ -68,5 +68,7 @@
     "upper": "Basic T-shirt",
     "bottom": "Basic shorts",
     "shoes": "Basic sneakers"
-  }
+  },
+  "enableTitle": "Turn on gamification",
+  "enableText": "A character friend, levels, rewards and celebrations — to make learning more fun."
 }

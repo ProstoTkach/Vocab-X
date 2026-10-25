@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import {
   CHOICE_MAX,
   FEEDBACK_COLUMNS,
+  FEEDBACK_FIELDS,
   feedbackRow,
   formatFeedback,
   MESSAGE_MAX,
@@ -134,27 +135,43 @@ describe('formatFeedback', () => {
   });
 });
 
+/** A cell of a feedback row by its technical column name. */
+const cellOf = (row: unknown[], key: string) =>
+  row[FEEDBACK_FIELDS.findIndex((f) => f.key === key)];
+
 describe('feedbackRow', () => {
   const at = new Date('2026-07-01T10:30:00Z');
   test('a survey fills its columns, in order, one cell per column', () => {
     const payload = parsePayload({
-      feedback: survey({ likes: ['cards'], device: 'phone', comment: '=1+1' }),
+      feedback: survey({
+        likes: ['cards'],
+        device: 'phone',
+        comment: '=1+1',
+        disappointment: 'very',
+      }),
       locale: 'uk',
       level: 3,
+      variant: 'g1q',
+      anonId: '6f1c2a9e-0000-4000-8000-000000000001',
     })!;
     const row = feedbackRow(payload, at);
     expect(row).toHaveLength(FEEDBACK_COLUMNS.length);
-    const cell = (column: string) => row[FEEDBACK_COLUMNS.indexOf(column)];
-    expect(cell('Тип')).toBe('Опитування');
-    expect(cell('Дата (Київ)')).toContain('13:30');
-    expect(cell('Рівень гравця')).toBe(3);
-    expect(cell('Загалом')).toBe(4);
-    expect(cell('Загалом: що не так')).toBe('мало слів');
-    expect(cell('Подобається')).toBe('картки зі свайпами');
-    expect(cell('Пристрій')).toBe('телефон');
+    const cell = (key: string) => cellOf(row, key);
+    expect(cell('kind')).toBe('Опитування');
+    expect(cell('date')).toEqual({ date: at.getTime() });
+    expect(cell('level')).toBe(3);
+    expect(cell('overall')).toBe(4);
+    expect(cell('overall_note')).toBe('мало слів');
+    expect(cell('likes')).toBe('картки зі свайпами');
+    expect(cell('device')).toBe('телефон');
     // Stored as text, never as a formula (the sheet is written RAW).
-    expect(cell('Коментар')).toBe('=1+1');
-    expect(typeof cell('Середня за все')).toBe('number');
+    expect(cell('comment')).toBe('=1+1');
+    expect(typeof cell('all_avg')).toBe('number');
+    expect(cell('disappointment')).toBe('дуже засмутився б');
+    expect(cell('variant')).toBe('g1q');
+    expect(cell('anon_id')).toBe('6f1c2a9e-0000-4000-8000-000000000001');
+    // Headers name both the Ukrainian label and the technical key.
+    expect(FEEDBACK_COLUMNS[0]).toBe('Дата (Київ) (date)');
   });
 
   test('a bug or an idea leaves the survey columns empty', () => {
@@ -163,16 +180,25 @@ describe('feedbackRow', () => {
         feedback: { kind: 'bug', platform: 'desktop', text: 'Падає' },
         locale: 'en',
         level: null,
+        variant: 'nope',
       })!,
       at,
     );
-    expect(bug[FEEDBACK_COLUMNS.indexOf('Баг: опис')]).toBe('Падає');
-    expect(bug[FEEDBACK_COLUMNS.indexOf('Загалом')]).toBe('');
-    expect(bug[FEEDBACK_COLUMNS.indexOf('Рівень гравця')]).toBe('');
+    expect(cellOf(bug, 'bug_text')).toBe('Падає');
+    expect(cellOf(bug, 'overall')).toBe('');
+    expect(cellOf(bug, 'level')).toBe('');
+    // A variant that is not one of the four is left out.
+    expect(cellOf(bug, 'variant')).toBe('');
     const idea = feedbackRow(
       parsePayload({ feedback: { kind: 'idea', text: 'Темна тема' }, locale: 'uk', level: 1 })!,
       at,
     );
-    expect(idea[FEEDBACK_COLUMNS.indexOf('Відгук або ідея')]).toBe('Темна тема');
+    expect(cellOf(idea, 'text')).toBe('Темна тема');
+  });
+
+  test('the disappointment answer comes from a fixed list', () => {
+    expect(
+      parsePayload({ feedback: survey({ disappointment: 'maybe' }), locale: 'uk' }),
+    ).toBeNull();
   });
 });

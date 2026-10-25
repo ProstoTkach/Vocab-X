@@ -290,7 +290,7 @@ export function parseSession(v: unknown, now: number): SessionSummary | null {
   if (!isTime(v.started_at, now) || !isTime(v.ended_at, now)) return null;
   if (v.end_reason !== 'pagehide' && v.end_reason !== 'timeout' && v.end_reason !== 'recovered')
     return null;
-  if (!SESSION_NUMBERS.every((k) => isNum(v[k]) && (v[k] as number) >= 0)) return null;
+  if (!SESSION_NUMBERS.every((k) => isNum(v[k]) && v[k] >= 0)) return null;
   if (!SESSION_FLAGS.every((k) => isBool(v[k]))) return null;
   if (!SESSION_TEXTS.every((k) => isText(v[k]))) return null;
   return v as unknown as SessionSummary;
@@ -326,15 +326,35 @@ export interface Column {
 export const header = (c: Column) => `${c.label} (${c.key})`;
 
 const COMMON_COLUMNS: Column[] = [
-  { key: 'anon_id', label: 'Анонімний ID', about: 'Випадковий ID браузера, без звʼязку з людиною.' },
+  {
+    key: 'anon_id',
+    label: 'Анонімний ID',
+    about: 'Випадковий ID браузера, без звʼязку з людиною.',
+  },
   { key: 'session_id', label: 'ID сесії', about: 'Випадковий ID сесії.' },
-  { key: 'variant', label: 'Варіант', about: 'g1c, g1q, g0c, g0q: g1/g0 — гейміфікація увімк./вимк., c/q — картки / 4 варіанти.' },
-  { key: 'assigned_by', label: 'Як призначено', about: 'link — з посилання ?v=, random — випадково.' },
-  { key: 'internal', label: 'Внутрішній', about: 'TRUE — візит розробника або тестувальника (?internal=1 чи localhost).' },
+  {
+    key: 'variant',
+    label: 'Варіант',
+    about: 'g1c, g1q, g0c, g0q: g1/g0 — гейміфікація увімк./вимк., c/q — картки / 4 варіанти.',
+  },
+  {
+    key: 'assigned_by',
+    label: 'Як призначено',
+    about: 'link — з посилання ?v=, random — випадково.',
+  },
+  {
+    key: 'internal',
+    label: 'Внутрішній',
+    about: 'TRUE — візит розробника або тестувальника (?internal=1 чи localhost).',
+  },
   { key: 'host', label: 'Сайт', about: 'Адреса, на якій відкрито застосунок.' },
   { key: 'ui_lang', label: 'Мова інтерфейсу', about: 'uk або en.' },
   { key: 'device', label: 'Пристрій', about: 'mobile або desktop.' },
-  { key: 'days_since_first_visit', label: 'Днів з першого візиту', about: 'Повних днів від першого заходу, 0 — перший день.' },
+  {
+    key: 'days_since_first_visit',
+    label: 'Днів з першого візиту',
+    about: 'Повних днів від першого заходу, 0 — перший день.',
+  },
 ];
 
 export const EVENT_PARAM_COLUMNS: Column[] = [
@@ -347,7 +367,11 @@ export const EVENT_PARAM_COLUMNS: Column[] = [
   { key: 'card_level', label: 'Рівень картки', about: 'Картки 1–3, тест 1–4.' },
   { key: 'grade', label: 'Оцінка', about: '1 Забув, 2 Важко, 3 Згадав, 4 Легко.' },
   { key: 'correct', label: 'Правильно', about: 'TRUE — відповідь правильна (оцінка 2–4).' },
-  { key: 'response_ms', label: 'Час відповіді, мс', about: 'Від показу картки до відповіді, мілісекунди.' },
+  {
+    key: 'response_ms',
+    label: 'Час відповіді, мс',
+    about: 'Від показу картки до відповіді, мілісекунди.',
+  },
   { key: 'duration_s', label: 'Тривалість, с', about: 'Тривалість дії, секунди.' },
   { key: 'count', label: 'Кількість', about: 'Число, головне для події (карток, слів, рядків).' },
 ];
@@ -366,26 +390,59 @@ export const SESSION_COLUMNS: Column[] = [
   { key: 'started_at', label: 'Початок', about: 'Початок сесії (Київ).', date: true },
   { key: 'ended_at', label: 'Кінець', about: 'Кінець сесії (Київ).', date: true },
   ...COMMON_COLUMNS,
-  { key: 'end_reason', label: 'Як завершилася', about: 'pagehide — закрито вкладку, timeout — 30 хв без дій, recovered — обірвалася, зібрано при наступному заході.' },
+  {
+    key: 'end_reason',
+    label: 'Як завершилася',
+    about:
+      'pagehide — закрито вкладку, timeout — 30 хв без дій, recovered — обірвалася, зібрано при наступному заході.',
+  },
   { key: 'session_n', label: 'Номер сесії', about: 'Котра це сесія на пристрої, з 1.' },
-  { key: 'active_time_s', label: 'Активний час, с', about: 'Секунди, коли вкладка видима й була дія за останні 60 с.' },
+  {
+    key: 'active_time_s',
+    label: 'Активний час, с',
+    about: 'Секунди, коли вкладка видима й була дія за останні 60 с.',
+  },
   { key: 'duration_s', label: 'Тривалість, с', about: 'Від початку до кінця сесії, секунди.' },
   { key: 'screens_n', label: 'Переходів між екранами', about: 'Скільки разів відкрито розділ.' },
   { key: 'answers_n', label: 'Відповідей', about: 'Скільки карток або питань тесту відповідено.' },
   { key: 'correct_n', label: 'Правильних', about: 'Скільки з них правильні (оцінка 2–4).' },
   { key: 'accuracy', label: 'Точність', about: 'Частка правильних, 0–1.' },
-  { key: 'scheduled_n', label: 'За розкладом (1+ день)', about: 'Відповіді на картки з інтервалом від 1 дня.' },
-  { key: 'scheduled_good_n', label: 'З них «Згадав»/«Легко»', about: 'Відповіді за розкладом з оцінкою 3 або 4.' },
-  { key: 'scheduled_good_share', label: 'Частка «Згадав»/«Легко» за розкладом', about: 'scheduled_good_n / scheduled_n, 0–1; порожньо, якщо не було.' },
-  { key: 'finished_stack', label: 'Дійшов до кінця стопки', about: 'TRUE — у сесії стопку повторено до кінця.' },
+  {
+    key: 'scheduled_n',
+    label: 'За розкладом (1+ день)',
+    about: 'Відповіді на картки з інтервалом від 1 дня.',
+  },
+  {
+    key: 'scheduled_good_n',
+    label: 'З них «Згадав»/«Легко»',
+    about: 'Відповіді за розкладом з оцінкою 3 або 4.',
+  },
+  {
+    key: 'scheduled_good_share',
+    label: 'Частка «Згадав»/«Легко» за розкладом',
+    about: 'scheduled_good_n / scheduled_n, 0–1; порожньо, якщо не було.',
+  },
+  {
+    key: 'finished_stack',
+    label: 'Дійшов до кінця стопки',
+    about: 'TRUE — у сесії стопку повторено до кінця.',
+  },
   { key: 'goal_reached', label: 'Ціль виконано', about: 'TRUE — у сесії виконано добову ціль.' },
   { key: 'xp', label: 'XP', about: 'Скільки XP отримано за сесію.' },
-  { key: 'settings_changes_n', label: 'Змін налаштувань', about: 'Скільки разів змінено ігровий режим, режим вивчення чи налаштування навчання.' },
+  {
+    key: 'settings_changes_n',
+    label: 'Змін налаштувань',
+    about: 'Скільки разів змінено ігровий режим, режим вивчення чи налаштування навчання.',
+  },
   { key: 'game_mode_start', label: 'Ігровий режим на початку', about: 'max, medium або off.' },
   { key: 'game_mode_end', label: 'Ігровий режим наприкінці', about: 'max, medium або off.' },
   { key: 'study_mode_start', label: 'Режим вивчення на початку', about: 'cards або quiz.' },
   { key: 'study_mode_end', label: 'Режим вивчення наприкінці', about: 'cards або quiz.' },
-  { key: 'return_after_pause', label: 'Повернення після паузи', about: 'TRUE — перед сесією була пауза 2+ дні.' },
+  {
+    key: 'return_after_pause',
+    label: 'Повернення після паузи',
+    about: 'TRUE — перед сесією була пауза 2+ дні.',
+  },
   { key: 'pause_days', label: 'Пауза, днів', about: 'Днів від попередньої сесії.' },
 ];
 
@@ -414,7 +471,7 @@ export function sessionRow(s: SessionSummary): SheetCell[] {
     scheduled_good_share: s.scheduled_n
       ? Math.round((s.scheduled_good_n / s.scheduled_n) * 1000) / 1000
       : '',
-  } as unknown as Record<string, SheetCell>;
+  };
   return SESSION_COLUMNS.map((c) => fields[c.key] ?? '');
 }
 

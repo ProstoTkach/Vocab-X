@@ -23,6 +23,7 @@ import { DialogTrigger } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip } from '@/components/ui/tooltip';
 import { ProgressBar } from '@/components/ui/progress-bar';
+import { track } from '@/lib/analytics';
 import { cx } from '@/lib/cx';
 import { useGamification } from '@/lib/gamification';
 import { usePlayer } from '@/lib/player';
@@ -218,7 +219,7 @@ function FeedbackBadge() {
     <Tooltip content={t('characterHint')} side="top">
       <button
         type="button"
-        onClick={feedback.open}
+        onClick={() => feedback.open('character')}
         aria-label={t('characterHint')}
         className="glass inline-flex size-11 items-center justify-center rounded-full border border-line text-accent shadow-card transition motion-fast hover:-translate-y-0.5 hover:border-accent/60 active:scale-95"
       >
@@ -296,6 +297,37 @@ function SpeechBubble({ text, shown }: { text: string; shown: boolean }) {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+/**
+ * With gamification off, in place of the character: a festive card that turns it back on. It
+ * stays still at rest (no idle motion), only reacting to the pointer.
+ */
+function EnableGamification() {
+  const t = useTranslations('character');
+  const { setMode } = useGamification();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        track('gamification_enable_click');
+        setMode('max', 'home_button');
+      }}
+      className="group flex w-full items-center gap-4 rounded-card border border-accent/25 bg-linear-to-br from-accent/15 to-accent-2/10 p-4 text-start transition-colors motion-fast hover:border-accent/50 hover:shadow-card md:p-5"
+    >
+      <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-brand text-on-accent shadow-glow">
+        <Sparkles aria-hidden className="size-6" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-1">
+        <span className="font-display text-lg leading-tight font-semibold">{t('enableTitle')}</span>
+        <span className="text-sm text-pretty text-fg-muted">{t('enableText')}</span>
+      </span>
+      <ChevronRight
+        aria-hidden
+        className="size-5 shrink-0 text-fg-muted group-hover:text-accent rtl:-scale-x-100"
+      />
+    </button>
   );
 }
 
@@ -387,7 +419,11 @@ export function HomeDashboard() {
     <>
       <ProgressPanel progress={progress} />
       {ready && !enabled ? (
-        <GoalPanel progress={progress} />
+        // Without the character: today's goal and a way to bring the playful side back.
+        <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
+          <GoalPanel progress={progress} />
+          <EnableGamification />
+        </div>
       ) : (
         <section
           aria-labelledby="character-title"
@@ -413,6 +449,7 @@ export function HomeDashboard() {
                   mood={progress.mood}
                   success={success}
                   onTap={() => {
+                    track('character_tap');
                     if (speaking) return;
                     setTurn((n) => n + 1);
                     setSpeaking(true);

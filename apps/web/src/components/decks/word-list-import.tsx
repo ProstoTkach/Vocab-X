@@ -35,6 +35,7 @@ import {
   useWordSuggest,
   withTranslation,
 } from './word-suggestions';
+import { track } from '@/lib/analytics';
 
 const TEXT_MAX = 50_000;
 const NEW_DECK = 'new';
@@ -198,7 +199,14 @@ export function WordListImport({ deckId }: { deckId?: string }) {
   };
 
   const parse = () => {
-    setRows(parseWordList(text, separator).rows.map(keyed));
+    const parsed = parseWordList(text, separator).rows;
+    track('import_parse', {
+      count: parsed.length,
+      valid_n: parsed.filter(isValid).length,
+      source: separator,
+      to: separatorChosen ? 'chosen' : 'detected',
+    });
+    setRows(parsed.map(keyed));
     setCollapsed(true);
     // Move focus to the result, so keyboard and screen-reader users land on it.
     requestAnimationFrame(() => listTop.current?.focus());
@@ -244,6 +252,11 @@ export function WordListImport({ deckId }: { deckId?: string }) {
       })),
       ctx,
     );
+    track('import_save', {
+      count: words.length,
+      skipped_n: skipped,
+      to: target === NEW_DECK ? 'new_deck' : 'existing_deck',
+    });
     toast({ title: t('saved', { count: words.length, name: deck.title }), tone: 'success' });
     router.push(`/decks/${deck.id}`);
   };

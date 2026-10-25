@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { HighlightedText } from '@/components/words/highlighted-text';
+import { track } from '@/lib/analytics';
 import { cx } from '@/lib/cx';
 import type { FormatProps, TypedAnswer } from './types';
 
@@ -154,6 +155,7 @@ export function SpeakButton({
       onPointerDown={(e) => e.stopPropagation()}
       onClick={(e) => {
         e.stopPropagation();
+        track('speak_click', { source: size === 'big' ? 'listen' : 'word' });
         speech.speak(text, speechLang);
       }}
       className={size === 'big' ? 'size-20 rounded-full' : ''}

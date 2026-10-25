@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { cx } from '@/lib/cx';
+import { track } from '@/lib/analytics';
 import { usePlayer } from '@/lib/player';
 import { rewardsByLevel, RewardChips } from './level-rewards';
 
@@ -26,7 +27,7 @@ export function LevelsDialog({ trigger }: { trigger: ReactNode }) {
   const levels = Array.from({ length: last }, (_, i) => i + 1);
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={(open) => open && track('levels_dialog_open', { count: level })}>
       {trigger}
       <DialogContent
         title={t('levelsTitle')}

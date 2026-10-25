@@ -3,11 +3,26 @@
 import { RotateCcw } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { useAnalytics } from '@/components/analytics/analytics-provider';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
+import { track } from '@/lib/analytics';
 import { useRepos } from '@/lib/repos';
 import { ExportBackup } from './export-backup';
 import { ImportBackup } from './import-backup';
+
+/** "Send anonymous statistics": the choice made in the consent window, changeable here. */
+function AnalyticsSwitch() {
+  const t = useTranslations('analytics');
+  const { consent, setConsent } = useAnalytics();
+  return (
+    <div className="border-b border-line/70 pb-4">
+      <Switch label={t('setting')} checked={consent === 'granted'} onCheckedChange={setConsent} />
+      <p className="text-sm text-fg-muted">{t('settingHint')}</p>
+    </div>
+  );
+}
 
 /** Backup, restore and reset of everything stored in this browser. */
 export function DataSettings() {
@@ -23,6 +38,7 @@ export function DataSettings() {
   }, [repos]);
 
   const resetData = async () => {
+    track('data_reset');
     await repos.reset();
     // Full navigation: clears in-memory state and re-runs the onboarding redirect.
     window.location.assign(`/${locale}/onboarding`);
@@ -30,6 +46,7 @@ export function DataSettings() {
 
   return (
     <div className="flex flex-col gap-4">
+      <AnalyticsSwitch />
       {usageKb !== null && <p className="text-sm text-fg-muted">{t('usage', { kb: usageKb })}</p>}
       <div className="flex flex-wrap gap-2">
         <ExportBackup />

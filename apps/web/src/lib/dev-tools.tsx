@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { isInternal, sinceFirstVisit, track } from './analytics';
 import { useRepos } from './repos';
 
 interface DevTools {
@@ -8,7 +9,8 @@ interface DevTools {
   setEnabled: (on: boolean) => void;
   /** Reviews use the four-choice test instead of flash cards. */
   quiz: boolean;
-  setQuiz: (on: boolean) => void;
+  /** `source`: where it was switched (settings, the developer panel), for the statistics. */
+  setQuiz: (on: boolean, source: string) => void;
 }
 
 const DevToolsContext = createContext<DevTools | null>(null);
@@ -37,7 +39,17 @@ export function DevToolsProvider({ children }: { children: ReactNode }) {
         void repos.settings.update({ devTools: on });
       },
       quiz,
-      setQuiz: (on) => {
+      setQuiz: (on, source) => {
+        if (on !== quiz) {
+          const since = sinceFirstVisit();
+          track('study_mode_change', {
+            from: quiz ? 'quiz' : 'cards',
+            to: on ? 'quiz' : 'cards',
+            source,
+            days_since_first: since.days,
+            sessions_since_first: since.sessions,
+          });
+        }
         setQuizState(on);
         void repos.settings.update({ quizMode: on });
       },
@@ -47,6 +59,8 @@ export function DevToolsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // The developer panel is for developers and testers only.
+      if (!isInternal()) return;
       if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
         e.preventDefault();
         value.setEnabled(!value.enabled);

@@ -7,6 +7,7 @@ import { useRef, useState } from 'react';
 import { Button, type ButtonVariant } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
+import { track } from '@/lib/analytics';
 import { useRepos } from '@/lib/repos';
 
 /** "Import JSON" button with file picker and confirmation; used in settings and onboarding. */
@@ -29,9 +30,16 @@ export function ImportBackup({
     if (!pending) return;
     try {
       await repos.importAll(pending.text);
+      track('data_import', { ok: true });
       toast({ title: t('importDone'), tone: 'success' });
       (onImported ?? (() => window.location.reload()))();
     } catch (e) {
+      track('data_import', {
+        ok: false,
+        to:
+          e instanceof StorageQuotaError ? 'quota' : e instanceof ImportError ? e.code : 'invalid',
+      });
+      if (e instanceof StorageQuotaError) track('storage_error', { source: 'import' });
       const description =
         e instanceof StorageQuotaError
           ? t('quotaText')

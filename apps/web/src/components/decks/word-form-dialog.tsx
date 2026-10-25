@@ -1,8 +1,14 @@
 'use client';
 
-import { splitTranslations, type LangCode, type Word, type WordInput } from '@vocabx/core';
+import {
+  splitTranslations,
+  type LangCode,
+  type Word,
+  type WordInput,
+  systemClock,
+} from '@vocabx/core';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { TextAreaField, TextField } from '@/components/ui/field';
@@ -16,6 +22,7 @@ import {
   useWordSuggest,
   withTranslation,
 } from './word-suggestions';
+import { track } from '@/lib/analytics';
 
 interface Draft {
   term: string;
@@ -41,6 +48,8 @@ export interface WordFormDialogProps {
   /** Shown under the title, e.g. which deck the word goes to. */
   hint?: string;
   onSubmit: (input: WordInput) => Promise<void>;
+  /** Where the window was opened (home, words, deck), for the statistics. */
+  source?: string;
 }
 
 /**
@@ -56,6 +65,7 @@ export function WordFormDialog({
   nativeLang,
   hint,
   onSubmit,
+  source = 'other',
 }: WordFormDialogProps) {
   const t = useTranslations('decks.form');
   const deckT = useTranslations('decks');
@@ -66,8 +76,15 @@ export function WordFormDialog({
   const { lookup, found, suggest, hide } = useWordSuggest(lexicon, wordLang, nativeLang);
   const [error, setError] = useState<string | null>(null);
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
+  /** When the window opened and whether a suggestion was taken (real time, for statistics). */
+  const opened = useRef({ at: 0, suggested: false, saved: false });
+  useEffect(() => {
+    opened.current = { at: systemClock.now(), suggested: false, saved: false };
+    if (!word) track('word_add_open', { source });
+  }, [word, source]);
 
   const addTranslation = (s: string) => {
+    opened.current.suggested = true;
     set({ translations: withTranslation(draft.translations, s) });
     setError(null);
   };
@@ -84,11 +101,27 @@ export function WordFormDialog({
       examples: draft.example.trim() ? [{ text: draft.example.trim() }] : [],
       ...(word?.variants ? { variants: word.variants } : {}),
     });
+    opened.current.saved = true;
+    track(word ? 'word_edit' : 'word_saved', {
+      source,
+      used_suggestion: opened.current.suggested,
+      has_example: !!draft.example.trim(),
+      count: translations.length,
+      duration_s: Math.round((systemClock.now() - opened.current.at) / 1000),
+    });
     onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        // Closed without saving a new word: the learner gave up on it.
+        if (!next && !word && !opened.current.saved)
+          track('word_add_cancel', { source, had_text: !!draft.term.trim() });
+        onOpenChange(next);
+      }}
+    >
       <DialogContent
         title={word ? deckT('editWord') : deckT('addWord')}
         {...(hint ? { description: hint } : {})}

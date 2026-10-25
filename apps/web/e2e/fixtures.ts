@@ -1,10 +1,34 @@
 import { expect, type Page } from '@playwright/test';
 
 /**
+ * Analytics for tests: the A/B variant is pinned (by default flash cards with gamification, the
+ * app's usual look) and the consent window answered, so it never covers what a test clicks.
+ * Only writes keys that are missing: a test may set its own before calling this.
+ */
+export async function pinAnalytics(
+  page: Page,
+  o: { variant?: string; consent?: 'granted' | 'denied' | null } = {},
+) {
+  await page.addInitScript(
+    ({ variant, consent }) => {
+      if (!localStorage.getItem('vocabx:analytics:variant'))
+        localStorage.setItem(
+          'vocabx:analytics:variant',
+          JSON.stringify({ v: variant, by: 'link' }),
+        );
+      if (consent && !localStorage.getItem('vocabx:analytics:consent'))
+        localStorage.setItem('vocabx:analytics:consent', consent);
+    },
+    { variant: o.variant ?? 'g1c', consent: o.consent === undefined ? 'denied' : o.consent },
+  );
+}
+
+/**
  * Seeds a learner who has finished onboarding (no decks), so shell tests start in the app.
  * Only writes when the key is missing, so state changed during a test survives reloads.
  */
 export async function seedOnboarded(page: Page, uiLocale = 'uk') {
+  await pinAnalytics(page);
   await page.addInitScript((locale) => {
     const key = 'vocabx:v1:profile';
     if (localStorage.getItem(key)) return;
@@ -36,6 +60,7 @@ export async function seedOnboarded(page: Page, uiLocale = 'uk') {
  * two B1 words, so the English B1 deck (30 words) is added.
  */
 export async function onboard(page: Page, pace: 'Легкий' | 'Звичайний' | 'Інтенсивний' = 'Легкий') {
+  await pinAnalytics(page);
   await page.goto('/uk/onboarding');
   // A click that lands before hydration is lost; retry until the next step shows.
   await expect(async () => {

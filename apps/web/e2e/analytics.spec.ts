@@ -1,0 +1,140 @@
+import { expect, test, type Page } from '@playwright/test';
+
+// A clean browser: no pinned variant, no answer to the consent window yet.
+test.use({ storageState: { cookies: [], origins: [] } });
+
+const consent = (page: Page) =>
+  page.getByRole('dialog', { name: 'Допоможіть нам зробити VocabX кращим' });
+
+/** Requests to /api/track, answered locally (the spreadsheet is never touched by tests). */
+async function trackRequests(page: Page) {
+  const bodies: { events: { type: string; variant: string; internal: boolean }[] }[] = [];
+  await page.route('**/api/track', async (route) => {
+    const body = route.request().postData();
+    if (body) bodies.push(JSON.parse(body) as (typeof bodies)[number]);
+    await route.fulfill({ status: 204 });
+  });
+  return bodies;
+}
+
+/** Through the first onboarding step (the interface language): the consent window opens. */
+async function firstStep(page: Page, url: string) {
+  await page.goto(url);
+  // Not before the interface language is chosen.
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(consent(page)).toHaveCount(0);
+  // A click that lands before hydration is lost; retry until the window shows.
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Далі' }).click();
+    await expect(consent(page)).toBeVisible({ timeout: 1000 });
+  }).toPass();
+}
+
+test('"Don\'t send": nothing goes out, and the window does not come back', async ({ page }) => {
+  const bodies = await trackRequests(page);
+  await firstStep(page, '/uk/onboarding');
+  await expect(consent(page)).toBeVisible();
+  await consent(page).getByRole('button', { name: 'Не надсилати' }).click();
+  await expect(consent(page)).toHaveCount(0);
+  // Leaving the page would send what was collected; nothing is.
+  await page.goto('/uk/onboarding');
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.waitForTimeout(500);
+  await expect(consent(page)).toHaveCount(0);
+  expect(bodies).toEqual([]);
+});
+
+test('agreeing sends the events; on localhost a warning says they are internal', async ({
+  page,
+}) => {
+  const bodies = await trackRequests(page);
+  const alerts: string[] = [];
+  page.on('dialog', (d) => {
+    alerts.push(d.message());
+    void d.accept();
+  });
+  await firstStep(page, '/uk/onboarding?v=g0q');
+  await consent(page).getByRole('button', { name: 'Добре, погоджуюся' }).click();
+  await expect.poll(() => alerts.length).toBe(1);
+  expect(alerts[0]).toContain('localhost');
+  await expect.poll(() => bodies.length).toBeGreaterThan(0);
+  const events = bodies.flatMap((b) => b.events);
+  const types = events.map((e) => e.type);
+  expect(types).toEqual(
+    expect.arrayContaining(['first_visit', 'session_start', 'consent_accepted']),
+  );
+  expect(types).toContain('onboarding_step_done');
+  // The variant from the link, and every event from this machine marked as internal.
+  expect(new Set(events.map((e) => e.variant))).toEqual(new Set(['g0q']));
+  expect(events.every((e) => e.internal)).toBe(true);
+});
+
+test('?debug=1 prints the events and sends nothing', async ({ page }) => {
+  const bodies = await trackRequests(page);
+  const logged: string[] = [];
+  page.on('console', (m) => {
+    if (m.text().startsWith('[analytics]')) logged.push(m.text());
+  });
+  page.on('dialog', (d) => void d.accept());
+  await firstStep(page, '/uk/onboarding?debug=1');
+  await consent(page).getByRole('button', { name: 'Добре, погоджуюся' }).click();
+  await page.goto('/uk/onboarding');
+  await expect.poll(() => logged.length).toBeGreaterThan(2);
+  expect(bodies).toEqual([]);
+});
+
+test('the variant from the link sets the start: no gamification, the four-choice test', async ({
+  page,
+}) => {
+  await firstStep(page, '/uk/onboarding?v=g0q');
+  await consent(page).getByRole('button', { name: 'Не надсилати' }).click();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.getByRole('button', { name: 'Пропустити' }).click();
+  await page.waitForURL(/\/uk$/);
+  // Instead of the character: a button that turns gamification on.
+  const enable = page.getByRole('button', { name: /Увімкнути гейміфікацію/ });
+  await expect(enable).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Погладити персонажа' })).toHaveCount(0);
+  await page.goto('/uk/settings');
+  await expect(page.getByRole('radio', { name: 'Тест із 4 варіантів' })).toBeChecked();
+  await expect(page.getByRole('radio', { name: /^Вимкнено Лише навчання/ })).toBeChecked();
+  // Another link later does not change the variant.
+  await page.goto('/uk/settings?v=g1c');
+  await expect(page.getByRole('radio', { name: 'Тест із 4 варіантів' })).toBeChecked();
+  // The button on Home turns gamification back on.
+  await page.goto('/uk');
+  await page.getByRole('button', { name: /Увімкнути гейміфікацію/ }).click();
+  await expect(page.getByRole('button', { name: 'Погладити персонажа' })).toBeVisible();
+});
+
+test('the statistics can be switched in Settings → Data', async ({ page }) => {
+  const bodies = await trackRequests(page);
+  await page.addInitScript(() => {
+    localStorage.setItem('vocabx:analytics:consent', 'denied');
+    localStorage.setItem(
+      'vocabx:v1:profile',
+      JSON.stringify({
+        id: 'e2e',
+        displayName: '',
+        uiLocale: 'uk',
+        nativeLang: 'uk',
+        targetLangs: ['en'],
+        activeTargetLang: 'en',
+        onboardedAt: 1,
+        createdAt: 1,
+      }),
+    );
+    localStorage.setItem('vocabx:v1:meta', JSON.stringify({ schemaVersion: 1 }));
+  });
+  page.on('dialog', (d) => void d.accept());
+  await page.goto('/uk/settings');
+  const toggle = page.getByRole('switch', { name: 'Надсилати анонімну статистику' });
+  await expect(toggle).not.toBeChecked();
+  expect(bodies).toEqual([]);
+  await toggle.click();
+  await expect(toggle).toBeChecked();
+  await expect
+    .poll(() => bodies.flatMap((b) => b.events).map((e) => e.type))
+    .toContain('consent_accepted');
+});

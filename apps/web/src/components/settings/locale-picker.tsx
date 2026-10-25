@@ -7,6 +7,7 @@ import { useTransition } from 'react';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { LOCALES, type Locale } from '@/i18n/locales';
 import { cx } from '@/lib/cx';
+import { track } from '@/lib/analytics';
 
 export function LocalePicker() {
   const t = useTranslations('settings');
@@ -18,9 +19,10 @@ export function LocalePicker() {
   return (
     <RadioGroup.Root
       value={locale}
-      onValueChange={(next) =>
-        startTransition(() => router.replace(pathname, { locale: next as Locale }))
-      }
+      onValueChange={(next) => {
+        track('ui_lang_change', { from: locale, to: next, source: 'settings' });
+        startTransition(() => router.replace(pathname, { locale: next as Locale }));
+      }}
       aria-label={t('language')}
       aria-busy={pending}
       className="grid gap-2 @md:grid-cols-2"

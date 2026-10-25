@@ -11,6 +11,10 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
+    // Every test starts with the A/B variant pinned (flash cards with gamification) and the
+    // statistics declined, so the consent window never covers what a test clicks. The analytics
+    // tests clear it (test.use({ storageState: EMPTY })).
+    storageState: 'e2e/storage-state.json',
   },
   projects: [
     {

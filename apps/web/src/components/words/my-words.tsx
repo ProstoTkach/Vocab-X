@@ -30,6 +30,7 @@ import { browserStorage, useRepos } from '@/lib/repos';
 import { ShowMore, useIncremental } from './show-more';
 import { useWordData } from './use-word-data';
 import { WordRow } from './word-row';
+import { track } from '@/lib/analytics';
 
 type WordSort = 'soonest' | 'latest';
 
@@ -63,6 +64,7 @@ export function MyWords() {
   const backupHidden = hiddenNow || storedHidden;
 
   const hideBackup = () => {
+    track('backup_reminder', { to: 'hidden' });
     setHiddenNow(true);
     try {
       browserStorage().setItem(BACKUP_HIDDEN_KEY, '1');
@@ -106,6 +108,7 @@ export function MyWords() {
   };
 
   const reset = async (word: Word) => {
+    track('word_reset', { source: 'words' });
     await resetWordProgress(repos, word.id);
     toast({ title: decksT('wordReset', { word: word.term }), tone: 'success' });
     setVersion((v) => v + 1);
@@ -113,6 +116,7 @@ export function MyWords() {
 
   // "I've learned it": off to the learned words, out of the reviews (and of this list).
   const learn = async (word: Word) => {
+    track('word_learned', { source: 'words' });
     const deck = await markWordLearned(repos, word, t('learnedDeck'), {
       now: clock.now(),
       newId,
@@ -122,6 +126,7 @@ export function MyWords() {
   };
 
   const remove = async (word: Word) => {
+    track('word_delete', { source: 'words' });
     await removeWordEverywhere(repos, word, clock.now());
     setRemoving(null);
     toast({ title: t('deleted', { word: word.term }), tone: 'success' });
@@ -143,6 +148,12 @@ export function MyWords() {
       (w.translations[native] ?? []).some((x) => x.toLocaleLowerCase().includes(q)),
   );
   const sorted = matching;
+  const found = matching.length;
+  useEffect(() => {
+    if (!q) return;
+    const id = window.setTimeout(() => track('words_search', { count: found }), 1500);
+    return () => window.clearTimeout(id);
+  }, [q, found]);
   // Long lists are drawn ten words at a time, more as the end comes into view.
   const page = useIncremental(sorted.length, `${q}|${sort}|${version}`);
   const visible = sorted.slice(0, page.visible);
@@ -165,7 +176,7 @@ export function MyWords() {
             <p className="text-sm text-fg-muted text-pretty">{t('backupText')}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
-            <ExportBackup size="sm" />
+            <ExportBackup size="sm" source="reminder" />
             <Button variant="ghost" size="sm" onClick={hideBackup}>
               <X aria-hidden className="size-4" />
               {t('backupHide')}
@@ -210,7 +221,10 @@ export function MyWords() {
           <select
             aria-label={t('sortLabel')}
             value={sort}
-            onChange={(e) => setSort(e.target.value as WordSort)}
+            onChange={(e) => {
+              track('words_sort', { from: sort, to: e.target.value });
+              setSort(e.target.value as WordSort);
+            }}
             className={cx(inputClass, 'pe-8 sm:flex-1')}
           >
             <option value="soonest">{t('sortSoonest')}</option>
@@ -288,6 +302,7 @@ export function MyWords() {
           open
           onOpenChange={(o) => !o && setEditing(null)}
           word={editing}
+          source="words"
           wordLang={editing.lang}
           nativeLang={state.profile.nativeLang}
           onSubmit={save}
@@ -301,6 +316,7 @@ export function MyWords() {
           wordLang={state.profile.activeTargetLang}
           nativeLang={state.profile.nativeLang}
           hint={t('addHint', { deck: t('personalDeck') })}
+          source="words"
           onSubmit={add}
         />
       )}

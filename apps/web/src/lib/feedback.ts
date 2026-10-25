@@ -1,7 +1,8 @@
 /**
  * Feedback from learners: what the forms collect, how it is checked on the server and how it
- * reads in the developer's Telegram chat. Anonymous by design: no name, e-mail, IP or device
- * id is ever part of it — only the answers, the interface language and the player level.
+ * reads in the developer's spreadsheet or Telegram chat. No name, e-mail or IP is ever part of
+ * it — only the answers, the interface language, the player level, the A/B variant and the
+ * random analytics id of the browser (to put the answers next to the usage statistics).
  */
 
 export type FeedbackKind = 'survey' | 'bug' | 'review' | 'idea';
@@ -47,6 +48,9 @@ export const DEVICES = ['phone', 'desktop', 'both'] as const;
 export const FREQUENCIES = ['daily', 'weekly', 'rarely', 'first'] as const;
 export type Device = (typeof DEVICES)[number];
 export type Frequency = (typeof FREQUENCIES)[number];
+/** "How would you feel if you could no longer use VocabX?" (the product-market fit question). */
+export const DISAPPOINTMENTS = ['very', 'somewhat', 'not', 'stopped'] as const;
+export type Disappointment = (typeof DISAPPOINTMENTS)[number];
 
 export const RATING_MAX = 5;
 /** "What exactly did you not like" under a rating below 5. */
@@ -69,6 +73,7 @@ export type Feedback =
       improve: ImproveOption[];
       device?: Device;
       frequency?: Frequency;
+      disappointment?: Disappointment;
       comment?: string;
       bug?: { platform: Platform; text: string };
     }
@@ -82,6 +87,9 @@ export interface FeedbackPayload {
   locale: string;
   /** Player level, for context; null while unknown. */
   level: number | null;
+  /** The A/B variant of this browser and its random analytics id ('' when unknown). */
+  variant: string;
+  anonId: string;
 }
 
 const PLATFORMS: readonly Platform[] = ['phone', 'desktop'];
@@ -128,6 +136,7 @@ function parseSurvey(f: Obj): Feedback | null {
   if (!likes || !improve) return null;
   if (f.device !== undefined && !oneOf(DEVICES)(f.device)) return null;
   if (f.frequency !== undefined && !oneOf(FREQUENCIES)(f.frequency)) return null;
+  if (f.disappointment !== undefined && !oneOf(DISAPPOINTMENTS)(f.disappointment)) return null;
   const comment = text(f.comment, TEXT_MAX);
   if (comment === null) return null;
   let bug: { platform: Platform; text: string } | undefined;
@@ -144,6 +153,7 @@ function parseSurvey(f: Obj): Feedback | null {
     improve,
     ...(f.device ? { device: f.device } : {}),
     ...(f.frequency ? { frequency: f.frequency } : {}),
+    ...(f.disappointment ? { disappointment: f.disappointment } : {}),
     ...(comment ? { comment } : {}),
     ...(bug ? { bug } : {}),
   };
@@ -182,7 +192,11 @@ export function parsePayload(body: unknown): FeedbackPayload | null {
     typeof body.level === 'number' && Number.isInteger(body.level) && body.level > 0
       ? body.level
       : null;
-  return { feedback, locale, level };
+  const variant =
+    typeof body.variant === 'string' && /^g[01][cq]$/.test(body.variant) ? body.variant : '';
+  const anonId =
+    typeof body.anonId === 'string' && /^[A-Za-z0-9-]{8,64}$/.test(body.anonId) ? body.anonId : '';
+  return { feedback, locale, level, variant, anonId };
 }
 
 export type SendResult = 'ok' | 'rate-limited' | 'failed';
@@ -263,6 +277,12 @@ const FREQUENCY_LABELS: Record<Frequency, string> = {
   first: 'вперше',
 };
 const PLATFORM_LABELS: Record<Platform, string> = { phone: '📱 телефон', desktop: '🖥 компʼютер' };
+const DISAPPOINTMENT_LABELS: Record<Disappointment, string> = {
+  very: 'дуже засмутився б',
+  somewhat: 'трохи засмутився б',
+  not: 'не засмутився б',
+  stopped: 'вже не користується',
+};
 
 const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(RATING_MAX - n);
 const quote = (s: string) => `<blockquote>${escapeHtml(s)}</blockquote>`;
@@ -280,7 +300,7 @@ export const visibleLength = (html: string) =>
  * The feedback as Telegram HTML (parse_mode=HTML), in one or more messages. It is built from
  * blocks that are valid HTML on their own, so a long survey is split between blocks only.
  */
-export function formatFeedback({ feedback: f, locale, level }: FeedbackPayload): string[] {
+export function formatFeedback({ feedback: f, locale, level, variant }: FeedbackPayload): string[] {
   const blocks = [`<b>${TITLES[f.kind]}</b> · VocabX`];
   switch (f.kind) {
     case 'survey': {
@@ -304,6 +324,7 @@ export function formatFeedback({ feedback: f, locale, level }: FeedbackPayload):
         extra.push(`🛠 Покращити: ${f.improve.map((x) => IMPROVE_LABELS[x]).join(', ')}`);
       if (f.device) extra.push(`Пристрій: ${DEVICE_LABELS[f.device]}`);
       if (f.frequency) extra.push(`Займається: ${FREQUENCY_LABELS[f.frequency]}`);
+      if (f.disappointment) extra.push(`Без VocabX: ${DISAPPOINTMENT_LABELS[f.disappointment]}`);
       if (extra.length) blocks.push('\n' + extra.join('\n'));
       if (f.comment) blocks.push(`\n<b>Коментар:</b>\n${quote(f.comment)}`);
       if (f.bug)
@@ -318,7 +339,9 @@ export function formatFeedback({ feedback: f, locale, level }: FeedbackPayload):
       blocks.push(quote(f.text));
       break;
   }
-  blocks.push(`\n<i>мова: ${escapeHtml(locale)} · рівень: ${level ?? '—'}</i>`);
+  blocks.push(
+    `\n<i>мова: ${escapeHtml(locale)} · рівень: ${level ?? '—'} · варіант: ${variant || '—'}</i>`,
+  );
 
   const messages: string[] = [];
   let current = '';
@@ -346,42 +369,54 @@ export const QUIZ_INVITE_TIP = 'feedback-invite-quiz';
 /** Labels without the leading emoji, for plain spreadsheet cells. */
 const plain = (label: string) => label.replace(/^[^\p{L}\p{N}]+/u, '');
 
-export const FEEDBACK_COLUMNS: readonly string[] = [
-  'Дата (Київ)',
-  'Тип',
-  'Мова інтерфейсу',
-  'Рівень гравця',
-  ...SURVEY_QUESTIONS.flatMap((q) => [QUESTION_LABELS[q], `${QUESTION_LABELS[q]}: що не так`]),
-  ...(Object.keys(SURVEY_SECTIONS) as SurveySection[]).map(
-    (s) => `${plain(SECTION_LABELS[s])}: середня`,
-  ),
-  'Середня за все',
-  'Подобається',
-  'Покращити',
-  'Пристрій',
-  'Як часто займається',
-  'Коментар',
-  'Баг: пристрій',
-  'Баг: опис',
-  'Відгук або ідея',
+/** A cell: text, number, TRUE/FALSE, or a date-time (Unix ms, shown in Kyiv time). */
+export type SheetCell = string | number | boolean | { date: number };
+
+/** Columns of the feedback sheets: a Ukrainian name and the technical one, in this order. */
+export const FEEDBACK_FIELDS: readonly { key: string; label: string }[] = [
+  { key: 'date', label: 'Дата (Київ)' },
+  { key: 'kind', label: 'Тип' },
+  { key: 'ui_lang', label: 'Мова інтерфейсу' },
+  { key: 'level', label: 'Рівень гравця' },
+  ...SURVEY_QUESTIONS.flatMap((q) => [
+    { key: q, label: QUESTION_LABELS[q] },
+    { key: `${q}_note`, label: `${QUESTION_LABELS[q]}: що не так` },
+  ]),
+  ...(Object.keys(SURVEY_SECTIONS) as SurveySection[]).map((sec) => ({
+    key: `${sec}_avg`,
+    label: `${plain(SECTION_LABELS[sec])}: середня`,
+  })),
+  { key: 'all_avg', label: 'Середня за все' },
+  { key: 'likes', label: 'Подобається' },
+  { key: 'improve', label: 'Покращити' },
+  { key: 'device', label: 'Пристрій' },
+  { key: 'frequency', label: 'Як часто займається' },
+  { key: 'comment', label: 'Коментар' },
+  { key: 'bug_platform', label: 'Баг: пристрій' },
+  { key: 'bug_text', label: 'Баг: опис' },
+  { key: 'text', label: 'Відгук або ідея' },
+  // Added later: only ever at the end.
+  { key: 'disappointment', label: 'Якби не міг більше користуватися' },
+  { key: 'variant', label: 'Варіант' },
+  { key: 'anon_id', label: 'Анонімний ID' },
 ];
 
-export type SheetCell = string | number;
+/** Header row: "Назва (key)". */
+export const FEEDBACK_COLUMNS: readonly string[] = FEEDBACK_FIELDS.map(
+  (f) => `${f.label} (${f.key})`,
+);
+/** The date-time column, for its cell format. */
+export const FEEDBACK_DATE_COLUMNS: readonly number[] = [0];
 
 /** The feedback as one spreadsheet row, matching FEEDBACK_COLUMNS (empty cells as ''). */
 export function feedbackRow(
-  { feedback: f, locale, level }: FeedbackPayload,
+  { feedback: f, locale, level, variant, anonId }: FeedbackPayload,
   at: Date,
 ): SheetCell[] {
-  const date = new Intl.DateTimeFormat('uk-UA', {
-    timeZone: 'Europe/Kyiv',
-    dateStyle: 'short',
-    timeStyle: 'short',
-  }).format(at);
   const survey = f.kind === 'survey' ? f : null;
   const bug = f.kind === 'bug' ? f : (survey?.bug ?? null);
   return [
-    date,
+    { date: at.getTime() },
     plain(TITLES[f.kind]),
     locale,
     level ?? '',
@@ -400,5 +435,8 @@ export function feedbackRow(
     bug ? plain(PLATFORM_LABELS[bug.platform]) : '',
     bug?.text ?? '',
     f.kind === 'review' || f.kind === 'idea' ? f.text : '',
+    survey?.disappointment ? DISAPPOINTMENT_LABELS[survey.disappointment] : '',
+    variant,
+    anonId,
   ];
 }

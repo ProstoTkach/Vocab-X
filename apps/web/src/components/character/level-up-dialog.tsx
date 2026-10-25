@@ -12,6 +12,7 @@ import { useGamification } from '@/lib/gamification';
 import { usePlayer } from '@/lib/player';
 import { useRepos } from '@/lib/repos';
 import { rewardsByLevel, RewardChips, type LevelReward } from './level-rewards';
+import { track } from '@/lib/analytics';
 
 /**
  * Congratulates on a new player level, once: what the new level(s) opened and how much XP the
@@ -36,6 +37,9 @@ export function LevelUpDialog() {
   }, [repos]);
 
   const open = ready && gameReady && enabled && seen !== null && level > seen;
+  useEffect(() => {
+    if (open) track('level_up', { count: level });
+  }, [open, level]);
   const close = () => {
     setSeen(level);
     // A feedback invitation may be waiting for this window to close.

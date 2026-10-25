@@ -12,12 +12,13 @@ import {
   type Sprite,
   type WearSlot,
 } from '@/character/config';
-import { isOpen, isWorn, itemsIn, wear, type Look } from '@/character/look';
+import { isOpen, isWorn, itemsIn, toEquipped, wear, type Look } from '@/character/look';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { Tooltip } from '@/components/ui/tooltip';
 import { cx } from '@/lib/cx';
 import { IMAGE_QUALITY } from '@/lib/images';
+import { track } from '@/lib/analytics';
 import { useGamification } from '@/lib/gamification';
 import { parseUnlock } from '@/themes/unlock';
 import type { Unlock } from '@/themes/types';
@@ -149,13 +150,25 @@ export function WardrobeDialog({ trigger }: { trigger: ReactNode }) {
     return t('lockedPurchase');
   };
   const change = (next: Look) => {
+    // Which slot changed, by the ids of what is worn before and after.
+    const before = toEquipped(look);
+    const after = toEquipped(next);
+    const slot = [...new Set([...Object.keys(before), ...Object.keys(after)])].find(
+      (k) => before[k] !== after[k],
+    );
+    if (slot) track('wardrobe_change', { source: slot, to: after[slot] ?? null });
     setLook(next);
     setChanged(true);
   };
 
   return (
     // Closing the wardrobe means the new things were seen: the button calms down.
-    <Dialog onOpenChange={(open) => !open && markSeen()}>
+    <Dialog
+      onOpenChange={(open) => {
+        if (open) track('wardrobe_open', { count: fresh.size });
+        else markSeen();
+      }}
+    >
       {trigger}
       <DialogContent
         title={t('wardrobe')}

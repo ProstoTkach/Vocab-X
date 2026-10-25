@@ -1,4 +1,5 @@
 // Message keys are type-checked against the default (Ukrainian) locale.
+import type analytics from '../../messages/uk/analytics.json';
 import type aside from '../../messages/uk/aside.json';
 import type character from '../../messages/uk/character.json';
 import type common from '../../messages/uk/common.json';
@@ -23,6 +24,7 @@ declare module 'next-intl' {
   interface AppConfig {
     Locale: Locale;
     Messages: {
+      analytics: typeof analytics;
       aside: typeof aside;
       character: typeof character;
       common: typeof common;

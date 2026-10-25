@@ -52,7 +52,6 @@ export default async function SettingsPage() {
           <CardTitle id="settings-data">{data('title')}</CardTitle>
           <CardText className="mt-1 mb-4">{data('hint')}</CardText>
           <DataSettings />
-          <hr className="my-4 border-line" />
           <DevToggle />
         </Card>
       </div>

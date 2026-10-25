@@ -109,6 +109,7 @@ export function DeckRow() {
           wordLang={profile.activeTargetLang}
           nativeLang={profile.nativeLang}
           hint={words('addHint', { deck: words('personalDeck') })}
+          source="home"
           onSubmit={add}
         />
       )}

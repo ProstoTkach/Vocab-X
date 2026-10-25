@@ -9,6 +9,7 @@ import { SelectField, TextField } from '@/components/ui/field';
 import { useClock } from '@/lib/clock';
 import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
+import { track } from '@/lib/analytics';
 
 export function CreateDeckDialog({
   open,
@@ -34,6 +35,7 @@ export function CreateDeckDialog({
   const submit = async () => {
     if (!title.trim()) return;
     const deck = await createDeck(repos, { title, lang }, { now: clock.now(), newId });
+    track('deck_create', { source: 'decks' });
     setTitle('');
     onOpenChange(false);
     onCreated(deck);
