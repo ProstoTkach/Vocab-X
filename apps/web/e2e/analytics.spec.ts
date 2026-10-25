@@ -147,3 +147,42 @@ test('the statistics can be switched in Settings → Data', async ({ page }) => 
     .poll(() => bodies.flatMap((b) => b.events).map((e) => e.type))
     .toContain('consent_accepted');
 });
+
+test('leaving the page sends the last events and the session summary', async ({ page }) => {
+  // A beacon of a page that is going away is not seen by the test runner: its body is copied
+  // into storage instead, and read when the site is opened again.
+  await page.addInitScript(() => {
+    const Original = window.Blob;
+    window.Blob = class extends Original {
+      constructor(parts?: BlobPart[], options?: BlobPropertyBag) {
+        super(parts, options);
+        if (options?.type === 'application/json' && typeof parts?.[0] === 'string')
+          localStorage.setItem(`test:beacon:${performance.now()}`, parts[0]);
+      }
+    };
+  });
+  await page.route('**/api/track', (route) => route.fulfill({ status: 204 }));
+  page.on('dialog', (d) => void d.accept());
+  await firstStep(page, '/uk/onboarding');
+  await consent(page).getByRole('button', { name: 'Добре, погоджуюся' }).click();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Мови' })).toBeVisible();
+  // Leaving the site fires pagehide just as closing the tab does.
+  await page.goto('about:blank');
+  await page.goto('/uk/onboarding');
+  const beacons = await page.evaluate(() =>
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith('test:beacon:'))
+      .map(
+        (k) =>
+          JSON.parse(localStorage.getItem(k)!) as {
+            events: { type: string }[];
+            sessions: { end_reason: string }[];
+          },
+      ),
+  );
+  expect(beacons.flatMap((b) => b.sessions).map((s) => s.end_reason)).toContain('pagehide');
+  const types = beacons.flatMap((b) => b.events).map((e) => e.type);
+  expect(types).toContain('session_end');
+  expect(types).toContain('onboarding_step_done');
+});

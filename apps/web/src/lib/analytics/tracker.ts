@@ -22,6 +22,13 @@ export const BUFFER_MAX = 300;
 const RETRIES_MAX = 3;
 /** Requests are kept under the server's body limit. */
 const BATCH_MAX = 150;
+/** Collected events go out once this many wait (small batches fit into a beacon). */
+const FLUSH_AT = 40;
+/**
+ * A page going away sends one beacon; browsers drop a beacon over about 64 KB entirely, so it
+ * carries what fits and the rest waits in storage for the next visit.
+ */
+export const BEACON_MAX_BYTES = 60_000;
 /** A return after a pause of at least this many days is counted as such. */
 const PAUSE_DAYS = 2;
 
@@ -49,6 +56,8 @@ interface SessionState extends Omit<SessionSummary, 'ended_at' | 'end_reason'> {
   last_activity: number;
 }
 
+const byteLength = (s: string) => new TextEncoder().encode(s).length;
+
 const readJson = <T>(storage: KeyValue, key: string): T | null => {
   try {
     return JSON.parse(storage.getItem(key) ?? 'null') as T | null;
@@ -62,6 +71,8 @@ export class Tracker {
   private sessions: SessionSummary[] = [];
   private failures = 0;
   private sending = false;
+  /** The page is going away: everything waits for the one beacon, no requests of its own. */
+  private leaving = false;
   private session: SessionState | null = null;
   private context: TrackContext = {
     ui_lang: 'uk',
@@ -114,6 +125,16 @@ export class Tracker {
    * "pagehide", killed browser) is summed up now, then a new one begins.
    */
   start() {
+    // Events that did not fit into the last beacon (or whose sending failed as the page closed).
+    const outbox = readJson<{ events?: AnalyticsEvent[]; sessions?: SessionSummary[] }>(
+      this.deps.storage,
+      KEYS.outbox,
+    );
+    this.safe(() => this.deps.storage.removeItem(KEYS.outbox));
+    if (outbox && this.consent !== 'denied') {
+      this.buffer.push(...(outbox.events ?? []).slice(-BUFFER_MAX));
+      this.sessions.push(...(outbox.sessions ?? []));
+    }
     const stored = readJson<SessionState>(this.deps.storage, KEYS.session);
     if (stored?.session_id) this.queueSummary(stored, 'recovered', stored.last_activity);
     this.safe(() => this.deps.storage.removeItem(KEYS.session));
@@ -122,6 +143,7 @@ export class Tracker {
   }
 
   private beginSession() {
+    this.leaving = false;
     const now = this.deps.now();
     const lastEnd = Number(this.safe(() => this.deps.storage.getItem(KEYS.lastSessionEnd), '0'));
     const pauseDays = lastEnd ? Math.floor((now - lastEnd) / DAY_MS) : 0;
@@ -172,6 +194,7 @@ export class Tracker {
   endSession(reason: 'pagehide' | 'timeout') {
     const s = this.session;
     if (!s) return;
+    if (reason === 'pagehide') this.leaving = true;
     const end = reason === 'timeout' ? s.last_activity : this.deps.now();
     this.track('session_end', { duration_s: Math.round((end - s.started_at) / 1000) });
     this.queueSummary(s, reason, end);
@@ -179,9 +202,20 @@ export class Tracker {
     this.safe(() => this.deps.storage.removeItem(KEYS.session));
   }
 
+  /**
+   * The session so far, while it goes on (end_reason "open"): sent when the tab is hidden and
+   * every few minutes, so a browser closed without any "goodbye" still leaves its session in the
+   * sheet. The server keeps one row per session and updates it with each newer summary.
+   */
+  snapshot() {
+    const s = this.session;
+    if (s) this.queueSummary(s, 'open', this.deps.now());
+  }
+
   private queueSummary(s: SessionState, reason: SessionSummary['end_reason'], end: number) {
     const { last_activity: _last, ...rest } = s;
-    this.safe(() => this.deps.storage.setItem(KEYS.lastSessionEnd, String(end)));
+    if (reason !== 'open')
+      this.safe(() => this.deps.storage.setItem(KEYS.lastSessionEnd, String(end)));
     const summary: SessionSummary = {
       ...rest,
       ended_at: end,
@@ -195,6 +229,8 @@ export class Tracker {
       this.deps.log('[analytics] session', summary);
       return;
     }
+    // Only the newest summary of a session is worth sending.
+    this.sessions = this.sessions.filter((x) => x.session_id !== summary.session_id);
     this.sessions.push(summary);
   }
 
@@ -246,7 +282,12 @@ export class Tracker {
     this.safe(() => {
       if (this.consent === 'denied') return;
       const now = this.deps.now();
-      const event: AnalyticsEvent = { ...this.common(now), type, params };
+      const event: AnalyticsEvent = {
+        ...this.common(now),
+        event_id: this.deps.uuid(),
+        type,
+        params,
+      };
       this.summarize(event);
       if (this.identity.debug) {
         this.deps.log('[analytics]', type, params);
@@ -254,6 +295,7 @@ export class Tracker {
       }
       this.buffer.push(event);
       if (this.buffer.length > BUFFER_MAX) this.buffer.splice(0, this.buffer.length - BUFFER_MAX);
+      if (this.buffer.length >= FLUSH_AT && !this.leaving) void this.flush();
     });
   }
 
@@ -316,18 +358,49 @@ export class Tracker {
 
   /** Sends what has been collected, if the learner agreed. Never throws. */
   async flush(beacon = false): Promise<void> {
-    if (this.consent !== 'granted' || this.identity.debug || this.sending) return;
+    if (this.consent !== 'granted' || this.identity.debug) return;
+    // A request in flight waits for the next round, but the page going away never waits.
+    if (this.sending && !beacon) return;
     if (!this.buffer.length && !this.sessions.length) return;
     const events = this.buffer.splice(0, BATCH_MAX);
     const sessions = this.sessions.splice(0);
-    this.sending = !beacon;
+    let body = JSON.stringify({ events, sessions });
+    if (beacon) {
+      // Over the limit: the newest events go back and wait for the next visit.
+      while (events.length && byteLength(body) > BEACON_MAX_BYTES) {
+        this.buffer.unshift(...events.splice(Math.floor(events.length / 2)));
+        body = JSON.stringify({ events, sessions });
+      }
+    }
+    if (!beacon) this.sending = true;
     let ok: boolean;
+    /** The request never got an answer (offline, or the page going away cut it off). */
+    let unanswered = false;
     try {
-      ok = await this.deps.send(JSON.stringify({ events, sessions }), beacon);
+      ok = await this.deps.send(body, beacon);
     } catch {
       ok = false;
+      unanswered = true;
     }
-    this.sending = false;
+    if (!beacon) this.sending = false;
+    if (beacon) {
+      // The page is going away: what is left (or what failed) is kept for the next visit.
+      const left = ok
+        ? { events: this.buffer, sessions: this.sessions }
+        : {
+            events: [...events, ...this.buffer],
+            sessions: [...sessions, ...this.sessions],
+          };
+      if (left.events.length || left.sessions.length)
+        this.safe(() =>
+          this.deps.storage.setItem(
+            KEYS.outbox,
+            JSON.stringify({ events: left.events.slice(-BUFFER_MAX), sessions: left.sessions }),
+          ),
+        );
+      else this.safe(() => this.deps.storage.removeItem(KEYS.outbox));
+      return;
+    }
     if (ok) {
       this.failures = 0;
       // More was waiting than one request carries.
@@ -336,7 +409,8 @@ export class Tracker {
     }
     this.failures += 1;
     // Noted once per run of failures (it goes out with the next batch that works).
-    if (this.failures === 1 && !beacon) this.track('api_error', { source: 'track' });
+    // An error answer of the server is worth knowing; a request cut off by leaving is not.
+    if (this.failures === 1 && !unanswered) this.track('api_error', { source: 'track' });
     if (this.failures >= RETRIES_MAX) {
       this.failures = 0;
       return;

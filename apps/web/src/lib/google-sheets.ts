@@ -263,6 +263,60 @@ export async function appendRows(
   });
 }
 
+/** A column's letters: 0 → A, 25 → Z, 26 → AA. */
+export function columnName(index: number): string {
+  let n = index + 1;
+  let out = '';
+  while (n > 0) {
+    const r = (n - 1) % 26;
+    out = String.fromCharCode(65 + r) + out;
+    n = Math.floor((n - 1) / 26);
+  }
+  return out;
+}
+
+/**
+ * One row per key (e.g. a session id): a row whose key is already in the tab is overwritten in
+ * place with the newer values, the others are appended. Several rows with the same key in one
+ * call: the last one wins.
+ */
+export async function upsertRows(
+  c: SheetsConfig,
+  title: string,
+  keyColumn: number,
+  rows: readonly (readonly SheetCell[])[],
+): Promise<void> {
+  if (!rows.length) return;
+  const latest = new Map<string, readonly SheetCell[]>();
+  for (const r of rows) {
+    const key = r[keyColumn];
+    if (typeof key === 'string' || typeof key === 'number') latest.set(String(key), r);
+  }
+  const col = columnName(keyColumn);
+  const keys = await call<{ values?: string[][] }>(c, `/values/${range(title, `${col}:${col}`)}`);
+  const at = new Map<string, number>();
+  (keys.values ?? []).forEach((v, i) => {
+    if (v[0]) at.set(v[0], i + 1);
+  });
+  const updates: { range: string; values: (string | number | boolean)[][] }[] = [];
+  const fresh: (readonly SheetCell[])[] = [];
+  for (const [key, row] of latest) {
+    const n = at.get(key);
+    if (n && n > 1) {
+      updates.push({
+        range: `'${title.replaceAll("'", "''")}'!A${n}`,
+        values: [row.map(value)],
+      });
+    } else fresh.push(row);
+  }
+  if (updates.length)
+    await call(c, '/values:batchUpdate', {
+      method: 'POST',
+      body: JSON.stringify({ valueInputOption: 'RAW', data: updates }),
+    });
+  await appendRows(c, title, fresh);
+}
+
 /** Replaces the whole content of a tab (e.g. a reference sheet), header included. */
 export async function replaceSheet(
   c: SheetsConfig,

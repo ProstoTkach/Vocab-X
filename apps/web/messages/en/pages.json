@@ -21,7 +21,18 @@
     "cardsWaitingShort": "{count, plural, one {card waiting} other {cards waiting}}",
     "breakdownShort": "{due} due · {fresh} new",
     "deckEmptyShort": "All reviewed",
-    "deckEmptyTextShort": "Words will be back soon"
+    "deckEmptyTextShort": "Words will be back soon",
+    "install": {
+      "title": "Add VocabX to your home screen",
+      "text": "VocabX is made for regular practice: a few minutes a day, and the words really stick. With a shortcut the app is always at hand, like any other app.",
+      "howIos": "Tap \"Share\" at the bottom of Safari, then \"Add to Home Screen\".",
+      "howAndroid": "Open the browser menu (⋮ at the top) and choose \"Add to Home screen\".",
+      "comeBack": "Your feedback truly matters to us. Coming back tomorrow or the day after gives our statistics an enormous boost: it shows us what helps you learn and what to improve.",
+      "thanks": "Thank you for helping make VocabX better!",
+      "install": "Add shortcut",
+      "understood": "Got it",
+      "later": "Later"
+    }
   },
   "review": {
     "title": "Review",

@@ -39,6 +39,14 @@ export default defineConfig({
     url: `http://localhost:${PORT}/uk`,
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
-    env: { NEXT_PUBLIC_ENABLE_DEV_UI: '1' },
+    env: {
+      NEXT_PUBLIC_ENABLE_DEV_UI: '1',
+      // Tests never write to the real spreadsheets or the chat: a beacon of a closing page slips
+      // past page.route, so the test server simply has no place to send anything.
+      GOOGLE_SPREADSHEET_ANALYTICS_ID: '',
+      GOOGLE_SPREADSHEET_POLLS_ID: '',
+      TELEGRAM_BOT_TOKEN: '',
+      TELEGRAM_CHAT_ID: '',
+    },
   },
 });

@@ -22,6 +22,8 @@ export const KEYS = {
   streak: 'vocabx:analytics:streak',
   /** The last onboarding step reached, to tell where an unfinished onboarding stopped. */
   onboardingStep: 'vocabx:analytics:onboarding-step',
+  /** Events and summaries a closing page could not send: they go out on the next visit. */
+  outbox: 'vocabx:analytics:outbox',
   /** Per tab (sessionStorage): print events instead of sending them. */
   debug: 'vocabx:analytics:debug',
 } as const;

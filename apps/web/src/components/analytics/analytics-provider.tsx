@@ -32,8 +32,11 @@ const AnalyticsContext = createContext<AnalyticsValue | null>(null);
 
 /** Active time is counted in these steps. */
 const TICK_MS = 5000;
-/** Besides leaving the page, collected events go out this often while the learner is active. */
-const FLUSH_MS = 5 * 60_000;
+/**
+ * Besides leaving the page, collected events and the session so far go out this often while the
+ * learner is active: a browser closed without any "goodbye" loses at most this much.
+ */
+const FLUSH_MS = 2 * 60_000;
 /** Activity is noted at most this often (scroll and pointer events come in bursts). */
 const ACTIVITY_THROTTLE_MS = 1000;
 /** On app pages the consent window waits a moment, so it never pops up mid-click. */
@@ -154,8 +157,12 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
       tracker.activity();
     };
     const onVisibility = () => {
-      if (document.visibilityState === 'hidden') void tracker.flush(true);
-      else tracker.activity();
+      // Hidden may be the last moment: closing the browser or a phone killing the tab often
+      // never fires pagehide. The session so far goes along, ending it is left to later.
+      if (document.visibilityState === 'hidden') {
+        tracker.snapshot();
+        void tracker.flush(true);
+      } else tracker.activity();
     };
     const onPageHide = () => {
       tracker.endSession('pagehide');
@@ -173,6 +180,7 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
       if (tracker.activeSeconds() > before) sinceFlush += TICK_MS;
       if (sinceFlush >= FLUSH_MS) {
         sinceFlush = 0;
+        tracker.snapshot();
         void tracker.flush();
       }
     }, TICK_MS);

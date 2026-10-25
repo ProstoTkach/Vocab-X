@@ -12,7 +12,7 @@ import {
   variantSettings,
   type AnalyticsEvent,
 } from './schema';
-import { BUFFER_MAX, SESSION_IDLE_MS, Tracker } from './tracker';
+import { BEACON_MAX_BYTES, BUFFER_MAX, SESSION_IDLE_MS, Tracker } from './tracker';
 
 const NOW = Date.UTC(2026, 9, 25, 10, 0);
 
@@ -259,18 +259,87 @@ describe('tracker', () => {
     expect(sent()[0]!.sessions).toEqual([expect.objectContaining({ end_reason: 'timeout' })]);
   });
 
-  test('the buffer is bounded and a failing server is retried a few times only', async () => {
-    const { t, send } = tracker({ consent: 'granted' });
+  test('the buffer is bounded while waiting for consent', () => {
+    const { t } = tracker();
     t.start();
     for (let i = 0; i < BUFFER_MAX + 50; i++) t.track('speak_click');
     expect(t.pending().events).toHaveLength(BUFFER_MAX);
+  });
+
+  test('a failing server is retried a few times only', async () => {
+    const { t, send } = tracker({ consent: 'granted' });
     send.mockResolvedValue(false);
+    t.start();
+    for (let i = 0; i < 10; i++) t.track('speak_click');
     await t.flush();
     await t.flush();
     await t.flush();
     // Dropped after the third failure in a row.
-    expect(t.pending().events.length).toBeLessThan(BUFFER_MAX);
+    expect(t.pending().events).toEqual([]);
     expect(send).toHaveBeenCalledTimes(3);
+  });
+
+  test('events go out in small batches, not only when the page closes', async () => {
+    const { t, send } = tracker({ consent: 'granted' });
+    t.start();
+    for (let i = 0; i < 45; i++) t.track('speak_click');
+    await vi.waitFor(() => expect(send).toHaveBeenCalled());
+  });
+
+  test('snapshots of a running session: only the newest goes out, as "open"', async () => {
+    const { t, sent, advance } = tracker({ consent: 'granted' });
+    t.start();
+    t.track('answer', { correct: true });
+    t.snapshot();
+    advance(60_000);
+    t.track('answer', { correct: false });
+    t.snapshot();
+    expect(t.pending().sessions).toEqual([
+      expect.objectContaining({ end_reason: 'open', answers_n: 2 }),
+    ]);
+    await t.flush(true);
+    expect(sent().at(-1)!.sessions).toEqual([
+      expect.objectContaining({ end_reason: 'open', answers_n: 2, duration_s: 60 }),
+    ]);
+    // The session goes on: the same session id ends it later.
+    t.endSession('pagehide');
+    await t.flush(true);
+    const end = sent().at(-1)!.sessions[0] as Record<string, unknown>;
+    expect(end).toMatchObject({ end_reason: 'pagehide' });
+    expect(end.session_id).toBe((sent()[0]!.sessions[0] as Record<string, unknown>).session_id);
+  });
+
+  test('a closing page sends what fits into a beacon; the rest goes out on the next visit', async () => {
+    const { t, send, sent, storage } = tracker();
+    t.start();
+    // Big events collected before the consent: together far over the beacon limit.
+    for (let i = 0; i < 120; i++)
+      t.track('js_error', { message: 'x'.repeat(290), file: 'a'.repeat(290) });
+    storage.setItem(KEYS.consent, 'granted');
+    t.endSession('pagehide');
+    await t.flush(true);
+    const beacon = send.mock.calls.at(-1)!;
+    expect(beacon[1]).toBe(true);
+    expect(new TextEncoder().encode(beacon[0]).length).toBeLessThanOrEqual(BEACON_MAX_BYTES);
+    // The session summary always rides along; the newest events wait in storage.
+    expect(sent().at(-1)!.sessions).toEqual([expect.objectContaining({ end_reason: 'pagehide' })]);
+    const kept = JSON.parse(storage.getItem(KEYS.outbox) ?? '{}') as { events: unknown[] };
+    expect(kept.events.length).toBeGreaterThan(0);
+    // Next visit: they go out first.
+    const next = new Tracker({
+      identity: resolveIdentity(env({ storage })),
+      storage,
+      now: () => NOW + 60_000,
+      uuid,
+      send,
+      log: vi.fn(),
+    });
+    const calls = send.mock.calls.length;
+    next.start();
+    // Sent at once (more than a batch's worth was waiting).
+    await vi.waitFor(() => expect(send.mock.calls.length).toBeGreaterThan(calls));
+    expect(sent().at(-1)!.events.length).toBeGreaterThanOrEqual(kept.events.length);
+    expect(storage.getItem(KEYS.outbox)).toBeNull();
   });
 });
 
@@ -288,6 +357,7 @@ describe('/api/track body and sheet rows', () => {
     days_since_first_visit: 3,
     game_mode: 'max',
     study_mode: 'cards',
+    event_id: '6f1c2a9e-0000-4000-8000-000000000003',
     type: 'answer',
     params: { mode: 'card', grade: 3, correct: true, response_ms: 1234, flips_n: 1 },
     ...over,
@@ -303,6 +373,8 @@ describe('/api/track body and sheet rows', () => {
           event({ ts: NOW + 5 * 86_400_000 }),
           event({ params: { 'Bad Key': 1 } }),
           event({ params: { nested: { a: 1 } } }),
+          // Without its id a retry could not be told from a new event.
+          event({ event_id: undefined }),
         ],
       },
       NOW,
@@ -324,6 +396,9 @@ describe('/api/track body and sheet rows', () => {
     expect(cell('correct')).toBe(true);
     expect(cell('screen')).toBe('');
     expect(JSON.parse(cell('params_json') as string)).toEqual({ flips_n: 1 });
+    // A column added later sits at the very end.
+    expect(EVENT_COLUMNS.at(-1)!.key).toBe('event_id');
+    expect(row.at(-1)).toBe('6f1c2a9e-0000-4000-8000-000000000003');
     expect(header(EVENT_COLUMNS[0]!)).toBe('Час (ts)');
   });
 

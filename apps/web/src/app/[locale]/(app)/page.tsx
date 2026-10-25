@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { HomeDashboard } from '@/components/home/home-dashboard';
 import { DeckRow } from '@/components/home/deck-row';
+import { InstallPrompt } from '@/components/home/install-prompt';
 
 export default async function HomePage() {
   const t = await getTranslations('pages.home');
@@ -11,6 +12,8 @@ export default async function HomePage() {
       <h1 className="sr-only">{t('title')}</h1>
       <HomeDashboard />
       <DeckRow />
+      {/* Phones, once, right after onboarding: a shortcut on the home screen. */}
+      <InstallPrompt />
     </div>
   );
 }

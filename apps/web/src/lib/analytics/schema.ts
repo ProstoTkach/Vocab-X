@@ -24,6 +24,8 @@ export const EVENTS = {
   consent_accepted: 'Користувач погодився надсилати статистику (у вікні або в налаштуваннях).',
   session_start: 'Початок сесії: номер дня з першого візиту, пауза з минулого візиту.',
   session_end: 'Кінець сесії: закрито вкладку або 30 хв без дій.',
+  install_prompt:
+    'Пропозиція додати ярлик на головний екран (телефон, після налаштування): показано / встановлено / закрито.',
   onboarding_step_shown: 'Показано крок налаштування.',
   onboarding_step_done: 'Крок налаштування пройдено; скільки часу на ньому.',
   onboarding_back: 'Натиснуто «Назад» у налаштуванні.',
@@ -135,6 +137,8 @@ export interface CommonFields {
 }
 
 export interface AnalyticsEvent extends CommonFields {
+  /** Random id of the event: a batch that arrives twice (a retry) is written once. */
+  event_id: string;
   type: EventType;
   params: Params;
 }
@@ -151,7 +155,7 @@ export interface SessionSummary {
   ui_lang: string;
   started_at: number;
   ended_at: number;
-  end_reason: 'pagehide' | 'timeout' | 'recovered';
+  end_reason: 'open' | 'pagehide' | 'timeout' | 'recovered';
   days_since_first_visit: number;
   session_n: number;
   active_time_s: number;
@@ -254,8 +258,8 @@ export function parseEvent(v: unknown, now: number): AnalyticsEvent | null {
   if (!isObj(v) || typeof v.type !== 'string' || !(v.type in EVENTS)) return null;
   const common = parseCommon(v, now);
   const params = parseParams(v.params);
-  if (!common || !params) return null;
-  return { ...common, type: v.type as EventType, params };
+  if (!common || !params || !isId(v.event_id)) return null;
+  return { ...common, event_id: v.event_id, type: v.type as EventType, params };
 }
 
 const SESSION_NUMBERS = [
@@ -288,8 +292,7 @@ export function parseSession(v: unknown, now: number): SessionSummary | null {
   if (v.assigned_by !== 'link' && v.assigned_by !== 'random') return null;
   if (v.device !== 'mobile' && v.device !== 'desktop') return null;
   if (!isTime(v.started_at, now) || !isTime(v.ended_at, now)) return null;
-  if (v.end_reason !== 'pagehide' && v.end_reason !== 'timeout' && v.end_reason !== 'recovered')
-    return null;
+  if (!['open', 'pagehide', 'timeout', 'recovered'].includes(v.end_reason as string)) return null;
   if (!SESSION_NUMBERS.every((k) => isNum(v[k]) && v[k] >= 0)) return null;
   if (!SESSION_FLAGS.every((k) => isBool(v[k]))) return null;
   if (!SESSION_TEXTS.every((k) => isText(v[k]))) return null;
@@ -384,6 +387,12 @@ export const EVENT_COLUMNS: Column[] = [
   { key: 'study_mode', label: 'Режим вивчення', about: 'cards або quiz — на момент події.' },
   ...EVENT_PARAM_COLUMNS,
   { key: 'params_json', label: 'Інші параметри', about: 'Решта параметрів події у JSON.' },
+  // Added later: only ever at the end.
+  {
+    key: 'event_id',
+    label: 'ID події',
+    about: 'Випадковий ID події; однаковий ID — та сама подія, надіслана двічі.',
+  },
 ];
 
 export const SESSION_COLUMNS: Column[] = [
@@ -394,7 +403,7 @@ export const SESSION_COLUMNS: Column[] = [
     key: 'end_reason',
     label: 'Як завершилася',
     about:
-      'pagehide — закрито вкладку, timeout — 30 хв без дій, recovered — обірвалася, зібрано при наступному заході.',
+      'open — сесія ще триває або браузер закрили без прощання (рядок оновиться при наступному заході), pagehide — закрито вкладку, timeout — 30 хв без дій, recovered — обірвалася, зібрано при наступному заході.',
   },
   { key: 'session_n', label: 'Номер сесії', about: 'Котра це сесія на пристрої, з 1.' },
   {

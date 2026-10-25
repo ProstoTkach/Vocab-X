@@ -1,6 +1,13 @@
 import { generateKeyPairSync } from 'node:crypto';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { appendRow, kyivSerial, rowsOf, sheetsConfigFromEnv } from './google-sheets';
+import {
+  appendRow,
+  columnName,
+  kyivSerial,
+  rowsOf,
+  sheetsConfigFromEnv,
+  upsertRows,
+} from './google-sheets';
 
 const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const pem = privateKey.export({ type: 'pkcs8', format: 'pem' });
@@ -61,5 +68,42 @@ describe('appended rows', () => {
     expect(kyivSerial(Date.UTC(2026, 9, 25, 10, 0))).toBeCloseTo(46320.5, 6);
     // Summer time: UTC+3.
     expect(kyivSerial(Date.UTC(2026, 6, 1, 9, 0))).toBeCloseTo(46204.5, 6);
+  });
+});
+
+describe('one row per session', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  test('a known key is overwritten in place, a new one appended', async () => {
+    const calls: { url: string; body?: string }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init: RequestInit = {}) => {
+        calls.push({ url, ...(typeof init.body === 'string' ? { body: init.body } : {}) });
+        if (url.startsWith('https://oauth2'))
+          return Response.json({ access_token: 'token', expires_in: 3600 });
+        if (url.includes(encodeURIComponent("'Сесії'!B:B")))
+          return Response.json({ values: [['ID сесії (session_id)'], ['s1']] });
+        if (url.includes('?fields='))
+          return Response.json({ sheets: [{ properties: { title: 'Сесії', sheetId: 7 } }] });
+        return Response.json({});
+      }),
+    );
+    const c = { clientEmail: 'bot@x', privateKey: pem, spreadsheetId: 'upsert' };
+    await upsertRows(c, 'Сесії', 1, [
+      ['old', 's1'],
+      ['new', 's2'],
+      ['newer', 's1'],
+    ]);
+    const update = calls.find((x) => x.url.endsWith('/values:batchUpdate'));
+    expect(JSON.parse(update!.body!)).toEqual({
+      valueInputOption: 'RAW',
+      data: [{ range: "'Сесії'!A2", values: [['newer', 's1']] }],
+    });
+    const append = calls.find((x) => x.url.includes(':append'));
+    expect(JSON.parse(append!.body!)).toEqual({ values: [['new', 's2']] });
+    expect(columnName(0)).toBe('A');
+    expect(columnName(25)).toBe('Z');
+    expect(columnName(26)).toBe('AA');
   });
 });
