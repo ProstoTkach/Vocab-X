@@ -5,7 +5,13 @@ import {
   formatFeedback,
   parsePayload,
 } from '@/lib/feedback';
-import { appendRow, appendRows, ensureSheet, sheetsConfigFromEnv } from '@/lib/google-sheets';
+import {
+  appendRow,
+  appendRows,
+  ensureSheet,
+  forgetSheets,
+  sheetsConfigFromEnv,
+} from '@/lib/google-sheets';
 
 /** The feedback sheet of the analytics spreadsheet, next to the usage statistics. */
 const ANALYTICS_SHEET = 'Відгуки';
@@ -19,6 +25,7 @@ async function copyToAnalytics(row: ReturnType<typeof feedbackRow>) {
   } catch (e) {
     // A copy only: the feedback itself went to the polls table or the chat.
     console.error('feedback: analytics copy', e instanceof Error ? e.message : e);
+    forgetSheets(analytics);
   }
 }
 
@@ -74,6 +81,7 @@ export async function POST(request: Request): Promise<Response> {
     } catch (e) {
       // The spreadsheet is down or not set up yet: the chat still gets it, if there is one.
       console.error('feedback: spreadsheet', e);
+      forgetSheets(sheets);
       if (!token || !chatId) return Response.json({ error: 'upstream' }, { status: 502 });
     }
   }

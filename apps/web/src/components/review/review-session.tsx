@@ -51,7 +51,7 @@ import { useSpeech } from '@/lib/speech';
 import { createStopwatch } from '@/lib/stopwatch';
 import { Celebration } from './celebration';
 import { FOUR_GRADES_TIP, FOUR_GRADES_TIP_STREAK, FourGradesTip } from './four-grades-tip';
-import { REVIEW_INTRO, ReviewIntro } from './review-intro';
+import { QUIZ_INTRO, REVIEW_INTRO, ReviewIntro } from './review-intro';
 import { CardStage } from './card-stage';
 import { acceptedAnswers } from './formats/parts';
 import { formatOf, rendererFor } from './formats/registry';
@@ -268,12 +268,14 @@ export function ReviewSession() {
   useEffect(() => {
     if (finished) endReviewRef.current();
   }, [finished]);
-  const introOpen = !!setup && !introClosed && !setup.tipsSeen.includes(REVIEW_INTRO);
+  // Flash cards and the test each explain themselves once.
+  const introTip = quiz ? QUIZ_INTRO : REVIEW_INTRO;
+  const introOpen = !!setup && !introClosed && !setup.tipsSeen.includes(introTip);
   const closeIntro = () => {
     setIntroClosed(true);
     track('review_intro_closed');
     if (!setup) return;
-    const tipsSeen = [...setup.tipsSeen, REVIEW_INTRO];
+    const tipsSeen = [...setup.tipsSeen, introTip];
     setSetup((s) => s && { ...s, tipsSeen });
     void repos.settings.update({ tipsSeen });
   };
@@ -795,6 +797,7 @@ export function ReviewSession() {
         open={introOpen}
         mirrored={swipe.mirrored}
         rtl={swipe.rtl}
+        quiz={quiz}
         onClose={closeIntro}
       />
       <FourGradesTip

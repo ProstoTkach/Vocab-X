@@ -13,7 +13,8 @@ export function OnboardingGate() {
   const router = useRouter();
   useEffect(() => {
     void repos.profile.get().then((p) => {
-      if (!p?.onboardedAt) router.replace('/onboarding');
+      // The query (an A/B link, ?internal=1, ?debug=1) goes along.
+      if (!p?.onboardedAt) router.replace(`/onboarding${window.location.search}`);
     });
   }, [repos, router]);
   return null;

@@ -105,5 +105,18 @@
     "next": "Next",
     "letters": "Show a hint",
     "hintLabel": "Hint: {hint}"
+  },
+  "quizIntro": {
+    "title": "How the test works",
+    "text": "Pick the right answer out of four. Every word goes through four levels, from the easiest to the hardest:",
+    "level": "Level {n}.",
+    "levels": {
+      "translation": "You see the word — pick its translation.",
+      "word": "You see the translation — pick the word.",
+      "audio": "You hear the word — pick its translation. The word can be shown.",
+      "type": "You see the translation — type the word yourself. A letters hint is there."
+    },
+    "progress": "A right answer moves the word a level up, a mistake a level down. Don't know? Tap \"I don't know\" and we show the answer.",
+    "start": "Got it, let's start"
   }
 }

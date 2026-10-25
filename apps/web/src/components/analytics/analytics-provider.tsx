@@ -26,8 +26,6 @@ import { useRepos } from '@/lib/repos';
 interface AnalyticsValue {
   consent: Consent;
   setConsent: (granted: boolean) => void;
-  /** Onboarding asks once its first step (the interface language) is done. */
-  requestConsent: () => void;
 }
 
 const AnalyticsContext = createContext<AnalyticsValue | null>(null);
@@ -39,7 +37,7 @@ const FLUSH_MS = 5 * 60_000;
 /** Activity is noted at most this often (scroll and pointer events come in bursts). */
 const ACTIVITY_THROTTLE_MS = 1000;
 /** On app pages the consent window waits a moment, so it never pops up mid-click. */
-const ASK_DELAY_MS = 1200;
+const ASK_DELAY_MS = 600;
 
 /** Sections of the app, as screen_view names them. */
 export function screenOf(pathname: string): string {
@@ -87,7 +85,6 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   const [consent, setConsentState] = useState<Consent>(null);
   const [asking, setAsking] = useState(false);
   const [started, setStarted] = useState(false);
-  const [requested, setRequested] = useState(false);
   const shownFor = useRef(false);
 
   // The context every event carries.
@@ -254,10 +251,10 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
     };
   }, [started]);
 
-  // The consent window: after onboarding's first step, or on the first visit to an app page.
+  // The consent window: as soon as the first page loads (onboarding or the app).
   const onboarding = pathname.startsWith('/onboarding');
-  const wantsAsk =
-    started && consent === null && (onboarding ? requested : !pathname.startsWith('/review'));
+  // Onboarding asks at once, on its first page; elsewhere never in the middle of a review.
+  const wantsAsk = started && consent === null && !pathname.startsWith('/review');
   useEffect(() => {
     if (!wantsAsk) return;
     const id = window.setTimeout(() => setAsking(true), onboarding ? 0 : ASK_DELAY_MS);
@@ -283,10 +280,7 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
     [t],
   );
 
-  const value = useMemo<AnalyticsValue>(
-    () => ({ consent, setConsent, requestConsent: () => setRequested(true) }),
-    [consent, setConsent],
-  );
+  const value = useMemo<AnalyticsValue>(() => ({ consent, setConsent }), [consent, setConsent]);
 
   return (
     <AnalyticsContext value={value}>

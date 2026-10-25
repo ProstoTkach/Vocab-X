@@ -115,6 +115,15 @@ interface SheetProps {
 const tabs = new Map<string, SheetProps[]>();
 const ready = new Set<string>();
 
+/**
+ * Forgets what is known about a spreadsheet's tabs: after a failed write (e.g. a tab was deleted
+ * or renamed by hand) the next request looks again and recreates what is missing.
+ */
+export function forgetSheets(c: SheetsConfig): void {
+  tabs.delete(c.spreadsheetId);
+  for (const key of ready) if (key.startsWith(`${c.spreadsheetId}/`)) ready.delete(key);
+}
+
 async function tabsOf(c: SheetsConfig): Promise<SheetProps[]> {
   const known = tabs.get(c.spreadsheetId);
   if (known) return known;

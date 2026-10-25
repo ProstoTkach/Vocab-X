@@ -50,7 +50,7 @@ export async function seedOnboarded(page: Page, uiLocale = 'uk') {
     if (!localStorage.getItem('vocabx:v1:settings'))
       localStorage.setItem(
         'vocabx:v1:settings',
-        JSON.stringify({ tipsSeen: ['review-intro', 'feedback-survey'] }),
+        JSON.stringify({ tipsSeen: ['review-intro', 'review-intro-quiz', 'feedback-survey'] }),
       );
   }, uiLocale);
 }
@@ -81,7 +81,10 @@ export async function onboard(page: Page, pace: 'Легкий' | 'Звичайн
   // with two grades and swipes only. The one-time windows (how to review, a new level) have
   // tests of their own and would only get in the way here.
   await setStudySettings(page, { gradeButtonsOnPhone: true, twoGrades: false });
-  await setSettings(page, { tipsSeen: ['review-intro', 'feedback-survey'], levelSeen: 99 });
+  await setSettings(page, {
+    tipsSeen: ['review-intro', 'review-intro-quiz', 'feedback-survey'],
+    levelSeen: 99,
+  });
 }
 
 /** Changes app settings in storage (top level; see setStudySettings for learning ones). */

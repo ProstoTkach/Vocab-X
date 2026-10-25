@@ -13,7 +13,13 @@ import {
   type Column,
 } from '@/lib/analytics/schema';
 import { FEEDBACK_COLUMNS } from '@/lib/feedback';
-import { appendRows, ensureSheet, replaceSheet, sheetsConfigFromEnv } from '@/lib/google-sheets';
+import {
+  appendRows,
+  ensureSheet,
+  forgetSheets,
+  replaceSheet,
+  sheetsConfigFromEnv,
+} from '@/lib/google-sheets';
 
 /** Sheet names of the analytics spreadsheet. */
 const SHEETS = { events: 'Події', sessions: 'Сесії', dictionary: 'Словник' } as const;
@@ -97,6 +103,9 @@ export async function POST(request: Request): Promise<Response> {
     }
   } catch (e) {
     console.error('track: spreadsheet', e instanceof Error ? e.message : e);
+    // A tab deleted or renamed by hand: looked up (and recreated) on the next request.
+    forgetSheets(sheets);
+    dictionaryWritten = false;
     return new Response(null, { status: 502 });
   }
   return new Response(null, { status: 204 });

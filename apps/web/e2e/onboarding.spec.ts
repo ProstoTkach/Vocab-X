@@ -133,3 +133,19 @@ test('a broken backup is rejected without touching data', async ({ page }) => {
   await page.goto('/uk');
   await expect(page.getByRole('heading', { name: /^30 карток чекають/ })).toBeVisible();
 });
+
+test('languages without ready-made decks cannot be chosen yet', async ({ page }) => {
+  await page.goto('/uk/onboarding');
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Далі' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Мови' })).toBeVisible({
+      timeout: 1000,
+    });
+  }).toPass();
+  for (const name of [/^Німецька/, /^Іспанська/]) {
+    const box = page.getByRole('checkbox', { name });
+    await expect(box).toBeDisabled();
+    await expect(box).not.toBeChecked();
+  }
+  await expect(page.getByRole('checkbox', { name: /^Англійська/ })).toBeEnabled();
+});

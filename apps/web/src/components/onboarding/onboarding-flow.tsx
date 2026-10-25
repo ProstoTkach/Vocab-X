@@ -15,7 +15,6 @@ import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { RadioGroup } from 'radix-ui';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { useAnalytics } from '@/components/analytics/analytics-provider';
 import { track, writeKey } from '@/lib/analytics';
 import { KEYS } from '@/lib/analytics/identity';
 import { LocalePicker } from '@/components/settings/locale-picker';
@@ -82,7 +81,6 @@ export function OnboardingFlow() {
   const [goal, setGoal] = useState<DailyGoalPreset>('regular');
   const [result, setResult] = useState<PlacementResult | null>(null);
   const [saving, setSaving] = useState(false);
-  const { requestConsent } = useAnalytics();
   /** When the onboarding and the current step began (real time), for the statistics. */
   const timing = useRef({ started: 0, step: 0 });
 
@@ -157,8 +155,6 @@ export function OnboardingFlow() {
         track('onboarding_langs', { count: targets.length, native: nativeLang });
       if (step === 'goal')
         track('onboarding_goal', { count: DAILY_GOAL_PRESETS[goal].dailyGoalXp });
-      // The interface language is chosen: now the learner is asked about the statistics.
-      if (step === 'welcome') requestConsent();
     }
     setStep(STEPS[index + delta] ?? step);
   };
@@ -333,9 +329,11 @@ export function OnboardingFlow() {
                     {targetOptions.map((l) => {
                       const hasDecks = catalog.decks.some((d) => d.lang === l.code);
                       return (
+                        // Languages without ready-made decks are not offered yet.
                         <CheckCard
                           key={l.code}
-                          checked={targets.includes(l.code)}
+                          checked={hasDecks && targets.includes(l.code)}
+                          disabled={!hasDecks}
                           onCheckedChange={(on) => toggleTarget(l.code, on)}
                           label={langName(l.code)}
                           description={

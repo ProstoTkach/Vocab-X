@@ -71,7 +71,8 @@ function gate(c: GateConfig) {
   } catch {
     onboarded = true; // storage unavailable: do not trap the user in a redirect loop
   }
-  if (!onboarded) location.replace('/' + locale + '/onboarding');
+  // The query goes along: an A/B link (?v=…) must reach the app on the first visit.
+  if (!onboarded) location.replace('/' + locale + '/onboarding' + location.search);
 }
 
 export const OPEN_SECTIONS = ['onboarding', 'dev'];

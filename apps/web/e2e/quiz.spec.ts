@@ -107,7 +107,7 @@ test('the developer panel switches the mode', async ({ page }) => {
 });
 
 test('after 15 answers in the test, the survey is offered once', async ({ page }) => {
-  await setSettings(page, { tipsSeen: ['review-intro'] });
+  await setSettings(page, { tipsSeen: ['review-intro', 'review-intro-quiz'] });
   await page.goto('/uk/review');
   for (let i = 0; i < 15; i++) {
     await page.getByRole('button', { name: 'Не знаю' }).click();
@@ -121,4 +121,19 @@ test('after 15 answers in the test, the survey is offered once', async ({ page }
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Не знаю' })).toBeVisible();
   await expect(card(page).getByText('Неправильно')).toHaveCount(0);
+});
+
+test('the first test explains its four levels instead of the swipes', async ({ page }) => {
+  await setSettings(page, { tipsSeen: ['review-intro', 'feedback-survey'] });
+  await page.goto('/uk/review');
+  const intro = page.getByRole('dialog', { name: 'Як проходить тест' });
+  await expect(intro).toBeVisible();
+  await expect(intro.getByRole('listitem')).toHaveCount(4);
+  await expect(intro.getByText(/Свайп/)).toHaveCount(0);
+  await intro.getByRole('button', { name: 'Зрозуміло, почнімо' }).click();
+  await expect(intro).toHaveCount(0);
+  // Once only.
+  await page.reload();
+  await expect(options(page)).toHaveCount(4);
+  await expect(intro).toHaveCount(0);
 });
