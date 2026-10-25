@@ -20,6 +20,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   gamification: 'max',
   timeOffsetMs: 0,
   devTools: false,
+  quizMode: false,
   tipsSeen: [],
   levelSeen: 1,
   xpBonus: 0,

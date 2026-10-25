@@ -97,6 +97,50 @@
       translate: 0 1px;
     }
   }
+
+  /* A wrong answer: a short shake from side to side. */
+  --animate-shake: vx-shake 0.4s ease-in-out;
+  @keyframes vx-shake {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    20%,
+    60% {
+      translate: -6px 0;
+    }
+    40%,
+    80% {
+      translate: 6px 0;
+    }
+  }
+
+  /* Time running out: a bar filling its box (the duration is set where it is used). */
+  --animate-fill: vx-fill 1s linear forwards;
+  @keyframes vx-fill {
+    from {
+      scale: 0 1;
+    }
+    to {
+      scale: 1 1;
+    }
+  }
+
+  /* A right answer: the check mark pops in, overshoots a little and settles. */
+  --animate-pop: vx-pop 0.35s cubic-bezier(0.2, 0, 0, 1);
+  @keyframes vx-pop {
+    0% {
+      scale: 0.3;
+      opacity: 0;
+    }
+    60% {
+      scale: 1.3;
+      opacity: 1;
+    }
+    100% {
+      scale: 1;
+    }
+  }
 }
 
 @theme inline {

@@ -33,6 +33,7 @@ import {
   IMPROVE_OPTIONS,
   LIKE_OPTIONS,
   NOTE_MAX,
+  QUIZ_INVITE_AFTER,
   RATING_MAX,
   REVIEW_MAX,
   sendFeedback,
@@ -52,7 +53,8 @@ import {
 import { usePlayer } from '@/lib/player';
 
 /** `invite`: opened by the app on reaching a level, not by the learner. */
-export type FeedbackReason = 'manual' | 'invite';
+/** Why the window opened: a button, a level reached, or enough answers in the four-choice test. */
+export type FeedbackReason = 'manual' | 'invite' | 'quiz';
 type Step = 'menu' | FeedbackKind | 'thanks';
 
 const FORM_ID = 'feedback-form';
@@ -474,7 +476,9 @@ export function FeedbackDialog({ open, reason, onOpenChange, onSurveySent }: Fee
     step === 'menu'
       ? reason === 'invite'
         ? t('inviteTitle', { level })
-        : t('title')
+        : reason === 'quiz'
+          ? t('quizInviteTitle')
+          : t('title')
       : step === 'thanks'
         ? t('thanks.title')
         : t(`kinds.${step}.title`);
@@ -482,7 +486,9 @@ export function FeedbackDialog({ open, reason, onOpenChange, onSurveySent }: Fee
     step === 'menu'
       ? reason === 'invite'
         ? t('inviteText')
-        : t('text')
+        : reason === 'quiz'
+          ? t('quizInviteText', { count: QUIZ_INVITE_AFTER })
+          : t('text')
       : step === 'survey'
         ? t('survey.text')
         : step === 'thanks'
@@ -491,7 +497,7 @@ export function FeedbackDialog({ open, reason, onOpenChange, onSurveySent }: Fee
 
   const footer =
     step === 'menu' ? (
-      reason === 'invite' ? (
+      reason !== 'manual' ? (
         <DialogClose asChild>
           <Button variant="secondary" className="justify-center">
             {t('later')}

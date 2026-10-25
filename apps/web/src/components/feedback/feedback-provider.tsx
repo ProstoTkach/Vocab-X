@@ -14,6 +14,7 @@ import { useGamification } from '@/lib/gamification';
 import { usePlayer } from '@/lib/player';
 import { useRepos } from '@/lib/repos';
 import { FeedbackDialog, type FeedbackReason } from './feedback-dialog';
+export { QUIZ_INVITE_AFTER, QUIZ_INVITE_TIP } from '@/lib/feedback';
 
 /**
  * Levels at which the app invites the learner to leave feedback, once each: by then they know
@@ -31,6 +32,10 @@ interface FeedbackValue {
   open: () => void;
   /** Settings changed elsewhere (e.g. a level-up window closed): look for a due invite again. */
   recheck: () => void;
+  /** Invites to the survey about the four-choice test, once per tip (never after the survey was sent). */
+  inviteOnce: (tip: string) => void;
+  /** The feedback window is open (keyboard shortcuts behind it should wait). */
+  isOpen: boolean;
 }
 
 const FeedbackContext = createContext<FeedbackValue | null>(null);
@@ -105,9 +110,27 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     });
   }, [repos]);
 
+  const inviteOnce = useCallback(
+    (tip: string) => {
+      void repos.settings.get().then((s) => {
+        if (s.tipsSeen.includes(SURVEY_SENT_TIP) || s.tipsSeen.includes(tip)) return;
+        show('quiz');
+        const tipsSeen = [...s.tipsSeen, tip];
+        setSettings({ tipsSeen, levelSeen: s.levelSeen });
+        return repos.settings.update({ tipsSeen });
+      });
+    },
+    [repos, show],
+  );
+
   const value = useMemo<FeedbackValue>(
-    () => ({ open: () => show('manual'), recheck: () => setNonce((n) => n + 1) }),
-    [show],
+    () => ({
+      open: () => show('manual'),
+      recheck: () => setNonce((n) => n + 1),
+      inviteOnce,
+      isOpen: state.open,
+    }),
+    [show, inviteOnce, state.open],
   );
 
   return (

@@ -128,5 +128,7 @@
     "text": "Your feedback is in. Answers like yours are what make VocabX better — you have just done a lot for it.",
     "more": "Leave something else",
     "done": "Done"
-  }
+  },
+  "quizInviteTitle": "How do you like the four-choice test?",
+  "quizInviteText": "You have given {count} answers in the new mode. Tell us what you liked and what to change — it takes a minute and helps a lot."
 }

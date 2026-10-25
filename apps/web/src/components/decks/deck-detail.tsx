@@ -3,6 +3,7 @@
 import {
   addWord,
   editWord,
+  markWordLearned,
   dueOrder,
   removeWordFromDeck,
   resetWordProgress,
@@ -43,6 +44,7 @@ interface Loaded {
 export function DeckDetail({ deckId }: { deckId: string }) {
   const t = useTranslations('decks');
   const common = useTranslations('common');
+  const words = useTranslations('words');
   const locale = useLocale();
   const repos = useRepos();
   const { clock } = useClock();
@@ -159,6 +161,18 @@ export function DeckDetail({ deckId }: { deckId: string }) {
     }
   };
 
+  const learn = async (word: Word) => {
+    const learned = await markWordLearned(repos, word, words('learnedDeck'), {
+      now: clock.now(),
+      newId,
+    });
+    toast({
+      title: words('learnedToast', { word: word.term, deck: deckTitle(learned, locale) }),
+      tone: 'success',
+    });
+    reload();
+  };
+
   const reset = async (word: Word) => {
     await resetWordProgress(repos, word.id);
     toast({ title: t('wordReset', { word: word.term }), tone: 'success' });
@@ -266,7 +280,10 @@ export function DeckDetail({ deckId }: { deckId: string }) {
                   now={now}
                   onEdit={() => setEditing(w)}
                   onRemove={() => setRemoving(w)}
-                  onReset={() => void reset(w)}
+                  // The learned words are not reviewed: neither button has a use there.
+                  {...(deck.learned
+                    ? {}
+                    : { onReset: () => void reset(w), onLearned: () => void learn(w) })}
                 />
               ))}
             </ul>

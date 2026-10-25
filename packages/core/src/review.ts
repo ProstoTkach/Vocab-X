@@ -48,7 +48,7 @@ export async function submitReview(repos: ReviewRepos, i: ReviewInput): Promise<
   const id = i.newId();
   const result = applyEvent(
     i.progress?.card ?? null,
-    { id, grade: i.grade, at: i.now, retention },
+    { id, grade: i.grade, at: i.now, retention, format: i.format },
     i.params,
   );
   const event: ReviewEvent = {

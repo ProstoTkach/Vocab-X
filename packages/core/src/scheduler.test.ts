@@ -157,7 +157,7 @@ describe('format levels', () => {
     const noPromo = reviewBinary(c, true, 10 * DAY, { ...p, tau0: [1e9, 1e9] }, 0.9, nf);
     expect(promoted.card).toMatchObject({ level: 2, levelStreak: 0 });
     expect(noPromo.card.level).toBe(1);
-    expect(Math.abs(promoted.card.stability - p.rho[0] * noPromo.card.stability)).toBeLessThan(
+    expect(Math.abs(promoted.card.stability - p.rho[0]! * noPromo.card.stability)).toBeLessThan(
       1e-9,
     );
   });

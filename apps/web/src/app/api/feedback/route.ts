@@ -1,4 +1,5 @@
-import { formatFeedback, parsePayload } from '@/lib/feedback';
+import { FEEDBACK_COLUMNS, feedbackRow, formatFeedback, parsePayload } from '@/lib/feedback';
+import { appendRow, sheetsConfigFromEnv } from '@/lib/google-sheets';
 
 /** Requests per address in a window; kept in memory, so it resets with the server. */
 const LIMIT = 5;
@@ -18,14 +19,17 @@ function tooMany(key: string): boolean {
 }
 
 /**
- * Forwards learner feedback to the developer's Telegram chat. The bot token stays on the
- * server. The sender's address is used only for the in-memory rate limit above and is never
+ * Forwards learner feedback to the developer: for now as a row of the "Vocab-X polls" Google
+ * spreadsheet when its service account is set up, otherwise to the Telegram chat. Keys stay on
+ * the server. The sender's address is used only for the in-memory rate limit above and is never
  * forwarded or stored, so the feedback stays anonymous.
  */
 export async function POST(request: Request): Promise<Response> {
+  const sheets = sheetsConfigFromEnv();
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return Response.json({ error: 'not-configured' }, { status: 503 });
+  if (!sheets && (!token || !chatId))
+    return Response.json({ error: 'not-configured' }, { status: 503 });
 
   const address = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
   if (tooMany(address)) return Response.json({ error: 'rate-limited' }, { status: 429 });
@@ -38,6 +42,18 @@ export async function POST(request: Request): Promise<Response> {
   }
   const payload = parsePayload(body);
   if (!payload) return Response.json({ error: 'invalid' }, { status: 400 });
+
+  if (sheets) {
+    try {
+      await appendRow(sheets, FEEDBACK_COLUMNS, feedbackRow(payload, new Date()));
+      return Response.json({ ok: true });
+    } catch (e) {
+      // The spreadsheet is down or not set up yet: the chat still gets it, if there is one.
+      console.error('feedback: spreadsheet', e);
+      if (!token || !chatId) return Response.json({ error: 'upstream' }, { status: 502 });
+    }
+  }
+  if (!token || !chatId) return Response.json({ error: 'not-configured' }, { status: 503 });
 
   try {
     // A long survey comes as several messages, in order.

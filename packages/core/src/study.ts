@@ -31,10 +31,15 @@ export async function studyOrder(
   lang: LangCode,
   deckIds?: readonly Id[],
 ): Promise<Id[]> {
-  const decks = (await repos.decks.list({ lang }))
-    .filter((d) => d.origin === 'own' && (!deckIds || deckIds.includes(d.id)))
+  const all = await repos.decks.list({ lang });
+  // Words marked as learned are not reviewed, whatever other deck they are in.
+  const learned = new Set(
+    all.filter((d) => d.origin === 'own' && d.learned).flatMap((d) => d.wordIds),
+  );
+  const decks = all
+    .filter((d) => d.origin === 'own' && !d.learned && (!deckIds || deckIds.includes(d.id)))
     .sort((a, b) => a.createdAt - b.createdAt);
-  return [...new Set(decks.flatMap((d) => d.wordIds))];
+  return [...new Set(decks.flatMap((d) => d.wordIds))].filter((id) => !learned.has(id));
 }
 
 export async function loadStudyStack(repos: StudyRepos, req: StackRequest): Promise<StudyCard[]> {

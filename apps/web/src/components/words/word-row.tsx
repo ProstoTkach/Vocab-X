@@ -35,6 +35,7 @@ export interface WordRowProps {
   /** The remove button's name; "remove from deck" by default. */
   removeLabel?: string;
   onReset?: () => void;
+  onLearned?: () => void;
 }
 
 /** One line of a word list: the word with its status and edit / remove buttons. */
@@ -48,6 +49,7 @@ export function WordRow({
   onRemove,
   removeLabel,
   onReset,
+  onLearned,
 }: WordRowProps) {
   const t = useTranslations('decks');
   const status = wordStatus(progress, now);
@@ -60,6 +62,7 @@ export function WordRow({
         stats={stats}
         status={{ label: t(`status.${status}`), tone: STATUS_TONE[status] }}
         {...(onReset ? { onReset } : {})}
+        {...(onLearned ? { onLearned } : {})}
         actions={
           <>
             {onEdit && (

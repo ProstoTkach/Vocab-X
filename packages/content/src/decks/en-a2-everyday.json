@@ -8,8 +8,8 @@
     "en": "English A2: everyday life"
   },
   "descriptionI18n": {
-    "uk": "15 слів для подорожей, покупок і розмов із сусідами.",
-    "en": "15 words for travel, shopping and chats with neighbours."
+    "uk": "30 слів для подорожей, покупок і розмов із сусідами.",
+    "en": "30 words for travel, shopping and chats with neighbours."
   },
   "words": [
     {
@@ -233,6 +233,231 @@
           "text": "It is nearly midnight.",
           "translations": {
             "uk": "Вже майже північ."
+          }
+        }
+      ]
+    },
+    {
+      "term": "arrive",
+      "pos": "verb",
+      "translations": {
+        "uk": ["прибувати", "приїжджати"]
+      },
+      "examples": [
+        {
+          "text": "Our train arrives at six in the evening.",
+          "translations": {
+            "uk": "Наш потяг прибуває о шостій вечора."
+          }
+        }
+      ]
+    },
+    {
+      "term": "decide",
+      "pos": "verb",
+      "translations": {
+        "uk": ["вирішувати"]
+      },
+      "examples": [
+        {
+          "text": "We decided to stay at home tonight.",
+          "translations": {
+            "uk": "Ми вирішили залишитися вдома сьогодні ввечері."
+          }
+        }
+      ]
+    },
+    {
+      "term": "explain",
+      "pos": "verb",
+      "translations": {
+        "uk": ["пояснювати"]
+      },
+      "examples": [
+        {
+          "text": "Can you explain this rule again?",
+          "translations": {
+            "uk": "Можете ще раз пояснити це правило?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "hurry",
+      "pos": "verb",
+      "translations": {
+        "uk": ["поспішати"]
+      },
+      "examples": [
+        {
+          "text": "We have to hurry or we will miss the bus.",
+          "translations": {
+            "uk": "Нам треба поспішати, інакше ми пропустимо автобус."
+          }
+        }
+      ]
+    },
+    {
+      "term": "careful",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["обережний"]
+      },
+      "examples": [
+        {
+          "text": "Be careful, the floor is wet.",
+          "translations": {
+            "uk": "Будьте обережні, підлога мокра."
+          }
+        }
+      ]
+    },
+    {
+      "term": "comfortable",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["зручний"]
+      },
+      "examples": [
+        {
+          "text": "This chair is very comfortable.",
+          "translations": {
+            "uk": "Цей стілець дуже зручний."
+          }
+        }
+      ]
+    },
+    {
+      "term": "dangerous",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["небезпечний"]
+      },
+      "examples": [
+        {
+          "text": "It is dangerous to swim here.",
+          "translations": {
+            "uk": "Тут плавати небезпечно."
+          }
+        }
+      ]
+    },
+    {
+      "term": "empty",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["порожній"]
+      },
+      "examples": [
+        {
+          "text": "The fridge is almost empty.",
+          "translations": {
+            "uk": "Холодильник майже порожній."
+          }
+        }
+      ]
+    },
+    {
+      "term": "quiet",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["тихий"]
+      },
+      "examples": [
+        {
+          "text": "The library is a quiet place to study.",
+          "translations": {
+            "uk": "Бібліотека — тихе місце для навчання."
+          }
+        }
+      ]
+    },
+    {
+      "term": "holiday",
+      "pos": "noun",
+      "translations": {
+        "uk": ["відпустка", "свято"]
+      },
+      "examples": [
+        {
+          "text": "We spent our holiday by the sea.",
+          "translations": {
+            "uk": "Ми провели відпустку біля моря."
+          }
+        }
+      ]
+    },
+    {
+      "term": "bill",
+      "pos": "noun",
+      "translations": {
+        "uk": ["рахунок"]
+      },
+      "examples": [
+        {
+          "text": "Could we have the bill, please?",
+          "translations": {
+            "uk": "Можна нам рахунок, будь ласка?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "message",
+      "pos": "noun",
+      "translations": {
+        "uk": ["повідомлення"]
+      },
+      "examples": [
+        {
+          "text": "I sent you a message this morning.",
+          "translations": {
+            "uk": "Я надіслав тобі повідомлення сьогодні вранці."
+          }
+        }
+      ]
+    },
+    {
+      "term": "gift",
+      "pos": "noun",
+      "translations": {
+        "uk": ["подарунок"]
+      },
+      "examples": [
+        {
+          "text": "She bought a gift for her mother.",
+          "translations": {
+            "uk": "Вона купила подарунок для мами."
+          }
+        }
+      ]
+    },
+    {
+      "term": "receipt",
+      "pos": "noun",
+      "translations": {
+        "uk": ["чек", "квитанція"]
+      },
+      "examples": [
+        {
+          "text": "Keep the receipt in case you want to return it.",
+          "translations": {
+            "uk": "Збережіть чек на випадок, якщо захочете це повернути."
+          }
+        }
+      ]
+    },
+    {
+      "term": "suddenly",
+      "pos": "adverb",
+      "translations": {
+        "uk": ["раптом"]
+      },
+      "examples": [
+        {
+          "text": "Suddenly it started to rain.",
+          "translations": {
+            "uk": "Раптом почався дощ."
           }
         }
       ]

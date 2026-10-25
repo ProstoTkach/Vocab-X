@@ -21,6 +21,7 @@ import {
   importedBuiltinIds,
   loadStudyStack,
   markKnown,
+  markWordLearned,
   moveInOrder,
   removeWordEverywhere,
   removeWordFromDeck,
@@ -163,6 +164,22 @@ describe('deck management', () => {
     await removeWordEverywhere(repo, { id: 'en:achieve', lang: 'en' }, NOW);
     expect((await stack()).some((c) => c.id === 'en:achieve')).toBe(false);
     expect(await repo.words.get('en:achieve')).not.toBeNull();
+  });
+
+  test('a learned word moves to the learned deck and is no longer studied', async () => {
+    const own = await importBuiltinDeck(repo, B1, 'uk', ctx);
+    const learned = await markWordLearned(repo, { id: 'en:achieve', lang: 'en' }, 'Learned', ctx);
+    expect(learned).toMatchObject({ title: 'Learned', learned: true, wordIds: ['en:achieve'] });
+    expect((await repo.decks.get(own.id))!.wordIds).not.toContain('en:achieve');
+    expect((await stack()).some((c) => c.id === 'en:achieve')).toBe(false);
+    // Adding it to a deck again does not bring it back while it is in the learned words.
+    await updateDeck(repo, (await repo.decks.get(own.id))!, { wordIds: [...own.wordIds] }, NOW);
+    expect((await stack()).some((c) => c.id === 'en:achieve')).toBe(false);
+    // One learned deck per language, reused; a copy of it is an ordinary deck.
+    const again = await markWordLearned(repo, { id: 'en:afford', lang: 'en' }, 'Learned', ctx);
+    expect(again.id).toBe(learned.id);
+    expect(again.wordIds).toEqual(['en:achieve', 'en:afford']);
+    expect(await duplicateDeck(repo, again, 'Copy', ctx)).not.toHaveProperty('learned');
   });
 
   test('study order can be rearranged', async () => {

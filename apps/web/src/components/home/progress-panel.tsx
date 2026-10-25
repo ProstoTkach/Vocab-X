@@ -188,9 +188,13 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
                   aria-current={isToday ? 'date' : undefined}
                   className={cx(
                     'flex w-10 shrink-0 snap-center flex-col items-center gap-0.5 rounded-control border py-1 text-center transition-colors motion-fast lg:w-14 lg:gap-1 lg:py-2',
-                    lit ? 'border-warning/40 bg-warning/10' : 'border-line/60 bg-surface',
+                    lit
+                      ? 'border-warning/40 bg-warning/10'
+                      : // Days ahead are muted by colour, not by transparency: the text keeps its contrast.
+                        future
+                        ? 'border-dashed border-line/60 bg-transparent'
+                        : 'border-line/60 bg-surface',
                     isToday && 'ring-2 ring-accent ring-offset-2 ring-offset-bg',
-                    future && 'opacity-50',
                   )}
                 >
                   <span
@@ -206,7 +210,10 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
                   </span>
                   <span
                     aria-hidden
-                    className="font-display text-sm leading-none font-bold tabular-nums lg:text-lg"
+                    className={cx(
+                      'font-display text-sm leading-none font-bold tabular-nums lg:text-lg',
+                      future && 'text-fg-muted',
+                    )}
                   >
                     {format.dateTime(date, { day: 'numeric' })}
                   </span>

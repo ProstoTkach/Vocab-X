@@ -102,9 +102,9 @@ const sLapse = (d: number, s: number, r: number, w: readonly number[]) =>
       Math.exp(at(w, 14) * (1 - r)),
   );
 
-/** τ(D) for the target level (2–3): harder cards need more stability before promotion. */
-export const tauFor = (targetLevel: 2 | 3, d: number, p: SchedulerParams) =>
-  p.tau0[targetLevel - 2]! * (1 + (p.betaTau * (d - 5)) / 5);
+/** τ(D) for the target level (2–4): harder cards need more stability before promotion. */
+export const tauFor = (targetLevel: 2 | 3 | 4, d: number, p: SchedulerParams) =>
+  (p.tau0[targetLevel - 2] ?? 0) * (1 + (p.betaTau * (d - 5)) / 5);
 
 /** Next interval for a card state: minutes under a day, whole (fuzzed) days from a day on. */
 function schedule(
@@ -186,7 +186,8 @@ export function reviewGraded(
     const boost = card.lapses > 0 ? streakBoost(c.streak, t, p) : 1;
     // An early success in the learning phase gains as much as one on time (see 9 above).
     const rGain = card.stability < 1 ? Math.min(r, rd) : r;
-    c.stability = sSuccess(card.difficulty, card.stability, rGain, g, w, boost);
+    const full = sSuccess(card.difficulty, card.stability, rGain, g, w, boost);
+    c.stability = card.stability + (full - card.stability) * (p.successGain ?? 1);
     if (t >= p.streakMinGapDays) c.levelStreak += 1;
   } else {
     c.stability = sLapse(card.difficulty, card.stability, r, w);
@@ -197,17 +198,19 @@ export function reviewGraded(
 
   // Format level: k0 successes in a row move the card on; after the last level the formats
   // start over from the first, so a well-known word keeps being met in every format.
+  // A card may come from the other mode with a level above this one's last.
+  const maxLevel = p.maxLevel ?? MAX_LEVEL;
   if (!recalled && c.level > 1) {
-    c.level = (c.level - 1) as Level;
+    c.level = (Math.min(c.level, maxLevel) - 1) as Level;
   } else if (recalled && c.levelStreak >= p.k0) {
-    if (c.level === MAX_LEVEL) {
+    if (c.level >= maxLevel) {
       c.level = 1;
       c.levelStreak = 0;
     } else {
-      const target = (c.level + 1) as 2 | 3;
+      const target = (c.level + 1) as 2 | 3 | 4;
       if (c.stability >= tauFor(target, c.difficulty, p)) {
         c.level = target;
-        c.stability *= p.rho[target - 2]!;
+        c.stability *= p.rho[target - 2] ?? 1;
         c.levelStreak = 0;
       }
     }

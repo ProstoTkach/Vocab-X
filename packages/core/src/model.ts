@@ -66,6 +66,11 @@ export interface Deck {
   skippedIds?: Id[];
   /** The learner's default deck for words added without choosing one (one per language). */
   personal?: boolean;
+  /**
+   * The learner's "learned words" (one per language): words they marked as known. Its words
+   * stay in it but are no longer reviewed.
+   */
+  learned?: boolean;
   archived: boolean;
   createdAt: number;
   updatedAt: number;
@@ -122,6 +127,8 @@ export interface AppSettings {
   timeOffsetMs: number;
   /** Shows the developer panel (time travel for demos). */
   devTools: boolean;
+  /** Dev: review with the four-choice test instead of flash cards (set in the developer panel). */
+  quizMode: boolean;
   /** One-time tips already shown (e.g. 'four-grades'). */
   tipsSeen: string[];
   /** The highest player level already congratulated on. */

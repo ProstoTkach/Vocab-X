@@ -38,6 +38,25 @@ const VARIANTS = 3;
 const SPEAK_MS = 3500;
 
 const panelClass = 'rounded-card border border-line/70 bg-surface/60 p-4 md:p-5';
+/**
+ * What the character says, in the colours of the "add a word" card: an accent tint over the
+ * surface (opaque, so nothing shows through), with a light accent border. The tail matches.
+ */
+const bubbleClass =
+  'border border-accent/25 bg-surface bg-linear-to-br from-accent/15 to-accent-2/10 text-fg';
+const tailClass = 'border-accent/25 bg-surface';
+
+/** The bubble's tail: a turned square with the tint of the bubble's corner. */
+function BubbleTail({ className }: { className: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cx('absolute size-4 rotate-45 overflow-hidden', tailClass, className)}
+    >
+      <span className="absolute inset-0 bg-accent/15" />
+    </span>
+  );
+}
 
 function IconBadge({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -232,12 +251,9 @@ function useMessage(progress: DailyProgress | null, turn: number): string {
 function MessagePanel({ text }: { text: string }) {
   const t = useTranslations('character');
   return (
-    <section className={cx(panelClass, 'relative bg-surface')}>
+    <section className={cx(panelClass, 'relative', bubbleClass)}>
       {/* The bubble's tail points sideways at the character. */}
-      <span
-        aria-hidden
-        className="absolute -start-2 top-8 size-4 rotate-45 border-s border-b border-line/70 bg-surface"
-      />
+      <BubbleTail className="-start-2 top-8 border-s border-b" />
       <p className="flex items-center gap-2 text-sm text-fg-muted">
         <MessageCircleHeart aria-hidden className="size-4 text-accent" />
         {t('saysTitle')}
@@ -250,12 +266,16 @@ function MessagePanel({ text }: { text: string }) {
 }
 
 /**
- * Phones: the phrase pops up above the character's head for a moment after a tap, over the
- * windows around it. Anchored by its bottom edge, so a longer phrase grows upward, never moves.
+ * Phones: the phrase pops up for a moment after a tap, in the top corner beside the character,
+ * clear of its head when it hops. Anchored by its bottom edge, so a longer phrase grows upward,
+ * never moves.
  */
 function SpeechBubble({ text, shown }: { text: string; shown: boolean }) {
   return (
-    <div aria-live="polite" className="pointer-events-none absolute inset-x-14 bottom-[88%] z-20">
+    <div
+      aria-live="polite"
+      className="pointer-events-none absolute end-0 bottom-[55%] z-20 w-[36%]"
+    >
       <AnimatePresence mode="wait">
         {shown && (
           <motion.p
@@ -264,13 +284,14 @@ function SpeechBubble({ text, shown }: { text: string; shown: boolean }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ type: 'spring', stiffness: 420, damping: 26 }}
-            className="relative rounded-card border border-line/70 bg-surface px-4 py-3 text-center font-display leading-snug text-pretty shadow-pop"
+            className={cx(
+              'relative rounded-card px-3 py-2 text-start font-display text-sm leading-snug text-pretty shadow-pop',
+              bubbleClass,
+            )}
           >
             {text}
-            <span
-              aria-hidden
-              className="absolute start-1/2 -bottom-2 size-4 -translate-x-1/2 rotate-45 border-e border-b border-line/70 bg-surface rtl:translate-x-1/2"
-            />
+            {/* The tail points sideways, at the character's head. */}
+            <BubbleTail className="-start-2 bottom-5 border-s border-b" />
           </motion.p>
         )}
       </AnimatePresence>
@@ -319,7 +340,12 @@ function WardrobeButton({ compact = false }: { compact?: boolean }) {
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-2 py-2">
                 <span className="font-semibold leading-none">{t('change')}</span>
-                <span className={cx('text-xs font-normal leading-none', lit ? 'opacity-90' : 'text-fg-muted')}>
+                <span
+                  className={cx(
+                    'text-xs font-normal leading-none',
+                    lit ? 'opacity-90' : 'text-fg-muted',
+                  )}
+                >
                   {lit ? t('changeFresh', { count: fresh.size }) : t('changeHint')}
                 </span>
               </span>

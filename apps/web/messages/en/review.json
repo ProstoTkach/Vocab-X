@@ -23,7 +23,11 @@
     "REC": "Recognition",
     "PROD": "Recall",
     "AUD_PART": "Audio with hint",
-    "AUD_FULL": "Audio only"
+    "AUD_FULL": "Audio only",
+    "MCQ_TR": "Pick the translation",
+    "MCQ_WORD": "Pick the word",
+    "MCQ_AUD": "Listen and pick",
+    "TYPE": "Type the word"
   },
   "translateTo": "{lang, select, en {How do you say it in English?} uk {How do you say it in Ukrainian?} de {How do you say it in German?} es {How do you say it in Spanish?} other {How do you say it in this language?}}",
   "listen": "Listen",
@@ -54,7 +58,7 @@
   "accuracy": "Accuracy {percent}%",
   "home": "Home",
   "more": "More cards",
-  "level": "Level {level} of 3",
+  "level": "Level {level} of {max}",
   "keys": {
     "space": "Space",
     "enter": "Enter",
@@ -90,5 +94,16 @@
   "introFlip": "Not sure? Tap the card to turn it over and check the answer, then swipe.",
   "introStart": "Got it, let’s start",
   "libraryTitle": "New words are in the library",
-  "libraryText": "Ready-made decks by topic and level: quickly pick words and add them to your study right away."
+  "libraryText": "Ready-made decks by topic and level: quickly pick words and add them to your study right away.",
+  "quiz": {
+    "pickTranslation": "Pick the translation",
+    "listenPick": "Listen to the word and pick its translation",
+    "showWord": "Show the word",
+    "right": "Correct!",
+    "wrong": "Wrong",
+    "dontKnow": "I don't know",
+    "next": "Next",
+    "letters": "Show a hint",
+    "hintLabel": "Hint: {hint}"
+  }
 }

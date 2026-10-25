@@ -10,5 +10,6 @@
   "toggle": "Developer mode",
   "toggleHint": "Time-shift panel for demonstrating spaced repetition.",
   "darkTheme": "Dark theme",
-  "reachLevel": "Reach level {level}"
+  "reachLevel": "Reach level {level}",
+  "quizMode": "Four-choice test instead of cards"
 }

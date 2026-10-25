@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import {
   CHOICE_MAX,
+  FEEDBACK_COLUMNS,
+  feedbackRow,
   formatFeedback,
   MESSAGE_MAX,
   NOTE_MAX,
@@ -129,5 +131,48 @@ describe('formatFeedback', () => {
       // Every tag opened in a message is closed in it.
       expect(m.split('<blockquote>').length).toBe(m.split('</blockquote>').length);
     }
+  });
+});
+
+describe('feedbackRow', () => {
+  const at = new Date('2026-07-01T10:30:00Z');
+  test('a survey fills its columns, in order, one cell per column', () => {
+    const payload = parsePayload({
+      feedback: survey({ likes: ['cards'], device: 'phone', comment: '=1+1' }),
+      locale: 'uk',
+      level: 3,
+    })!;
+    const row = feedbackRow(payload, at);
+    expect(row).toHaveLength(FEEDBACK_COLUMNS.length);
+    const cell = (column: string) => row[FEEDBACK_COLUMNS.indexOf(column)];
+    expect(cell('Тип')).toBe('Опитування');
+    expect(cell('Дата (Київ)')).toContain('13:30');
+    expect(cell('Рівень гравця')).toBe(3);
+    expect(cell('Загалом')).toBe(4);
+    expect(cell('Загалом: що не так')).toBe('мало слів');
+    expect(cell('Подобається')).toBe('картки зі свайпами');
+    expect(cell('Пристрій')).toBe('телефон');
+    // Stored as text, never as a formula (the sheet is written RAW).
+    expect(cell('Коментар')).toBe('=1+1');
+    expect(typeof cell('Середня за все')).toBe('number');
+  });
+
+  test('a bug or an idea leaves the survey columns empty', () => {
+    const bug = feedbackRow(
+      parsePayload({
+        feedback: { kind: 'bug', platform: 'desktop', text: 'Падає' },
+        locale: 'en',
+        level: null,
+      })!,
+      at,
+    );
+    expect(bug[FEEDBACK_COLUMNS.indexOf('Баг: опис')]).toBe('Падає');
+    expect(bug[FEEDBACK_COLUMNS.indexOf('Загалом')]).toBe('');
+    expect(bug[FEEDBACK_COLUMNS.indexOf('Рівень гравця')]).toBe('');
+    const idea = feedbackRow(
+      parsePayload({ feedback: { kind: 'idea', text: 'Темна тема' }, locale: 'uk', level: 1 })!,
+      at,
+    );
+    expect(idea[FEEDBACK_COLUMNS.indexOf('Відгук або ідея')]).toBe('Темна тема');
   });
 });

@@ -26,3 +26,4 @@ export * from './review';
 export * from './session';
 export * from './decks';
 export * from './streak';
+export * from './quiz';

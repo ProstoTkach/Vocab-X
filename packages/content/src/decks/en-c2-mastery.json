@@ -8,8 +8,8 @@
     "en": "English C2: mastery"
   },
   "descriptionI18n": {
-    "uk": "15 рідкісних слів рівня C2 для тонкої, виразної мови.",
-    "en": "15 rare C2 words for subtle, expressive language."
+    "uk": "30 рідкісних слів рівня C2 для тонкої, виразної мови.",
+    "en": "30 rare C2 words for subtle, expressive language."
   },
   "words": [
     {
@@ -233,6 +233,231 @@
           "text": "It is an insidious disease.",
           "translations": {
             "uk": "Це підступна хвороба."
+          }
+        }
+      ]
+    },
+    {
+      "term": "acquiesce",
+      "pos": "verb",
+      "translations": {
+        "uk": ["поступатися", "неохоче погоджуватися"]
+      },
+      "examples": [
+        {
+          "text": "He finally acquiesced to their demands.",
+          "translations": {
+            "uk": "Зрештою він поступився їхнім вимогам."
+          }
+        }
+      ]
+    },
+    {
+      "term": "cacophony",
+      "pos": "noun",
+      "translations": {
+        "uk": ["какофонія"]
+      },
+      "examples": [
+        {
+          "text": "A cacophony of car horns filled the street.",
+          "translations": {
+            "uk": "Вулицю наповнила какофонія автомобільних сигналів."
+          }
+        }
+      ]
+    },
+    {
+      "term": "capricious",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["примхливий", "мінливий"]
+      },
+      "examples": [
+        {
+          "text": "The weather in the mountains is capricious.",
+          "translations": {
+            "uk": "Погода в горах мінлива."
+          }
+        }
+      ]
+    },
+    {
+      "term": "circumspect",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["обачний", "розважливий"]
+      },
+      "examples": [
+        {
+          "text": "Be circumspect about what you post online.",
+          "translations": {
+            "uk": "Будьте обачні з тим, що публікуєте в мережі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "disparage",
+      "pos": "verb",
+      "translations": {
+        "uk": ["принижувати", "зневажливо відгукуватися"]
+      },
+      "examples": [
+        {
+          "text": "He never disparages his rivals.",
+          "translations": {
+            "uk": "Він ніколи не відгукується зневажливо про суперників."
+          }
+        }
+      ]
+    },
+    {
+      "term": "equanimity",
+      "pos": "noun",
+      "translations": {
+        "uk": ["незворушність", "душевна рівновага"]
+      },
+      "examples": [
+        {
+          "text": "She accepted the news with equanimity.",
+          "translations": {
+            "uk": "Вона сприйняла новину незворушно."
+          }
+        }
+      ]
+    },
+    {
+      "term": "esoteric",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["езотеричний", "зрозумілий лише обраним"]
+      },
+      "examples": [
+        {
+          "text": "The lecture was full of esoteric terms.",
+          "translations": {
+            "uk": "Лекція була повна термінів, зрозумілих лише фахівцям."
+          }
+        }
+      ]
+    },
+    {
+      "term": "fastidious",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["прискіпливий", "перебірливий"]
+      },
+      "examples": [
+        {
+          "text": "He is fastidious about cleanliness.",
+          "translations": {
+            "uk": "Він прискіпливий щодо чистоти."
+          }
+        }
+      ]
+    },
+    {
+      "term": "gregarious",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["товариський", "компанійський"]
+      },
+      "examples": [
+        {
+          "text": "Our gregarious neighbour knows everyone on the street.",
+          "translations": {
+            "uk": "Наш компанійський сусід знає всіх на вулиці."
+          }
+        }
+      ]
+    },
+    {
+      "term": "idiosyncrasy",
+      "pos": "noun",
+      "translations": {
+        "uk": ["особливість", "дивацтво"]
+      },
+      "examples": [
+        {
+          "text": "Every writer has their own idiosyncrasies.",
+          "translations": {
+            "uk": "Кожен письменник має свої особливості."
+          }
+        }
+      ]
+    },
+    {
+      "term": "inexorable",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["невблаганний", "неминучий"]
+      },
+      "examples": [
+        {
+          "text": "The inexorable rise of prices worries everyone.",
+          "translations": {
+            "uk": "Невблаганне зростання цін турбує всіх."
+          }
+        }
+      ]
+    },
+    {
+      "term": "laconic",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["лаконічний", "небагатослівний"]
+      },
+      "examples": [
+        {
+          "text": "His laconic reply surprised us.",
+          "translations": {
+            "uk": "Його лаконічна відповідь нас здивувала."
+          }
+        }
+      ]
+    },
+    {
+      "term": "perfunctory",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["формальний", "побіжний"]
+      },
+      "examples": [
+        {
+          "text": "The guard gave our passports a perfunctory glance.",
+          "translations": {
+            "uk": "Охоронець побіжно глянув на наші паспорти."
+          }
+        }
+      ]
+    },
+    {
+      "term": "recalcitrant",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["непокірний", "норовливий"]
+      },
+      "examples": [
+        {
+          "text": "The teacher struggled with a recalcitrant pupil.",
+          "translations": {
+            "uk": "Учителю було важко з непокірним учнем."
+          }
+        }
+      ]
+    },
+    {
+      "term": "sycophant",
+      "pos": "noun",
+      "translations": {
+        "uk": ["підлабузник"]
+      },
+      "examples": [
+        {
+          "text": "The king was surrounded by sycophants.",
+          "translations": {
+            "uk": "Короля оточували підлабузники."
           }
         }
       ]

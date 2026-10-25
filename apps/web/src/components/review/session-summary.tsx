@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReviewOutcome, SessionState, StudyCard } from '@vocabx/core';
+import type { Grade, ReviewOutcome, SessionState, StudyCard } from '@vocabx/core';
 import { CircleCheck, Coffee } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Button, buttonClass } from '@/components/ui/button';
@@ -12,10 +12,13 @@ import { GRADE_NAME, GRADE_TONE } from './grade-bar';
 export function SessionSummary({
   session,
   minutes,
+  grades,
   onMore,
 }: {
   session: SessionState<StudyCard, ReviewOutcome>;
   minutes: number;
+  /** The grades in use: Hard and Easy are left out when only two are. */
+  grades: readonly Grade[];
   onMore: () => void;
 }) {
   const t = useTranslations('review');
@@ -47,7 +50,7 @@ export function SessionSummary({
       {!empty && (
         <>
           <div className="flex flex-wrap justify-center gap-2">
-            {([1, 2, 3, 4] as const).map((g) => (
+            {grades.map((g) => (
               <span
                 key={g}
                 className={`rounded-full px-3 py-1 text-sm font-semibold ${GRADE_TONE[g]}`}

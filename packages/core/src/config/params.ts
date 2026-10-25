@@ -2,15 +2,26 @@
  * All tunable model constants live here with their meaning and default value.
  * Symbols follow the thesis notation (w₀…w₂₀, ρ, τ⁰, β, …).
  */
-import type { ExerciseFormat } from '../types';
+import type { ExerciseFormat, Level } from '../types';
 
 export interface SchedulerParams {
   /** FSRS-6 weights w₀…w₂₀. */
   w: readonly number[];
-  /** ρ: stability transfer when promoted to format level 2, 3. */
-  rho: readonly [number, number];
-  /** τ⁰: base stability thresholds (days) to reach format level 2, 3. */
-  tau0: readonly [number, number];
+  /** ρ: stability transfer when promoted to format level 2, 3, 4. */
+  rho: readonly number[];
+  /** τ⁰: base stability thresholds (days) to reach format level 2, 3, 4. */
+  tau0: readonly number[];
+  /**
+   * The last format level; after it the formats start over. Unset: the card mode's three.
+   * Events of the four-choice test use four (see applyEvent).
+   */
+  maxLevel?: Level;
+  /**
+   * Share of the usual stability gain a success brings (1 when unset). The four-choice test
+   * uses less: recognizing a word among four is easier than recalling it, so its intervals
+   * grow more slowly.
+   */
+  successGain?: number;
   /** β_τ: how strongly difficulty D shifts the promotion threshold τ(D). */
   betaTau: number;
   /** k₀: consecutive successes required for promotion. */
@@ -48,8 +59,8 @@ export const DEFAULT_SCHEDULER_PARAMS: SchedulerParams = {
   w: FSRS6_DEFAULT_W,
   // Formats change after two successes in a row, whatever the stability or the pause: the
   // level is about variety, so it does not cut the interval either.
-  rho: [1, 1],
-  tau0: [0, 0],
+  rho: [1, 1, 1],
+  tau0: [0, 0, 0],
   betaTau: 0.3,
   k0: 2,
   maxInterval: 36_500,
@@ -62,6 +73,17 @@ export const DEFAULT_SCHEDULER_PARAMS: SchedulerParams = {
   streakBoost: 0.2,
   streakBoostMax: 4,
 };
+
+/**
+ * How the four-choice test changes the scheduler: four levels, a new level after every right
+ * answer (more variety), and intervals that grow slower (choosing is easier than recalling,
+ * typing a little less so).
+ */
+export const QUIZ_SCHEDULER = {
+  maxLevel: 4,
+  k0: 1,
+  successGain: { choice: 0.35, typing: 0.6 },
+} as const;
 
 /** r_d: target probability of recall. User-adjustable within RETENTION_RANGE. */
 export const DEFAULT_RETENTION = 0.9;
@@ -121,6 +143,11 @@ export const DEFAULT_XP_PARAMS: XpParams = {
     AUD_PART: 1.5,
     PROD: 1.75,
     AUD_FULL: 2,
+    // The test: choosing is easier than recalling, typing (PROD) is the same as on cards.
+    MCQ_TR: 1,
+    MCQ_WORD: 1.25,
+    MCQ_AUD: 1.25,
+    TYPE: 1.75,
     MCQ: 1,
     MAT: 1,
     CLZ: 1.5,

@@ -1,14 +1,30 @@
 // The review log is the source of truth; card state is a fold over it.
-import type { SchedulerParams } from './config/params';
+import { QUIZ_SCHEDULER, type SchedulerParams } from './config/params';
 import type { ReviewEvent } from './model';
 import { rngForEvent } from './rng';
 import { placeKnown, review, type CardState, type ReviewResult } from './scheduler';
+import { isQuizFormat } from './types';
 
 export function applyEvent(
   card: CardState | null,
-  e: Pick<ReviewEvent, 'id' | 'grade' | 'at' | 'retention' | 'kind'>,
-  p: SchedulerParams,
+  e: Pick<ReviewEvent, 'id' | 'grade' | 'at' | 'retention' | 'kind'> &
+    Partial<Pick<ReviewEvent, 'format'>>,
+  params: SchedulerParams,
 ): ReviewResult {
+  // An answer in the four-choice test: four levels, one up after each right answer, and a
+  // smaller stability gain. The format is in the log, so replays agree.
+  const p: SchedulerParams =
+    e.format && isQuizFormat(e.format)
+      ? {
+          ...params,
+          maxLevel: QUIZ_SCHEDULER.maxLevel,
+          k0: QUIZ_SCHEDULER.k0,
+          successGain:
+            e.format === 'TYPE'
+              ? QUIZ_SCHEDULER.successGain.typing
+              : QUIZ_SCHEDULER.successGain.choice,
+        }
+      : params;
   // "I know it" from the level check skips the learning phase of a new card.
   if (e.kind === 'placement' && !card) return placeKnown(e.at, p, e.retention, rngForEvent(e.id));
   return review(card, e.grade, e.at, p, e.retention, rngForEvent(e.id));

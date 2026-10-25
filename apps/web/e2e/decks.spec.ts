@@ -17,20 +17,26 @@ async function mockDictionaries(page: Page) {
       },
     }),
   );
-  await page.route('https://en.wiktionary.org/**', (route) =>
-    route.fulfill({
-      json: {
-        en: [
-          {
-            partOfSpeech: 'Noun',
-            definitions: [
-              { definition: 'Income.', parsedExamples: [{ example: 'Revenue grew by 10%.' }] },
-            ],
-          },
+  const wiktionary = {
+    en: [
+      {
+        partOfSpeech: 'Noun',
+        definitions: [
+          { definition: 'Income.', parsedExamples: [{ example: 'Revenue grew by 10%.' }] },
         ],
       },
+    ],
+  };
+  await page.route('https://en.wiktionary.org/**', (route) => route.fulfill({ json: wiktionary }));
+  // Dictionaries asked through the app's own route: Wiktionary answers, Free Dictionary has none.
+  await page.route('**/api/dictionary?**', (route) =>
+    route.fulfill({
+      json: new URL(route.request().url()).searchParams.get('url')?.includes('wiktionary')
+        ? wiktionary
+        : null,
     }),
   );
+  await page.route('https://api.tatoeba.org/**', (route) => route.fulfill({ json: { data: [] } }));
 }
 
 async function mouseSwipe(page: Page, testId: string, dx: number) {
@@ -81,12 +87,13 @@ test('my words: list with learning bars and details', async ({ page }) => {
 
 test('add a word from my words goes to "My words"', async ({ page }) => {
   await page.goto('/uk/decks');
-  await page.getByRole('button', { name: 'Додати слово' }).click();
+  await page.getByRole('button', { name: /^Додати нове слово/ }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByText('Слово потрапить у колоду «Мої слова».')).toBeVisible();
   await dialog.getByLabel('Слово або вираз').fill('revenue');
-  await dialog.getByRole('button', { name: 'Підказати' }).click();
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
   await dialog.getByRole('button', { name: 'дохід' }).click();
+  await dialog.getByRole('button', { name: 'Revenue grew by 10%.' }).click();
   await expect(dialog.getByLabel('Приклад речення')).toHaveValue('Revenue grew by 10%.');
   await dialog.getByRole('button', { name: 'Додати', exact: true }).click();
 
@@ -98,6 +105,23 @@ test('add a word from my words goes to "My words"', async ({ page }) => {
 
   await page.getByRole('link', { name: 'Мої колоди' }).click();
   await expect(page.getByRole('link', { name: 'Мої слова' }).last()).toBeVisible();
+});
+
+test('"I have learned it" moves a word to the learned words, out of the reviews', async ({
+  page,
+}) => {
+  await page.goto('/uk/decks');
+  await expect(page.getByText('30 слів', { exact: true })).toBeVisible();
+  await wordButton(page, 'achieve').click();
+  await page.getByRole('button', { name: 'Я вивчив!' }).click();
+  await expect(
+    page.getByText('Слово «achieve» перенесено до колоди «Вивчені слова»').first(),
+  ).toBeVisible();
+  await expect(page.getByText('29 слів', { exact: true })).toBeVisible();
+  await page.goto('/uk');
+  await expect(page.getByRole('heading', { name: /^29 карток чекають/ })).toBeVisible();
+  await page.goto('/uk/decks/mine');
+  await expect(page.getByText('Вивчені слова').first()).toBeVisible();
 });
 
 test('library: pick single words by swiping, then add the rest', async ({ page }) => {
@@ -124,8 +148,8 @@ test('library: pick single words by swiping, then add the rest', async ({ page }
   await expect(page.getByRole('heading', { name: 'Додано 2 слова' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Бібліотека' }).click();
-  await expect(page.getByText('Додано 2 з 15')).toBeVisible();
-  await expect(page.getByText('Відбір не завершено · Переглянуто 3 з 15')).toBeVisible();
+  await expect(page.getByText('Додано 2 з 30')).toBeVisible();
+  await expect(page.getByText('Відбір не завершено · Переглянуто 3 з 30')).toBeVisible();
   await page.goto('/uk');
   await expect(heroCount(page, 32)).toBeVisible();
 
@@ -147,7 +171,7 @@ test('library: pick single words by swiping, then add the rest', async ({ page }
   await expect(page).toHaveURL(/\/uk\/decks\/library$/);
   await expect(page.getByText(/збережено до ваших слів/).first()).toBeVisible();
   await page.goto('/uk');
-  await expect(heroCount(page, 45)).toBeVisible();
+  await expect(heroCount(page, 60)).toBeVisible();
 });
 
 test('my decks: create a deck, add a word, review only that deck', async ({ page }) => {

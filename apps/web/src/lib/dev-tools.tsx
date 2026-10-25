@@ -6,6 +6,9 @@ import { useRepos } from './repos';
 interface DevTools {
   enabled: boolean;
   setEnabled: (on: boolean) => void;
+  /** Reviews use the four-choice test instead of flash cards. */
+  quiz: boolean;
+  setQuiz: (on: boolean) => void;
 }
 
 const DevToolsContext = createContext<DevTools | null>(null);
@@ -14,11 +17,14 @@ const DevToolsContext = createContext<DevTools | null>(null);
 export function DevToolsProvider({ children }: { children: ReactNode }) {
   const repos = useRepos();
   const [enabled, setState] = useState(false);
+  const [quiz, setQuizState] = useState(false);
 
   useEffect(() => {
     const ctrl = new AbortController();
     void repos.settings.get().then((s) => {
-      if (!ctrl.signal.aborted) setState(s.devTools);
+      if (ctrl.signal.aborted) return;
+      setState(s.devTools);
+      setQuizState(s.quizMode);
     });
     return () => ctrl.abort();
   }, [repos]);
@@ -30,8 +36,13 @@ export function DevToolsProvider({ children }: { children: ReactNode }) {
         setState(on);
         void repos.settings.update({ devTools: on });
       },
+      quiz,
+      setQuiz: (on) => {
+        setQuizState(on);
+        void repos.settings.update({ quizMode: on });
+      },
     }),
-    [enabled, repos],
+    [enabled, quiz, repos],
   );
 
   useEffect(() => {

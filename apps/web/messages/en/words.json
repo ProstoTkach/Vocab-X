@@ -1,6 +1,6 @@
 {
   "title": "My words",
-  "intro": "All the words you are learning. Tap a word to see the details.",
+  "intro": "Every word you are learning. Tap a word to see its details, review it more often or mark it as learned.",
   "myDecks": "My decks",
   "library": "Library",
   "addWord": "Add word",
@@ -21,7 +21,7 @@
   "streak": "{count} correct in a row",
   "example": "Example",
   "noExample": "No example yet.",
-  "reviewMore": "Review it more often",
+  "reviewMore": "Show it more often",
   "backupTitle": "Afraid of losing your data?",
   "backupText": "Everything is stored in this browser only. Download a JSON file with your current progress and settings — you can restore from it at any time.",
   "sortLabel": "Sort",
@@ -34,5 +34,8 @@
   "deleteTitle": "Delete \"{word}\"?",
   "deleteText": "The word will disappear from all your decks and will no longer come up for review.",
   "deleted": "\"{word}\" deleted",
-  "myDecksTip": "Your sets of words: browse, edit and review each one on its own."
+  "myDecksTip": "Your sets of words: browse, edit and review each one on its own.",
+  "learnedIt": "I've learned it!",
+  "learnedDeck": "Learned words",
+  "learnedToast": "The word \"{word}\" moved to the deck \"{deck}\""
 }

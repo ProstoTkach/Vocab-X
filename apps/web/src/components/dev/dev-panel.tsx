@@ -21,7 +21,7 @@ const DEMO_LEVEL = 15;
 export function DevPanel() {
   const t = useTranslations('dev');
   const format = useFormatter();
-  const { enabled, setEnabled } = useDevTools();
+  const { enabled, setEnabled, quiz, setQuiz } = useDevTools();
   const { clock, offsetMs, setOffsetMs } = useClock();
   const { resolved, setChoice } = useTheme();
   const { reachLevel, level } = usePlayer();
@@ -74,6 +74,8 @@ export function DevPanel() {
         onCheckedChange={(on) => setChoice(on ? SYSTEM_THEMES.dark : SYSTEM_THEMES.light)}
         className="mt-3 border-t border-line/70 pt-2"
       />
+      {/* Reviews as a four-choice test instead of flash cards (same words, same progress). */}
+      <Switch label={t('quizMode')} checked={quiz} onCheckedChange={setQuiz} />
       <Button
         size="sm"
         variant="secondary"

@@ -8,7 +8,7 @@ import {
   type Word,
   type WordReviewStats,
 } from '@vocabx/core';
-import { ChevronDown, CircleCheck, CircleX, Flame, RotateCcw } from 'lucide-react';
+import { ChevronDown, CircleCheck, CircleX, Flame, GraduationCap, RotateCcw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId, useState, type ReactNode } from 'react';
 import { Badge, BadgeDot, type BadgeTone } from '@/components/ui/badge';
@@ -51,12 +51,14 @@ function WordDetails({
   stats,
   status,
   onReset,
+  onLearned,
 }: {
   word: Word;
   progress: CardProgress | undefined;
   stats: WordReviewStats | undefined;
   status: WordItemStatus | undefined;
   onReset: (() => void) | undefined;
+  onLearned: (() => void) | undefined;
 }) {
   const t = useTranslations('words');
   const example = word.examples[0];
@@ -90,11 +92,21 @@ function WordDetails({
           )}
         </div>
         {/* Only a word already being learned has something to reset. */}
-        {progress && onReset && (
-          <Button variant="secondary" size="sm" onClick={onReset} className="self-start">
-            <RotateCcw aria-hidden className="size-4" />
-            {t('reviewMore')}
-          </Button>
+        {((progress && onReset) || onLearned) && (
+          <div className="flex flex-wrap gap-2">
+            {progress && onReset && (
+              <Button variant="secondary" size="sm" onClick={onReset}>
+                <RotateCcw aria-hidden className="size-4" />
+                {t('reviewMore')}
+              </Button>
+            )}
+            {onLearned && (
+              <Button variant="secondary" size="sm" onClick={onLearned}>
+                <GraduationCap aria-hidden className="size-4 text-success" />
+                {t('learnedIt')}
+              </Button>
+            )}
+          </div>
         )}
       </div>
       {/* Compact on phones, so the counts fit on one line. */}
@@ -138,6 +150,8 @@ export interface WordItemProps {
   actions?: ReactNode;
   /** "Review this more often": resets what was learned; shown for words being learned. */
   onReset?: () => void;
+  /** "I've learned it": moves the word to the learned words, which are not reviewed. */
+  onLearned?: () => void;
 }
 
 /** A word with its learning bar; opens to show timing, example and answer history. */
@@ -149,6 +163,7 @@ export function WordItem({
   status,
   actions,
   onReset,
+  onLearned,
 }: WordItemProps) {
   const t = useTranslations('words');
   const [open, setOpen] = useState(false);
@@ -211,6 +226,7 @@ export function WordItem({
             stats={stats}
             status={status}
             onReset={onReset}
+            onLearned={onLearned}
           />
         </div>
       )}

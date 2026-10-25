@@ -4,6 +4,7 @@ import {
   addWord,
   editWord,
   ensurePersonalDeck,
+  markWordLearned,
   removeWordEverywhere,
   dueOrder,
   resetWordProgress,
@@ -110,6 +111,16 @@ export function MyWords() {
     setVersion((v) => v + 1);
   };
 
+  // "I've learned it": off to the learned words, out of the reviews (and of this list).
+  const learn = async (word: Word) => {
+    const deck = await markWordLearned(repos, word, t('learnedDeck'), {
+      now: clock.now(),
+      newId,
+    });
+    toast({ title: t('learnedToast', { word: word.term, deck: deck.title }), tone: 'success' });
+    setVersion((v) => v + 1);
+  };
+
   const remove = async (word: Word) => {
     await removeWordEverywhere(repos, word, clock.now());
     setRemoving(null);
@@ -138,7 +149,6 @@ export function MyWords() {
 
   return (
     <div className="flex flex-col gap-5">
-      <h1 className="sr-only">{t('title')}</h1>
       {/* Data lives in this browser only: a reminder that a backup is one click away. */}
       {!backupHidden && (
         <section
@@ -165,7 +175,7 @@ export function MyWords() {
       )}
 
       {/* Adding words first, then where the words come from: the same cards as on Home. */}
-      <div className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-3">
+      <div className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-3 max-lg:mt-6">
         <AddWordCard layout="row" onClick={() => setAdding(true)} disabled={!state} />
         <AddListCard layout="row" />
         <ActionCardLink
@@ -245,6 +255,7 @@ export function MyWords() {
                 now={clock.now()}
                 onEdit={() => setEditing(w)}
                 onReset={() => void reset(w)}
+                onLearned={() => void learn(w)}
                 onRemove={() => setRemoving(w)}
                 removeLabel={t('delete')}
               />

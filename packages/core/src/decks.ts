@@ -51,6 +51,8 @@ export async function duplicateDeck(
   const {
     builtinId: _builtin,
     skippedIds: _skipped,
+    // A copy of the learned words is an ordinary deck.
+    learned: _learned,
     titleI18n: _t,
     descriptionI18n: _d,
     ...rest
@@ -200,6 +202,52 @@ export async function removeWordEverywhere(
     (d) => d.origin === 'own' && d.wordIds.includes(word.id),
   );
   for (const deck of decks) await removeWordFromDeck(repos, deck, word.id, now);
+}
+
+/** The deck of learned words of a language, created (or brought back from the archive) on demand. */
+export async function ensureLearnedDeck(
+  repos: DeckRepos,
+  lang: LangCode,
+  title: string,
+  ctx: Ctx,
+): Promise<Deck> {
+  const existing = (await repos.decks.list({ lang, includeArchived: true })).find(
+    (d) => d.origin === 'own' && d.learned,
+  );
+  if (existing)
+    return existing.archived ? updateDeck(repos, existing, { archived: false }, ctx.now) : existing;
+  const deck: Deck = {
+    id: ctx.newId(),
+    title,
+    lang,
+    wordIds: [],
+    origin: 'own',
+    learned: true,
+    archived: false,
+    createdAt: ctx.now,
+    updatedAt: ctx.now,
+  };
+  await repos.decks.save(deck);
+  return deck;
+}
+
+/**
+ * "I've learned it": the word moves from its decks to the learned words and is no longer
+ * reviewed. Its progress and history stay, so taking it out of there picks up where it was.
+ */
+export async function markWordLearned(
+  repos: DeckRepos,
+  word: Pick<Word, 'id' | 'lang'>,
+  learnedTitle: string,
+  ctx: Ctx,
+): Promise<Deck> {
+  const target = await ensureLearnedDeck(repos, word.lang, learnedTitle, ctx);
+  const others = (await repos.decks.list({ lang: word.lang })).filter(
+    (d) => d.origin === 'own' && d.id !== target.id && d.wordIds.includes(word.id),
+  );
+  for (const deck of others) await removeWordFromDeck(repos, deck, word.id, ctx.now);
+  if (target.wordIds.includes(word.id)) return target;
+  return updateDeck(repos, target, { wordIds: [...target.wordIds, word.id] }, ctx.now);
 }
 
 /**

@@ -331,3 +331,74 @@ export function formatFeedback({ feedback: f, locale, level }: FeedbackPayload):
   messages.push(current);
   return messages;
 }
+
+/**
+ * The four-choice test is new: after this many answers in it, the learner is asked once what
+ * they think (in the session, between two cards).
+ */
+export const QUIZ_INVITE_AFTER = 15;
+export const QUIZ_INVITE_TIP = 'feedback-invite-quiz';
+
+// ---------------------------------------------------------------------------------------------
+// The spreadsheet row: one row per sent form, the columns below in this order. Read by the
+// developer only, so it is not translated.
+
+/** Labels without the leading emoji, for plain spreadsheet cells. */
+const plain = (label: string) => label.replace(/^[^\p{L}\p{N}]+/u, '');
+
+export const FEEDBACK_COLUMNS: readonly string[] = [
+  'Дата (Київ)',
+  'Тип',
+  'Мова інтерфейсу',
+  'Рівень гравця',
+  ...SURVEY_QUESTIONS.flatMap((q) => [QUESTION_LABELS[q], `${QUESTION_LABELS[q]}: що не так`]),
+  ...(Object.keys(SURVEY_SECTIONS) as SurveySection[]).map(
+    (s) => `${plain(SECTION_LABELS[s])}: середня`,
+  ),
+  'Середня за все',
+  'Подобається',
+  'Покращити',
+  'Пристрій',
+  'Як часто займається',
+  'Коментар',
+  'Баг: пристрій',
+  'Баг: опис',
+  'Відгук або ідея',
+];
+
+export type SheetCell = string | number;
+
+/** The feedback as one spreadsheet row, matching FEEDBACK_COLUMNS (empty cells as ''). */
+export function feedbackRow(
+  { feedback: f, locale, level }: FeedbackPayload,
+  at: Date,
+): SheetCell[] {
+  const date = new Intl.DateTimeFormat('uk-UA', {
+    timeZone: 'Europe/Kyiv',
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(at);
+  const survey = f.kind === 'survey' ? f : null;
+  const bug = f.kind === 'bug' ? f : (survey?.bug ?? null);
+  return [
+    date,
+    plain(TITLES[f.kind]),
+    locale,
+    level ?? '',
+    ...SURVEY_QUESTIONS.flatMap((q) =>
+      survey ? [survey.answers[q].rating, survey.answers[q].note ?? ''] : ['', ''],
+    ),
+    ...(Object.values(SURVEY_SECTIONS) as readonly (readonly SurveyQuestion[])[]).map((qs) =>
+      survey ? Number(average(qs, survey.answers)) : '',
+    ),
+    survey ? Number(average(SURVEY_QUESTIONS, survey.answers)) : '',
+    survey ? survey.likes.map((x) => LIKE_LABELS[x]).join(', ') : '',
+    survey ? survey.improve.map((x) => IMPROVE_LABELS[x]).join(', ') : '',
+    survey?.device ? plain(DEVICE_LABELS[survey.device]) : '',
+    survey?.frequency ? FREQUENCY_LABELS[survey.frequency] : '',
+    survey?.comment ?? '',
+    bug ? plain(PLATFORM_LABELS[bug.platform]) : '',
+    bug?.text ?? '',
+    f.kind === 'review' || f.kind === 'idea' ? f.text : '',
+  ];
+}

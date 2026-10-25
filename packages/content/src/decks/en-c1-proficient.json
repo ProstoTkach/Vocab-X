@@ -8,8 +8,8 @@
     "en": "English C1: confident speaker"
   },
   "descriptionI18n": {
-    "uk": "15 слів C1 для аргументованих дискусій, звітів і переговорів.",
-    "en": "15 C1 words for reasoned debates, reports and negotiations."
+    "uk": "30 слів C1 для аргументованих дискусій, звітів і переговорів.",
+    "en": "30 C1 words for reasoned debates, reports and negotiations."
   },
   "words": [
     {
@@ -233,6 +233,231 @@
           "text": "The team reached a consensus.",
           "translations": {
             "uk": "Команда дійшла згоди."
+          }
+        }
+      ]
+    },
+    {
+      "term": "alleviate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["полегшувати"]
+      },
+      "examples": [
+        {
+          "text": "The medicine helped to alleviate the pain.",
+          "translations": {
+            "uk": "Ліки допомогли полегшити біль."
+          }
+        }
+      ]
+    },
+    {
+      "term": "arbitrary",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["довільний", "свавільний"]
+      },
+      "examples": [
+        {
+          "text": "The decision seemed completely arbitrary.",
+          "translations": {
+            "uk": "Рішення здавалося цілком довільним."
+          }
+        }
+      ]
+    },
+    {
+      "term": "comprise",
+      "pos": "verb",
+      "translations": {
+        "uk": ["складатися з", "охоплювати"]
+      },
+      "examples": [
+        {
+          "text": "The team comprises five engineers.",
+          "translations": {
+            "uk": "Команда складається з п’яти інженерів."
+          }
+        }
+      ]
+    },
+    {
+      "term": "contemplate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["обмірковувати", "розглядати"]
+      },
+      "examples": [
+        {
+          "text": "She is contemplating a move abroad.",
+          "translations": {
+            "uk": "Вона обмірковує переїзд за кордон."
+          }
+        }
+      ]
+    },
+    {
+      "term": "convey",
+      "pos": "verb",
+      "translations": {
+        "uk": ["передавати", "висловлювати"]
+      },
+      "examples": [
+        {
+          "text": "Words cannot convey how grateful I am.",
+          "translations": {
+            "uk": "Словами не передати, наскільки я вдячний."
+          }
+        }
+      ]
+    },
+    {
+      "term": "deem",
+      "pos": "verb",
+      "translations": {
+        "uk": ["вважати", "визнавати"]
+      },
+      "examples": [
+        {
+          "text": "The plan was deemed too risky.",
+          "translations": {
+            "uk": "План визнали надто ризикованим."
+          }
+        }
+      ]
+    },
+    {
+      "term": "discern",
+      "pos": "verb",
+      "translations": {
+        "uk": ["розрізняти", "помічати"]
+      },
+      "examples": [
+        {
+          "text": "It was hard to discern any difference between them.",
+          "translations": {
+            "uk": "Між ними було важко помітити будь-яку різницю."
+          }
+        }
+      ]
+    },
+    {
+      "term": "explicit",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["чіткий", "явний"]
+      },
+      "examples": [
+        {
+          "text": "The instructions were clear and explicit.",
+          "translations": {
+            "uk": "Інструкції були зрозумілими й чіткими."
+          }
+        }
+      ]
+    },
+    {
+      "term": "inherent",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["притаманний", "властивий"]
+      },
+      "examples": [
+        {
+          "text": "Every investment has inherent risks.",
+          "translations": {
+            "uk": "Кожній інвестиції притаманні ризики."
+          }
+        }
+      ]
+    },
+    {
+      "term": "intricate",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["складний", "заплутаний"]
+      },
+      "examples": [
+        {
+          "text": "The carpet has an intricate pattern.",
+          "translations": {
+            "uk": "На килимі складний візерунок."
+          }
+        }
+      ]
+    },
+    {
+      "term": "plausible",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["правдоподібний"]
+      },
+      "examples": [
+        {
+          "text": "His explanation sounded plausible.",
+          "translations": {
+            "uk": "Його пояснення звучало правдоподібно."
+          }
+        }
+      ]
+    },
+    {
+      "term": "scrutiny",
+      "pos": "noun",
+      "translations": {
+        "uk": ["ретельна перевірка", "пильна увага"]
+      },
+      "examples": [
+        {
+          "text": "The report came under close scrutiny.",
+          "translations": {
+            "uk": "Звіт піддали ретельній перевірці."
+          }
+        }
+      ]
+    },
+    {
+      "term": "tentative",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["попередній", "невпевнений"]
+      },
+      "examples": [
+        {
+          "text": "We made a tentative plan to meet on Friday.",
+          "translations": {
+            "uk": "Ми попередньо домовилися зустрітися в п’ятницю."
+          }
+        }
+      ]
+    },
+    {
+      "term": "unprecedented",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["безпрецедентний", "небувалий"]
+      },
+      "examples": [
+        {
+          "text": "The city saw an unprecedented amount of rain.",
+          "translations": {
+            "uk": "Місто побачило небувалу кількість опадів."
+          }
+        }
+      ]
+    },
+    {
+      "term": "viable",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["життєздатний", "здійсненний"]
+      },
+      "examples": [
+        {
+          "text": "Solar power is a viable alternative.",
+          "translations": {
+            "uk": "Сонячна енергія — життєздатна альтернатива."
           }
         }
       ]

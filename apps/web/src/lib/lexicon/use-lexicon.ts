@@ -24,6 +24,12 @@ export interface Lexicon {
   dictionary: LexiconProvider;
 }
 
+/**
+ * Contact address for MyMemory: with it the free quota is 50,000 characters a day instead of
+ * 5,000. It is sent with every translation request.
+ */
+const MYMEMORY_EMAIL = 'danieltkachenko093@gmail.com';
+
 const CACHE = { maxEntries: 400, ttlMs: 30 * DAY_MS, now: () => systemClock.now() };
 
 function createLexicon(): Lexicon {
@@ -35,7 +41,7 @@ function createLexicon(): Lexicon {
     // English Wiktionary add the other senses (several variants to choose from).
     translations: mergedTranslations([
       cachedTranslations(
-        createMyMemoryProvider({ fetch: fetchJson }),
+        createMyMemoryProvider({ fetch: fetchJson, email: MYMEMORY_EMAIL }),
         // Versioned: results cached before the cleanup of broken variants are not reused.
         createLookupCache<string[]>(storage, 'translations-v2', CACHE),
       ),
