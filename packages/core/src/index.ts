@@ -13,6 +13,7 @@ export * from './language';
 export * from './grading';
 export * from './text/similarity';
 export * from './text/highlight';
+export * from './text/word-list';
 export * from './model';
 export * from './repos';
 export * from './providers';

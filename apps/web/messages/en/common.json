@@ -10,17 +10,5 @@
   "comingSoon": "This section arrives in stage {stage}.",
   "notFoundTitle": "Page not found",
   "notFoundText": "The link may be outdated or the page has moved.",
-  "goHome": "Go home",
-  "pos": {
-    "noun": "noun",
-    "verb": "verb",
-    "adjective": "adjective",
-    "adverb": "adverb",
-    "pronoun": "pronoun",
-    "preposition": "preposition",
-    "conjunction": "conjunction",
-    "interjection": "interjection",
-    "phrase": "phrase",
-    "other": "other"
-  }
+  "goHome": "Go home"
 }

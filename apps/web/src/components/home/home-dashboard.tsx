@@ -317,9 +317,9 @@ function WardrobeButton({ compact = false }: { compact?: boolean }) {
               >
                 <Shirt aria-hidden className="size-5" />
               </span>
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className="font-semibold">{t('change')}</span>
-                <span className={cx('text-xs font-normal', lit ? 'opacity-90' : 'text-fg-muted')}>
+              <span className="flex min-w-0 flex-1 flex-col gap-2 py-2">
+                <span className="font-semibold leading-none">{t('change')}</span>
+                <span className={cx('text-xs font-normal leading-none', lit ? 'opacity-90' : 'text-fg-muted')}>
                   {lit ? t('changeFresh', { count: fresh.size }) : t('changeHint')}
                 </span>
               </span>
@@ -380,8 +380,8 @@ export function HomeDashboard() {
           </div>
           <div className="relative mx-auto w-full max-w-[400px]">
             {/* On phones the figure is a third smaller, so it leaves room for the rest of the
-                page; the buttons stay in the corners of the full-width window around it. */}
-            <div className="mx-auto w-2/3 lg:w-full">
+                page; from md up it is full size. The buttons stay in the window's corners. */}
+            <div className="mx-auto w-2/3 md:w-full">
               {ready && progress ? (
                 <CharacterFigure
                   mood={progress.mood}

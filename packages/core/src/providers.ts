@@ -27,6 +27,8 @@ export interface LexiconEntry {
   pos?: PartOfSpeech;
   definitions: string[];
   examples: Example[];
+  /** Words of similar meaning, when the dictionary gives them. */
+  synonyms?: string[];
 }
 
 export interface LexiconProvider {

@@ -1,6 +1,7 @@
 import { builtinCatalog } from '@vocabx/content';
 import {
   addWord,
+  addWords,
   addWordsFromBuiltin,
   builtinPickState,
   isPickOnlyCopy,
@@ -21,6 +22,7 @@ import {
   loadStudyStack,
   markKnown,
   moveInOrder,
+  removeWordEverywhere,
   removeWordFromDeck,
   resetWordProgress,
   updateDeck,
@@ -57,6 +59,30 @@ const stack = (deckIds?: string[]) =>
   });
 
 describe('deck management', () => {
+  test('a pasted list becomes words of a deck, in order, saved at once', async () => {
+    const deck = await createDeck(repo, { title: 'Imported', lang: 'en' }, ctx);
+    const { deck: next, words } = await addWords(
+      repo,
+      deck,
+      [
+        { term: 'apple', translations: { uk: ['яблуко'] }, examples: [{ text: 'An apple.' }] },
+        { term: '  ', translations: { uk: ['порожньо'] } },
+        { term: 'pear', translations: { uk: [] } },
+        { term: 'plum', translations: { uk: ['слива', 'слива'] } },
+      ],
+      ctx,
+    );
+    expect(words.map((w) => w.term)).toEqual(['apple', 'plum']);
+    expect(words[0]).toMatchObject({ source: 'import', examples: [{ text: 'An apple.' }] });
+    expect(words[1]!.translations).toEqual({ uk: ['слива'] });
+    expect(next.wordIds).toEqual(words.map((w) => w.id));
+    expect((await repo.decks.get(deck.id))?.wordIds).toEqual(next.wordIds);
+    // The new words are in the big deck right away.
+    expect((await stack()).map((c) => c.word.term)).toEqual(
+      expect.arrayContaining(['apple', 'plum']),
+    );
+  });
+
   test('a new deck with a user word joins the big deck', async () => {
     const deck = await createDeck(repo, { title: '  Business  ', lang: 'en' }, ctx);
     expect(deck).toMatchObject({ title: 'Business', origin: 'own', wordIds: [] });
@@ -133,6 +159,10 @@ describe('deck management', () => {
     // Still studied through the original deck; the same word appears once.
     expect((await stack()).filter((c) => c.id === 'en:achieve')).toHaveLength(1);
     expect(await stack([copy.id])).toHaveLength(29);
+    // Removed everywhere: no longer in any deck, so it is no longer studied.
+    await removeWordEverywhere(repo, { id: 'en:achieve', lang: 'en' }, NOW);
+    expect((await stack()).some((c) => c.id === 'en:achieve')).toBe(false);
+    expect(await repo.words.get('en:achieve')).not.toBeNull();
   });
 
   test('study order can be rearranged', async () => {

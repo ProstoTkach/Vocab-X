@@ -21,7 +21,7 @@ export function StudySummary({ className, version = 0 }: { className?: string; v
       {/* Smaller on phones, where the card itself is shorter. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -end-6 -top-6 -z-10 max-sm:scale-[0.6] ltr:origin-top-right rtl:origin-top-left"
+        className="pointer-events-none absolute -end-6 -top-6 -z-10 max-lg:scale-[0.6] ltr:origin-top-right rtl:origin-top-left"
       >
         {[12, 0, -12].map((deg, i) => (
           <span
@@ -43,28 +43,28 @@ export function StudySummary({ className, version = 0 }: { className?: string; v
       </p>
 
       {/* Phones get short phrases that each fit on one line. */}
-      <h2 id="deck-hero-title" className="flex items-center gap-3 sm:gap-4">
-        <span className="font-display text-5xl leading-none font-bold tracking-tight tabular-nums sm:text-6xl md:text-7xl">
+      <h2 id="deck-hero-title" className="flex items-center gap-3 lg:gap-4">
+        <span className="font-display text-5xl leading-none font-bold tracking-tight tabular-nums lg:text-7xl">
           {ready ? total : '·'}
         </span>
         <span className="flex min-w-0 flex-col">
-          <span className="leading-tight font-semibold text-balance sm:text-lg md:text-xl">
-            <span className="sm:hidden">
+          <span className="leading-tight font-semibold text-balance lg:text-xl">
+            <span className="lg:hidden">
               {empty ? t('deckEmptyShort') : t('cardsWaitingShort', { count: total })}
             </span>
-            <span className="max-sm:hidden">
+            <span className="max-lg:hidden">
               {empty ? t('deckEmpty') : t('cardsWaiting', { count: total })}
             </span>
           </span>
-          <span className="mt-0.5 min-h-5 text-sm font-normal opacity-90 sm:mt-1 sm:min-h-6 sm:text-base">
+          <span className="mt-0.5 min-h-5 text-sm font-normal opacity-90 lg:mt-1 lg:min-h-6 lg:text-base">
             {ready && (
               <>
-                <span className="sm:hidden">
+                <span className="lg:hidden">
                   {empty
                     ? t('deckEmptyTextShort')
                     : t('breakdownShort', { due: stack.due, fresh: stack.fresh })}
                 </span>
-                <span className="max-sm:hidden">
+                <span className="max-lg:hidden">
                   {empty
                     ? t('deckEmptyText')
                     : t('breakdown', { due: stack.due, fresh: stack.fresh })}
@@ -77,14 +77,14 @@ export function StudySummary({ className, version = 0 }: { className?: string; v
 
       {/* Phones: the whole card is the button; a play icon in the corner says so. */}
       {!empty && (
-        <span className="absolute end-4 bottom-4 inline-flex size-10 items-center justify-center rounded-full bg-surface text-accent shadow-pop transition motion-fast group-hover:scale-105 sm:hidden">
+        <span className="absolute end-4 bottom-4 inline-flex size-10 items-center justify-center rounded-full bg-surface text-accent shadow-pop transition motion-fast group-hover:scale-105 lg:hidden">
           <Play aria-hidden className="size-5" />
           <span className="sr-only">{t('start')}</span>
         </span>
       )}
       <span
         className={cx(
-          'mt-auto inline-flex min-h-13 items-center justify-center gap-2 rounded-control bg-surface px-6 text-lg font-semibold text-accent shadow-pop max-sm:hidden',
+          'mt-auto inline-flex min-h-13 items-center justify-center gap-2 rounded-control bg-surface px-6 text-lg font-semibold text-accent shadow-pop max-lg:hidden',
           'transition motion-fast group-hover:-translate-y-0.5 group-active:scale-[0.98]',
           empty && 'opacity-60',
         )}
@@ -100,7 +100,7 @@ export function StudySummary({ className, version = 0 }: { className?: string; v
   );
 
   const shell = cx(
-    'group relative isolate flex flex-col gap-2 overflow-hidden rounded-card bg-brand p-4 text-on-accent shadow-glow sm:gap-4 sm:p-6 md:p-7',
+    'group relative isolate flex flex-col gap-2 overflow-hidden rounded-card bg-brand p-4 text-on-accent shadow-glow lg:gap-4 lg:p-7',
     className,
   );
   // The whole card starts the review; with nothing to review it is not a link.

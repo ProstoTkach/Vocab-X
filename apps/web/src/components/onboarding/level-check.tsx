@@ -37,7 +37,6 @@ export interface LevelCheckProps {
  */
 export function LevelCheck({ levels, words, onDone, onSkip }: LevelCheckProps) {
   const t = useTranslations('onboarding');
-  const common = useTranslations('common');
   const rtl = localeInfo(useLocale()).dir === 'rtl';
   const [state, setState] = useState(() => startPlacement(levels));
   const [exitDir, setExitDir] = useState<PhysicalDir | null>(null);
@@ -126,7 +125,6 @@ export function LevelCheck({ levels, words, onDone, onSkip }: LevelCheckProps) {
             <p lang={word.lang} className="font-display text-3xl font-bold break-words sm:text-4xl">
               {word.term}
             </p>
-            {word.pos && <p className="text-fg-muted">{common(`pos.${word.pos}`)}</p>}
           </div>
         </CardStage>
         <div className="grid shrink-0 grid-cols-2 gap-3">

@@ -27,15 +27,16 @@ export function Segmented<V extends string>({
         onValueChange={(v) => onChange(v as V)}
         aria-label={label}
         orientation="horizontal"
-        // Equal columns that wrap as whole rows, never leaving one orphaned option.
-        className="grid grid-cols-[repeat(auto-fit,minmax(7.5rem,1fr))] gap-1 rounded-control bg-surface-2 p-1"
+        // Options share the row and shrink down to their own label; only when even that does not
+        // fit does one move to the next line.
+        className="flex flex-wrap gap-1 rounded-control bg-surface-2 p-1"
       >
         {options.map((o) => (
           <RadioGroup.Item
             key={o.value}
             value={o.value}
             className={cx(
-              'min-h-10 rounded-lg px-3 text-sm font-medium text-fg-muted',
+              'min-h-10 flex-1 rounded-lg px-3 text-sm font-medium whitespace-nowrap text-fg-muted',
               'transition-colors motion-fast hover:text-fg',
               'data-[state=checked]:bg-surface data-[state=checked]:text-fg data-[state=checked]:shadow-card',
             )}

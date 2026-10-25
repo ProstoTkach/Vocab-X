@@ -1,9 +1,14 @@
 import { createLookupCache, MemoryStorage } from '@vocabx/data';
 import { describe, expect, test, vi } from 'vitest';
 import { cachedTranslations } from './cached';
+import { createFreeDictionaryProvider } from './free-dictionary';
 import type { FetchLike } from './http';
-import { createMyMemoryProvider } from './mymemory';
+import { createMyMemoryProvider, looksBroken } from './mymemory';
+import { proxiedFetch } from './proxy';
+import { isSentence, mergedLexicon, mergedTranslations, suggestWord } from './suggest';
+import { createTatoebaProvider } from './tatoeba';
 import { createWiktionaryProvider } from './wiktionary';
+import { createWiktionaryTranslations, translationsFromWikitext } from './wiktionary-translations';
 
 const json = (body: unknown, status = 200) =>
   Promise.resolve(new Response(JSON.stringify(body), { status }));
@@ -112,5 +117,249 @@ describe('cache', () => {
       'мандрівка',
     ]);
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+// Shape captured from api.dictionaryapi.dev/api/v2/entries/en/hello (shortened).
+const FREE_DICTIONARY = [
+  {
+    word: 'hello',
+    phonetics: [{ text: '/həˈləʊ/' }],
+    meanings: [
+      {
+        partOfSpeech: 'noun',
+        definitions: [{ definition: '"Hello!" or an equivalent greeting.', synonyms: [] }],
+        synonyms: ['greeting'],
+      },
+      {
+        partOfSpeech: 'interjection',
+        definitions: [
+          { definition: 'A greeting.', synonyms: ['hi'], example: 'Hello, everyone.' },
+          { definition: 'Answering the telephone.', example: 'Hello? How may I help you?' },
+        ],
+        synonyms: [],
+      },
+    ],
+  },
+];
+
+describe('Free Dictionary', () => {
+  test('maps meanings to examples and synonyms', async () => {
+    const fetch = vi.fn<FetchLike>(() => json(FREE_DICTIONARY));
+    const p = createFreeDictionaryProvider({ fetch });
+    const entries = await p.lookup('hello', 'en');
+    expect(fetch.mock.calls[0]![0]).toBe('https://api.dictionaryapi.dev/api/v2/entries/en/hello');
+    expect(entries.flatMap((e) => e.examples.map((x) => x.text))).toEqual([
+      'Hello, everyone.',
+      'Hello? How may I help you?',
+    ]);
+    expect(entries.flatMap((e) => e.synonyms)).toEqual(['greeting', 'hi']);
+  });
+
+  test('other languages, "not found" and an outage give nothing', async () => {
+    const fetch = vi.fn<FetchLike>(() => json(FREE_DICTIONARY));
+    expect(await createFreeDictionaryProvider({ fetch }).lookup('hallo', 'de')).toEqual([]);
+    expect(fetch).not.toHaveBeenCalled();
+    const missing = createFreeDictionaryProvider({
+      fetch: () => json({ title: 'No Definitions Found' }, 404),
+    });
+    expect(await missing.lookup('zzz', 'en')).toEqual([]);
+    const down = createFreeDictionaryProvider({ fetch: () => json('error code: 1033', 530) });
+    expect(await down.lookup('run', 'en')).toEqual([]);
+  });
+});
+
+describe('suggestWord', () => {
+  const translations = {
+    id: 'fake',
+    translate: vi.fn(({ text }: { text: string }) =>
+      Promise.resolve(
+        (
+          { hello: ['привіт', 'вітаю'], greeting: ['вітання', 'привіт'], hi: ['привіт'] } as Record<
+            string,
+            string[]
+          >
+        )[text] ?? [],
+      ),
+    ),
+  };
+  const dictionary = mergedLexicon([
+    createFreeDictionaryProvider({ fetch: () => json(FREE_DICTIONARY) }),
+    // A dictionary that fails must not spoil the others.
+    { id: 'broken', lookup: () => Promise.reject(new Error('down')) },
+    {
+      id: 'more',
+      lookup: () =>
+        Promise.resolve([
+          {
+            lemma: 'hello',
+            definitions: [],
+            examples: [{ text: 'She waved a greeting.' }, { text: 'Hello, everyone.' }],
+          },
+        ]),
+    },
+  ]);
+
+  test('several translations (also via synonyms) and examples with the word first', async () => {
+    const s = await suggestWord(
+      { translations, dictionary },
+      { term: ' hello ', from: 'en', to: 'uk' },
+    );
+    expect(s.translations).toEqual(['привіт', 'вітаю', 'вітання']);
+    expect(s.examples).toEqual([
+      'Hello, everyone.',
+      'Hello? How may I help you?',
+      'She waved a greeting.',
+    ]);
+  });
+
+  test('an empty word asks nothing', async () => {
+    translations.translate.mockClear();
+    expect(
+      await suggestWord({ translations, dictionary }, { term: ' ', from: 'en', to: 'uk' }),
+    ).toEqual({
+      translations: [],
+      examples: [],
+    });
+    expect(translations.translate).not.toHaveBeenCalled();
+  });
+});
+
+// Lines captured from the wikitext of en.wiktionary.org/wiki/journey and run/translations.
+const JOURNEY_WIKITEXT = [
+  '==English==',
+  '===Noun===',
+  '{{trans-top|a set amount of travelling}}',
+  '* Ukrainian: {{t|uk|пої́здка|f}}, {{t+|uk|по́дорож|f}}',
+  '* Russian: {{t+|ru|пое́здка|f}}',
+  '{{trans-top|to travel, to make a trip or voyage}}',
+  '* Ukrainian: {{t|uk|подорожувати}}, {{tt+check|uk|[[мандрувати]]}}',
+  '==French==',
+  '* Ukrainian: {{t|uk|день}}',
+].join('\n');
+
+describe('Wiktionary translation tables', () => {
+  test('every sense of the English entry, without stress marks or other languages', () => {
+    expect(translationsFromWikitext(JOURNEY_WIKITEXT, 'uk')).toEqual([
+      'поїздка',
+      'подорож',
+      'подорожувати',
+      'мандрувати',
+    ]);
+    expect(translationsFromWikitext(JOURNEY_WIKITEXT, 'de')).toEqual([]);
+  });
+
+  test('follows a translation subpage; only English words are looked up', async () => {
+    const fetch = vi.fn<FetchLike>((url) =>
+      json({
+        parse: {
+          wikitext: url.includes('run%2Ftranslations')
+            ? '* Ukrainian: {{t+|uk|бі́гти|impf}}, {{t+|uk|біг|m}}'
+            : '==English==\n{{see translation subpage|Verb}}',
+        },
+      }),
+    );
+    const p = createWiktionaryTranslations({ fetch });
+    expect(await p.translate({ text: 'run', from: 'en', to: 'uk' })).toEqual(['бігти', 'біг']);
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(await p.translate({ text: 'laufen', from: 'de', to: 'uk' })).toEqual([]);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  test('joined with MyMemory: its best variant first, no repeats, a failing source skipped', async () => {
+    const merged = mergedTranslations([
+      createMyMemoryProvider({ fetch: () => json(MYMEMORY) }),
+      createWiktionaryTranslations({
+        fetch: () => json({ parse: { wikitext: JOURNEY_WIKITEXT } }),
+      }),
+      { id: 'down', translate: () => Promise.reject(new Error('down')) },
+    ]);
+    expect(await merged.translate({ text: 'journey', from: 'en', to: 'uk' })).toEqual([
+      'подорож',
+      'мандрівка',
+      'поїздка',
+      'подорожувати',
+      'мандрувати',
+    ]);
+  });
+});
+
+describe('dictionary proxy', () => {
+  test('dictionaries go through /api/dictionary, MyMemory straight', async () => {
+    const fetch = vi.fn<FetchLike>(() => json(null));
+    const p = proxiedFetch(fetch);
+    await p('https://api.dictionaryapi.dev/api/v2/entries/en/hello');
+    await p('https://api.mymemory.translated.net/get?q=hello');
+    expect(fetch.mock.calls.map((c) => c[0])).toEqual([
+      '/api/dictionary?url=https%3A%2F%2Fapi.dictionaryapi.dev%2Fapi%2Fv2%2Fentries%2Fen%2Fhello',
+      'https://api.mymemory.translated.net/get?q=hello',
+    ]);
+  });
+
+  test('a word the dictionary does not know comes back as nothing', async () => {
+    const p = createFreeDictionaryProvider({ fetch: proxiedFetch(() => json(null)) });
+    expect(await p.lookup('zzz', 'en')).toEqual([]);
+  });
+});
+
+describe('cleaning up what the sources give', () => {
+  test('a wiki link with its own "|" stays one translation', () => {
+    const wikitext = [
+      '==English==',
+      '* Ukrainian: {{tt+|uk|англі́йський}}, {{tt|uk|[[англійський|англі́йська]] [[мо́ва]]|f}}',
+    ].join('\n');
+    expect(translationsFromWikitext(wikitext, 'uk')).toEqual(['англійський', 'англійська мова']);
+  });
+
+  test('MyMemory: memories of the word itself first, text split apart dropped', async () => {
+    // Shape captured from a real response (en → uk, "achieve").
+    const fetch = vi.fn<FetchLike>(() =>
+      json({
+        responseStatus: 200,
+        responseData: { translatedText: 'р езуль татами . ', match: 0.97 },
+        matches: [
+          { segment: 'achieve. ', translation: 'р езуль татами . ', quality: 74, match: 0.97 },
+          { segment: 'achieve', translation: 'досягти', quality: 70, match: 0.85 },
+          { segment: 'Achieve Type', translation: 'Тип досягнення', quality: 74, match: 0.85 },
+        ],
+      }),
+    );
+    const p = createMyMemoryProvider({ fetch });
+    expect(await p.translate({ text: 'achieve', from: 'en', to: 'uk' })).toEqual(['досягти']);
+  });
+
+  test('a lone letter that is no word gives broken text away', () => {
+    expect(looksBroken('р езуль татами', 'uk')).toBe(true);
+    expect(looksBroken('йти в школу', 'uk')).toBe(false);
+    expect(looksBroken('a b c', 'xx')).toBe(false);
+  });
+
+  test('examples: sentences are kept, bare phrases are not', () => {
+    expect(isSentence('the old reliables')).toBe(false);
+    expect(isSentence('Is Tom reliable?')).toBe(true);
+    expect(isSentence('She is a very reliable friend')).toBe(true);
+    expect(isSentence('信頼できる人です')).toBe(true);
+  });
+
+  test('Tatoeba: sentences of a readable length, unapproved ones left out', async () => {
+    const fetch = vi.fn<FetchLike>(() =>
+      json({
+        data: [
+          { text: 'I wonder whether Tom is reliable.' },
+          { text: 'Tom is  not  reliable at all.', is_unapproved: false },
+          { text: 'Reliable bad sentence here.', is_unapproved: true },
+        ],
+      }),
+    );
+    const p = createTatoebaProvider({ fetch });
+    const [entry] = await p.lookup('reliable', 'en');
+    expect(entry?.examples.map((e) => e.text)).toEqual([
+      'I wonder whether Tom is reliable.',
+      'Tom is not reliable at all.',
+    ]);
+    const url = new URL(fetch.mock.calls[0]![0]);
+    expect(url.searchParams.get('lang')).toBe('eng');
+    expect(url.searchParams.get('word_count')).toBe('5-14');
+    expect(await p.lookup('reliable', 'xx')).toEqual([]);
   });
 });

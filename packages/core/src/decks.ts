@@ -127,6 +127,43 @@ export async function addWord(
   return { deck: next, word };
 }
 
+/**
+ * Creates several user words at once (e.g. from a pasted list) and appends them to the deck in
+ * the given order; the deck is saved once. Inputs without a term or a translation are skipped.
+ */
+export async function addWords(
+  repos: Pick<Repos, 'decks' | 'words'>,
+  deck: Deck,
+  inputs: readonly WordInput[],
+  ctx: Ctx,
+  source: Word['source'] = 'import',
+): Promise<{ deck: Deck; words: Word[] }> {
+  const words: Word[] = [];
+  for (const input of inputs) {
+    const fields = buildWordFields(input);
+    if (!fields.term || Object.keys(fields.translations).length === 0) continue;
+    const word: Word = {
+      id: `${deck.lang}:u:${ctx.newId()}`,
+      lang: deck.lang,
+      ...fields,
+      source,
+      createdAt: ctx.now,
+      updatedAt: ctx.now,
+    };
+    await repos.words.save(word);
+    words.push(word);
+  }
+  const next = words.length
+    ? await updateDeck(
+        repos,
+        deck,
+        { wordIds: [...deck.wordIds, ...words.map((w) => w.id)] },
+        ctx.now,
+      )
+    : deck;
+  return { deck: next, words };
+}
+
 /** Edits a word; built-in words become a personal copy (copy-on-write in the repository). */
 export async function editWord(
   repos: Pick<Repos, 'words'>,
@@ -148,6 +185,21 @@ export async function removeWordFromDeck(
   now: number,
 ): Promise<Deck> {
   return updateDeck(repos, deck, { wordIds: deck.wordIds.filter((id) => id !== wordId) }, now);
+}
+
+/**
+ * Removes a word from every own deck of its language, so it leaves the big deck and no longer
+ * comes up for review. The word and its progress stay (adding it again restores both).
+ */
+export async function removeWordEverywhere(
+  repos: DeckRepos,
+  word: Pick<Word, 'id' | 'lang'>,
+  now: number,
+): Promise<void> {
+  const decks = (await repos.decks.list({ lang: word.lang })).filter(
+    (d) => d.origin === 'own' && d.wordIds.includes(word.id),
+  );
+  for (const deck of decks) await removeWordFromDeck(repos, deck, word.id, now);
 }
 
 /**

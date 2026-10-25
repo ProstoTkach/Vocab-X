@@ -10,7 +10,7 @@ import {
 } from '@vocabx/core';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Badge, type BadgeTone } from '@/components/ui/badge';
+import type { BadgeTone } from '@/components/ui/badge';
 import { cx } from '@/lib/cx';
 import { WordItem } from './word-item';
 
@@ -22,7 +22,7 @@ const STATUS_TONE: Record<WordStatus, BadgeTone> = {
 };
 
 const iconButton =
-  'inline-flex size-11 shrink-0 items-center justify-center rounded-control text-fg-muted transition-colors motion-fast hover:bg-surface-2 hover:text-fg';
+  'inline-flex size-9 shrink-0 items-center justify-center rounded-control text-fg-muted transition-colors motion-fast hover:bg-surface-2 hover:text-fg sm:size-11';
 
 export interface WordRowProps {
   word: Word;
@@ -32,6 +32,8 @@ export interface WordRowProps {
   now: number;
   onEdit?: () => void;
   onRemove?: () => void;
+  /** The remove button's name; "remove from deck" by default. */
+  removeLabel?: string;
   onReset?: () => void;
 }
 
@@ -44,6 +46,7 @@ export function WordRow({
   now,
   onEdit,
   onRemove,
+  removeLabel,
   onReset,
 }: WordRowProps) {
   const t = useTranslations('decks');
@@ -55,12 +58,10 @@ export function WordRow({
         nativeLang={nativeLang}
         progress={progress}
         stats={stats}
+        status={{ label: t(`status.${status}`), tone: STATUS_TONE[status] }}
         {...(onReset ? { onReset } : {})}
         actions={
           <>
-            <Badge tone={STATUS_TONE[status]} className="hidden sm:inline-flex">
-              {t(`status.${status}`)}
-            </Badge>
             {onEdit && (
               <button
                 type="button"
@@ -75,7 +76,7 @@ export function WordRow({
               <button
                 type="button"
                 onClick={onRemove}
-                aria-label={t('removeWord')}
+                aria-label={removeLabel ?? t('removeWord')}
                 className={cx(iconButton, 'hover:text-danger')}
               >
                 <Trash2 aria-hidden className="size-4" />

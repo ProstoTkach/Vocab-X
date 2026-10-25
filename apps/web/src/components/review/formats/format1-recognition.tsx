@@ -23,7 +23,6 @@ function Format1Recognition(p: FormatProps) {
           example={card.word.examples[0]}
           term={card.word.term}
           wordLang={card.word.lang}
-          nativeLang={nativeLang}
         />
       }
     >

@@ -25,7 +25,7 @@ function StreakBody({ streak, atRisk }: { streak: number; atRisk: boolean }) {
     <>
       <span
         className={cx(
-          'relative isolate inline-flex size-9 shrink-0 items-center justify-center rounded-full md:size-12',
+          'relative isolate inline-flex size-9 shrink-0 items-center justify-center rounded-full lg:size-12',
           atRisk
             ? 'bg-warning/10 text-warning/80'
             : streak > 0
@@ -50,14 +50,14 @@ function StreakBody({ streak, atRisk }: { streak: number; atRisk: boolean }) {
         )}
         <Flame
           aria-hidden
-          className="size-5 md:size-6"
+          className="size-5 lg:size-6"
           fill={streak > 0 ? 'currentColor' : 'none'}
           fillOpacity={atRisk ? 0.3 : 1}
         />
       </span>
       <span className="block text-start">
-        <span className="hidden text-sm text-fg-muted md:block">{t('streakTitle')}</span>
-        <span className="block font-display text-sm leading-tight font-bold md:text-xl">
+        <span className="hidden text-sm text-fg-muted lg:block">{t('streakTitle')}</span>
+        <span className="block font-display text-sm leading-tight font-bold lg:text-xl">
           {t('streakDays', { count: streak })}
         </span>
       </span>
@@ -71,7 +71,7 @@ function StreakBody({ streak, atRisk }: { streak: number; atRisk: boolean }) {
  */
 function Streak({ streak, atRisk }: { streak: number; atRisk: boolean }) {
   const t = useTranslations('aside');
-  const row = 'flex items-center gap-2 ps-1 md:gap-3 md:ps-0';
+  const row = 'flex items-center gap-2 ps-1 lg:gap-3 lg:ps-0';
   if (!atRisk)
     return (
       <div className={row}>
@@ -158,10 +158,10 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
     <section
       aria-label={t('label')}
       aria-busy={!s}
-      className="flex flex-col gap-4 rounded-card border border-line/70 bg-surface/60 p-2.5 md:p-5"
+      className="flex flex-col gap-4 rounded-card border border-line/70 bg-surface/60 p-2.5 lg:p-5"
     >
       {/* One row everywhere: the streak, then the days; both shrink on phones. */}
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 md:grid-cols-[12rem_minmax(0,1fr)] md:gap-4">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 lg:grid-cols-[12rem_minmax(0,1fr)]">
         <Streak streak={streak} atRisk={atRisk} />
 
         <div className="relative">
@@ -172,7 +172,7 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
             tabIndex={0}
             // Scrolls with touch, trackpad or the buttons; the scrollbar itself is hidden. Positioned,
             // so the screen-reader labels of far-off days stay inside the scroll area.
-            className="relative flex snap-x snap-proximity gap-1.5 overflow-x-auto md:gap-2 rounded-control px-1 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="relative flex snap-x snap-proximity gap-1.5 overflow-x-auto lg:gap-2 rounded-control px-1 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {days.map((day) => {
               const date = dateOf(day);
@@ -187,7 +187,7 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
                   ref={isToday ? todayRef : undefined}
                   aria-current={isToday ? 'date' : undefined}
                   className={cx(
-                    'flex w-10 shrink-0 snap-center flex-col items-center gap-0.5 rounded-control border py-1 text-center transition-colors motion-fast md:w-14 md:gap-1 md:py-2',
+                    'flex w-10 shrink-0 snap-center flex-col items-center gap-0.5 rounded-control border py-1 text-center transition-colors motion-fast lg:w-14 lg:gap-1 lg:py-2',
                     lit ? 'border-warning/40 bg-warning/10' : 'border-line/60 bg-surface',
                     isToday && 'ring-2 ring-accent ring-offset-2 ring-offset-bg',
                     future && 'opacity-50',
@@ -195,7 +195,7 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
                 >
                   <span
                     className={cx(
-                      'text-[0.625rem] leading-none font-semibold uppercase md:text-[0.6875rem]',
+                      'text-[0.625rem] leading-none font-semibold uppercase lg:text-[0.6875rem]',
                       firstOfMonth ? 'text-accent' : 'text-fg-muted',
                     )}
                     aria-hidden
@@ -206,13 +206,13 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
                   </span>
                   <span
                     aria-hidden
-                    className="font-display text-sm leading-none font-bold tabular-nums md:text-lg"
+                    className="font-display text-sm leading-none font-bold tabular-nums lg:text-lg"
                   >
                     {format.dateTime(date, { day: 'numeric' })}
                   </span>
                   <Flame
                     aria-hidden
-                    className={cx('size-3 md:size-4', lit ? 'text-warning' : 'text-fg-muted/40')}
+                    className={cx('size-3 lg:size-4', lit ? 'text-warning' : 'text-fg-muted/40')}
                     fill={lit ? 'currentColor' : 'none'}
                   />
                   <span className="sr-only">
@@ -223,7 +223,7 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
               );
             })}
           </ol>
-          <div className="pointer-events-none absolute inset-y-0 start-0 hidden items-center md:flex">
+          <div className="pointer-events-none absolute inset-y-0 start-0 hidden items-center lg:flex">
             <button
               type="button"
               onClick={() => scrollBy(false)}
@@ -233,7 +233,7 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
               <ChevronLeft aria-hidden className="size-4 rtl:-scale-x-100" />
             </button>
           </div>
-          <div className="pointer-events-none absolute inset-y-0 end-0 hidden items-center md:flex">
+          <div className="pointer-events-none absolute inset-y-0 end-0 hidden items-center lg:flex">
             <button
               type="button"
               onClick={() => scrollBy(true)}

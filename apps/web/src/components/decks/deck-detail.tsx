@@ -13,7 +13,7 @@ import {
   type Profile,
   type Word,
 } from '@vocabx/core';
-import { ArrowLeft, Play, Plus, Search } from 'lucide-react';
+import { ArrowLeft, Copy, ListPlus, Play, Plus, Search } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Button, buttonClass } from '@/components/ui/button';
@@ -138,6 +138,27 @@ export function DeckDetail({ deckId }: { deckId: string }) {
     reload();
   };
 
+  // The deck in the import format ("word - translations - example"), in study order, so it can
+  // be pasted into notes or another deck's import as it is.
+  const copyAsText = async () => {
+    const text = deck.wordIds
+      .flatMap((id) => {
+        const w = data.words.get(id);
+        if (!w) return [];
+        const fields = [w.term, (w.translations[profile.nativeLang] ?? []).join(', ')];
+        const example = w.examples[0]?.text.trim();
+        if (example) fields.push(example);
+        return [fields.join(' - ')];
+      })
+      .join('\n');
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ title: t('copied', { count: ordered.length }), tone: 'success' });
+    } catch {
+      toast({ title: t('copyFailed'), tone: 'danger' });
+    }
+  };
+
   const reset = async (word: Word) => {
     await resetWordProgress(repos, word.id);
     toast({ title: t('wordReset', { word: word.term }), tone: 'success' });
@@ -174,10 +195,6 @@ export function DeckDetail({ deckId }: { deckId: string }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={() => setEditing('new')}>
-            <Plus aria-hidden className="size-4" />
-            {t('addWord')}
-          </Button>
           {!deck.archived && (
             <Link
               href={`/review?deck=${encodeURIComponent(deck.id)}`}
@@ -187,6 +204,25 @@ export function DeckDetail({ deckId }: { deckId: string }) {
               {t('review')}
             </Link>
           )}
+          <Button variant="secondary" onClick={() => setEditing('new')}>
+            <Plus aria-hidden className="size-4" />
+            {t('addWord')}
+          </Button>
+          <Link
+            href={`/decks/import?deck=${encodeURIComponent(deck.id)}`}
+            className={buttonClass('secondary')}
+          >
+            <ListPlus aria-hidden className="size-4" />
+            {t('addList')}
+          </Link>
+          <Button
+            variant="secondary"
+            disabled={ordered.length === 0}
+            onClick={() => void copyAsText()}
+          >
+            <Copy aria-hidden className="size-4" />
+            {t('copyText')}
+          </Button>
         </div>
       </header>
 

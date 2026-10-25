@@ -3,12 +3,49 @@
 import type { TranslationProvider } from '@vocabx/core';
 import { getJson, stripHtml, type FetchLike } from './http';
 
+interface MyMemoryMatch {
+  segment?: string;
+  translation?: string;
+  quality?: number | string;
+  match?: number;
+}
 interface MyMemoryResponse {
   responseStatus?: number | string;
   quotaFinished?: boolean;
   responseData?: { translatedText?: string };
-  matches?: { translation?: string; quality?: number | string; match?: number }[];
+  matches?: MyMemoryMatch[];
 }
+
+/** Single letters that are whole words; any other lone letter is a word split apart. */
+const ONE_LETTER_WORDS: Record<string, string> = {
+  uk: 'авзійоуя',
+  ru: 'абвжикосуя',
+  en: 'ai',
+  pl: 'aiouwz',
+  cs: 'aiksuvoz',
+  de: '',
+  fr: 'aày',
+  es: 'aeoyu',
+  it: 'aeio',
+  pt: 'aeo',
+};
+
+/**
+ * Memories sometimes hold text broken by a bad import, "р езуль татами" for "результатами":
+ * a lone letter that is no word of the language gives it away.
+ */
+export function looksBroken(text: string, lang: string): boolean {
+  const words = ONE_LETTER_WORDS[lang.split('-')[0]!];
+  if (words === undefined) return false;
+  return text
+    .toLocaleLowerCase(lang)
+    .split(/\s+/)
+    .some((w) => /^\p{L}$/u.test(w) && !words.includes(w));
+}
+
+/** The memory is of the asked word itself, give or take case and trailing punctuation. */
+const sameText = (segment: string, q: string, lang: string) =>
+  clean(segment).toLocaleLowerCase(lang) === q.toLocaleLowerCase(lang);
 
 export interface MyMemoryOptions {
   fetch: FetchLike;
@@ -54,19 +91,26 @@ export function createMyMemoryProvider(o: MyMemoryOptions): TranslationProvider 
       )) as MyMemoryResponse | null;
       if (!data || data.quotaFinished || Number(data.responseStatus) !== 200) return [];
 
+      // Memories of exactly this word (machine translations score lower but are often the best),
+      // then close matches; the "best" answer is just the top memory, so it gets no priority.
+      const same = (m: MyMemoryMatch) => sameText(m.segment ?? '', q, from);
       const candidates = [
-        data.responseData?.translatedText ?? '',
         ...(data.matches ?? [])
-          .filter((m) => (m.match ?? 0) >= 0.9)
-          .sort((a, b) => Number(b.quality ?? 0) - Number(a.quality ?? 0))
+          .filter((m) => same(m) || (m.match ?? 0) >= 0.9)
+          .sort(
+            (a, b) =>
+              Number(same(b)) - Number(same(a)) || Number(b.quality ?? 0) - Number(a.quality ?? 0),
+          )
           .map((m) => m.translation ?? ''),
+        data.responseData?.translatedText ?? '',
       ];
       const seen = new Set<string>();
       const out: string[] = [];
       for (const c of candidates) {
         const t = clean(c);
         const key = t.toLocaleLowerCase(to);
-        if (!t || key === q.toLocaleLowerCase(from) || seen.has(key)) continue;
+        if (!t || key === q.toLocaleLowerCase(from) || seen.has(key) || looksBroken(t, to))
+          continue;
         seen.add(key);
         out.push(dictionaryCase(t, to));
       }

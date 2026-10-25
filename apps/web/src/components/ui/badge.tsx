@@ -28,3 +28,32 @@ export function Badge({
     />
   );
 }
+
+const DOTS: Record<BadgeTone, string> = {
+  neutral: 'bg-fg-muted',
+  accent: 'bg-accent',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-danger',
+  info: 'bg-info',
+};
+
+/** A badge reduced to a dot of its colour, for tight rows; the label is kept for screen readers. */
+export function BadgeDot({
+  tone = 'neutral',
+  label,
+  className,
+}: {
+  tone?: BadgeTone;
+  label: string;
+  className?: string;
+}) {
+  return (
+    <span
+      role="img"
+      aria-label={label}
+      title={label}
+      className={cx('inline-block size-2.5 shrink-0 rounded-full', DOTS[tone], className)}
+    />
+  );
+}

@@ -9,7 +9,7 @@
   "search": "Search words",
   "empty": "No words yet. Add a word or a deck from the library.",
   "noMatches": "Nothing found.",
-  "count": "{count, plural, one {# word} other {# words}}",
+  "count": "{count, plural, one {<n>#</n> word} other {<n>#</n> words}}",
   "mastery": "Learned {percent}%",
   "details": "Details about “{word}”",
   "nextIn": "Until the next review",
@@ -27,5 +27,12 @@
   "sortLabel": "Sort",
   "showMore": "Show {count} more",
   "sortSoonest": "Due soonest",
-  "sortLatest": "Due latest"
+  "sortLatest": "Due latest",
+  "importList": "Import a list",
+  "backupHide": "Hide",
+  "delete": "Delete word",
+  "deleteTitle": "Delete \"{word}\"?",
+  "deleteText": "The word will disappear from all your decks and will no longer come up for review.",
+  "deleted": "\"{word}\" deleted",
+  "myDecksTip": "Your sets of words: browse, edit and review each one on its own."
 }

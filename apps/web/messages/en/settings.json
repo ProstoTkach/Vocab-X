@@ -44,5 +44,13 @@
     "off": "Off",
     "offHint": "Just learning: no character and no celebrations."
   },
-  "gradeButtonsOnPhone": "Grade buttons under the card on phones"
+  "gradeButtonsOnPhone": "Grade buttons under the card on phones",
+  "dictionaries": "Dictionaries for suggestions",
+  "dictionariesHint": "The \"Find\" button next to a word looks up translations and examples in free open sources. Suggestions are only offered — you choose what to keep.",
+  "dictionaryRoles": {
+    "mymemory": "word translations",
+    "freeDictionary": "example sentences and synonyms (English)",
+    "wiktionary": "translations, definitions and examples",
+    "tatoeba": "real example sentences in many languages"
+  }
 }

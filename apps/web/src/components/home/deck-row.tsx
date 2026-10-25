@@ -1,53 +1,59 @@
 'use client';
 
 import { addWord, ensurePersonalDeck, type Profile } from '@vocabx/core';
-import { ChevronRight, Plus } from 'lucide-react';
+import { ListPlus, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { WordFormDialog } from '@/components/decks/word-form-dialog';
 import { LibraryShortcut } from '@/components/library/library-shortcut';
 import { useToast } from '@/components/ui/toast';
 import { useClock } from '@/lib/clock';
-import { cx } from '@/lib/cx';
 import { newId } from '@/lib/ids';
+import { ActionCardButton, ActionCardLink, type ActionCardLayout } from './action-card';
 import { useRepos } from '@/lib/repos';
 import { StudySummary } from './study-summary';
 
-const lift =
-  'transition motion-fast hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-60';
+type Layout = ActionCardLayout;
 
 /** Adding a word: a little festive (accent tint, brand icon), yet quieter than the deck hero. */
-function AddWordCard({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+export function AddWordCard({
+  onClick,
+  disabled,
+  layout,
+}: {
+  onClick: () => void;
+  disabled: boolean;
+  layout?: Layout;
+}) {
   const t = useTranslations('pages.home');
   return (
-    <button
-      type="button"
+    <ActionCardButton
       onClick={onClick}
       disabled={disabled}
-      className={cx(
-        // A compact row on phones, a small card with a tip from md up.
-        'group flex w-full items-center gap-3 rounded-card border border-accent/25 bg-linear-to-br from-accent/15 to-accent-2/10 p-3 text-start hover:border-accent/50 hover:shadow-card',
-        'md:flex-col md:items-start md:gap-2 md:p-4',
-        lift,
-      )}
-    >
-      <span className="flex min-w-0 flex-1 items-center gap-3 md:flex-none">
-        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-brand text-on-accent shadow-glow transition-transform motion-normal group-hover:rotate-90 md:size-10">
-          <Plus aria-hidden className="size-5" />
-        </span>
-        <span className="min-w-0">
-          <span className="block font-display text-sm font-semibold md:text-base">
-            {t('addWordTitle')}
-          </span>
-          <span className="block truncate text-xs text-fg-muted md:hidden">{t('addWordTip')}</span>
-        </span>
-      </span>
-      <span className="hidden text-sm text-pretty text-fg-muted md:block">{t('addWordTip')}</span>
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand px-3 py-1.5 text-sm font-semibold text-on-accent md:mt-1">
-        <span className="hidden md:inline">{t('addWordAction')}</span>
-        <ChevronRight aria-hidden className="size-4 rtl:-scale-x-100" />
-      </span>
-    </button>
+      {...(layout ? { layout } : {})}
+      icon={
+        <Plus
+          aria-hidden
+          className="size-5 transition-transform motion-normal group-hover:rotate-90"
+        />
+      }
+      title={t('addWordTitle')}
+      tip={t('addWordTip')}
+    />
+  );
+}
+
+/** Adding a whole list of words at once, on the import page. */
+export function AddListCard({ layout }: { layout?: Layout }) {
+  const t = useTranslations('pages.home');
+  return (
+    <ActionCardLink
+      href="/decks/import"
+      {...(layout ? { layout } : {})}
+      icon={<ListPlus aria-hidden className="size-5" />}
+      title={t('addListTitle')}
+      tip={t('addListTip')}
+    />
   );
 }
 
@@ -86,9 +92,12 @@ export function DeckRow() {
 
   return (
     // The deck hero is always in the middle: between the two shortcuts on wide screens, and
-    // between them in the column on phones.
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1fr)] md:items-center md:gap-6">
-      <AddWordCard onClick={() => setAdding(true)} disabled={!profile} />
+    // between them in the column on phones (where both "add" buttons share one row).
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1fr)] lg:items-center lg:gap-6">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-1 lg:gap-4">
+        <AddWordCard onClick={() => setAdding(true)} disabled={!profile} />
+        <AddListCard />
+      </div>
       <StudySummary version={version} />
       <LibraryShortcut title={home('libraryTitle')} text={home('libraryTip')} />
 

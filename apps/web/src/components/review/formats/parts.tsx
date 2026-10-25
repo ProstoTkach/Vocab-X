@@ -84,17 +84,14 @@ export function ExampleBlock({
   example,
   term,
   wordLang,
-  nativeLang,
 }: {
   example: Example | undefined;
   /** The studied word, highlighted wherever it appears in the sentence. */
   term: string;
   wordLang: LangCode;
-  nativeLang: LangCode;
 }) {
   const t = useTranslations('review');
   if (!example) return null;
-  const translation = example.translations?.[nativeLang];
   return (
     <figure className="w-full max-w-md rounded-control bg-surface-2 px-4 py-3 text-start">
       <figcaption className="text-xs font-semibold text-fg-muted uppercase">
@@ -103,11 +100,6 @@ export function ExampleBlock({
       <p lang={wordLang} className="mt-1">
         <HighlightedText text={example.text} term={term} lang={wordLang} />
       </p>
-      {translation && (
-        <p lang={nativeLang} className="mt-1 text-sm text-fg-muted">
-          {translation}
-        </p>
-      )}
     </figure>
   );
 }
