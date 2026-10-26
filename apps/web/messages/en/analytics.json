@@ -4,7 +4,7 @@
   "where": "You can change this any time in Settings → Data.",
   "accept": "OK, I agree",
   "decline": "Don't send",
-  "localhostAlert": "Note: you are testing the app on localhost. All events from this device are recorded as internal (internal = TRUE) and stay out of the statistics of real users.",
+  "localhostAlert": "Note: you opened the app on localhost. Analytics is never sent from here — nothing reaches the spreadsheet.",
   "setting": "Send anonymous statistics",
   "settingHint": "Which screens you open, how many cards you review and how long you study — without your name, e-mail, IP address or the words themselves. Helps make VocabX better."
 }

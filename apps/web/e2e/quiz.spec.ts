@@ -52,10 +52,10 @@ test('the four-choice test replaces flash cards', async ({ page }) => {
 test('a mistake stays longer; an undo brings the card back with its result', async ({ page }) => {
   await page.getByRole('button', { name: 'Не знаю' }).click();
   await expect(card(page).getByText('Неправильно')).toBeVisible();
-  // Still there after more than the "right" delay.
-  await page.waitForTimeout(1500);
-  await expect(card(page).getByText('Неправильно')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Далі' })).toBeFocused();
+  // Still there after more than the "right" delay (1 s; a mistake stays 4 s).
+  await page.waitForTimeout(1200);
+  await expect(card(page).getByText('Неправильно')).toBeVisible({ timeout: 500 });
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button', { name: 'Не знаю' })).toBeVisible();
 

@@ -1,7 +1,7 @@
 // The app's analytics: one tracker per browser tab, created on first use. On the server (and
 // wherever storage is blocked) every call is a quiet no-op.
 import { systemClock } from '@vocabx/core';
-import { resolveIdentity, type Identity, type KeyValue } from './identity';
+import { isLocalHost, resolveIdentity, type Identity, type KeyValue } from './identity';
 import type { EventType, Params } from './schema';
 import { Tracker } from './tracker';
 
@@ -33,7 +33,15 @@ function storageOf(get: () => Storage): KeyValue {
   }
 }
 
+/**
+ * Nothing is ever sent from a developer's machine (localhost): the events are dropped as if
+ * delivered. Only the end-to-end tests build the app with NEXT_PUBLIC_ANALYTICS_ON_LOCALHOST=1
+ * to check the sending (their server has no spreadsheet to write to).
+ */
+export const sendsFromLocalhost = process.env.NEXT_PUBLIC_ANALYTICS_ON_LOCALHOST === '1';
+
 async function send(body: string, beacon: boolean): Promise<boolean> {
+  if (isLocalHost(window.location.hostname) && !sendsFromLocalhost) return true;
   if (beacon && typeof navigator !== 'undefined' && 'sendBeacon' in navigator)
     return navigator.sendBeacon(ENDPOINT, new Blob([body], { type: 'application/json' }));
   const res = await fetch(ENDPOINT, {

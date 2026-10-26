@@ -23,21 +23,29 @@ async function firstStep(page: Page, url: string) {
   await expect(consent(page)).toBeVisible();
 }
 
-test('"Don\'t send": nothing goes out, and the window does not come back', async ({ page }) => {
+test('the consent window can be neither closed nor declined (testing phase)', async ({ page }) => {
   const bodies = await trackRequests(page);
+  page.on('dialog', (d) => void d.accept());
   await firstStep(page, '/uk/onboarding');
+  // Nothing goes out before the choice.
+  expect(bodies).toEqual([]);
+  // No "Don't send", no close button; Escape and a click outside leave it open.
+  await expect(consent(page).getByRole('button')).toHaveCount(1);
+  await expect(consent(page).getByRole('button', { name: 'Не надсилати' })).toHaveCount(0);
+  await expect(consent(page).getByRole('button', { name: 'Закрити' })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await page.mouse.click(5, 5);
   await expect(consent(page)).toBeVisible();
-  await consent(page).getByRole('button', { name: 'Не надсилати' }).click();
+  await consent(page).getByRole('button', { name: 'Добре, погоджуюся' }).click();
   await expect(consent(page)).toHaveCount(0);
-  // Leaving the page would send what was collected; nothing is.
-  await page.goto('/uk/onboarding');
-  await page.getByRole('button', { name: 'Далі' }).click();
+  await expect.poll(() => bodies.length).toBeGreaterThan(0);
+  // Asked once only.
+  await page.reload();
   await page.waitForTimeout(500);
   await expect(consent(page)).toHaveCount(0);
-  expect(bodies).toEqual([]);
 });
 
-test('agreeing sends the events; on localhost a warning says they are internal', async ({
+test('agreeing sends the events (in this test build); on localhost a warning says nothing is sent', async ({
   page,
 }) => {
   const bodies = await trackRequests(page);
@@ -85,7 +93,9 @@ test('the variant from the link sets the start: no gamification, the four-choice
   expect(await page.evaluate(() => localStorage.getItem('vocabx:analytics:variant'))).toBe(
     JSON.stringify({ v: 'g0q', by: 'link' }),
   );
-  await consent(page).getByRole('button', { name: 'Не надсилати' }).click();
+  page.on('dialog', (d) => void d.accept());
+  await trackRequests(page);
+  await consent(page).getByRole('button', { name: 'Добре, погоджуюся' }).click();
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Далі' }).click();
   await page.getByRole('button', { name: 'Пропустити' }).click();
   await page.waitForURL(/\/uk$/);

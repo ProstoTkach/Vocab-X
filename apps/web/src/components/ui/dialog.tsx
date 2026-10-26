@@ -20,6 +20,11 @@ export interface DialogContentProps {
   /** Width from `sm` up: `md` for forms, `lg` for pickers with a preview. */
   size?: keyof typeof WIDTHS;
   className?: string;
+  /**
+   * False: a choice has to be made with the footer buttons — no close button, and neither a
+   * click outside nor Escape closes the window.
+   */
+  dismissible?: boolean;
 }
 
 const WIDTHS = {
@@ -35,6 +40,7 @@ export function DialogContent({
   footer,
   size = 'md',
   className,
+  dismissible = true,
 }: DialogContentProps) {
   const t = useTranslations('common');
   return (
@@ -42,6 +48,12 @@ export function DialogContent({
       <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-scrim" />
       <DialogPrimitive.Content
         {...(description ? {} : { 'aria-describedby': undefined })}
+        {...(dismissible
+          ? {}
+          : {
+              onEscapeKeyDown: (e: KeyboardEvent) => e.preventDefault(),
+              onInteractOutside: (e: Event) => e.preventDefault(),
+            })}
         className={cx(
           'fixed inset-x-0 bottom-0 z-50 max-h-[90dvh] overflow-y-auto rounded-t-card border border-line bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] text-fg shadow-pop',
           'sm:inset-x-auto sm:start-1/2 sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 sm:rounded-card sm:pb-5',
@@ -54,11 +66,13 @@ export function DialogContent({
           <DialogPrimitive.Title className="font-display text-title font-semibold">
             {title}
           </DialogPrimitive.Title>
-          <DialogPrimitive.Close asChild>
-            <Button variant="ghost" size="icon" aria-label={t('close')} className="-me-2 -mt-2">
-              <X aria-hidden className="size-5" />
-            </Button>
-          </DialogPrimitive.Close>
+          {dismissible && (
+            <DialogPrimitive.Close asChild>
+              <Button variant="ghost" size="icon" aria-label={t('close')} className="-me-2 -mt-2">
+                <X aria-hidden className="size-5" />
+              </Button>
+            </DialogPrimitive.Close>
+          )}
         </div>
         {description && (
           <DialogPrimitive.Description className="mt-2 text-fg-muted">

@@ -41,6 +41,8 @@ export default defineConfig({
     timeout: 300_000,
     env: {
       NEXT_PUBLIC_ENABLE_DEV_UI: '1',
+      // Localhost never sends analytics, except in this test build (to check the sending).
+      NEXT_PUBLIC_ANALYTICS_ON_LOCALHOST: '1',
       // Tests never write to the real spreadsheets or the chat: a beacon of a closing page slips
       // past page.route, so the test server simply has no place to send anything.
       GOOGLE_SPREADSHEET_ANALYTICS_ID: '',
