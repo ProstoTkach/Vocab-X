@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { Analytics } from '@vercel/analytics/next';
 import { localeInfo } from '@/i18n/locales';
 import { routing } from '@/i18n/routing';
 import { bootScript } from '@/lib/boot-script';
@@ -68,6 +69,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <Providers dir={info.dir}>{children}</Providers>
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
