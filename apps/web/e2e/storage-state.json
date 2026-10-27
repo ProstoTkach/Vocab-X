@@ -15,6 +15,14 @@
         {
           "name": "vocabx:install-prompt",
           "value": "shown"
+        },
+        {
+          "name": "vocabx:tour:home",
+          "value": "seen"
+        },
+        {
+          "name": "vocabx:tour:game",
+          "value": "seen"
         }
       ]
     }

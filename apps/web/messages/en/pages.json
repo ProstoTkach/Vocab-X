@@ -32,6 +32,90 @@
       "install": "Add shortcut",
       "understood": "Got it",
       "later": "Later"
+    },
+    "tour": {
+      "progress": "{current} of {total}",
+      "next": "Next",
+      "back": "Back",
+      "skip": "Skip",
+      "done": "Let's go!",
+      "enable": {
+        "title": "Game mode is off",
+        "text": "This button turns on the playful side: your character friend, levels, rewards and the wardrobe. Tap it any time — or turn it on right now."
+      },
+      "turnOn": "Turn on",
+      "later": "Not now",
+      "hello": {
+        "title": "Hi! Let me show you around",
+        "text": "A quick tour of the home screen — under a minute. You can skip it at any time."
+      },
+      "streak": {
+        "title": "Streak and calendar",
+        "text": "How many days in a row you have met your daily goal. Those days get a flame in the calendar — try not to break the streak."
+      },
+      "character": {
+        "title": "This is your friend",
+        "text": "It is happy when you study and sad when you have been away. Tap it and it will tell you something."
+      },
+      "message": {
+        "title": "What your friend says",
+        "text": "Here it cheers you on and tells you how much is left to your daily goal."
+      },
+      "level": {
+        "title": "Level",
+        "text": "Every answer earns experience (XP), and your level grows with it. Tap to see all levels and their rewards."
+      },
+      "goal": {
+        "title": "Daily goal",
+        "text": "How much XP you want to earn each day. Meet it and the day lights up with a flame in the calendar."
+      },
+      "wardrobe": {
+        "title": "Wardrobe",
+        "text": "Change your friend's look here. New items unlock with levels — the button lights up when they do."
+      },
+      "feedback": {
+        "title": "Feedback",
+        "text": "Something unclear, or have an idea? Write to us — we read every message."
+      },
+      "deck": {
+        "title": "Your deck",
+        "text": "The main button: all your words gathered in one deck. Tap it to review the cards that are due right now."
+      },
+      "add": {
+        "title": "Add words",
+        "text": "Add a single word with its translation, or paste a whole list — it all goes into your deck."
+      },
+      "library": {
+        "title": "Library",
+        "text": "Ready-made word sets by level and topic. Add a whole set or pick words one by one."
+      },
+      "nav": {
+        "title": "The pages",
+        "text": "Switch between sections here:"
+      },
+      "pages": {
+        "home": "this screen: streak, goal and your deck.",
+        "review": "cards with the words that are due.",
+        "decks": "all your words and decks: search, edit, import a list.",
+        "league": "compete with other learners. Coming soon.",
+        "profile": "achievements and statistics. Coming soon."
+      },
+      "extras": {
+        "title": "Feedback, language and settings",
+        "text": "Send us feedback, change the interface language or open the settings: theme, game mode, daily goal and your data."
+      },
+      "bye": {
+        "title": "All set!",
+        "text": "Start with your deck: a few minutes a day and the words really stick. You can repeat this tour in the settings."
+      },
+      "gameHello": {
+        "title": "Game mode is on!",
+        "text": "Now you have a character friend, levels and rewards. Let me show you where everything is."
+      },
+      "gameBye": {
+        "title": "On to new levels!",
+        "text": "Every review brings a new level — and new things for your friend — a little closer."
+      }
     }
   },
   "review": {

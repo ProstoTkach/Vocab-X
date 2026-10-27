@@ -8,6 +8,7 @@ import { GamificationSettings } from '@/components/settings/gamification-setting
 import { LocalePicker } from '@/components/settings/locale-picker';
 import { StudySettingsForm } from '@/components/settings/study-settings';
 import { ThemePicker } from '@/components/settings/theme-picker';
+import { TourRestart } from '@/components/settings/tour-restart';
 import { Card, CardText, CardTitle } from '@/components/ui/card';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -47,6 +48,11 @@ export default async function SettingsPage() {
           <CardTitle id="settings-dictionaries">{t('dictionaries')}</CardTitle>
           <CardText className="mt-1 mb-4">{t('dictionariesHint')}</CardText>
           <DictionarySources />
+        </Card>
+        <Card aria-labelledby="settings-tour">
+          <CardTitle id="settings-tour">{t('tour')}</CardTitle>
+          <CardText className="mt-1 mb-4">{t('tourHint')}</CardText>
+          <TourRestart />
         </Card>
         <Card aria-labelledby="settings-data">
           <CardTitle id="settings-data">{data('title')}</CardTitle>

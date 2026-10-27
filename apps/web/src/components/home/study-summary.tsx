@@ -105,12 +105,18 @@ export function StudySummary({ className, version = 0 }: { className?: string; v
   );
   // The whole card starts the review; with nothing to review it is not a link.
   return empty || !ready ? (
-    <section aria-busy={!ready} aria-labelledby="deck-hero-title" className={shell}>
+    <section
+      aria-busy={!ready}
+      aria-labelledby="deck-hero-title"
+      data-tour="deck"
+      className={shell}
+    >
       {body}
     </section>
   ) : (
     <Link
       href="/review"
+      data-tour="deck"
       className={cx(shell, 'transition motion-fast hover:-translate-y-0.5 hover:brightness-105')}
     >
       {body}

@@ -160,6 +160,7 @@ export function ProgressPanel({ progress: s }: { progress: DailyProgress | null 
     <section
       aria-label={t('label')}
       aria-busy={!s}
+      data-tour="streak"
       className="flex flex-col gap-4 rounded-card border border-line/70 bg-surface/60 p-2.5 lg:p-5"
     >
       {/* One row everywhere: the streak, then the days; both shrink on phones. */}

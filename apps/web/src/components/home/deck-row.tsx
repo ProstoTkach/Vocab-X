@@ -94,7 +94,7 @@ export function DeckRow() {
     // The deck hero is always in the middle: between the two shortcuts on wide screens, and
     // between them in the column on phones (where both "add" buttons share one row).
     <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1fr)] lg:items-center lg:gap-6">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-1 lg:gap-4">
+      <div data-tour="add" className="grid grid-cols-2 gap-3 lg:grid-cols-1 lg:gap-4">
         <AddWordCard onClick={() => setAdding(true)} disabled={!profile} />
         <AddListCard />
       </div>

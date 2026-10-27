@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { HomeDashboard } from '@/components/home/home-dashboard';
 import { DeckRow } from '@/components/home/deck-row';
+import { HomeTour } from '@/components/home/home-tour';
 import { InstallPrompt } from '@/components/home/install-prompt';
 
 export default async function HomePage() {
@@ -14,6 +15,8 @@ export default async function HomePage() {
       <DeckRow />
       {/* Phones, once, right after onboarding: a shortcut on the home screen. */}
       <InstallPrompt />
+      {/* The first visit: what each part of the screen and each page is for. */}
+      <HomeTour />
     </div>
   );
 }

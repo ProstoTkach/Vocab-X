@@ -13,7 +13,7 @@ export function MobileTopBar() {
   return (
     <header className="glass sticky top-0 z-30 flex h-(--vx-chrome-top) items-center justify-between gap-2 border-b border-line/60 px-4 pt-safe md:hidden">
       <Logo />
-      <div className="flex items-center gap-1">
+      <div data-tour="extras" className="flex items-center gap-1">
         <button
           type="button"
           onClick={() => feedback.open('topbar')}

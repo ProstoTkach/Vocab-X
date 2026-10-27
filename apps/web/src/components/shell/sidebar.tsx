@@ -91,7 +91,7 @@ export function Sidebar() {
       <div className="flex min-h-14 items-center px-2 sidebar-collapsed:justify-center sidebar-collapsed:px-0">
         <Logo compact={collapsed} />
       </div>
-      <nav aria-label={t('main')} className="mt-2 flex flex-col">
+      <nav aria-label={t('main')} data-tour="nav" className="mt-2 flex flex-col">
         {PRIMARY_NAV.map((item) => {
           const active = isActive(pathname, item.href);
           return (
@@ -128,7 +128,7 @@ export function Sidebar() {
         />
       </button>
 
-      <div className="flex flex-col gap-1 border-t border-line pt-2">
+      <div data-tour="extras" className="flex flex-col gap-1 border-t border-line pt-2">
         <Tooltip content={t('feedback')} side="right" disabled={!collapsed}>
           <button type="button" onClick={() => feedback.open('sidebar')} className={itemClass}>
             <MessageSquareHeart aria-hidden className="size-5 shrink-0 text-accent" />

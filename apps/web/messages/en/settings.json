@@ -57,5 +57,8 @@
   "studyModes": {
     "cards": "Flash cards",
     "quiz": "Four-choice test"
-  }
+  },
+  "tour": "Tips",
+  "tourHint": "A short tour of the home screen and the pages of the app.",
+  "tourAgain": "Show the tour again"
 }

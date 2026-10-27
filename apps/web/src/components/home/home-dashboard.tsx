@@ -83,6 +83,7 @@ function LevelPanel() {
         <DialogTrigger asChild>
           <button
             type="button"
+            data-tour="level"
             className={cx(
               panelClass,
               'group block w-full text-start transition motion-fast hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-card',
@@ -129,6 +130,7 @@ function LevelBadge() {
           <button
             type="button"
             aria-label={t('level', { level })}
+            data-tour="level"
             className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-brand px-3 font-display font-bold text-on-accent shadow-glow transition motion-fast active:scale-95"
           >
             <Crown aria-hidden className="size-4" />
@@ -171,7 +173,7 @@ function GoalBody({ progress }: { progress: DailyProgress | null }) {
 
 function GoalPanel({ progress }: { progress: DailyProgress | null }) {
   return (
-    <section className={panelClass}>
+    <section data-tour="goal" className={panelClass}>
       <GoalBody progress={progress} />
     </section>
   );
@@ -192,6 +194,7 @@ function GoalBadge({ progress }: { progress: DailyProgress | null }) {
         <button
           type="button"
           aria-label={`${t('goalTitle')}: ${t('goalProgress', { current: xp, goal })}`}
+          data-tour="goal"
           className={cx(
             'inline-flex size-11 items-center justify-center rounded-full shadow-card transition motion-fast active:scale-95',
             done ? 'bg-success text-on-success' : 'glass border border-line text-accent',
@@ -221,6 +224,7 @@ function FeedbackBadge() {
         type="button"
         onClick={() => feedback.open('character')}
         aria-label={t('characterHint')}
+        data-tour="feedback"
         className="glass inline-flex size-11 items-center justify-center rounded-full border border-line text-accent shadow-card transition motion-fast hover:-translate-y-0.5 hover:border-accent/60 active:scale-95"
       >
         <MessageSquareHeart aria-hidden className="size-5" />
@@ -252,7 +256,7 @@ function useMessage(progress: DailyProgress | null, turn: number): string {
 function MessagePanel({ text }: { text: string }) {
   const t = useTranslations('character');
   return (
-    <section className={cx(panelClass, 'relative', bubbleClass)}>
+    <section data-tour="message" className={cx(panelClass, 'relative', bubbleClass)}>
       {/* The bubble's tail points sideways at the character. */}
       <BubbleTail className="-start-2 top-8 border-s border-b" />
       <p className="flex items-center gap-2 text-sm text-fg-muted">
@@ -310,6 +314,7 @@ function EnableGamification() {
   return (
     <button
       type="button"
+      data-tour="enable"
       onClick={() => {
         track('gamification_enable_click');
         setMode('max', 'home_button');
@@ -345,6 +350,7 @@ function WardrobeButton({ compact = false }: { compact?: boolean }) {
               size="icon"
               variant={lit ? 'primary' : 'secondary'}
               disabled={!ready}
+              data-tour="wardrobe"
               aria-label={
                 lit ? `${t('change')}. ${t('changeFresh', { count: fresh.size })}` : t('change')
               }
@@ -357,6 +363,7 @@ function WardrobeButton({ compact = false }: { compact?: boolean }) {
               size="lg"
               variant={lit ? 'primary' : 'secondary'}
               disabled={!ready}
+              data-tour="wardrobe"
               className={cx(
                 'group min-h-16 w-full gap-3 px-3 text-start hover:-translate-y-0.5',
                 lit && 'shine',
@@ -443,7 +450,7 @@ export function HomeDashboard() {
           <div className="relative mx-auto w-full max-w-[400px]">
             {/* On phones the figure is a third smaller, so it leaves room for the rest of the
                 page; from md up it is full size. The buttons stay in the window's corners. */}
-            <div className="mx-auto w-2/3 md:w-full">
+            <div data-tour="character" className="mx-auto w-2/3 md:w-full">
               {ready && progress ? (
                 <CharacterFigure
                   mood={progress.mood}

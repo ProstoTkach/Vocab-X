@@ -17,6 +17,7 @@ export function LibraryShortcut({
   return (
     <Link
       href="/decks/library"
+      data-tour="library"
       className={cx(
         'group flex items-center gap-3 rounded-card border border-line/70 bg-surface/60 p-3.5 text-start hover:border-accent/50',
         'transition motion-fast hover:-translate-y-0.5',
