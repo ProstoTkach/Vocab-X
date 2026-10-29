@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonClass } from '@/components/ui/button';
 import { Card, CardText } from '@/components/ui/card';
+import { PageTour, type TourStep } from '@/components/tour/page-tour';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { inputClass } from '@/components/ui/field';
 import { ActionMenu } from '@/components/ui/menu';
@@ -31,6 +32,14 @@ import { useDecks } from './use-decks';
 import { track } from '@/lib/analytics';
 
 export const deckTitle = (d: Deck, locale: string) => d.titleI18n?.[locale] ?? d.title;
+
+/** The first visit to "My decks". */
+const MINE_TOUR: readonly TourStep[] = [
+  { id: 'hello', joy: true, hidden: true },
+  { id: 'all', target: 'mine-all', hidden: true },
+  { id: 'create', target: 'mine-create', hidden: true },
+  { id: 'deck', target: 'mine-deck', hidden: true },
+];
 
 export function DeckList() {
   const t = useTranslations('decks');
@@ -124,9 +133,11 @@ export function DeckList() {
 
   return (
     <div className="flex flex-col gap-8">
+      <PageTour tour="mine" steps={MINE_TOUR} ready />
       {/* The one big deck first: decks only decide what goes into it. */}
       <section
         aria-labelledby="all-deck"
+        data-tour="mine-all"
         className="flex flex-wrap items-center justify-between gap-4 rounded-card bg-brand p-5 text-on-accent shadow-glow"
       >
         <div className="flex items-center gap-4">
@@ -156,7 +167,7 @@ export function DeckList() {
           <h2 id="my-decks" className="font-display text-title font-semibold">
             {t('mine')}
           </h2>
-          <Button onClick={() => setCreating(true)}>
+          <Button data-tour="mine-create" onClick={() => setCreating(true)}>
             <Plus aria-hidden className="size-4" />
             {t('create')}
           </Button>
@@ -184,8 +195,14 @@ export function DeckList() {
           <p className="text-fg-muted">{t('noMatches')}</p>
         ) : (
           <ul className="grid gap-3 @container sm:grid-cols-2">
-            {active.map((d) => (
-              <DeckCard key={d.id} deck={d} stats={data.stats.get(d.id)} actions={deckActions(d)} />
+            {active.map((d, i) => (
+              <DeckCard
+                key={d.id}
+                deck={d}
+                stats={data.stats.get(d.id)}
+                actions={deckActions(d)}
+                {...(i === 0 ? { tourMark: 'mine-deck' } : {})}
+              />
             ))}
           </ul>
         )}
@@ -250,10 +267,13 @@ function DeckCard({
   deck,
   stats,
   actions,
+  tourMark,
 }: {
   deck: Deck;
   stats: DeckStats | undefined;
   actions: Parameters<typeof ActionMenu>[0]['actions'];
+  /** The `data-tour` mark of the first deck (the tour of the page points at it). */
+  tourMark?: string;
 }) {
   const t = useTranslations('decks');
   const tl = useTranslations('languages');
@@ -261,7 +281,7 @@ function DeckCard({
   const total = stats?.total ?? deck.wordIds.length;
   const mastered = stats ? stats.mastered + stats.learning : 0;
   return (
-    <li>
+    <li data-tour={tourMark}>
       <Card className={cx('flex h-full flex-col gap-3', deck.archived && 'opacity-75')}>
         <div className="flex items-start gap-2">
           <Link

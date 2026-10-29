@@ -25,7 +25,7 @@ export function SessionTopBar({
 }: SessionTopBarProps) {
   const t = useTranslations('review');
   return (
-    <header className="flex w-full items-center gap-3">
+    <header data-tour="review-progress" className="flex w-full items-center gap-3">
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex items-center justify-between gap-2 text-sm">
           <span className="inline-flex min-w-0 items-center gap-1.5 font-semibold">
@@ -50,6 +50,7 @@ export function SessionTopBar({
           disabled={!canUndo}
           aria-label={t('undo')}
           aria-keyshortcuts="Z"
+          data-tour="review-undo"
           className="glass inline-flex size-11 shrink-0 items-center justify-center rounded-control border border-line/70 text-fg-muted transition-colors motion-fast hover:text-fg disabled:opacity-40"
         >
           <Undo2 aria-hidden className="size-5" />

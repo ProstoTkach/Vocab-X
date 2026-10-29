@@ -124,11 +124,16 @@ export interface StudySettings {
  */
 export type GamificationMode = 'off' | 'medium' | 'max';
 
-/** How reviews are done: flash cards, the four-choice test, or sentences. */
-export type StudyMode = 'cards' | 'quiz' | 'sentences';
+/**
+ * How reviews are done: the four-choice test and sentences taking turns (the recommended one),
+ * flash cards, the four-choice test, or sentences.
+ */
+export type StudyMode = 'mixed' | 'cards' | 'quiz' | 'sentences';
 
-export const studyModeOf = (s: Pick<AppSettings, 'quizMode' | 'sentenceMode'>): StudyMode =>
-  s.sentenceMode ? 'sentences' : s.quizMode ? 'quiz' : 'cards';
+export const studyModeOf = (
+  s: Pick<AppSettings, 'quizMode' | 'sentenceMode'> & Partial<Pick<AppSettings, 'mixedMode'>>,
+): StudyMode =>
+  s.sentenceMode ? 'sentences' : s.quizMode ? 'quiz' : (s.mixedMode ?? true) ? 'mixed' : 'cards';
 
 export interface AppSettings {
   themeId: string;
@@ -147,6 +152,11 @@ export interface AppSettings {
   quizMode: boolean;
   /** Review with sentences (the word left out of an example); wins over quizMode. */
   sentenceMode: boolean;
+  /**
+   * The test and the sentences taking turns (the default); quizMode and sentenceMode win over
+   * it, and with all three off the review uses flash cards.
+   */
+  mixedMode: boolean;
   /** One-time tips already shown (e.g. 'four-grades'). */
   tipsSeen: string[];
   /** The highest player level already congratulated on. */
@@ -181,7 +191,7 @@ export interface ReviewEvent {
    * "placement": the learner marked the word as known in the onboarding level check.
    * It schedules the card like a review but is not study activity: no XP, no daily limits.
    */
-  kind?: 'placement';
+  kind?: 'placement' | 'mixed';
 }
 
 export interface DailyStats {

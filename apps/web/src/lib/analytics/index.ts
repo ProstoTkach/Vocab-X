@@ -70,7 +70,7 @@ export function writeKey(key: string, value: string): void {
   }
 }
 
-/** The tracker of this tab (created, and the variant pinned, on the first call). */
+/** The tracker of this tab (created on the first call). */
 export function getTracker(): Tracker | null {
   if (tracker) return tracker;
   if (typeof window === 'undefined') return null;
@@ -84,8 +84,6 @@ export function getTracker(): Tracker | null {
       storage,
       tab: storageOf(() => window.sessionStorage),
       now: systemClock.now(),
-      // Evenly distributed: a random 32-bit number scaled to [0, 1).
-      rng: () => crypto.getRandomValues(new Uint32Array(1))[0]! / 2 ** 32,
       uuid,
     });
     tracker = new Tracker({
@@ -121,10 +119,9 @@ export function isInternal(): boolean {
   return getTracker()?.identity.internal ?? false;
 }
 
-/** For feedback: which variant and random id the answers come from. */
-export function analyticsIds(): { variant: string; anonId: string } {
-  const id = getTracker()?.identity;
-  return { variant: id?.variant ?? '', anonId: id?.anonId ?? '' };
+/** For feedback: the random id the answers come from. */
+export function analyticsIds(): { anonId: string } {
+  return { anonId: getTracker()?.identity.anonId ?? '' };
 }
 
 /** "dd" days and the session count since the first visit, for settings changes. */

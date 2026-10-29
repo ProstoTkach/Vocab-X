@@ -151,7 +151,6 @@ describe('feedbackRow', () => {
       }),
       locale: 'uk',
       level: 3,
-      variant: 'g1q',
       anonId: '6f1c2a9e-0000-4000-8000-000000000001',
     })!;
     const row = feedbackRow(payload, at);
@@ -168,7 +167,8 @@ describe('feedbackRow', () => {
     expect(cell('comment')).toBe('=1+1');
     expect(typeof cell('all_avg')).toBe('number');
     expect(cell('disappointment')).toBe('дуже засмутився б');
-    expect(cell('variant')).toBe('g1q');
+    // The former A/B test's column stays, empty.
+    expect(cell('variant')).toBe('');
     expect(cell('anon_id')).toBe('6f1c2a9e-0000-4000-8000-000000000001');
     // Headers name both the Ukrainian label and the technical key.
     expect(FEEDBACK_COLUMNS[0]).toBe('Дата (Київ) (date)');
@@ -180,15 +180,12 @@ describe('feedbackRow', () => {
         feedback: { kind: 'bug', platform: 'desktop', text: 'Падає' },
         locale: 'en',
         level: null,
-        variant: 'nope',
       })!,
       at,
     );
     expect(cellOf(bug, 'bug_text')).toBe('Падає');
     expect(cellOf(bug, 'overall')).toBe('');
     expect(cellOf(bug, 'level')).toBe('');
-    // A variant that is not one of the four is left out.
-    expect(cellOf(bug, 'variant')).toBe('');
     const idea = feedbackRow(
       parsePayload({ feedback: { kind: 'idea', text: 'Темна тема' }, locale: 'uk', level: 1 })!,
       at,

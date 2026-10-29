@@ -34,6 +34,7 @@ function FinishButton({ goal }: { goal: DailyGoal }) {
   return (
     <Link
       href="/"
+      data-tour="review-finish"
       className={cx(
         'group relative isolate flex min-h-16 w-full items-center gap-3 overflow-hidden rounded-card px-4 py-3 text-start',
         'transition motion-normal hover:-translate-y-0.5 active:scale-[0.98]',

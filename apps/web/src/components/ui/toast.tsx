@@ -63,7 +63,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             </ToastPrimitive.Close>
           </ToastPrimitive.Root>
         ))}
-        <ToastPrimitive.Viewport className="fixed inset-x-4 bottom-24 z-50 flex flex-col gap-2 outline-none md:start-auto md:end-6 md:bottom-6 md:w-96" />
+        <ToastPrimitive.Viewport className="fixed inset-x-4 bottom-24 z-50 flex flex-col gap-2 outline-none md:start-auto md:end-6 md:top-6 md:bottom-auto md:w-96" />
       </ToastPrimitive.Provider>
     </ToastContext>
   );

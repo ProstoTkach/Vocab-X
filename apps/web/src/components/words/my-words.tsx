@@ -19,6 +19,7 @@ import { WordFormDialog } from '@/components/decks/word-form-dialog';
 import { ActionCardLink } from '@/components/home/action-card';
 import { AddListCard, AddWordCard } from '@/components/home/deck-row';
 import { Button } from '@/components/ui/button';
+import { PageTour, type TourStep } from '@/components/tour/page-tour';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { ExportBackup } from '@/components/settings/export-backup';
 import { inputClass } from '@/components/ui/field';
@@ -39,6 +40,15 @@ const BACKUP_HIDDEN_KEY = 'vocabx:backup-reminder-hidden';
 const noSubscription = () => () => {};
 
 /** Every word of the one big deck (active decks of the language being learned). */
+/** The first visit to "My words". */
+const WORDS_TOUR: readonly TourStep[] = [
+  { id: 'hello', joy: true, hidden: true },
+  { id: 'actions', target: 'words-actions', hidden: true },
+  { id: 'find', target: 'words-find', hidden: true },
+  { id: 'list', target: 'words-list', hidden: true },
+  { id: 'backup', target: 'words-backup', hidden: true },
+];
+
 export function MyWords() {
   const t = useTranslations('words');
   const decksT = useTranslations('decks');
@@ -160,10 +170,12 @@ export function MyWords() {
 
   return (
     <div className="flex flex-col gap-5">
+      <PageTour tour="words" steps={WORDS_TOUR} ready={!!state && !!data} />
       {/* Data lives in this browser only: a reminder that a backup is one click away. */}
       {!backupHidden && (
         <section
           aria-labelledby="backup-title"
+          data-tour="words-backup"
           className="flex flex-col gap-3 rounded-card border border-line/70 bg-surface/60 p-4 sm:flex-row sm:items-center"
         >
           <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-2 text-accent max-sm:hidden">
@@ -186,7 +198,7 @@ export function MyWords() {
       )}
 
       {/* Adding words first, then where the words come from: the same cards as on Home. */}
-      <div className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-3">
+      <div data-tour="words-actions" className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-3">
         <AddWordCard layout="row" onClick={() => setAdding(true)} disabled={!state} />
         <AddListCard layout="row" />
         <ActionCardLink
@@ -217,7 +229,7 @@ export function MyWords() {
               ),
             })}
         </p>
-        <div className="flex w-full flex-col gap-3 sm:flex-row">
+        <div data-tour="words-find" className="flex w-full flex-col gap-3 sm:flex-row">
           <select
             aria-label={t('sortLabel')}
             value={sort}
@@ -258,7 +270,7 @@ export function MyWords() {
       ) : (
         // The same list as inside a deck, from the least remembered (or the best-known) word.
         <>
-          <ul className="flex flex-col gap-2">
+          <ul data-tour="words-list" className="flex flex-col gap-2">
             {visible.map((w) => (
               <WordRow
                 key={w.id}

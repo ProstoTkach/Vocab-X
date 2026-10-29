@@ -15,20 +15,30 @@ export function DevRouteWarmup() {
   const locale = useLocale();
   useEffect(() => {
     if (process.env.NODE_ENV !== 'development') return;
-    const ctrl = new AbortController();
+    let stopped = false;
+    let request: XMLHttpRequest | null = null;
+    // XMLHttpRequest, not fetch: browser extensions that wrap fetch (and throw inside their
+    // wrapper) would fill the console with their errors on every page.
+    const load = (url: string) =>
+      new Promise<void>((resolve) => {
+        const xhr = new XMLHttpRequest();
+        request = xhr;
+        xhr.onloadend = () => resolve();
+        xhr.open('GET', url);
+        xhr.send();
+      });
     const warm = async () => {
       for (const href of [...PRIMARY_NAV.map((i) => i.href), ...EXTRA_ROUTES]) {
-        if (ctrl.signal.aborted) return;
+        if (stopped) return;
         // Sequential: parallel compiles would compete with the page the user is looking at.
-        await fetch(`/${locale}${href === '/' ? '' : href}`, { signal: ctrl.signal }).catch(
-          () => undefined,
-        );
+        await load(`/${locale}${href === '/' ? '' : href}`);
       }
     };
     const id = requestIdleCallback(() => void warm(), { timeout: 3000 });
     return () => {
+      stopped = true;
       cancelIdleCallback(id);
-      ctrl.abort();
+      request?.abort();
     };
   }, [locale]);
   return null;

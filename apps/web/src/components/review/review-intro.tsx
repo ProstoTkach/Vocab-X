@@ -22,6 +22,7 @@ import { cx } from '@/lib/cx';
 export const REVIEW_INTRO = 'review-intro';
 export const QUIZ_INTRO = 'review-intro-quiz';
 export const SENTENCE_INTRO = 'review-intro-sentences';
+export const MIXED_INTRO = 'review-intro-mixed';
 
 interface Step {
   key: 'introRemembered' | 'introForgot' | 'introFlip';
@@ -41,19 +42,38 @@ const LEVELS = {
     { key: 'say', icon: Mic },
     { key: 'type', icon: Keyboard },
   ],
+  // The mixed mode's round (MIXED_STEPS): the test and the sentences taking turns.
+  mixed: [
+    { key: 'q1', icon: Languages },
+    { key: 's1', icon: ListChecks },
+    { key: 'q2', icon: ArrowLeftRight },
+    { key: 'q3', icon: Volume2 },
+    { key: 's2', icon: Mic },
+    { key: 's3', icon: Keyboard },
+  ],
 } as const;
 
-/** The first visit to the test or the sentences: how to answer and what the levels are. */
+const INTRO_MESSAGES = {
+  quiz: 'review.quizIntro',
+  sentences: 'review.sentenceIntro',
+  mixed: 'review.mixedIntro',
+} as const;
+
+/**
+ * The first visit to the test, the sentences or the mixed mode: how to answer and what the
+ * levels (the mixed mode's steps) are.
+ */
 function LevelsIntro({
   mode,
   open,
   onClose,
 }: {
-  mode: 'quiz' | 'sentences';
+  mode: 'quiz' | 'sentences' | 'mixed';
   open: boolean;
   onClose: () => void;
 }) {
-  const t = useTranslations(mode === 'quiz' ? 'review.quizIntro' : 'review.sentenceIntro');
+  // One shape for the three: the keys of the quiz's messages stand for all of them.
+  const t = useTranslations(INTRO_MESSAGES[mode] as 'review.quizIntro');
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
@@ -73,7 +93,7 @@ function LevelsIntro({
               </span>
               <span className="text-sm">
                 <span className="font-semibold">{t('level', { n: i + 1 })}</span>{' '}
-                {t(`levels.${key}`)}
+                {t(`levels.${key}` as 'levels.word')}
               </span>
             </li>
           ))}

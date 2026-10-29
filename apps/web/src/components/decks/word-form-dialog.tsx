@@ -9,7 +9,8 @@ import {
   systemClock,
 } from '@vocabx/core';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { TextAreaField, TextField } from '@/components/ui/field';
@@ -24,6 +25,9 @@ import {
   withTranslation,
 } from './word-suggestions';
 import { track } from '@/lib/analytics';
+import { cx } from '@/lib/cx';
+import { markTourSeen, tourSeen } from '@/lib/home-tour';
+import { IMAGE_QUALITY } from '@/lib/images';
 
 interface Draft {
   term: string;
@@ -76,6 +80,12 @@ export function WordFormDialog({
   const [draft, setDraft] = useState<Draft>(() => draftOf(word, nativeLang));
   const { lookup, found, suggest, hide } = useWordSuggest(lexicon, wordLang, nativeLang);
   const [error, setError] = useState<string | null>(null);
+  /** The first new word: what "Find" does, beside it, until "Got it". */
+  const [help, setHelp] = useState(() => !word && !tourSeen('addWord'));
+  const closeHelp = () => {
+    markTourSeen('addWord');
+    setHelp(false);
+  };
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
   /** When the window opened and whether a suggestion was taken (real time, for statistics). */
   const opened = useRef({ at: 0, suggested: false, saved: false });
@@ -170,12 +180,16 @@ export function WordFormDialog({
               autoComplete="off"
               maxLength={200}
             />
-            <SuggestButton
-              lookup={lookup}
-              term={draft.term}
-              onSuggest={() => void suggest(draft.term)}
-            />
+            {/* Ringed while its tip is open, as an element a tour points at. */}
+            <span className={cx('rounded-control', help && 'ring-2 ring-accent ring-offset-2')}>
+              <SuggestButton
+                lookup={lookup}
+                term={draft.term}
+                onSuggest={() => void suggest(draft.term)}
+              />
+            </span>
           </div>
+          {help && <FindTip onClose={closeHelp} />}
           <HideSuggestionsButton lookup={lookup} onHide={hide} className="-mt-2 self-end" />
 
           <TextField
@@ -216,5 +230,45 @@ export function WordFormDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/**
+ * The first new word: a tip card like the tours' (the wolf, what the button does), right under
+ * "Find" and pointing at it. Inside the window, so its focus trap leaves the card alone.
+ */
+function FindTip({ onClose }: { onClose: () => void }) {
+  const t = useTranslations('tours.addWord');
+  const titleId = useId();
+  return (
+    <section
+      aria-labelledby={titleId}
+      className="relative -mt-1 flex flex-col gap-3 rounded-card border border-line bg-surface p-4 text-fg shadow-pop motion-safe:animate-pop"
+    >
+      {/* The corner pointing up at the button. */}
+      <span
+        aria-hidden
+        className="absolute -top-1.5 end-10 size-3 rotate-45 border-s border-t border-line bg-surface"
+      />
+      <div className="flex gap-3">
+        <Image
+          src="/male/_wolf/wolf_head.png"
+          alt=""
+          width={284}
+          height={351}
+          quality={IMAGE_QUALITY}
+          className="h-14 w-auto shrink-0 self-start drop-shadow-md"
+        />
+        <div className="min-w-0 flex-1">
+          <h3 id={titleId} className="font-display text-lg leading-tight font-semibold">
+            {t('title')}
+          </h3>
+          <p className="mt-1.5 text-sm text-pretty text-fg-muted">{t('text')}</p>
+        </div>
+      </div>
+      <Button size="sm" className="self-end" onClick={onClose}>
+        {t('ok')}
+      </Button>
+    </section>
   );
 }

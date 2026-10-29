@@ -37,6 +37,10 @@ export interface CardState {
   reps: number;
   /** Successes in a row since the last lapse (missing in snapshots made before it existed). */
   streak?: number;
+  /** The mixed mode: the step of its round (see MIXED_STEPS); unset — taken from the level. */
+  mix?: number;
+  /** The mixed mode: wrong answers in a row at this step. */
+  misses?: number;
 }
 
 export interface ReviewResult {

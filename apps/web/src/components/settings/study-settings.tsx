@@ -86,6 +86,7 @@ export function StudySettingsForm() {
         value={mode}
         onChange={(v) => setMode(v, 'settings')}
         options={[
+          { value: 'mixed', label: t('studyModes.mixed') },
           { value: 'cards', label: t('studyModes.cards') },
           { value: 'quiz', label: t('studyModes.quiz') },
           { value: 'sentences', label: t('studyModes.sentences') },

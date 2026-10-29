@@ -1,19 +1,11 @@
-// Who is counted: a random id per browser, the A/B variant pinned to it, and the service flags
-// from the address (?internal=1, ?debug=1). Pure: storage, time and randomness come from outside.
-import {
-  isVariant,
-  VARIANTS,
-  type AssignedBy,
-  type EventType,
-  type Params,
-  type Variant,
-} from './schema';
+// Who is counted: a random id per browser and the service flags from the address (?internal=1,
+// ?debug=1). Pure: storage, time and randomness come from outside.
+import type { EventType, Params } from './schema';
 
 /** Analytics keys live apart from the app's data (vocabx:v1:*): a data reset keeps them. */
 export const KEYS = {
   anonId: 'vocabx:analytics:anon-id',
   firstVisit: 'vocabx:analytics:first-visit',
-  variant: 'vocabx:analytics:variant',
   internal: 'vocabx:analytics:internal',
   consent: 'vocabx:analytics:consent',
   session: 'vocabx:analytics:session',
@@ -52,40 +44,19 @@ export interface IdentityEnv {
   /** sessionStorage */
   tab: KeyValue;
   now: number;
-  rng: () => number;
   uuid: () => string;
 }
 
 export interface Identity {
   anonId: string;
   firstVisitAt: number;
-  variant: Variant;
-  assignedBy: AssignedBy;
   internal: boolean;
   debug: boolean;
   host: string;
   /** No id was stored: this is the first visit from this browser. */
   firstVisit: boolean;
-  /** Events found while resolving (first visit, variant assigned or in conflict). */
+  /** Events found while resolving (the first visit). */
   events: { type: EventType; params: Params }[];
-}
-
-interface StoredVariant {
-  v: Variant;
-  by: AssignedBy;
-}
-
-function readVariant(storage: KeyValue): StoredVariant | null {
-  try {
-    const raw = JSON.parse(storage.getItem(KEYS.variant) ?? 'null') as unknown;
-    if (raw && typeof raw === 'object') {
-      const { v, by } = raw as Record<string, unknown>;
-      if (isVariant(v) && (by === 'link' || by === 'random')) return { v, by };
-    }
-  } catch {
-    // Unreadable: assigned anew.
-  }
-  return null;
 }
 
 const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
@@ -98,11 +69,7 @@ function referrerDomain(referrer: string): string {
   }
 }
 
-/**
- * The variant comes from ?v= on the first visit and stays with the browser after that, even
- * when the site is opened without it. A different ?v= later is logged (variant_conflict) and
- * ignored. Without ?v= the variant is drawn at random, evenly.
- */
+/** The browser's id (made on its first visit) and the flags from the address. */
 export function resolveIdentity(env: IdentityEnv): Identity {
   const { search, storage, tab } = env;
   const events: Identity['events'] = [];
@@ -122,23 +89,6 @@ export function resolveIdentity(env: IdentityEnv): Identity {
   }
   const firstVisitAt = Number(storage.getItem(KEYS.firstVisit)) || env.now;
 
-  const incoming = search.get('v');
-  const fromLink = isVariant(incoming) ? incoming : null;
-  let stored = readVariant(storage);
-  if (stored) {
-    if (fromLink && fromLink !== stored.v)
-      events.push({ type: 'variant_conflict', params: { from: stored.v, to: fromLink } });
-  } else {
-    stored = fromLink
-      ? { v: fromLink, by: 'link' }
-      : {
-          v: VARIANTS[Math.min(VARIANTS.length - 1, Math.floor(env.rng() * VARIANTS.length))]!,
-          by: 'random',
-        };
-    storage.setItem(KEYS.variant, JSON.stringify(stored));
-    if (stored.by === 'random') events.push({ type: 'variant_assigned', params: { to: stored.v } });
-  }
-
   if (firstVisit) {
     const params: Params = {
       referrer_domain: referrerDomain(env.referrer),
@@ -148,14 +98,12 @@ export function resolveIdentity(env: IdentityEnv): Identity {
       const value = search.get(k);
       if (value) params[k] = value.slice(0, 100);
     }
-    events.unshift({ type: 'first_visit', params });
+    events.push({ type: 'first_visit', params });
   }
 
   return {
     anonId,
     firstVisitAt,
-    variant: stored.v,
-    assignedBy: stored.by,
     internal,
     debug: tab.getItem(KEYS.debug) === '1',
     host: env.hostname,

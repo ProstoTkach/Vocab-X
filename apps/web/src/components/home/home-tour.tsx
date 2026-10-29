@@ -22,6 +22,17 @@ import { useGamification } from '@/lib/gamification';
 import { markTourSeen, tourSeen, type TourPart } from '@/lib/home-tour';
 import { useCloseOnBack } from '@/lib/close-on-back';
 import { IMAGE_QUALITY } from '@/lib/images';
+import {
+  boxOf,
+  CHECK_MS,
+  noDialogs,
+  place,
+  QUIET_MS,
+  sameBox,
+  scrollToTarget,
+  targetOf,
+  type Box,
+} from '@/components/tour/geometry';
 
 type StepId =
   | 'hello'
@@ -49,22 +60,24 @@ interface Step {
   joy?: boolean;
   /** In the fixed chrome (navigation, top bar): never scrolled to. */
   fixed?: boolean;
+  /** Left out of the tour for now (kept, with its texts, to bring back any time). */
+  hidden?: boolean;
 }
 
 const STEPS: Record<StepId, Step> = {
   hello: { joy: true },
   streak: { target: 'streak' },
   character: { target: 'character', joy: true },
-  message: { target: 'message' },
+  message: { target: 'message', hidden: true },
   level: { target: 'level' },
-  goal: { target: 'goal' },
-  wardrobe: { target: 'wardrobe' },
-  feedback: { target: 'feedback' },
+  goal: { target: 'goal', hidden: true },
+  wardrobe: { target: 'wardrobe', hidden: true },
+  feedback: { target: 'feedback', hidden: true },
   enable: { target: 'enable', joy: true },
-  deck: { target: 'deck' },
-  add: { target: 'add' },
+  deck: { target: 'deck', hidden: true },
+  add: { target: 'add', hidden: true },
   library: { target: 'library' },
-  nav: { target: 'nav', fixed: true },
+  nav: { target: 'nav', fixed: true, hidden: true },
   extras: { target: 'extras', fixed: true },
   bye: { joy: true },
   gameHello: { joy: true },
@@ -79,6 +92,10 @@ const PAGE_STEPS: StepId[] = ['deck', 'add', 'library', 'nav', 'extras', 'bye'];
  * turns it on. Steps whose element is not on this screen (phone or desktop layout) are skipped.
  */
 function stepsOf(part: TourPart, enabled: boolean): StepId[] {
+  return allStepsOf(part, enabled).filter((id) => !STEPS[id].hidden);
+}
+
+function allStepsOf(part: TourPart, enabled: boolean): StepId[] {
   if (part === 'game') return ['gameHello', ...GAME_STEPS, 'gameBye'];
   return enabled
     ? [
@@ -104,116 +121,10 @@ const PAGES = [
   { key: 'profile', icon: User },
 ] as const;
 
-/** Space between the element and its highlight. px */
-const PAD = 6;
-/** Length of the line from the card to the element. px */
-const GAP = 28;
-/** Distance kept from the edges of the screen. px */
-const EDGE = 12;
-/** Scrolled into view this far below the top (clear of the phone's top bar). px */
-const TOP_CLEAR = 80;
-/** The tour waits until no other window has been open for this long. ms */
-const QUIET_MS = 1500;
-const CHECK_MS = 250;
-
-interface Box {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-}
-
-/** The element of a mark that is on screen (phones and desktops each hide one of a pair). */
-function targetOf(mark: string): HTMLElement | null {
-  for (const el of document.querySelectorAll<HTMLElement>(`[data-tour="${mark}"]`))
-    if (el.getClientRects().length > 0) return el;
-  return null;
-}
-
 const presentMarks = () =>
   Object.values(STEPS)
     .flatMap((s) => (s.target && targetOf(s.target) ? [s.target] : []))
     .join(' ');
-
-const boxOf = (el: HTMLElement): Box => {
-  const r = el.getBoundingClientRect();
-  return {
-    top: r.top - PAD,
-    left: r.left - PAD,
-    width: r.width + 2 * PAD,
-    height: r.height + 2 * PAD,
-  };
-};
-
-const sameBox = (a: Box | null, b: Box | null) =>
-  a === b ||
-  (!!a &&
-    !!b &&
-    Math.abs(a.top - b.top) < 0.5 &&
-    Math.abs(a.left - b.left) < 0.5 &&
-    Math.abs(a.width - b.width) < 0.5 &&
-    Math.abs(a.height - b.height) < 0.5);
-
-const clamp = (v: number, min: number, max: number) =>
-  Math.min(Math.max(v, min), Math.max(min, max));
-
-type Side = 'bottom' | 'top' | 'right' | 'left';
-
-interface Placement {
-  x: number;
-  y: number;
-  /** The line from the card to the element, if the card is beside it. */
-  line: { x1: number; y1: number; x2: number; y2: number } | null;
-}
-
-/**
- * Where the card goes: beside the element, on the first side with room for it (below or above
- * first; to the side first for tall elements such as the desktop menu), with a line between
- * them. With no room anywhere it sits at the far edge of the screen, over the page.
- */
-function place(t: Box | null, w: number, h: number, vw: number, vh: number): Placement {
-  if (!t) return { x: (vw - w) / 2, y: (vh - h) / 2, line: null };
-  const cx = t.left + t.width / 2;
-  const cy = t.top + t.height / 2;
-  const sides: Side[] =
-    t.height > vh * 0.4 && t.width < vw * 0.4
-      ? ['right', 'left', 'bottom', 'top']
-      : ['bottom', 'top', 'right', 'left'];
-  for (const side of sides) {
-    if (side === 'bottom' || side === 'top') {
-      const y = side === 'bottom' ? t.top + t.height + GAP : t.top - GAP - h;
-      if (y < EDGE || y + h > vh - EDGE) continue;
-      const x = clamp(cx - w / 2, EDGE, vw - EDGE - w);
-      const lx = clamp(cx, x + 20, x + w - 20);
-      const edge = side === 'bottom' ? t.top + t.height : t.top;
-      return {
-        x,
-        y,
-        line: { x1: lx, y1: edge, x2: lx, y2: side === 'bottom' ? y : y + h },
-      };
-    }
-    const x = side === 'right' ? t.left + t.width + GAP : t.left - GAP - w;
-    if (x < EDGE || x + w > vw - EDGE) continue;
-    const y = clamp(cy - h / 2, EDGE, vh - EDGE - h);
-    const ly = clamp(cy, y + 20, y + h - 20);
-    const edge = side === 'right' ? t.left + t.width : t.left;
-    return { x, y, line: { x1: edge, y1: ly, x2: side === 'right' ? x : x + w, y2: ly } };
-  }
-  const x = (vw - w) / 2;
-  return { x, y: cy > vh / 2 ? EDGE : vh - EDGE - h, line: null };
-}
-
-/** Brings an element into view: near the top, so the card fits below it; centred if it is tall. */
-function scrollToTarget(el: HTMLElement, smooth: boolean) {
-  const r = el.getBoundingClientRect();
-  const vh = window.innerHeight;
-  const top = r.height > vh * 0.45 ? r.top - (vh - r.height) / 2 : r.top - TOP_CLEAR;
-  if (Math.abs(top) < 4) return;
-  window.scrollBy({ top, behavior: smooth ? 'smooth' : 'auto' });
-}
-
-/** No dialog of the app is open (the consent window, the install offer, a survey). */
-const noDialogs = () => !document.querySelector('[role="dialog"], [role="alertdialog"]');
 
 /**
  * A guided tour of Home for newcomers: everything is dimmed except one element at a time, with a

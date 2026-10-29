@@ -97,7 +97,7 @@ export function CardStage({ cardKey, exitDir, depth, ...card }: CardStageProps) 
   return (
     // Bottom margin leaves room for the deck peeking out under the card. z-10 lifts a dragged
     // card above everything after it (grade bar, aside with its progress bars).
-    <div className="relative z-10 mb-6 min-h-0 flex-1">
+    <div data-tour="review-card" className="relative z-10 mb-6 min-h-0 flex-1">
       {Array.from({ length: layers }, (_, i) => (
         <div
           key={i}

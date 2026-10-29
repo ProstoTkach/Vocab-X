@@ -107,18 +107,22 @@ export function SentenceCard(p: SentenceCardProps) {
     <ChoiceLayout
       top={
         answered ? (
-          'typed' in answer ? (
-            <TypedFeedback typed={answer.typed} />
-          ) : (
-            <>
-              <Verdict right={right} />
-              {'said' in answer && !right && answer.said.heard && (
-                <p className="text-sm text-fg-muted">
-                  {t('sentence.heard', { heard: answer.said.heard })}
-                </p>
-              )}
-            </>
-          )
+          <>
+            {/* Above the verdict (the top grows upwards): the sentence does not move. */}
+            <SpeakButton text={cloze.example.text} speechLang={p.speechLang} speech={p.speech} />
+            {'typed' in answer ? (
+              <TypedFeedback typed={answer.typed} />
+            ) : (
+              <>
+                <Verdict right={right} />
+                {'said' in answer && !right && answer.said.heard && (
+                  <p className="text-sm text-fg-muted">
+                    {t('sentence.heard', { heard: answer.said.heard })}
+                  </p>
+                )}
+              </>
+            )}
+          </>
         ) : (
           <p className="text-sm text-fg-muted">{t(`sentence.prompt.${format}`)}</p>
         )
@@ -134,8 +138,9 @@ export function SentenceCard(p: SentenceCardProps) {
             answered={answered}
             onPick={p.onPick}
           />
-        ) : (
-          // Kept in place (unseen) once answered, so the sentence does not move.
+        ) : // The microphone is tall: once answered it goes, and the sentence is in the middle.
+        format === 'SENT_SAY' && answered ? null : (
+          // The field is kept in place (unseen) once answered, so the sentence does not move.
           <div
             aria-hidden={answered}
             inert={answered}
@@ -157,10 +162,6 @@ export function SentenceCard(p: SentenceCardProps) {
     >
       {sentence}
       {hint}
-      {/* Once answered, the whole sentence can be heard. */}
-      {answered && (
-        <SpeakButton text={cloze.example.text} speechLang={p.speechLang} speech={p.speech} />
-      )}
     </ChoiceLayout>
   );
 }

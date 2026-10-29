@@ -1,8 +1,8 @@
 /**
  * Feedback from learners: what the forms collect, how it is checked on the server and how it
  * reads in the developer's spreadsheet or Telegram chat. No name, e-mail or IP is ever part of
- * it — only the answers, the interface language, the player level, the A/B variant and the
- * random analytics id of the browser (to put the answers next to the usage statistics).
+ * it — only the answers, the interface language, the player level and the random analytics id
+ * of the browser (to put the answers next to the usage statistics).
  */
 
 export type FeedbackKind = 'survey' | 'bug' | 'review' | 'idea';
@@ -87,8 +87,7 @@ export interface FeedbackPayload {
   locale: string;
   /** Player level, for context; null while unknown. */
   level: number | null;
-  /** The A/B variant of this browser and its random analytics id ('' when unknown). */
-  variant: string;
+  /** The random analytics id of this browser ('' when unknown). */
   anonId: string;
 }
 
@@ -192,11 +191,9 @@ export function parsePayload(body: unknown): FeedbackPayload | null {
     typeof body.level === 'number' && Number.isInteger(body.level) && body.level > 0
       ? body.level
       : null;
-  const variant =
-    typeof body.variant === 'string' && /^g[01][cq]$/.test(body.variant) ? body.variant : '';
   const anonId =
     typeof body.anonId === 'string' && /^[A-Za-z0-9-]{8,64}$/.test(body.anonId) ? body.anonId : '';
-  return { feedback, locale, level, variant, anonId };
+  return { feedback, locale, level, anonId };
 }
 
 export type SendResult = 'ok' | 'rate-limited' | 'failed';
@@ -300,7 +297,7 @@ export const visibleLength = (html: string) =>
  * The feedback as Telegram HTML (parse_mode=HTML), in one or more messages. It is built from
  * blocks that are valid HTML on their own, so a long survey is split between blocks only.
  */
-export function formatFeedback({ feedback: f, locale, level, variant }: FeedbackPayload): string[] {
+export function formatFeedback({ feedback: f, locale, level }: FeedbackPayload): string[] {
   const blocks = [`<b>${TITLES[f.kind]}</b> · VocabX`];
   switch (f.kind) {
     case 'survey': {
@@ -339,9 +336,7 @@ export function formatFeedback({ feedback: f, locale, level, variant }: Feedback
       blocks.push(quote(f.text));
       break;
   }
-  blocks.push(
-    `\n<i>мова: ${escapeHtml(locale)} · рівень: ${level ?? '—'} · варіант: ${variant || '—'}</i>`,
-  );
+  blocks.push(`\n<i>мова: ${escapeHtml(locale)} · рівень: ${level ?? '—'}</i>`);
 
   const messages: string[] = [];
   let current = '';
@@ -397,6 +392,7 @@ export const FEEDBACK_FIELDS: readonly { key: string; label: string }[] = [
   { key: 'text', label: 'Відгук або ідея' },
   // Added later: only ever at the end.
   { key: 'disappointment', label: 'Якби не міг більше користуватися' },
+  // The former A/B test's variant: always empty now, kept so the columns after it stay put.
   { key: 'variant', label: 'Варіант' },
   { key: 'anon_id', label: 'Анонімний ID' },
 ];
@@ -410,7 +406,7 @@ export const FEEDBACK_DATE_COLUMNS: readonly number[] = [0];
 
 /** The feedback as one spreadsheet row, matching FEEDBACK_COLUMNS (empty cells as ''). */
 export function feedbackRow(
-  { feedback: f, locale, level, variant, anonId }: FeedbackPayload,
+  { feedback: f, locale, level, anonId }: FeedbackPayload,
   at: Date,
 ): SheetCell[] {
   const survey = f.kind === 'survey' ? f : null;
@@ -436,7 +432,7 @@ export function feedbackRow(
     bug?.text ?? '',
     f.kind === 'review' || f.kind === 'idea' ? f.text : '',
     survey?.disappointment ? DISAPPOINTMENT_LABELS[survey.disappointment] : '',
-    variant,
+    '',
     anonId,
   ];
 }

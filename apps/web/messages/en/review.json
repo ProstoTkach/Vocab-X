@@ -111,7 +111,8 @@
     "wrongCount": "Wrong",
     "rightCount": "Right",
     "hotkeyPick": "Pick an option",
-    "exampleHint": "Get a hint"
+    "pause": "Pause",
+    "resume": "Resume"
   },
   "quizIntro": {
     "title": "How the test works",
@@ -153,6 +154,21 @@
       "type": "Type the word yourself."
     },
     "progress": "A right answer moves the word a level up. After a mistake the level stays, but the sentence changes.",
+    "start": "Got it, let’s start"
+  },
+  "mixedIntro": {
+    "title": "How the mixed mode works",
+    "text": "The test and sentences take turns. Each word goes round six steps:",
+    "level": "Step {n}.",
+    "levels": {
+      "q1": "Test: see a word, pick its translation.",
+      "s1": "Sentence: pick the missing word from four.",
+      "q2": "Test: see a translation, pick the word.",
+      "q3": "Test: hear a word, pick its translation.",
+      "s2": "Sentence: say the missing word aloud.",
+      "s3": "Sentence: type the missing word."
+    },
+    "progress": "A right answer takes the word to the next step, and after the sixth back to the first. Two wrong answers in a row on the same word take it one step back.",
     "start": "Got it, let’s start"
   },
   "modeMenu": "Change how you study",

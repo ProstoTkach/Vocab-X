@@ -18,6 +18,8 @@ import {
   quizChoices,
   quizFormatForLevel,
   sentenceFormatForLevel,
+  MIXED_STEPS,
+  mixedStepOf,
   seededRng,
   sessionDone,
   sessionReducer,
@@ -62,7 +64,7 @@ import { useSpeech } from '@/lib/speech';
 import { createStopwatch } from '@/lib/stopwatch';
 import { Celebration } from './celebration';
 import { FOUR_GRADES_TIP, FOUR_GRADES_TIP_STREAK, FourGradesTip } from './four-grades-tip';
-import { QUIZ_INTRO, REVIEW_INTRO, ReviewIntro, SENTENCE_INTRO } from './review-intro';
+import { MIXED_INTRO, QUIZ_INTRO, REVIEW_INTRO, ReviewIntro, SENTENCE_INTRO } from './review-intro';
 import { CardStage } from './card-stage';
 import { acceptedAnswers } from './formats/parts';
 import { formatOf, rendererFor } from './formats/registry';
@@ -81,6 +83,7 @@ import {
 } from './swipe';
 import { STUDY_MODES, StudyModeMenu } from './study-mode-menu';
 import { SessionTopBar } from './top-bar';
+import { PageTour, type TourStep } from '@/components/tour/page-tour';
 import { WaitingPanel } from './waiting-panel';
 
 type Session = SessionState<StudyCard, ReviewOutcome>;
@@ -108,14 +111,37 @@ interface QuizResult {
   responseMs: number;
   /** The next card comes by itself after this long; null (after an undo) waits for "Next". */
   autoMs: number | null;
+  /** Paused by the learner: how long it was to go, to resume with. */
+  pausedMs?: number;
+  /** Brought back by undo: it waits for "Next", so there is nothing to pause. */
+  restored?: boolean;
 }
 
 /** How long the result stays before the next card: a glance when right, time to read when not. */
 const QUIZ_NEXT_MS = { right: 600, wrong: 2000 } as const;
+/** The sentences: time to read and hear the whole sentence with the word in it. */
+const SENTENCE_NEXT_MS = { right: 3000, wrong: 6000 } as const;
+/** Said longer than that: the next card comes this long after the sentence ends. */
+const AFTER_SPEECH_MS = 600;
+/** The lab keeps this many answers to take back. */
+const LAB_UNDO = 3;
 /** A test answer is saved this long after it is given, once its result is on screen. */
 const PRESAVE_MS = 150;
 
 const silent: typeof track = () => {};
+
+/** The first visit: the screen, step by step; the kind of task is explained after it. */
+const REVIEW_TOUR: readonly TourStep[] = [
+  { id: 'hello', joy: true, hidden: true },
+  { id: 'progress', target: 'review-progress', hidden: true },
+  { id: 'undo', target: 'review-undo' },
+  { id: 'task', target: 'review-task', hidden: true },
+  { id: 'mode', target: 'review-mode' },
+  { id: 'card', target: 'review-card', hidden: true },
+  { id: 'answer', target: 'review-answer', hidden: true },
+  { id: 'finish', target: 'review-finish', hidden: true },
+  { id: 'bye', joy: true, hidden: true },
+];
 /** The lab looks this far ahead, so every word is due there. */
 const LAB_AHEAD_MS = 3650 * DAY_MS;
 const labSelect =
@@ -189,7 +215,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
       canSpeak: rawSpeech.canSpeak,
       speak: (text: string, lang: string) => {
         statsOf(shownKey.current).audio = true;
-        rawSpeech.speak(text, lang);
+        return rawSpeech.speak(text, lang);
       },
     }),
     [rawSpeech, statsOf],
@@ -203,8 +229,8 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   const [labMode, setLabMode] = useState<StudyMode>(savedMode);
   const [labLevel, setLabLevel] = useState<Level>(1);
   const studyMode = lab ? labMode : savedMode;
-  const quiz = studyMode === 'quiz';
-  const sentences = studyMode === 'sentences';
+  /** The test and the sentences taking turns, each word at its own step. */
+  const mixed = studyMode === 'mixed';
   const feedback = useFeedback();
   /** Answers given in the test so far (all sessions), until the survey invitation was made. */
   const quizAnswered = useRef<number | null>(null);
@@ -223,6 +249,10 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
    */
   const presaved = useRef<{ key: string; outcome: Promise<ReviewOutcome> } | null>(null);
   const presaveTimer = useRef(0);
+  /** The sentence being said after the answer: ends when it has been said. */
+  const sentenceSaid = useRef<Promise<void> | null>(null);
+  /** The lab: the stack before each of the last answers, to take them back. */
+  const [labHistory, setLabHistory] = useState<Session[]>([]);
   /** Answers already recorded, by event: an undo brings the card back with its result. */
   const quizAnswers = useRef(new Map<string, QuizResult>());
   const [exitDir, setExitDir] = useState<PhysicalDir | null>(null);
@@ -307,6 +337,15 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   }, [repos, clock, dayOf, reloadKey, watch, deckParam, lab, log]);
 
   const card = session?.queue[0];
+  // The mixed mode: this word's step (the lab goes through the steps one answer after another).
+  const mixStep =
+    mixed && card
+      ? MIXED_STEPS[
+          lab ? session.reviewed % MIXED_STEPS.length : mixedStepOf(card.progress?.card ?? null)
+        ]!
+      : null;
+  const quiz = studyMode === 'quiz' || mixStep?.mode === 'quiz';
+  const sentences = studyMode === 'sentences' || mixStep?.mode === 'sentences';
   /** Sums the review up once: when the stack is done or the learner leaves it. */
   const endReviewRef = useRef<() => void>(() => {});
   useEffect(() => {
@@ -336,8 +375,17 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     if (finished) endReviewRef.current();
   }, [finished]);
   // Flash cards and the test each explain themselves once.
-  const introTip = sentences ? SENTENCE_INTRO : quiz ? QUIZ_INTRO : REVIEW_INTRO;
-  const introOpen = !lab && !!setup && !introClosed && !setup.tipsSeen.includes(introTip);
+  const introTip = mixed
+    ? MIXED_INTRO
+    : sentences
+      ? SENTENCE_INTRO
+      : quiz
+        ? QUIZ_INTRO
+        : REVIEW_INTRO;
+  /** The tour of the review screen is over (or was seen before): the task is explained next. */
+  const [tourDone, setTourDone] = useState(false);
+  const introOpen =
+    !lab && tourDone && !!setup && !introClosed && !setup.tipsSeen.includes(introTip);
   const closeIntro = () => {
     setIntroClosed(true);
     log('review_intro_closed');
@@ -351,20 +399,21 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     rtl: localeInfo(locale).dir === 'rtl',
     mirrored: settings?.swipeLayout === 'mirrored',
     // The test only knows right and wrong, so it always counts in two grades.
-    twoGrades: (settings?.twoGrades ?? false) || quiz || sentences,
+    twoGrades: (settings?.twoGrades ?? false) || quiz || sentences || mixed,
   };
   const grades = swipe.twoGrades ? TWO_GRADES : ALL_GRADES;
   const cardKey = card ? `${card.id}:${session.reviewed}` : null;
   const nativeLang = setup?.profile.nativeLang ?? 'uk';
-  const level: Level = lab ? labLevel : (card?.progress?.card.level ?? 1);
+  const level: Level = mixStep ? mixStep.level : lab ? labLevel : (card?.progress?.card.level ?? 1);
   // Sentences: the example for this answer (they take turns, so a wrong answer comes back with
   // another one). A word with no example holding it is asked as a choice of four instead.
   // The lab has no saved answers: there the examples take turns with every answer.
   const turn = lab ? (session?.reviewed ?? 0) : (card?.progress?.card.reps ?? 0);
-  const example = useMemo(() => (card ? clozeForReview(card.word, turn) : null), [card, turn]);
-  // The test's first two levels offer it as a hint ("Get a hint").
-  const cloze = sentences ? example : null;
-  useExampleTopUp(setup?.words ?? null, sentences);
+  const cloze = useMemo(
+    () => (sentences && card ? clozeForReview(card.word, turn) : null),
+    [sentences, card, turn],
+  );
+  useExampleTopUp(setup?.words ?? null, sentences || mixed);
   const levelFormat: QuizFormat | SentenceFormat | null = !card
     ? null
     : cloze
@@ -435,7 +484,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     if (!cardKey || !listenTerm || spokenFor.current === cardKey) return;
     if (!speech.canSpeak(speechLang)) return;
     spokenFor.current = cardKey;
-    speech.speak(listenTerm, speechLang);
+    void speech.speak(listenTerm, speechLang);
   }, [cardKey, listenTerm, speech, speechLang]);
 
   /** The first reveal of a card speaks the word once; later flips are silent. */
@@ -443,7 +492,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     if (!card) return;
     // A listening card has spoken already; the test speaks by itself only on its listening level.
     if (!revealed && settings?.autoSpeak && format !== 'AUD_PART' && !quizFormat)
-      speech.speak(card.word.term, speechLang);
+      void speech.speak(card.word.term, speechLang);
     setRevealed(true);
   };
 
@@ -489,6 +538,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
       settings: setup.settings,
       params: DEFAULT_SCHEDULER_PARAMS,
       newId,
+      mixed,
     });
   };
 
@@ -501,10 +551,16 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
       grade: g,
       responseMs,
       // Typing the word: twice as long to look at what was typed against the answer.
-      autoMs:
-        (right ? QUIZ_NEXT_MS.right : QUIZ_NEXT_MS.wrong) *
-        (isTypingFormat(format) || format === 'SENT_SAY' ? 2 : 1),
+      autoMs: sentenceFormat
+        ? right
+          ? SENTENCE_NEXT_MS.right
+          : SENTENCE_NEXT_MS.wrong
+        : (right ? QUIZ_NEXT_MS.right : QUIZ_NEXT_MS.wrong) * (isTypingFormat(format) ? 2 : 1),
     });
+    // The sentences: the whole sentence, the word in its place, is heard once answered. The
+    // next card waits for it to be said to the end.
+    sentenceSaid.current =
+      cloze && setup?.settings.autoSpeak ? speech.speak(cloze.example.text, speechLang) : null;
     reveal();
     // Saved once the result is painted and the "Next" bar is filling (an animation the
     // compositor runs on its own), never in the frame of the answer itself.
@@ -559,6 +615,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   };
 
   const nextCard = () => {
+    sentenceSaid.current = null;
     setSide('front');
     setRevealed(false);
     setTyped(null);
@@ -576,7 +633,9 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     // A card can be graded (swiped away) without flipping it first.
     if (!card || !setup || busy) return;
     if (lab) {
-      // The card goes to the bottom of the stack: the words come round again and again.
+      // The card goes to the bottom of the stack: the words come round again and again. The
+      // last few answers can be taken back.
+      setLabHistory((h) => [...h, session].slice(-LAB_UNDO));
       setSession((s) => s && labAnswer(s, g));
       setExitDir(dir ?? directionForGrade(g, swipe));
       nextCard();
@@ -673,8 +732,17 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   };
 
   const undo = async () => {
+    if (lab) {
+      const previous = labHistory.at(-1);
+      if (!previous || busy) return;
+      setLabHistory((h) => h.slice(0, -1));
+      setExitDir(null);
+      setSession(previous);
+      nextCard();
+      return;
+    }
     const last = session?.history.at(-1);
-    if (!last || busy || lab) return;
+    if (!last || busy) return;
     setBusy(true);
     // The card on screen was answered and saved already: that answer goes too.
     window.clearTimeout(presaveTimer.current);
@@ -689,19 +757,35 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     nextCard();
     // A test card comes back answered, with its result, not to be answered again.
     const answered = quizAnswers.current.get(last.token.event.id);
-    if (answered) setQuizResult({ ...answered, autoMs: null });
+    if (answered) setQuizResult({ ...answered, autoMs: null, restored: true });
     setBusy(false);
   };
 
   const changeMode = (next: StudyMode) => {
     if (lab) setLabMode(next);
     else setMode(next, 'review');
+    // A way of studying tried for the first time explains itself too.
+    setIntroClosed(false);
     nextCard();
   };
   const changeLevel = (next: Level) => {
     setLabLevel(next);
     nextCard();
   };
+
+  /** The sentences: stops going on by itself (to read and listen), or starts it again. */
+  const togglePause = () =>
+    setQuizResult((r) => {
+      if (!r) return r;
+      if (r.pausedMs !== undefined) {
+        const { pausedMs, ...rest } = r;
+        return { ...rest, autoMs: pausedMs };
+      }
+      return r.autoMs === null ? r : { ...r, autoMs: null, pausedMs: r.autoMs };
+    });
+
+  /** The sentences' answer going on by itself can be paused. */
+  const canPause = !!sentenceFormat && !quizResult?.restored;
 
   const nextQuiz = (auto = false) => {
     if (!quizResult) return;
@@ -719,8 +803,21 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   const autoMs = quizResult?.autoMs ?? null;
   useEffect(() => {
     if (autoMs === null || busy) return;
-    const id = window.setTimeout(() => nextQuizRef.current(true), autoMs);
-    return () => window.clearTimeout(id);
+    let gone = false;
+    let after = 0;
+    const id = window.setTimeout(() => {
+      // The sentence still being said: the card goes on a moment after it ends.
+      const said = sentenceSaid.current;
+      if (!said) return nextQuizRef.current(true);
+      void said.then(() => {
+        if (!gone) after = window.setTimeout(() => nextQuizRef.current(true), AFTER_SPEECH_MS);
+      });
+    }, autoMs);
+    return () => {
+      gone = true;
+      window.clearTimeout(id);
+      window.clearTimeout(after);
+    };
   }, [autoMs, busy, cardKey]);
 
   // Waiting cards come back on their own once due (the demo clock may jump, so poll gently).
@@ -785,7 +882,13 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   const done = sessionDone(session);
   // Phones: once answered, a bar fills up along the card's bottom edge and an arrow goes on.
   const phoneNext = quizResult
-    ? { autoMs: quizResult.autoMs, disabled: busy, onNext: () => nextQuiz() }
+    ? {
+        autoMs: quizResult.autoMs,
+        disabled: busy,
+        onNext: () => nextQuiz(),
+        paused: quizResult.pausedMs !== undefined,
+        onPause: canPause ? togglePause : undefined,
+      }
     : undefined;
   const suggested = typed
     ? swipe.twoGrades
@@ -816,7 +919,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
               total={session.total}
               remaining={session.queue.length}
               deckName={deckName}
-              canUndo={!lab && session.history.length > 0 && !busy}
+              canUndo={(lab ? labHistory.length : session.history.length) > 0 && !busy}
               onUndo={() => void undo()}
             />
             {!card && returnAt !== null ? (
@@ -861,22 +964,28 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
                         </option>
                       ))}
                     </select>
-                    <select
-                      aria-label={t('lab.level')}
-                      value={labLevel}
-                      onChange={(e) => changeLevel(Number(e.target.value) as Level)}
-                      className={labSelect}
-                    >
-                      {([1, 2, 3] as const).map((n) => (
-                        <option key={n} value={n}>
-                          {t('level', { level: n, max: 3 })} ·{' '}
-                          {t(`format.${formatOfLevel(labMode, n)}`)}
-                        </option>
-                      ))}
-                    </select>
+                    {/* The mixed mode goes through its steps by itself. */}
+                    {labMode !== 'mixed' && (
+                      <select
+                        aria-label={t('lab.level')}
+                        value={labLevel}
+                        onChange={(e) => changeLevel(Number(e.target.value) as Level)}
+                        className={labSelect}
+                      >
+                        {([1, 2, 3] as const).map((n) => (
+                          <option key={n} value={n}>
+                            {t('level', { level: n, max: 3 })} ·{' '}
+                            {t(`format.${formatOfLevel(labMode, n)}`)}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between gap-2 text-xs font-medium text-fg-muted">
+                  <div
+                    data-tour="review-task"
+                    className="flex items-center justify-between gap-2 text-xs font-medium text-fg-muted"
+                  >
                     <span className="rounded-full border border-line/70 px-2.5 py-1">
                       {t(`format.${format}`)}
                     </span>
@@ -929,13 +1038,14 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
                           onPick={pickOption}
                           onTyped={typeQuiz}
                           onHint={(kind) => log('quiz_hint', { to: kind })}
-                          example={example}
                           next={phoneNext}
                         />
                       )}
                     </CardStage>
                     <QuizBar
                       answered={!!quizResult}
+                      paused={quizResult?.pausedMs !== undefined}
+                      onPause={canPause ? togglePause : undefined}
                       disabled={busy}
                       autoMs={quizResult?.autoMs ?? null}
                       onNext={() => nextQuiz()}
@@ -987,6 +1097,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
                     {/* The grades are always there on wide screens: a card can be graded with or
                     without flipping. Phones swipe; the buttons there are a setting. */}
                     <div
+                      data-tour="review-answer"
                       className={cx(
                         'shrink-0',
                         !setup.settings.gradeButtonsOnPhone && 'max-md:hidden',
@@ -1006,9 +1117,22 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
               </>
             )}
           </section>
-          <SessionAside session={session} swipe={swipe} goal={goal} quiz={quiz || sentences} />
+          <SessionAside
+            session={session}
+            swipe={swipe}
+            goal={goal}
+            quiz={quiz || sentences || mixed}
+          />
         </div>
       </div>
+      {!lab && (
+        <PageTour
+          tour="review"
+          steps={REVIEW_TOUR}
+          ready={!!card}
+          onFinish={() => setTourDone(true)}
+        />
+      )}
       <ReviewIntro
         open={introOpen}
         mirrored={swipe.mirrored}

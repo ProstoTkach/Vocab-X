@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-// A clean browser: no pinned variant, no answer to the consent window yet.
+// A clean browser: no answer to the consent window yet.
 test.use({ storageState: { cookies: [], origins: [] } });
 
 const consent = (page: Page) =>
@@ -8,7 +8,7 @@ const consent = (page: Page) =>
 
 /** Requests to /api/track, answered locally (the spreadsheet is never touched by tests). */
 async function trackRequests(page: Page) {
-  const bodies: { events: { type: string; variant: string; internal: boolean }[] }[] = [];
+  const bodies: { events: { type: string; variant?: string; internal: boolean }[] }[] = [];
   await page.route('**/api/track', async (route) => {
     const body = route.request().postData();
     if (body) bodies.push(JSON.parse(body) as (typeof bodies)[number]);
@@ -54,7 +54,7 @@ test('agreeing sends the events (in this test build); on localhost a warning say
     alerts.push(d.message());
     void d.accept();
   });
-  await firstStep(page, '/uk/onboarding?v=g0q');
+  await firstStep(page, '/uk/onboarding');
   await consent(page).getByRole('button', { name: 'Добре, погоджуюся' }).click();
   await expect.poll(() => alerts.length).toBe(1);
   expect(alerts[0]).toContain('localhost');
@@ -65,8 +65,8 @@ test('agreeing sends the events (in this test build); on localhost a warning say
     expect.arrayContaining(['first_visit', 'session_start', 'consent_accepted']),
   );
   expect(types).toContain('onboarding_step_shown');
-  // The variant from the link, and every event from this machine marked as internal.
-  expect(new Set(events.map((e) => e.variant))).toEqual(new Set(['g0q']));
+  // No A/B variant any more, and every event from this machine marked as internal.
+  expect(events.some((e) => 'variant' in e)).toBe(false);
   expect(events.every((e) => e.internal)).toBe(true);
 });
 
@@ -84,48 +84,22 @@ test('?debug=1 prints the events and sends nothing', async ({ page }) => {
   expect(bodies).toEqual([]);
 });
 
-test('the variant from the link sets the start: no gamification, the four-choice test', async ({
+test('everyone starts alike: gamification on and the mixed mode, whatever the link', async ({
   page,
 }) => {
-  // From the root of the site: the redirects to onboarding keep ?v=.
+  // An old A/B link changes nothing now.
   await firstStep(page, '/?v=g0q');
-  await expect(page).toHaveURL(/\/uk\/onboarding\?v=g0q$/);
-  expect(await page.evaluate(() => localStorage.getItem('vocabx:analytics:variant'))).toBe(
-    JSON.stringify({ v: 'g0q', by: 'link' }),
-  );
   page.on('dialog', (d) => void d.accept());
   await trackRequests(page);
   await consent(page).getByRole('button', { name: 'Добре, погоджуюся' }).click();
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Далі' }).click();
   await page.getByRole('button', { name: 'Пропустити' }).click();
   await page.waitForURL(/\/uk$/);
-  // Instead of the character: a button that turns gamification on.
-  const enable = page.getByRole('button', { name: /Увімкнути гейміфікацію/ });
-  await expect(enable).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Погладити персонажа' })).toHaveCount(0);
-  await page.goto('/uk/settings');
-  await expect(page.getByRole('radio', { name: 'Тест із 4 варіантів' })).toBeChecked();
-  await expect(page.getByRole('radio', { name: /^Вимкнено Лише навчання/ })).toBeChecked();
-  // Another link later does not change the variant.
-  await page.goto('/uk/settings?v=g1c');
-  await expect(page.getByRole('radio', { name: 'Тест із 4 варіантів' })).toBeChecked();
-  // The button on Home turns gamification back on.
-  await page.goto('/uk');
-  await page.getByRole('button', { name: /Увімкнути гейміфікацію/ }).click();
   await expect(page.getByRole('button', { name: 'Погладити персонажа' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('vocabx:analytics:variant'))).toBeNull();
+  await page.goto('/uk/settings');
+  await expect(page.getByRole('radio', { name: 'Змішаний' })).toBeChecked();
 });
-
-for (const [v, game] of [
-  ['g1c', 'max'],
-  ['g0c', 'off'],
-] as const) {
-  test(`${v}: gamification ${game} from the first visit`, async ({ page }) => {
-    await page.goto(`/?v=${v}`);
-    await expect(consent(page)).toBeVisible();
-    const settings = await page.evaluate(() => localStorage.getItem('vocabx:v1:settings'));
-    expect(JSON.parse(settings ?? '{}')).toMatchObject({ gamification: game, quizMode: false });
-  });
-}
 
 test('the statistics can be switched in Settings → Data', async ({ page }) => {
   const bodies = await trackRequests(page);

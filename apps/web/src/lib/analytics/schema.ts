@@ -3,23 +3,15 @@
 // or studied words — only screens, counts, times and choices.
 import type { SheetCell } from '../feedback';
 
-/** The A/B test: gamification on (g1) or off (g0) × flash cards (c) or the four-choice test (q). */
-export const VARIANTS = ['g1c', 'g1q', 'g0c', 'g0q'] as const;
-export type Variant = (typeof VARIANTS)[number];
-export type AssignedBy = 'link' | 'random';
-export const isVariant = (v: unknown): v is Variant =>
-  typeof v === 'string' && (VARIANTS as readonly string[]).includes(v);
-
-/** The starting settings of a variant (the learner may change both later). */
-export function variantSettings(v: Variant): { gamification: 'max' | 'off'; quizMode: boolean } {
-  return { gamification: v.startsWith('g1') ? 'max' : 'off', quizMode: v.endsWith('q') };
-}
+/** How reviews are done, as counted. */
+export const STUDY_MODES = ['mixed', 'cards', 'quiz', 'sentences'] as const;
+export type StudyModeName = (typeof STUDY_MODES)[number];
+const isStudyMode = (v: unknown): v is StudyModeName =>
+  (STUDY_MODES as readonly unknown[]).includes(v);
 
 /** Event types with what each means, in Ukrainian (the spreadsheet's "Словник" sheet). */
 export const EVENTS = {
   first_visit: 'Перший захід на цьому пристрої: звідки прийшов (домен реферера, utm-мітки).',
-  variant_assigned: 'Варіант призначено випадково (захід без ?v=).',
-  variant_conflict: 'У посиланні інший варіант, ніж уже закріплений; залишено закріплений.',
   consent_shown: 'Показано вікно згоди на аналітику.',
   consent_accepted: 'Користувач погодився надсилати статистику (у вікні або в налаштуваннях).',
   session_start: 'Початок сесії: номер дня з першого візиту, пауза з минулого візиту.',
@@ -99,8 +91,10 @@ export const EVENTS = {
   theme_change: 'Змінено тему оформлення.',
   gamification_enable_click: 'Натиснуто «Увімкнути гейміфікацію» на головній.',
   game_mode_change: 'Змінено ігровий режим: з якого на який, через скільки днів і сесій.',
-  study_mode_change: 'Змінено режим вивчення (картки, 4 варіанти, речення).',
+  study_mode_change: 'Змінено режим вивчення (змішаний, картки, 4 варіанти, речення).',
   dev_mode: 'Режим розробника: to — unlocked / wrong_code / locked.',
+  page_tour:
+    'Тур сторінки (повторення, мої слова, бібліотека, мої колоди): показано / пройдено / пропущено.',
   setting_change: 'Змінено інше налаштування навчання.',
   ui_lang_change: 'Змінено мову інтерфейсу.',
   data_export: 'Експорт JSON.',
@@ -128,8 +122,6 @@ export type Params = Record<string, ParamValue>;
 export interface CommonFields {
   anon_id: string;
   session_id: string;
-  variant: Variant;
-  assigned_by: AssignedBy;
   internal: boolean;
   /** Where the app runs (vocabx-sigma.vercel.app, localhost…). */
   host: string;
@@ -139,7 +131,7 @@ export interface CommonFields {
   device: Device;
   days_since_first_visit: number;
   game_mode: string;
-  study_mode: 'cards' | 'quiz' | 'sentences';
+  study_mode: StudyModeName;
 }
 
 export interface AnalyticsEvent extends CommonFields {
@@ -153,8 +145,6 @@ export interface AnalyticsEvent extends CommonFields {
 export interface SessionSummary {
   session_id: string;
   anon_id: string;
-  variant: Variant;
-  assigned_by: AssignedBy;
   internal: boolean;
   host: string;
   device: Device;
@@ -212,8 +202,6 @@ function parseCommon(o: Obj, now: number): CommonFields | null {
   const {
     anon_id,
     session_id,
-    variant,
-    assigned_by,
     internal,
     host,
     ts,
@@ -223,17 +211,14 @@ function parseCommon(o: Obj, now: number): CommonFields | null {
     game_mode,
     study_mode,
   } = o;
-  if (!isId(anon_id) || !isId(session_id) || !isVariant(variant)) return null;
-  if (assigned_by !== 'link' && assigned_by !== 'random') return null;
+  if (!isId(anon_id) || !isId(session_id)) return null;
   if (!isBool(internal) || !isText(host) || !isTime(ts, now) || !isText(ui_lang, 10)) return null;
   if (device !== 'mobile' && device !== 'desktop') return null;
   if (!isNum(days_since_first_visit) || !isText(game_mode, 10)) return null;
-  if (study_mode !== 'cards' && study_mode !== 'quiz' && study_mode !== 'sentences') return null;
+  if (!isStudyMode(study_mode)) return null;
   return {
     anon_id,
     session_id,
-    variant,
-    assigned_by,
     internal,
     host,
     ts,
@@ -294,8 +279,7 @@ const SESSION_TEXTS = [
 
 export function parseSession(v: unknown, now: number): SessionSummary | null {
   if (!isObj(v)) return null;
-  if (!isId(v.session_id) || !isId(v.anon_id) || !isVariant(v.variant)) return null;
-  if (v.assigned_by !== 'link' && v.assigned_by !== 'random') return null;
+  if (!isId(v.session_id) || !isId(v.anon_id)) return null;
   if (v.device !== 'mobile' && v.device !== 'desktop') return null;
   if (!isTime(v.started_at, now) || !isTime(v.ended_at, now)) return null;
   if (!['open', 'pagehide', 'timeout', 'recovered'].includes(v.end_reason as string)) return null;
@@ -341,15 +325,17 @@ const COMMON_COLUMNS: Column[] = [
     about: 'Випадковий ID браузера, без звʼязку з людиною.',
   },
   { key: 'session_id', label: 'ID сесії', about: 'Випадковий ID сесії.' },
+  // The A/B test's columns, now always empty: kept in place, so the older rows keep their
+  // meaning (columns are only ever added at the end).
   {
     key: 'variant',
     label: 'Варіант',
-    about: 'g1c, g1q, g0c, g0q: g1/g0 — гейміфікація увімк./вимк., c/q — картки / 4 варіанти.',
+    about: 'Більше не заповнюється (колишній A/B-тест: g1c, g1q, g0c, g0q).',
   },
   {
     key: 'assigned_by',
     label: 'Як призначено',
-    about: 'link — з посилання ?v=, random — випадково.',
+    about: 'Більше не заповнюється (колишній A/B-тест: link чи random).',
   },
   {
     key: 'internal',
@@ -393,7 +379,7 @@ export const EVENT_COLUMNS: Column[] = [
   {
     key: 'study_mode',
     label: 'Режим вивчення',
-    about: 'cards, quiz або sentences — на момент події.',
+    about: 'mixed, cards, quiz або sentences — на момент події.',
   },
   ...EVENT_PARAM_COLUMNS,
   { key: 'params_json', label: 'Інші параметри', about: 'Решта параметрів події у JSON.' },

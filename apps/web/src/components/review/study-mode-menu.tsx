@@ -10,7 +10,8 @@ import { useCloseOnBack } from '@/lib/close-on-back';
 import { useDevTools } from '@/lib/dev-tools';
 import { cx } from '@/lib/cx';
 
-export const STUDY_MODES: readonly StudyMode[] = ['cards', 'quiz', 'sentences'];
+/** The recommended one first. */
+export const STUDY_MODES: readonly StudyMode[] = ['mixed', 'cards', 'quiz', 'sentences'];
 
 const itemClass =
   'flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 text-sm outline-none data-[highlighted]:bg-surface-2';
@@ -35,6 +36,7 @@ export function StudyModeMenu({
   return (
     <DropdownMenu.Root open={open} onOpenChange={setOpen}>
       <DropdownMenu.Trigger
+        data-tour="review-mode"
         className={cx(
           'inline-flex min-h-9 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold text-fg-muted',
           'transition-colors motion-fast hover:bg-surface-2 hover:text-fg data-[state=open]:bg-surface-2',
@@ -57,7 +59,12 @@ export function StudyModeMenu({
                 value={m}
                 className={cx(itemClass, 'data-[state=checked]:font-semibold')}
               >
-                {modes(m)}
+                <span className="flex flex-col">
+                  {modes(m)}
+                  {m === 'mixed' && (
+                    <span className="text-xs font-normal text-accent">{modes('recommended')}</span>
+                  )}
+                </span>
                 <DropdownMenu.ItemIndicator className="size-2 rounded-full bg-accent" />
               </DropdownMenu.RadioItem>
             ))}

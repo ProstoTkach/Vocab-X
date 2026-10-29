@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { deckTitle } from '@/components/decks/deck-list';
 import { useDecks } from '@/components/decks/use-decks';
+import { PageTour, type TourStep } from '@/components/tour/page-tour';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CheckMenu } from '@/components/ui/check-menu';
@@ -15,6 +16,12 @@ import { Link } from '@/i18n/navigation';
 import { cx } from '@/lib/cx';
 
 const CEFR_ORDER = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
+/** The first visit to the library. */
+const LIBRARY_TOUR: readonly TourStep[] = [
+  { id: 'hello', joy: true, hidden: true },
+  { id: 'tools', target: 'library-tools' },
+  { id: 'deck', target: 'library-deck', hidden: true },
+];
 type Level = (typeof CEFR_ORDER)[number];
 type Sort = 'levelUp' | 'levelDown' | 'title';
 const SORTS: Sort[] = ['levelUp', 'levelDown', 'title'];
@@ -67,7 +74,11 @@ export function LibraryList() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
+      <PageTour tour="library" steps={LIBRARY_TOUR} ready />
+      <div
+        data-tour="library-tools"
+        className="grid grid-cols-2 gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
+      >
         <div className="relative col-span-2 lg:col-span-1">
           <Search
             aria-hidden
@@ -129,7 +140,7 @@ export function LibraryList() {
         </div>
       ) : (
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))] gap-3">
-          {decks.map((d) => {
+          {decks.map((d, i) => {
             const total = d.wordIds.length;
             const pick = data.picks.get(d.id);
             const added = pick?.added ?? 0;
@@ -138,7 +149,7 @@ export function LibraryList() {
             // Picking stopped halfway: the deck is marked so the learner can come back to it.
             const inProgress = !done && !!pick?.inProgress;
             return (
-              <li key={d.id} className="flex">
+              <li key={d.id} className="flex" data-tour={i === 0 ? 'library-deck' : undefined}>
                 <Link
                   href={`/decks/library/${encodeURIComponent(d.id)}${inProgress ? '?pick=1' : ''}`}
                   className={cx(

@@ -74,25 +74,22 @@ export async function quizRightIndex(page: Page, native = 'uk'): Promise<number>
 }
 
 /**
- * Analytics for tests: the A/B variant is pinned (by default flash cards with gamification, the
- * app's usual look) and the consent window answered, so it never covers what a test clicks.
- * Only writes keys that are missing: a test may set its own before calling this.
+ * The usual start of a test: the consent window answered (so it never covers what a test
+ * clicks) and flash cards for the review, which most tests are about (the mixed mode, the
+ * app's default, has tests of its own). Only writes what is missing: a test may set its own
+ * before calling this.
  */
-export async function pinAnalytics(
-  page: Page,
-  o: { variant?: string; consent?: 'granted' | 'denied' | null } = {},
-) {
+export async function pinAnalytics(page: Page, o: { consent?: 'granted' | 'denied' | null } = {}) {
   await page.addInitScript(
-    ({ variant, consent }) => {
-      if (!localStorage.getItem('vocabx:analytics:variant'))
-        localStorage.setItem(
-          'vocabx:analytics:variant',
-          JSON.stringify({ v: variant, by: 'link' }),
-        );
+    ({ consent }) => {
       if (consent && !localStorage.getItem('vocabx:analytics:consent'))
         localStorage.setItem('vocabx:analytics:consent', consent);
+      const key = 'vocabx:v1:settings';
+      const settings = JSON.parse(localStorage.getItem(key) ?? '{}') as Record<string, unknown>;
+      if (settings.mixedMode === undefined)
+        localStorage.setItem(key, JSON.stringify({ ...settings, mixedMode: false }));
     },
-    { variant: o.variant ?? 'g1c', consent: o.consent === undefined ? 'denied' : o.consent },
+    { consent: o.consent === undefined ? 'denied' : o.consent },
   );
 }
 
@@ -119,15 +116,21 @@ export async function seedOnboarded(page: Page, uiLocale = 'uk') {
         createdAt: 1,
       }),
     );
-    // The one-time "how to review" window has a test of its own.
-    if (!localStorage.getItem('vocabx:v1:settings'))
+    // The one-time "how to review" windows have a test of their own.
+    const settings = JSON.parse(localStorage.getItem('vocabx:v1:settings') ?? '{}') as Record<
+      string,
+      unknown
+    >;
+    if (!settings.tipsSeen)
       localStorage.setItem(
         'vocabx:v1:settings',
         JSON.stringify({
+          ...settings,
           tipsSeen: [
             'review-intro',
             'review-intro-quiz',
             'review-intro-sentences',
+            'review-intro-mixed',
             'feedback-survey',
           ],
         }),
@@ -161,7 +164,13 @@ export async function onboard(page: Page, pace: 'Легкий' | 'Звичайн
   // tests of their own and would only get in the way here.
   await setStudySettings(page, { gradeButtonsOnPhone: true, twoGrades: false });
   await setSettings(page, {
-    tipsSeen: ['review-intro', 'review-intro-quiz', 'review-intro-sentences', 'feedback-survey'],
+    tipsSeen: [
+      'review-intro',
+      'review-intro-quiz',
+      'review-intro-sentences',
+      'review-intro-mixed',
+      'feedback-survey',
+    ],
     levelSeen: 99,
   });
 }

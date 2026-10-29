@@ -104,6 +104,7 @@ export const settingsPatchSchema = z.object({
   devUnlocked: z.boolean().optional(),
   quizMode: z.boolean().optional(),
   sentenceMode: z.boolean().optional(),
+  mixedMode: z.boolean().optional(),
   tipsSeen: z.array(z.string().max(64)).max(100).optional(),
   levelSeen: z.number().int().min(1).optional(),
   xpBonus: z.number().int().nonnegative().optional(),
@@ -118,6 +119,8 @@ export const cardStateSchema = z.object({
   lapses: z.number().int().nonnegative(),
   reps: z.number().int().nonnegative(),
   streak: z.number().int().nonnegative().optional(),
+  mix: z.number().int().min(0).max(5).optional(),
+  misses: z.number().int().nonnegative().optional(),
 });
 
 export const cardProgressSchema = z.object({

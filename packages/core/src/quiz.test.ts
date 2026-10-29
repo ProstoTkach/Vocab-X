@@ -6,7 +6,12 @@ import { letterHint, quizChoices } from './quiz';
 import { seededRng } from './rng';
 import type { CardState } from './scheduler';
 import { DAY_MS as DAY } from './time';
-import { quizFormatForLevel, sentenceFormatForLevel, type ExerciseFormat } from './types';
+import {
+  MIXED_STEPS,
+  quizFormatForLevel,
+  sentenceFormatForLevel,
+  type ExerciseFormat,
+} from './types';
 
 const word = (id: string, term: string, uk: string[], pos: Word['pos'] = 'noun'): Word => ({
   id,
@@ -171,6 +176,75 @@ describe('levels of the sentences', () => {
     expect(answer(card(2), 'SENT_SAY', 1).level).toBe(2);
     expect(answer(card(3), 'SENT_TYPE').level).toBe(1);
     expect(answer(card(4), 'SENT_TYPE', 1).level).toBe(3);
+  });
+
+  test('every right answer moves on, even minutes after the last one, while still learning', () => {
+    const fresh: CardState = { ...card(1), stability: 0.01, levelStreak: 0, lastReviewAt: 0 };
+    const soon = (c: CardState) =>
+      applyEvent(c, { id: 'e', grade: 3, at: 60_000, retention: 0.9, format: 'SENT_PICK' }, p).card;
+    expect(soon(fresh).level).toBe(2);
+    expect(soon({ ...fresh, level: 2 }).level).toBe(3);
+  });
+});
+
+describe('the mixed mode', () => {
+  const card = (over: Partial<CardState> = {}): CardState => ({
+    stability: 0.01,
+    difficulty: 5,
+    lastReviewAt: 0,
+    level: 1,
+    levelStreak: 0,
+    lapses: 0,
+    reps: 1,
+    ...over,
+  });
+  let at = 0;
+  const answer = (c: CardState | null, grade: 1 | 3 = 3) =>
+    applyEvent(
+      c,
+      { id: `e${++at}`, grade, at: at * 60_000, retention: 0.9, format: 'MCQ_TR', kind: 'mixed' },
+      p,
+    ).card;
+
+  test('the round: q1 s1 q2 q3 s2 s3, then again', () => {
+    expect(MIXED_STEPS.map((s) => `${s.mode[0]}${s.level}`)).toEqual([
+      'q1',
+      's1',
+      'q2',
+      'q3',
+      's2',
+      's3',
+    ]);
+  });
+
+  test('each right answer one step on, after the last the first again', () => {
+    let c = answer(null);
+    expect(c.mix).toBe(1);
+    for (const step of [2, 3, 4, 5, 0]) {
+      c = answer(c);
+      expect(c.mix).toBe(step);
+      expect(c.level).toBe(MIXED_STEPS[step]!.level);
+    }
+  });
+
+  test('two wrong answers in a row take a step back; one keeps the step', () => {
+    const once = answer(card({ mix: 3 }), 1);
+    expect(once).toMatchObject({ mix: 3, misses: 1 });
+    expect(answer(once, 1)).toMatchObject({ mix: 2, misses: 0 });
+    // A right answer between them: they are not in a row.
+    expect(answer(answer(once), 1)).toMatchObject({ mix: 4, misses: 1 });
+    expect(answer(answer(card({ mix: 0 }), 1), 1).mix).toBe(0);
+  });
+
+  test('a word without a step starts from its level; another mode drops the step', () => {
+    expect(answer(card({ level: 3 })).mix).toBe(4);
+    const other = applyEvent(
+      card({ mix: 4, misses: 1 }),
+      { id: 'x', grade: 3, at: 0, retention: 0.9, format: 'MCQ_TR' },
+      p,
+    ).card;
+    expect(other).not.toHaveProperty('mix');
+    expect(other).not.toHaveProperty('misses');
   });
 });
 

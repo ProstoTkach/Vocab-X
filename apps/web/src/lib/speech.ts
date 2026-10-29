@@ -5,8 +5,12 @@ import { useEffect, useMemo, useState } from 'react';
 export interface Speech {
   /** True when the device has a voice for the language (e.g. "en-US", falls back to "en"). */
   canSpeak: (speechLang: string) => boolean;
-  speak: (text: string, speechLang: string) => void;
+  /** Resolves once the text has been said (or cut off, or could not be said). */
+  speak: (text: string, speechLang: string) => Promise<void>;
 }
+
+/** Some browsers never report the end of a long text: it is taken as said after this long. */
+const MAX_SPEAK_MS = 20_000;
 
 function pickVoice(voices: SpeechSynthesisVoice[], speechLang: string) {
   const want = speechLang.toLowerCase();
@@ -44,7 +48,7 @@ export function useSpeech(): Speech {
       canSpeak: (lang) => !!pickVoice(voices, lang),
       speak: (text, lang) => {
         const voice = pickVoice(voices, lang);
-        if (!voice) return;
+        if (!voice) return Promise.resolve();
         // Cancelling an idle synthesizer holds the next word back on Android for a moment.
         if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
@@ -52,7 +56,18 @@ export function useSpeech(): Speech {
         u.lang = voice.lang;
         u.rate = 0.95;
         if (SILENT) u.volume = 0;
+        const said = new Promise<void>((resolve) => {
+          const done = () => {
+            window.clearTimeout(cap);
+            resolve();
+          };
+          const cap = window.setTimeout(done, MAX_SPEAK_MS);
+          u.onend = done;
+          // Also when cut off by the next text.
+          u.onerror = done;
+        });
         speechSynthesis.speak(u);
+        return said;
       },
     }),
     [voices],

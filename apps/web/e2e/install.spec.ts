@@ -1,17 +1,14 @@
 import { expect, test, type Page } from '@playwright/test';
 import { onboard } from './fixtures';
 
-// The variant and the consent as usual, but the home-screen window not seen yet.
+// The consent as usual, but the home-screen window not seen yet.
 test.use({
   storageState: {
     cookies: [],
     origins: [
       {
         origin: 'http://localhost:3100',
-        localStorage: [
-          { name: 'vocabx:analytics:variant', value: JSON.stringify({ v: 'g1c', by: 'link' }) },
-          { name: 'vocabx:analytics:consent', value: 'denied' },
-        ],
+        localStorage: [{ name: 'vocabx:analytics:consent', value: 'denied' }],
       },
     ],
   },

@@ -2,13 +2,12 @@
 
 import {
   letterHint,
-  type Cloze,
   type LangCode,
   type QuizFormat,
   type QuizOption,
   type StudyCard,
 } from '@vocabx/core';
-import { Check, Eye, Lightbulb, X } from 'lucide-react';
+import { Check, Eye, Lightbulb, Pause, Play, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,6 @@ import {
 } from '../formats/parts';
 import type { TypedAnswer } from '../formats/types';
 import { ChoiceLayout, Swap, type NextProps } from './choice-layout';
-import { ClozeText } from './cloze-text';
 
 export type { NextProps };
 
@@ -50,13 +48,8 @@ export interface QuizCardProps {
   onPick: (index: number) => void;
   /** `hinted`: the letters hint was opened before answering. */
   onTyped: (input: string, hinted: boolean) => void;
-  /**
-   * A hint was opened: the letters of the typed word, the heard word written out, or an
-   * example with the word left out.
-   */
-  onHint?: (kind: 'letters' | 'show_word' | 'example') => void;
-  /** Levels 1 and 2: an example of the word, shown with the word left out on request. */
-  example?: Cloze | null;
+  /** A hint was opened: the letters of the typed word, or the heard word written out. */
+  onHint?: (kind: 'letters' | 'show_word') => void;
   /** Phones: the bar filling up along the card's bottom edge and the arrow to go on. */
   next?: NextProps | undefined;
 }
@@ -75,7 +68,6 @@ export function QuizCard(p: QuizCardProps) {
   const [shownFor, setShownFor] = useState<string | null>(null);
   const [hintFor, setHintFor] = useState<string | null>(null);
   const hinted = hintFor === card.id;
-  const [exampleFor, setExampleFor] = useState<string | null>(null);
   const voice = p.speech.canSpeak(p.speechLang);
 
   const prompt =
@@ -206,33 +198,6 @@ export function QuizCard(p: QuizCardProps) {
       }
     >
       {asked}
-      {/* The button and the example share one place: opening it moves nothing. */}
-      {p.example && (format === 'MCQ_TR' || format === 'MCQ_WORD') && (
-        <Swap
-          shown={answered || exampleFor === card.id}
-          first={
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setExampleFor(card.id);
-                p.onHint?.('example');
-              }}
-              className="text-fg-muted hover:text-warning"
-            >
-              <Lightbulb aria-hidden className="size-4" />
-              {t('quiz.exampleHint')}
-            </Button>
-          }
-          second={
-            <ClozeText
-              cloze={p.example}
-              lang={word.lang}
-              className="max-w-md rounded-control bg-surface-2 px-3 py-2 text-sm leading-relaxed text-fg-muted"
-            />
-          }
-        />
-      )}
     </ChoiceLayout>
   );
 }
@@ -356,16 +321,37 @@ export function QuizBar({
   autoMs,
   disabled,
   onNext,
+  paused,
+  onPause,
 }: {
   answered: boolean;
   /** Time until the next card comes by itself; null when it waits for the button. */
   autoMs: number | null;
   disabled: boolean;
   onNext: () => void;
+  /** The sentences: going on by itself can be paused to read and listen. */
+  paused?: boolean;
+  onPause?: (() => void) | undefined;
 }) {
   const t = useTranslations('review');
   return (
-    <div className="flex shrink-0 justify-center max-sm:hidden">
+    <div data-tour="review-answer" className="flex shrink-0 justify-center gap-2 max-sm:hidden">
+      {answered && onPause && (
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={onPause}
+          aria-label={paused ? t('quiz.resume') : t('quiz.pause')}
+          aria-pressed={paused}
+          className="size-13"
+        >
+          {paused ? (
+            <Play aria-hidden className="size-5" />
+          ) : (
+            <Pause aria-hidden className="size-5" />
+          )}
+        </Button>
+      )}
       {answered ? (
         // Focused at once: Enter or Space goes on to the next card.
         <Button

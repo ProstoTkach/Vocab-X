@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   devUnlocked: false,
   quizMode: false,
   sentenceMode: false,
+  mixedMode: true,
   tipsSeen: [],
   levelSeen: 1,
   xpBonus: 0,

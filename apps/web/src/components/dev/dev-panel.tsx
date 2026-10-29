@@ -80,16 +80,16 @@ export function DevPanel() {
         }}
         className="mt-3 border-t border-line/70 pt-2"
       />
-      {/* Reviews as a four-choice test instead of flash cards (same words, same progress). */}
+      {/* Reviews as a four-choice test instead of the mixed mode (same words, same progress). */}
       <Switch
         label={t('quizMode')}
         checked={quiz}
-        onCheckedChange={(on) => setMode(on ? 'quiz' : 'cards', 'dev_panel')}
+        onCheckedChange={(on) => setMode(on ? 'quiz' : 'mixed', 'dev_panel')}
       />
       <Switch
         label={t('sentenceMode')}
         checked={sentences}
-        onCheckedChange={(on) => setMode(on ? 'sentences' : 'cards', 'dev_panel')}
+        onCheckedChange={(on) => setMode(on ? 'sentences' : 'mixed', 'dev_panel')}
       />
       <Button
         size="sm"

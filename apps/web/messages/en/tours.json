@@ -1,0 +1,104 @@
+{
+  "skip": "Skip",
+  "back": "Back",
+  "next": "Next",
+  "done": "Got it",
+  "progress": "{current} of {total}",
+  "review": {
+    "hello": {
+      "title": "This is the review",
+      "text": "Here you review your words, the most forgotten first. A quick look around, then how to answer."
+    },
+    "progress": {
+      "title": "How far you are",
+      "text": "Which deck you review, how many cards are left and how much of this session is done."
+    },
+    "undo": {
+      "title": "Undo an answer",
+      "text": "Answered wrong by mistake? This button (or the Z key) brings the last card back."
+    },
+    "task": {
+      "title": "Task and level",
+      "text": "On the left what to do now, on the right the level of this word. Each right answer moves it up, and the task gets harder."
+    },
+    "mode": {
+      "title": "How you study",
+      "text": "Mixed (recommended), flash cards, the four-choice test or sentences: switch any time. Words and progress are shared."
+    },
+    "card": {
+      "title": "The card",
+      "text": "The word or the task itself. Everything needed is on the card; nothing to scroll."
+    },
+    "answer": {
+      "title": "Answering",
+      "text": "The grade buttons or “Next”. Every answer is saved at once, so you can leave any time."
+    },
+    "finish": {
+      "title": "Finish",
+      "text": "Back to Home. The button fills up as you get closer to today’s goal."
+    },
+    "bye": {
+      "title": "Now, how to answer",
+      "text": "Next, a short word on how this kind of task works."
+    }
+  },
+  "words": {
+    "hello": {
+      "title": "These are your words",
+      "text": "All the words you study, and everything to add new ones."
+    },
+    "actions": {
+      "title": "Add words",
+      "text": "One word, a whole list, your decks or ready decks from the library."
+    },
+    "find": {
+      "title": "Find a word",
+      "text": "Search by word or translation, and the order: due soon or not soon."
+    },
+    "list": {
+      "title": "Your words",
+      "text": "The bar shows how well a word is remembered. Tap a word for details, an example and “I have learned it”."
+    },
+    "backup": {
+      "title": "Backup",
+      "text": "Your words live in this browser only. Save a copy to a file so nothing gets lost."
+    }
+  },
+  "library": {
+    "hello": {
+      "title": "Deck library",
+      "text": "Ready decks by level and topic. Take a whole deck or just the words you need."
+    },
+    "tools": {
+      "title": "Search and filters",
+      "text": "Find a deck by name, filter by level or progress and sort. Unfinished decks always come first."
+    },
+    "deck": {
+      "title": "A deck",
+      "text": "Tap a deck: all its words, “Add the whole deck” and picking words by swiping."
+    }
+  },
+  "mine": {
+    "hello": {
+      "title": "Your decks",
+      "text": "Decks only decide what goes into your one big deck, and let you review part of your words on its own."
+    },
+    "all": {
+      "title": "The whole deck",
+      "text": "All your words reviewed together, the most forgotten first."
+    },
+    "create": {
+      "title": "New deck",
+      "text": "Make a deck of your own: only for work or travel, for example."
+    },
+    "deck": {
+      "title": "A deck",
+      "text": "“Review” goes through its words only. The “⋯” menu renames, duplicates, archives or deletes it."
+    }
+  },
+  "addWord": {
+    "title": "The “Find” button",
+    "text": "Type a word and press “Find”: its translations and examples show up. Pick the ones you need, and the word is ready.",
+    "ok": "Got it"
+  }
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Pause, Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useLayoutEffect, useRef, type ReactNode, type RefObject } from 'react';
 import { cx } from '@/lib/cx';
@@ -10,7 +10,14 @@ export interface NextProps {
   autoMs: number | null;
   disabled: boolean;
   onNext: () => void;
+  /** The sentences: going on by itself can be paused (and resumed) to read and listen. */
+  paused?: boolean;
+  onPause?: (() => void) | undefined;
 }
+
+/** Round, see-through, the border and the icon in the primary colour: quiet over the card. */
+const ROUND =
+  'absolute top-1/2 inline-flex size-11 items-center justify-center rounded-full border-2 border-accent/70 bg-surface/50 text-accent backdrop-blur-sm transition motion-fast hover:border-accent hover:bg-surface/80 motion-safe:animate-pop disabled:opacity-50';
 
 /**
  * The card of a test or a sentence task, never scrolled: what it asks above, the question in
@@ -63,8 +70,12 @@ export function ChoiceLayout({
  * Phones only. Positioned against the card itself (the nearest positioned box): the bar lies
  * in the card's bottom padding, the arrow over its side.
  */
-function NextBar({ autoMs, disabled, onNext }: NextProps) {
+function NextBar({ autoMs, disabled, onNext, paused, onPause }: NextProps) {
   const t = useTranslations('review');
+  // The sentences (where it can pause): a little lower, off the sentence, and fainter.
+  const place = onPause
+    ? 'translate-y-[calc(-50%+15px)] opacity-60 hover:opacity-100 focus-visible:opacity-100'
+    : '-translate-y-1/2';
   return (
     <div className="sm:hidden">
       <span aria-hidden className="absolute inset-x-0 bottom-0 h-1 overflow-hidden bg-surface-2">
@@ -82,10 +93,25 @@ function NextBar({ autoMs, disabled, onNext }: NextProps) {
         disabled={disabled}
         onClick={onNext}
         aria-label={t('quiz.next')}
-        className="absolute end-2 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-accent text-on-accent shadow-pop motion-safe:animate-pop disabled:opacity-60"
+        className={cx(ROUND, place, 'end-2')}
       >
         <ChevronRight aria-hidden className="size-6 rtl:-scale-x-100" />
       </button>
+      {onPause && (
+        <button
+          type="button"
+          onClick={onPause}
+          aria-label={paused ? t('quiz.resume') : t('quiz.pause')}
+          aria-pressed={paused}
+          className={cx(ROUND, place, 'start-2')}
+        >
+          {paused ? (
+            <Play aria-hidden className="size-5" />
+          ) : (
+            <Pause aria-hidden className="size-5" />
+          )}
+        </button>
+      )}
     </div>
   );
 }
@@ -105,10 +131,11 @@ export function Swap({
 }) {
   return (
     <div className="grid place-items-center [&>*]:col-start-1 [&>*]:row-start-1">
-      <div className={cx('flex justify-center', shown && 'invisible')} aria-hidden={shown}>
+      {/* Inert, not just aria-hidden: the button pressed keeps no focus inside a hidden part. */}
+      <div className={cx('flex justify-center', shown && 'invisible')} inert={shown}>
         {first}
       </div>
-      <div className={cx('flex justify-center', !shown && 'invisible')} aria-hidden={!shown}>
+      <div className={cx('flex justify-center', !shown && 'invisible')} inert={!shown}>
         {second}
       </div>
     </div>

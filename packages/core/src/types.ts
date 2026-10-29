@@ -79,6 +79,26 @@ export function sentenceFormatForLevel(level: Level): SentenceFormat {
   return SENTENCE_LEVEL_FORMATS[Math.min(level, SENTENCE_MAX_LEVEL) - 1]!;
 }
 
+/**
+ * The mixed mode's round: the test and the sentences take turns, each right answer one step on
+ * (q1 s1 q2 q3 s2 s3, then again); two wrong answers in a row, one step back.
+ */
+export const MIXED_STEPS: readonly { mode: 'quiz' | 'sentences'; level: Level }[] = [
+  { mode: 'quiz', level: 1 },
+  { mode: 'sentences', level: 1 },
+  { mode: 'quiz', level: 2 },
+  { mode: 'quiz', level: 3 },
+  { mode: 'sentences', level: 2 },
+  { mode: 'sentences', level: 3 },
+];
+
+/** The step of a card that has none yet (new, or answered in another mode): by its level. */
+export function mixedStepOf(card: { level: Level; mix?: number } | null): number {
+  if (card?.mix !== undefined && card.mix >= 0 && card.mix < MIXED_STEPS.length) return card.mix;
+  const level = card?.level ?? 1;
+  return level >= 3 ? 3 : level === 2 ? 2 : 0;
+}
+
 export function isGrade(n: number): n is Grade {
   return n === 1 || n === 2 || n === 3 || n === 4;
 }

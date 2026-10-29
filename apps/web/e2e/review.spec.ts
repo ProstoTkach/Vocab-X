@@ -278,3 +278,19 @@ test('reaching today’s goal is celebrated, without blocking the card', async (
   await page.getByRole('button', { name: 'Закрити' }).click();
   await expect(done).toBeHidden();
 });
+
+test('the first review: the screen is shown step by step, then how to answer', async ({ page }) => {
+  await page.addInitScript(() => localStorage.removeItem('vocabx:tour:review'));
+  await setSettings(page, { tipsSeen: ['feedback-survey'] });
+  await page.goto('/uk/review');
+  const tour = page.getByTestId('page-tour');
+  // Only the undo button and the way of studying (the other steps are hidden for now).
+  await expect(tour).toContainText('Скасувати відповідь');
+  await expect(tour).toContainText('1 з 2');
+  await tour.getByRole('button', { name: 'Далі' }).click();
+  await expect(tour).toContainText('Спосіб навчання');
+  await page.keyboard.press('Escape');
+  await expect(tour).toHaveCount(0);
+  // Then the second instruction: how this kind of task is answered.
+  await expect(page.getByRole('dialog')).toBeVisible();
+});

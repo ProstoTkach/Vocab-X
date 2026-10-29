@@ -17,7 +17,7 @@ interface DevTools {
   /** The developer panel is shown (only in the unlocked mode). */
   enabled: boolean;
   setEnabled: (on: boolean) => void;
-  /** How reviews are done: flash cards, the four-choice test or sentences. */
+  /** How reviews are done: mixed, flash cards, the four-choice test or sentences. */
   mode: StudyMode;
   /** Reviews use the four-choice test instead of flash cards. */
   quiz: boolean;
@@ -38,7 +38,7 @@ export function DevToolsProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [enabled, setState] = useState(false);
-  const [mode, setModeState] = useState<StudyMode>('cards');
+  const [mode, setModeState] = useState<StudyMode>('mixed');
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -101,6 +101,7 @@ export function DevToolsProvider({ children }: { children: ReactNode }) {
         void repos.settings.update({
           quizMode: next === 'quiz',
           sentenceMode: next === 'sentences',
+          mixedMode: next === 'mixed',
         });
       },
     }),

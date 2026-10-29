@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { onboard, setSettings } from './fixtures';
+import { onboard, quizRightIndex, setSettings } from './fixtures';
 
 const card = (page: Page) => page.getByTestId('review-card');
 const options = (page: Page) => card(page).getByRole('list').getByRole('button');
@@ -110,6 +110,22 @@ test('level 1: the word left out of an example is picked from four, its translat
   await expect(card(page).locator('mark').first()).toBeVisible();
   await expect(card(page).getByText(/^(Правильно!|Неправильно)$/)).toBeVisible();
   await expect(card(page).getByRole('button', { name: 'Прослухати' })).toBeVisible();
+  // Paused, the card waits longer than even a mistake would (6 s) for the arrow.
+  await page.getByRole('button', { name: 'Зупинити перехід' }).click();
+  await page.waitForTimeout(6500);
+  await expect(card(page).locator('mark').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Продовжити перехід' }).click();
+  await expect(card(page).locator('mark')).toHaveCount(0, { timeout: 7000 });
+});
+
+test('an answer taken back comes with its result, waiting for "Next": nothing to pause', async ({
+  page,
+}) => {
+  await options(page).first().click();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.getByRole('button', { name: 'Скасувати останню оцінку' }).click();
+  await expect(card(page).locator('mark').first()).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Зупинити перехід' })).toHaveCount(0);
 });
 
 test('level 2: the word is said aloud; without a microphone it is typed', async ({ page }) => {
@@ -192,5 +208,51 @@ test('the lab: any mode and level, nothing saved, the words come round', async (
     await expect(options(page).first()).toBeEnabled();
   }
   await expect(page.getByText('30 карток у колоді')).toBeVisible();
+  // The last answers can be taken back here too.
+  const undo = page.getByRole('button', { name: 'Скасувати останню оцінку' });
+  await expect(undo).toBeEnabled();
+  await undo.click();
+  await expect(options(page).first()).toBeEnabled();
   expect(await levels(page)).toEqual(before);
+});
+
+test('the mixed mode: first and recommended, explained once, each right answer a step on', async ({
+  page,
+}) => {
+  // As a learner who has not tried it yet.
+  await setSettings(page, {
+    tipsSeen: ['review-intro', 'review-intro-quiz', 'review-intro-sentences', 'feedback-survey'],
+  });
+  await page.reload();
+  await page.getByRole('button', { name: 'Змінити' }).click();
+  const first = page.getByRole('menuitemradio').first();
+  await expect(first).toContainText('Змішаний');
+  await expect(first).toContainText('Рекомендований');
+  await first.click();
+  // Chosen for the first time: it explains itself.
+  const intro = page.getByRole('dialog', { name: 'Як проходить змішаний режим' });
+  await expect(intro).toBeVisible();
+  await intro.getByRole('button', { name: 'Зрозуміло, почнімо' }).click();
+  await expect(intro).toHaveCount(0);
+  // The first step of a word: the test, its first level.
+  await expect(page.getByText('Вибір перекладу', { exact: true })).toBeVisible();
+  await options(page)
+    .nth(await quizRightIndex(page))
+    .click();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  // The word answered right is at the next step: the sentence, level 1.
+  const steps = await page.evaluate(() => {
+    const out: (number | undefined)[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)!;
+      if (!k.includes('progress')) continue;
+      const map = JSON.parse(localStorage.getItem(k)!) as Record<
+        string,
+        { card: { mix?: number } }
+      >;
+      out.push(...Object.values(map).map((p) => p.card.mix));
+    }
+    return out;
+  });
+  expect(steps).toContain(1);
 });

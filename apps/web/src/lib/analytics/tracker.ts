@@ -9,6 +9,7 @@ import type {
   EventType,
   Params,
   SessionSummary,
+  StudyModeName,
 } from './schema';
 
 const DAY_MS = 86_400_000;
@@ -38,7 +39,7 @@ export interface TrackContext {
   ui_lang: string;
   device: Device;
   game_mode: string;
-  study_mode: 'cards' | 'quiz' | 'sentences';
+  study_mode: StudyModeName;
 }
 
 export interface TrackerDeps {
@@ -78,7 +79,7 @@ export class Tracker {
     ui_lang: 'uk',
     device: 'desktop',
     game_mode: 'max',
-    study_mode: 'cards',
+    study_mode: 'mixed',
   };
 
   constructor(private readonly deps: TrackerDeps) {}
@@ -153,8 +154,6 @@ export class Tracker {
     this.session = {
       session_id: this.deps.uuid(),
       anon_id: id.anonId,
-      variant: id.variant,
-      assigned_by: id.assignedBy,
       internal: id.internal,
       host: id.host,
       device: this.context.device,
@@ -304,8 +303,6 @@ export class Tracker {
     return {
       anon_id: id.anonId,
       session_id: this.session?.session_id ?? 'no-session',
-      variant: id.variant,
-      assigned_by: id.assignedBy,
       internal: id.internal,
       host: id.host,
       ts: now,

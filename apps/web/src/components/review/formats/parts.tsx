@@ -180,7 +180,7 @@ export function SpeakButton({
       onClick={(e) => {
         e.stopPropagation();
         track('speak_click', { source: size === 'big' ? 'listen' : 'word' });
-        speech.speak(text, speechLang);
+        void speech.speak(text, speechLang);
       }}
       className={size === 'big' ? 'size-20 rounded-full' : ''}
     >

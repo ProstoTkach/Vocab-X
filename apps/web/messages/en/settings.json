@@ -55,9 +55,11 @@
   },
   "studyMode": "Study mode",
   "studyModes": {
+    "mixed": "Mixed",
     "cards": "Flash cards",
     "quiz": "Four-choice test",
-    "sentences": "Sentences"
+    "sentences": "Sentences",
+    "recommended": "Recommended"
   },
   "tour": "Tips",
   "tourHint": "A short tour of the home screen and the pages of the app.",

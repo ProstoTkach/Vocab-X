@@ -39,7 +39,7 @@ async function walk(page: Page, name: string): Promise<string[]> {
   return titles;
 }
 
-test('gamification on: the tour explains the character, the deck and the pages, once', async ({
+test('gamification on: the tour explains the character, the library and the extras, once', async ({
   page,
 }) => {
   await seedOnboarded(page);
@@ -51,15 +51,22 @@ test('gamification on: the tour explains the character, the deck and the pages, 
       'Серія та календар',
       'Це ваш друг',
       'Рівень',
-      'Денна ціль',
-      'Гардероб',
-      'Ваша колода',
       'Бібліотека',
-      'Сторінки застосунку',
       'Відгук, мова й налаштування',
     ]),
   );
-  expect(titles).not.toContain('Ігровий режим вимкнено');
+  // Steps hidden for now (kept in the code).
+  for (const hidden of [
+    'Що каже ваш друг',
+    'Денна ціль',
+    'Гардероб',
+    'Відгук',
+    'Ваша колода',
+    'Додати слова',
+    'Сторінки застосунку',
+    'Ігровий режим вимкнено',
+  ])
+    expect(titles).not.toContain(hidden);
   expect(titles.at(-1)).toBe('Усе, можна починати!');
   await tour(page).getByRole('button', { name: 'Почати!' }).click();
   await expect(tour(page)).toHaveCount(0);
@@ -97,7 +104,8 @@ test('gamification off: the tour shows the button that turns it on, and turning 
   await tour(page).getByRole('button', { name: 'Увімкнути' }).click();
   await expect(title(page)).toHaveText('Це ваш друг');
   const titles = await walk(page, 'enabled');
-  expect(titles).toContain('Гардероб');
+  expect(titles).toContain('Рівень');
+  expect(titles).not.toContain('Гардероб');
   expect(titles.at(-1)).toBe('Усе, можна починати!');
 });
 

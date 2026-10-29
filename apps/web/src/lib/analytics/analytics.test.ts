@@ -9,7 +9,6 @@ import {
   parseTrackBody,
   SESSION_COLUMNS,
   sessionRow,
-  variantSettings,
   type AnalyticsEvent,
 } from './schema';
 import { BEACON_MAX_BYTES, BUFFER_MAX, SESSION_IDLE_MS, Tracker } from './tracker';
@@ -38,59 +37,27 @@ function env(over: Partial<IdentityEnv> & { query?: string } = {}): IdentityEnv 
     storage: memory(),
     tab: memory(),
     now: NOW,
-    rng: () => 0.5,
     uuid,
     ...over,
   };
 }
 
-describe('variant', () => {
-  test('taken from ?v= on the first visit and pinned after that', () => {
+describe('identity', () => {
+  test('an id made on the first visit and kept after that', () => {
     const storage = memory();
-    const first = resolveIdentity(env({ storage, query: 'v=g0q' }));
-    expect(first).toMatchObject({ variant: 'g0q', assignedBy: 'link', firstVisit: true });
+    const first = resolveIdentity(env({ storage }));
+    expect(first.firstVisit).toBe(true);
     expect(first.events.map((e) => e.type)).toEqual(['first_visit']);
-    // Without the parameter later: still the same.
     const again = resolveIdentity(env({ storage }));
-    expect(again).toMatchObject({ variant: 'g0q', assignedBy: 'link', firstVisit: false });
+    expect(again.firstVisit).toBe(false);
     expect(again.anonId).toBe(first.anonId);
     expect(again.events).toEqual([]);
-  });
-
-  test('another ?v= later is logged as a conflict and ignored', () => {
-    const storage = memory();
-    resolveIdentity(env({ storage, query: 'v=g1c' }));
-    const other = resolveIdentity(env({ storage, query: 'v=g0q' }));
-    expect(other.variant).toBe('g1c');
-    expect(other.events).toEqual([
-      { type: 'variant_conflict', params: { from: 'g1c', to: 'g0q' } },
-    ]);
-  });
-
-  test('without ?v= the variant is drawn at random, evenly', () => {
-    const counts = new Map<string, number>();
-    for (let i = 0; i < 400; i++) {
-      const id = resolveIdentity(env({ rng: () => (i + 0.5) / 400 }));
-      expect(id.assignedBy).toBe('random');
-      counts.set(id.variant, (counts.get(id.variant) ?? 0) + 1);
-    }
-    expect([...counts.values()]).toEqual([100, 100, 100, 100]);
-    const unknown = resolveIdentity(env({ query: 'v=zzz' }));
-    expect(unknown.assignedBy).toBe('random');
-    expect(unknown.events.map((e) => e.type)).toEqual(['first_visit', 'variant_assigned']);
-  });
-
-  test('the variant sets the starting gamification and study mode', () => {
-    expect(variantSettings('g1c')).toEqual({ gamification: 'max', quizMode: false });
-    expect(variantSettings('g1q')).toEqual({ gamification: 'max', quizMode: true });
-    expect(variantSettings('g0c')).toEqual({ gamification: 'off', quizMode: false });
-    expect(variantSettings('g0q')).toEqual({ gamification: 'off', quizMode: true });
   });
 
   test('first visit: referrer domain and utm tags, never the full address', () => {
     const id = resolveIdentity(
       env({
-        query: 'v=g1c&utm_source=tg&utm_campaign=test&secret=1',
+        query: 'utm_source=tg&utm_campaign=test&secret=1',
         referrer: 'https://t.me/some/chat?x=1',
         pathname: '/en/review',
       }),
@@ -127,7 +94,7 @@ function tracker(o: { query?: string; consent?: 'granted' | 'denied' } = {}) {
   const storage = memory();
   if (o.consent) storage.setItem(KEYS.consent, o.consent);
   let now = NOW;
-  const identity = resolveIdentity(env({ storage, query: o.query ?? 'v=g1q' }));
+  const identity = resolveIdentity(env({ storage, query: o.query ?? '' }));
   const send = vi.fn(async (_body: string, _beacon: boolean) => true);
   const log = vi.fn();
   const t = new Tracker({ identity, storage, now: () => now, uuid, send, log });
@@ -155,11 +122,8 @@ describe('tracker', () => {
     await vi.waitFor(() => expect(send).toHaveBeenCalledTimes(1));
     const types = sent()[0]!.events.map((e) => e.type);
     expect(types).toEqual(['first_visit', 'session_start', 'screen_view', 'consent_accepted']);
-    expect(sent()[0]!.events[0]).toMatchObject({
-      variant: 'g1q',
-      assigned_by: 'link',
-      internal: false,
-    });
+    expect(sent()[0]!.events[0]).toMatchObject({ internal: false });
+    expect(sent()[0]!.events[0]).not.toHaveProperty('variant');
   });
 
   test('"Don\'t send": nothing is kept and nothing ever goes out', async () => {
@@ -175,7 +139,7 @@ describe('tracker', () => {
   });
 
   test('?debug=1 prints the events and sends nothing, even with consent', async () => {
-    const { t, send, log } = tracker({ query: 'v=g0c&debug=1', consent: 'granted' });
+    const { t, send, log } = tracker({ query: 'debug=1', consent: 'granted' });
     t.start();
     t.track('screen_view', { screen: 'home' });
     t.endSession('pagehide');
@@ -184,7 +148,7 @@ describe('tracker', () => {
     expect(log).toHaveBeenCalledWith('[analytics]', 'screen_view', { screen: 'home' });
     expect(log).toHaveBeenCalledWith(
       '[analytics] session',
-      expect.objectContaining({ variant: 'g0c' }),
+      expect.objectContaining({ host: 'vocabx-sigma.vercel.app' }),
     );
   });
 
@@ -347,8 +311,6 @@ describe('/api/track body and sheet rows', () => {
   const event = (over: Record<string, unknown> = {}) => ({
     anon_id: '6f1c2a9e-0000-4000-8000-000000000001',
     session_id: '6f1c2a9e-0000-4000-8000-000000000002',
-    variant: 'g1c',
-    assigned_by: 'link',
     internal: true,
     host: 'localhost',
     ts: NOW,
@@ -369,7 +331,7 @@ describe('/api/track body and sheet rows', () => {
         events: [
           event(),
           event({ type: 'hack' }),
-          event({ variant: 'g9z' }),
+          event({ study_mode: 'flying' }),
           event({ ts: NOW + 5 * 86_400_000 }),
           event({ params: { 'Bad Key': 1 } }),
           event({ params: { nested: { a: 1 } } }),
@@ -406,8 +368,6 @@ describe('/api/track body and sheet rows', () => {
     const summary = {
       session_id: '6f1c2a9e-0000-4000-8000-000000000002',
       anon_id: '6f1c2a9e-0000-4000-8000-000000000001',
-      variant: 'g0q',
-      assigned_by: 'random',
       internal: false,
       host: 'vocabx-sigma.vercel.app',
       device: 'mobile',

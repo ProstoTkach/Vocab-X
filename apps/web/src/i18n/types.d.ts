@@ -17,6 +17,7 @@ import type pages from '../../messages/uk/pages.json';
 import type review from '../../messages/uk/review.json';
 import type settings from '../../messages/uk/settings.json';
 import type themes from '../../messages/uk/themes.json';
+import type tours from '../../messages/uk/tours.json';
 import type words from '../../messages/uk/words.json';
 import type { Locale } from './locales';
 
@@ -42,6 +43,7 @@ declare module 'next-intl' {
       review: typeof review;
       settings: typeof settings;
       themes: typeof themes;
+      tours: typeof tours;
       words: typeof words;
     };
   }

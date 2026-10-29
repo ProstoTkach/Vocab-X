@@ -22,6 +22,8 @@ export interface ReviewInput {
   params: SchedulerParams;
   unload?: UnloadParams;
   newId: () => string;
+  /** Answered in the mixed mode (it keeps its own steps). */
+  mixed?: boolean;
 }
 
 export interface ReviewOutcome {
@@ -48,7 +50,14 @@ export async function submitReview(repos: ReviewRepos, i: ReviewInput): Promise<
   const id = i.newId();
   const result = applyEvent(
     i.progress?.card ?? null,
-    { id, grade: i.grade, at: i.now, retention, format: i.format },
+    {
+      id,
+      grade: i.grade,
+      at: i.now,
+      retention,
+      format: i.format,
+      ...(i.mixed ? { kind: 'mixed' as const } : {}),
+    },
     i.params,
   );
   const event: ReviewEvent = {
@@ -61,6 +70,7 @@ export async function submitReview(repos: ReviewRepos, i: ReviewInput): Promise<
     wasNew: i.progress === null,
     retention,
     xp: xpFor(i.grade, i.format, result.predicted, stats[0]?.reviews ?? 0, retention),
+    ...(i.mixed ? { kind: 'mixed' as const } : {}),
   };
   const progress: CardProgress = {
     wordId: i.word.id,
