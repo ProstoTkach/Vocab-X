@@ -219,3 +219,27 @@ test('the phone "Back" button closes an open window instead of leaving the page'
   await page.goBack();
   await expect(page).toHaveURL(/\/uk\/decks$/);
 });
+
+test('the developer mode opens with the developer code', async ({ page }) => {
+  await page.goto('/uk/settings');
+  await expect(page.getByRole('switch', { name: 'Панель розробника' })).toHaveCount(0);
+  await page.getByRole('switch', { name: 'Режим розробника' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Код розробника' });
+  await dialog.getByLabel('Код').fill('wrong');
+  await dialog.getByRole('button', { name: 'Увімкнути' }).click();
+  await expect(dialog.getByText('Неправильний код.')).toBeVisible();
+  await dialog.getByLabel('Код').fill('test-code');
+  await dialog.getByRole('button', { name: 'Увімкнути' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('switch', { name: 'Режим розробника' })).toBeChecked();
+  await page.getByRole('switch', { name: 'Панель розробника' }).click();
+  await expect(page.getByTestId('dev-panel')).toBeVisible();
+  await page.getByRole('link', { name: 'Полігон способів навчання' }).click();
+  await expect(page.getByRole('combobox', { name: 'Спосіб навчання' })).toBeVisible();
+});
+
+test('without the developer mode the lab stays closed', async ({ page }) => {
+  await page.goto('/uk/review/lab');
+  await expect(page.getByRole('link', { name: 'До налаштувань' })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Спосіб навчання' })).toHaveCount(0);
+});

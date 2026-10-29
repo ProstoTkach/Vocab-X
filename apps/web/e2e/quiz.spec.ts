@@ -40,6 +40,12 @@ test('the four-choice test replaces flash cards', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Знаю', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Не знаю' })).toHaveCount(0);
 
+  // Levels 1 and 2 offer an example with the word left out; opening it moves nothing.
+  const box = await options(page).first().boundingBox();
+  await card(page).getByRole('button', { name: 'Отримати підказку' }).click();
+  await expect(card(page).getByLabel('пропущене слово').first()).toBeVisible();
+  expect(await options(page).first().boundingBox()).toEqual(box);
+
   // A right answer with its key: the next card comes by itself. Nothing is spoken.
   const right = await quizRightIndex(page);
   expect(right).toBeGreaterThanOrEqual(0);
@@ -78,7 +84,7 @@ test('a mistake stays longer; an undo brings the card back with its result', asy
 });
 
 test('the developer panel switches the mode', async ({ page }) => {
-  await setSettings(page, { devTools: true });
+  await setSettings(page, { devTools: true, devUnlocked: true });
   await page.goto('/uk/review');
   const panel = page.getByTestId('dev-panel');
   const toggle = panel.getByRole('switch', { name: 'Тест із 4 варіантів замість карток' });

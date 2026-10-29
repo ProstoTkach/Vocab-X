@@ -100,6 +100,7 @@ export const EVENTS = {
   gamification_enable_click: 'Натиснуто «Увімкнути гейміфікацію» на головній.',
   game_mode_change: 'Змінено ігровий режим: з якого на який, через скільки днів і сесій.',
   study_mode_change: 'Змінено режим вивчення (картки, 4 варіанти, речення).',
+  dev_mode: 'Режим розробника: to — unlocked / wrong_code / locked.',
   setting_change: 'Змінено інше налаштування навчання.',
   ui_lang_change: 'Змінено мову інтерфейсу.',
   data_export: 'Експорт JSON.',

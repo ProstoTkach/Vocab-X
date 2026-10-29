@@ -136,8 +136,13 @@ export interface AppSettings {
   gamification: GamificationMode;
   /** Demo/dev: offset applied to the clock, ms. */
   timeOffsetMs: number;
-  /** Shows the developer panel (time travel for demos). */
+  /** Shows the developer panel (time travel for demos). Only once the mode is unlocked. */
   devTools: boolean;
+  /**
+   * The developer mode was unlocked with the developer code (checked by the server): the
+   * developer panel can be switched on and the study modes lab is open.
+   */
+  devUnlocked: boolean;
   /** Review with the four-choice test instead of flash cards. */
   quizMode: boolean;
   /** Review with sentences (the word left out of an example); wins over quizMode. */

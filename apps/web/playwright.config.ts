@@ -43,6 +43,8 @@ export default defineConfig({
     timeout: 300_000,
     env: {
       NEXT_PUBLIC_ENABLE_DEV_UI: '1',
+      // The developer code of the test server (the developer mode test enters it).
+      DEVELOPER_CODE: 'test-code',
       // The words are spoken at zero volume: the system voice ignores --mute-audio.
       NEXT_PUBLIC_SILENT_SPEECH: '1',
       // Localhost never sends analytics, except in this test build (to check the sending).

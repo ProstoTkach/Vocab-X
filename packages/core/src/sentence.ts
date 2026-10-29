@@ -1,12 +1,17 @@
 // The sentence mode: an example sentence of a word with the word left out.
 import type { Example, Word } from './model';
 
-/** An example with the word cut out: `before` + `answer` + `after` is the whole sentence. */
+/**
+ * An example with the word cut out, wherever it is ("…ever since we were friends. Trust is
+ * important between friends."): `parts` and `answers` interleaved make the whole text.
+ */
 export interface Cloze {
-  before: string;
-  /** The word as the sentence has it (it may be inflected: "achieved" for "achieve"). */
+  /** The text around the gaps; one more than the gaps. */
+  parts: string[];
+  /** The word as the sentence has it at each gap (it may be inflected: "achieved"). */
+  answers: string[];
+  /** The first gap's form: the one offered among the options. */
   answer: string;
-  after: string;
   example: Example;
 }
 
@@ -16,8 +21,8 @@ export const MAX_EXAMPLES = 5;
 const LETTER = String.raw`[\p{L}\p{M}]`;
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-function find(text: string, pattern: string): RegExpExecArray | null {
-  return new RegExp(`(?<!${LETTER})(${pattern})(?!${LETTER})`, 'iu').exec(text);
+function findAll(text: string, pattern: string): RegExpExecArray[] {
+  return [...text.matchAll(new RegExp(`(?<!${LETTER})(?:${pattern})(?!${LETTER})`, 'giu'))];
 }
 
 type WordForms = Pick<Word, 'lang' | 'term' | 'lemma' | 'variants'>;
@@ -44,8 +49,8 @@ function inflected(word: string, lang: string): string | null {
 }
 
 /**
- * Where the word is in an example: the word itself (or its lemma or a variant), else an
- * inflected form of it. Null when the sentence does not hold the word.
+ * Where the word is in an example, every time it occurs: the word itself (or its lemma or a
+ * variant) or an inflected form of it. Null when the sentence does not hold the word.
  */
 export function clozeOf(example: Example, word: WordForms): Cloze | null {
   const text = example.text;
@@ -53,21 +58,24 @@ export function clozeOf(example: Example, word: WordForms): Cloze | null {
     .map((f) => f.trim())
     .filter(Boolean)
     .sort((a, b) => b.length - a.length);
-  let match: RegExpExecArray | null = null;
-  for (const form of forms) {
-    match = find(text, escape(form).replace(/\s+/g, '\\s+'));
-    if (match) break;
-  }
   const single = forms.find((f) => !/\s/.test(f));
-  const pattern = !match && single ? inflected(single, word.lang) : null;
-  if (pattern) match = find(text, pattern);
-  if (!match) return null;
-  return {
-    before: text.slice(0, match.index),
-    answer: match[0],
-    after: text.slice(match.index + match[0].length),
-    example,
-  };
+  const inflections = single ? inflected(single, word.lang) : null;
+  // The forms as written first, then the inflected ones ("friend", else "friends").
+  const pattern = [
+    ...forms.map((f) => escape(f).replace(/\s+/g, '\\s+')),
+    ...(inflections ? [inflections] : []),
+  ].join('|');
+  const matches = findAll(text, pattern);
+  if (!matches.length) return null;
+  const parts: string[] = [];
+  let from = 0;
+  for (const m of matches) {
+    parts.push(text.slice(from, m.index));
+    from = m.index + m[0].length;
+  }
+  parts.push(text.slice(from));
+  const answers = matches.map((m) => m[0]);
+  return { parts, answers, answer: answers[0]!, example };
 }
 
 /** Every example of the word that holds it, in their order. */

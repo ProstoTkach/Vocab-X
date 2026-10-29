@@ -15,7 +15,7 @@ const word = (term: string, examples: string[] = [], lang = 'en'): Word => ({
 });
 const cut = (text: string, w: Word) => {
   const c = clozeOf({ text }, w);
-  return c && [c.before, c.answer, c.after];
+  return c && [c.parts[0], c.answer, c.parts.slice(1).join('…')];
 };
 
 describe('clozeOf', () => {
@@ -44,6 +44,22 @@ describe('clozeOf', () => {
     expect(cut('Ми їдемо в подорож улітку.', word('подорож', [], 'uk'))?.[1]).toBe('подорож');
     expect(cut('Він розповів про подорожі.', word('подорож', [], 'uk'))?.[1]).toBe('подорожі');
   });
+});
+
+test('every occurrence of the word is a gap of its own', () => {
+  const c = clozeOf(
+    {
+      text: 'We have been friends since college. Trust is important between friends. A friend helps.',
+    },
+    word('friend'),
+  );
+  expect(c?.answers).toEqual(['friends', 'friends', 'friend']);
+  expect(c?.parts).toEqual([
+    'We have been ',
+    ' since college. Trust is important between ',
+    '. A ',
+    ' helps.',
+  ]);
 });
 
 describe('examples in turn', () => {

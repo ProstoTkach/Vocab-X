@@ -11,6 +11,7 @@ import {
   loadStudyStack,
   nextReturnAt,
   clozeForReview,
+  formatForLevel,
   isQuizFormat,
   isSentenceFormat,
   isTypingFormat,
@@ -26,6 +27,8 @@ import {
   undoReview,
   type Deck,
   type Grade,
+  type Level,
+  type StudyMode,
   type Profile,
   type QuizFormat,
   type ReviewOutcome,
@@ -76,6 +79,7 @@ import {
   type PhysicalDir,
   type SwipeOptions,
 } from './swipe';
+import { STUDY_MODES, StudyModeMenu } from './study-mode-menu';
 import { SessionTopBar } from './top-bar';
 import { WaitingPanel } from './waiting-panel';
 
@@ -111,6 +115,35 @@ const QUIZ_NEXT_MS = { right: 600, wrong: 2000 } as const;
 /** A test answer is saved this long after it is given, once its result is on screen. */
 const PRESAVE_MS = 150;
 
+const silent: typeof track = () => {};
+/** The lab looks this far ahead, so every word is due there. */
+const LAB_AHEAD_MS = 3650 * DAY_MS;
+const labSelect =
+  'min-h-11 w-full rounded-control border-2 border-line-strong/60 bg-surface px-3 text-sm font-semibold text-fg outline-none focus-visible:border-accent';
+const GRADE_COUNT = { 1: 'again', 2: 'hard', 3: 'good', 4: 'easy' } as const;
+
+/** The lab: the answered card goes to the bottom of the stack (the words come round forever). */
+function labAnswer(s: Session, g: Grade): Session {
+  const [first, ...rest] = s.queue;
+  if (!first) return s;
+  const key = GRADE_COUNT[g];
+  return {
+    ...s,
+    queue: [...rest, first],
+    reviewed: s.reviewed + 1,
+    counts: { ...s.counts, [key]: s.counts[key] + 1 },
+  };
+}
+
+/** What a level of a mode asks (the lab's level list names them). */
+function formatOfLevel(mode: StudyMode, level: Level) {
+  return mode === 'sentences'
+    ? sentenceFormatForLevel(level)
+    : mode === 'quiz'
+      ? quizFormatForLevel(level)
+      : formatForLevel(level);
+}
+
 const ALL_GRADES: readonly Grade[] = [1, 2, 3, 4];
 const TWO_GRADES: readonly Grade[] = [1, 3];
 /** In two-grade mode a typo still passes and a fast answer is just "Good". */
@@ -132,8 +165,11 @@ function isTextInput(target: EventTarget | null) {
  * until its next interval, "Again" puts it back at the bottom. The navigation stays available,
  * so a session can be left at any moment — every answer is already saved.
  */
-export function ReviewSession() {
+export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   const t = useTranslations('review');
+  const modeNames = useTranslations('settings.studyModes');
+  /** The lab tries modes and levels: nothing is saved and nothing goes to the statistics. */
+  const log: typeof track = lab ? silent : track;
   const tn = useTranslations('nav');
   const locale = useLocale();
   const deckParam = useSearchParams().get('deck');
@@ -161,8 +197,14 @@ export function ReviewSession() {
   /** The review in the statistics: real time (not the demo clock) and whether it was summed up. */
   const reviewStats = useRef({ startedAt: 0, ended: true, reviewsBefore: 0 });
   const gamification = useGamification();
-  // Dev: the four-choice test replaces flash cards (same words, levels and progress).
-  const { mode: studyMode, quiz, sentences } = useDevTools();
+  // Flash cards, the four-choice test or sentences (same words, levels and progress). The lab
+  // has its own choice, and its own level for every card.
+  const { mode: savedMode, setMode } = useDevTools();
+  const [labMode, setLabMode] = useState<StudyMode>(savedMode);
+  const [labLevel, setLabLevel] = useState<Level>(1);
+  const studyMode = lab ? labMode : savedMode;
+  const quiz = studyMode === 'quiz';
+  const sentences = studyMode === 'sentences';
   const feedback = useFeedback();
   /** Answers given in the test so far (all sessions), until the survey invitation was made. */
   const quizAnswered = useRef<number | null>(null);
@@ -214,9 +256,12 @@ export function ReviewSession() {
       ];
       const cards = await loadStudyStack(repos, {
         lang: deck?.lang ?? profile.activeTargetLang,
-        now,
+        // The lab: every word counts as due, and no daily limit holds it back.
+        now: lab ? now + LAB_AHEAD_MS : now,
         today: dayOf(now),
-        settings: settings.study,
+        settings: lab
+          ? { ...settings.study, newPerDay: null, reviewsPerDay: null }
+          : settings.study,
         params: DEFAULT_SCHEDULER_PARAMS,
         ...(deck ? { deckIds: [deck.id] } : {}),
       });
@@ -224,9 +269,10 @@ export function ReviewSession() {
       const inviteAhead = ![QUIZ_INVITE_TIP, SURVEY_SENT_TIP].some((tip) =>
         settings.tipsSeen.includes(tip),
       );
-      const answered = inviteAhead
-        ? (await repos.reviewLog.listSince(0)).filter((e) => isQuizFormat(e.format)).length
-        : null;
+      const answered =
+        inviteAhead && !lab
+          ? (await repos.reviewLog.listSince(0)).filter((e) => isQuizFormat(e.format)).length
+          : null;
       if (ctrl.signal.aborted) return;
       quizAnswered.current = answered;
       watch.reset();
@@ -246,7 +292,7 @@ export function ReviewSession() {
         ended: cards.length === 0,
         reviewsBefore: todayStats?.reviews ?? 0,
       };
-      track(cards.length ? 'review_start' : 'review_empty', {
+      log(cards.length ? 'review_start' : 'review_empty', {
         count: cards.length,
         new_n: cards.filter((c) => c.isNew).length,
         deck_filter: !!deck,
@@ -258,7 +304,7 @@ export function ReviewSession() {
       setEndedAt(null);
     })();
     return () => ctrl.abort();
-  }, [repos, clock, dayOf, reloadKey, watch, deckParam]);
+  }, [repos, clock, dayOf, reloadKey, watch, deckParam, lab, log]);
 
   const card = session?.queue[0];
   /** Sums the review up once: when the stack is done or the learner leaves it. */
@@ -268,7 +314,7 @@ export function ReviewSession() {
       const r = reviewStats.current;
       if (r.ended || !session) return;
       r.ended = true;
-      track('review_end', {
+      log('review_end', {
         count: session.reviewed,
         correct_n: session.reviewed - session.counts.again,
         finished_stack: session.queue.length === 0 && session.waiting.length === 0,
@@ -291,10 +337,10 @@ export function ReviewSession() {
   }, [finished]);
   // Flash cards and the test each explain themselves once.
   const introTip = sentences ? SENTENCE_INTRO : quiz ? QUIZ_INTRO : REVIEW_INTRO;
-  const introOpen = !!setup && !introClosed && !setup.tipsSeen.includes(introTip);
+  const introOpen = !lab && !!setup && !introClosed && !setup.tipsSeen.includes(introTip);
   const closeIntro = () => {
     setIntroClosed(true);
-    track('review_intro_closed');
+    log('review_intro_closed');
     if (!setup) return;
     const tipsSeen = [...setup.tipsSeen, introTip];
     setSetup((s) => s && { ...s, tipsSeen });
@@ -310,13 +356,14 @@ export function ReviewSession() {
   const grades = swipe.twoGrades ? TWO_GRADES : ALL_GRADES;
   const cardKey = card ? `${card.id}:${session.reviewed}` : null;
   const nativeLang = setup?.profile.nativeLang ?? 'uk';
-  const level = card?.progress?.card.level ?? 1;
+  const level: Level = lab ? labLevel : (card?.progress?.card.level ?? 1);
   // Sentences: the example for this answer (they take turns, so a wrong answer comes back with
   // another one). A word with no example holding it is asked as a choice of four instead.
-  const cloze = useMemo(
-    () => (sentences && card ? clozeForReview(card.word, card.progress?.card.reps ?? 0) : null),
-    [sentences, card],
-  );
+  // The lab has no saved answers: there the examples take turns with every answer.
+  const turn = lab ? (session?.reviewed ?? 0) : (card?.progress?.card.reps ?? 0);
+  const example = useMemo(() => (card ? clozeForReview(card.word, turn) : null), [card, turn]);
+  // The test's first two levels offer it as a hint ("Get a hint").
+  const cloze = sentences ? example : null;
   useExampleTopUp(setup?.words ?? null, sentences);
   const levelFormat: QuizFormat | SentenceFormat | null = !card
     ? null
@@ -360,7 +407,7 @@ export function ReviewSession() {
   const sentenceFormat = quizFormat && isSentenceFormat(quizFormat) ? quizFormat : null;
   /** For the statistics: which mode the card was answered in. */
   const answerMode = sentenceFormat ? 'sentences' : quizFormat ? 'quiz' : 'card';
-  const format = quizFormat ?? (card ? formatOf(card) : 'REC');
+  const format = quizFormat ?? (lab ? formatForLevel(level) : card ? formatOf(card) : 'REC');
   const renderer = rendererFor(quizFormat ? 'PROD' : format);
   const typing = !!settings?.typing && renderer.supportsTyping;
   const speechLang = card ? (getLanguage(card.word.lang)?.speechLang ?? card.word.lang) : '';
@@ -378,10 +425,10 @@ export function ReviewSession() {
     if (!speechLang || voiceChecked.current) return;
     const id = window.setTimeout(() => {
       voiceChecked.current = true;
-      if (!rawSpeech.canSpeak(speechLang)) track('voice_missing', { to: speechLang });
+      if (!rawSpeech.canSpeak(speechLang)) log('voice_missing', { to: speechLang });
     }, 3000);
     return () => window.clearTimeout(id);
-  }, [speechLang, rawSpeech]);
+  }, [speechLang, rawSpeech, log]);
   // Once per card, as soon as a voice is there (voices load a moment after the page).
   const spokenFor = useRef<string | null>(null);
   useEffect(() => {
@@ -423,7 +470,7 @@ export function ReviewSession() {
       params: DEFAULT_GRADING_PARAMS,
     });
     setTyped({ input, result });
-    track('typed_answer', { mode: 'card', to: result.verdict, hint_used: false });
+    log('typed_answer', { mode: 'card', to: result.verdict, hint_used: false });
     reveal();
     setSide('back');
   };
@@ -461,6 +508,7 @@ export function ReviewSession() {
     reveal();
     // Saved once the result is painted and the "Next" bar is filling (an animation the
     // compositor runs on its own), never in the frame of the answer itself.
+    if (lab) return;
     presaveTimer.current = window.setTimeout(() => {
       presaved.current = { key: cardKey, outcome: record(g, responseMs) };
     }, PRESAVE_MS);
@@ -480,7 +528,7 @@ export function ReviewSession() {
     });
     // With the letters shown, a right answer is at most "Hard".
     const g = hinted ? (Math.min(result.grade, 2) as Grade) : result.grade;
-    track('typed_answer', { mode: answerMode, to: result.verdict, hint_used: hinted });
+    log('typed_answer', { mode: answerMode, to: result.verdict, hint_used: hinted });
     answerQuiz(
       { typed: { input, result } },
       swipe.twoGrades ? toTwoGrades(g) : g,
@@ -506,7 +554,7 @@ export function ReviewSession() {
           params: DEFAULT_GRADING_PARAMS,
         }).verdict !== 'wrong',
     );
-    track('spoken_answer', { to: right ? 'right' : 'wrong', count: variants.length });
+    log('spoken_answer', { to: right ? 'right' : 'wrong', count: variants.length });
     answerQuiz({ said: { heard: variants[0] ?? '', right } }, right ? 3 : 1, right);
   };
 
@@ -527,6 +575,13 @@ export function ReviewSession() {
   ) => {
     // A card can be graded (swiped away) without flipping it first.
     if (!card || !setup || busy) return;
+    if (lab) {
+      // The card goes to the bottom of the stack: the words come round again and again.
+      setSession((s) => s && labAnswer(s, g));
+      setExitDir(dir ?? directionForGrade(g, swipe));
+      nextCard();
+      return;
+    }
     setBusy(true);
     // "Next" pressed before the answer was saved: it is saved here instead.
     window.clearTimeout(presaveTimer.current);
@@ -545,7 +600,7 @@ export function ReviewSession() {
     };
     if (quizAnswer) quizAnswers.current.set(outcome.event.id, quizAnswer);
     const p = card.progress;
-    track('answer', {
+    log('answer', {
       mode: answerMode,
       card_level: p?.card.level ?? 1,
       format,
@@ -563,7 +618,7 @@ export function ReviewSession() {
     });
     // Past the daily number of reviews XP starts to shrink.
     if (reviewStats.current.reviewsBefore + session.reviewed + 1 === DEFAULT_XP_PARAMS.dailyDecayN0)
-      track('xp_decay_reached', { count: DEFAULT_XP_PARAMS.dailyDecayN0 });
+      log('xp_decay_reached', { count: DEFAULT_XP_PARAMS.dailyDecayN0 });
     // After enough answers in the test, ask once what the learner thinks of it.
     if ((isQuizFormat(format) || isSentenceFormat(format)) && quizAnswered.current !== null) {
       quizAnswered.current += 1;
@@ -593,8 +648,8 @@ export function ReviewSession() {
     const before = setup.xpBefore + session.xp;
     if (before < goal && before + outcome.event.xp >= goal) {
       setCelebrate(true);
-      track('goal_reached', { count: goal });
-      if (gamification.enabled) track('celebration_shown');
+      log('goal_reached', { count: goal });
+      if (gamification.enabled) log('celebration_shown');
     }
     // The first good run with two grades brings the tip about Hard and Easy, once.
     const nextRun = g >= 2 ? run + 1 : 0;
@@ -610,7 +665,7 @@ export function ReviewSession() {
       setSetup((s) => s && { ...s, tipsSeen });
       void repos.settings.update({ tipsSeen });
       setTipOpen(true);
-      track('four_grades_tip', { to: 'shown' });
+      log('four_grades_tip', { to: 'shown' });
     }
     setExitDir(dir ?? directionForGrade(g, swipe));
     nextCard();
@@ -619,7 +674,7 @@ export function ReviewSession() {
 
   const undo = async () => {
     const last = session?.history.at(-1);
-    if (!last || busy) return;
+    if (!last || busy || lab) return;
     setBusy(true);
     // The card on screen was answered and saved already: that answer goes too.
     window.clearTimeout(presaveTimer.current);
@@ -627,7 +682,7 @@ export function ReviewSession() {
     presaved.current = null;
     if (saved) await undoReview(repos, await saved.outcome);
     await undoReview(repos, last.token);
-    track('undo', { mode: answerMode });
+    log('undo', { mode: answerMode });
     setExitDir(null);
     setSession((s) => s && sessionReducer(s, { type: 'undo' }));
     setEndedAt(null);
@@ -638,9 +693,19 @@ export function ReviewSession() {
     setBusy(false);
   };
 
+  const changeMode = (next: StudyMode) => {
+    if (lab) setLabMode(next);
+    else setMode(next, 'review');
+    nextCard();
+  };
+  const changeLevel = (next: Level) => {
+    setLabLevel(next);
+    nextCard();
+  };
+
   const nextQuiz = (auto = false) => {
     if (!quizResult) return;
-    track('quiz_next', { auto, card_level: card?.progress?.card.level ?? 1 });
+    log('quiz_next', { auto, card_level: card?.progress?.card.level ?? 1 });
     const a = quizResult.answer;
     const input: AnswerInput =
       'typed' in a ? 'typed' : 'said' in a ? 'spoken' : a.picked < 0 ? 'skip' : 'option';
@@ -718,6 +783,10 @@ export function ReviewSession() {
   if (!session || !setup) return <div className="h-app" />;
 
   const done = sessionDone(session);
+  // Phones: once answered, a bar fills up along the card's bottom edge and an arrow goes on.
+  const phoneNext = quizResult
+    ? { autoMs: quizResult.autoMs, disabled: busy, onNext: () => nextQuiz() }
+    : undefined;
   const suggested = typed
     ? swipe.twoGrades
       ? toTwoGrades(typed.result.grade)
@@ -747,7 +816,7 @@ export function ReviewSession() {
               total={session.total}
               remaining={session.queue.length}
               deckName={deckName}
-              canUndo={session.history.length > 0 && !busy}
+              canUndo={!lab && session.history.length > 0 && !busy}
               onUndo={() => void undo()}
             />
             {!card && returnAt !== null ? (
@@ -755,7 +824,7 @@ export function ReviewSession() {
                 returnAt={returnAt}
                 waiting={session.waiting.length}
                 onShowNow={() => {
-                  track('review_show_now', { count: session.waiting.length });
+                  log('review_show_now', { count: session.waiting.length });
                   setSession((s) => s && sessionReducer(s, { type: 'release', upTo: returnAt }));
                 }}
               />
@@ -768,7 +837,7 @@ export function ReviewSession() {
                 )}
                 grades={grades}
                 onMore={() => {
-                  track('review_more');
+                  log('review_more');
                   setReloadKey((k) => k + 1);
                 }}
               />
@@ -777,17 +846,49 @@ export function ReviewSession() {
                 <p aria-live="polite" className="sr-only">
                   {t('cardAnnouncement', { current: done + 1, total: session.total, front })}
                 </p>
-                <div className="flex items-center justify-between text-xs font-medium text-fg-muted">
-                  <span className="rounded-full border border-line/70 px-2.5 py-1">
-                    {t(`format.${format}`)}
-                  </span>
-                  <span>
-                    {t('level', {
-                      level: Math.min(level, 3),
-                      max: 3,
-                    })}
-                  </span>
-                </div>
+                {lab ? (
+                  // The lab: the mode and the level are chosen here, for every card.
+                  <div className="grid grid-cols-2 gap-2">
+                    <select
+                      aria-label={t('lab.mode')}
+                      value={labMode}
+                      onChange={(e) => changeMode(e.target.value as StudyMode)}
+                      className={labSelect}
+                    >
+                      {STUDY_MODES.map((m) => (
+                        <option key={m} value={m}>
+                          {modeNames(m)}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      aria-label={t('lab.level')}
+                      value={labLevel}
+                      onChange={(e) => changeLevel(Number(e.target.value) as Level)}
+                      className={labSelect}
+                    >
+                      {([1, 2, 3] as const).map((n) => (
+                        <option key={n} value={n}>
+                          {t('level', { level: n, max: 3 })} ·{' '}
+                          {t(`format.${formatOfLevel(labMode, n)}`)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between gap-2 text-xs font-medium text-fg-muted">
+                    <span className="rounded-full border border-line/70 px-2.5 py-1">
+                      {t(`format.${format}`)}
+                    </span>
+                    <StudyModeMenu mode={studyMode} onChange={changeMode} />
+                    <span>
+                      {t('level', {
+                        level: Math.min(level, 3),
+                        max: 3,
+                      })}
+                    </span>
+                  </div>
+                )}
                 {quizFormat ? (
                   <>
                     <CardStage
@@ -795,6 +896,7 @@ export function ReviewSession() {
                       side="front"
                       depth={session.queue.length - 1}
                       swipeEnabled={false}
+                      fit
                       exitDir={exitDir}
                       actionFor={() => null}
                       onSwipe={() => {}}
@@ -812,6 +914,8 @@ export function ReviewSession() {
                           onPick={pickOption}
                           onTyped={(input) => typeQuiz(input, false)}
                           onSaid={sayQuiz}
+                          onHint={() => log('quiz_hint', { to: 'translation' })}
+                          next={phoneNext}
                         />
                       ) : (
                         <QuizCard
@@ -824,7 +928,9 @@ export function ReviewSession() {
                           speech={speech}
                           onPick={pickOption}
                           onTyped={typeQuiz}
-                          onHint={(kind) => track('quiz_hint', { to: kind })}
+                          onHint={(kind) => log('quiz_hint', { to: kind })}
+                          example={example}
+                          next={phoneNext}
                         />
                       )}
                     </CardStage>
@@ -832,15 +938,6 @@ export function ReviewSession() {
                       answered={!!quizResult}
                       disabled={busy}
                       autoMs={quizResult?.autoMs ?? null}
-                      // A choice of four has no "I don't know": one of them is picked.
-                      onSkip={
-                        quizOptions.length >= 2
-                          ? undefined
-                          : () => {
-                              track('quiz_skip', { card_level: level });
-                              answerQuiz({ picked: -1 }, 1, false);
-                            }
-                      }
                       onNext={() => nextQuiz()}
                     />
                   </>
@@ -923,12 +1020,12 @@ export function ReviewSession() {
         open={tipOpen}
         onClose={() => {
           setTipOpen(false);
-          track('four_grades_tip', { to: 'closed' });
+          log('four_grades_tip', { to: 'closed' });
         }}
         onEnable={() => {
           setTipOpen(false);
-          track('four_grades_tip', { to: 'enabled' });
-          track('four_grades_on', { source: 'tip' });
+          log('four_grades_tip', { to: 'enabled' });
+          log('four_grades_on', { source: 'tip' });
           setSetup((s) => s && { ...s, settings: { ...s.settings, twoGrades: false } });
           void repos.settings.update({ study: { twoGrades: false } });
         }}

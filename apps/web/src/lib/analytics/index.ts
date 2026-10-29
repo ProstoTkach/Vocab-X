@@ -1,7 +1,7 @@
 // The app's analytics: one tracker per browser tab, created on first use. On the server (and
 // wherever storage is blocked) every call is a quiet no-op.
 import { systemClock } from '@vocabx/core';
-import { isLocalHost, resolveIdentity, type Identity, type KeyValue } from './identity';
+import { isLocalHost, KEYS, resolveIdentity, type Identity, type KeyValue } from './identity';
 import type { EventType, Params } from './schema';
 import { Tracker } from './tracker';
 
@@ -109,6 +109,14 @@ export function track(type: EventType, params: Params = {}): void {
 }
 
 /** Developers and testers: ?internal=1 once, or the app opened on localhost. */
+/**
+ * From now on this browser counts as internal (as after ?internal=1): its events are marked
+ * so, from the next page load. Used when the developer mode is unlocked.
+ */
+export function markInternal(): void {
+  writeKey(KEYS.internal, '1');
+}
+
 export function isInternal(): boolean {
   return getTracker()?.identity.internal ?? false;
 }

@@ -221,9 +221,15 @@ export function AnswerInput({ onSubmit, lang }: { onSubmit: (v: string) => void;
         autoCapitalize="none"
         spellCheck={false}
         enterKeyHint="done"
-        className="min-h-12 min-w-0 flex-1 rounded-control border-2 border-line-strong bg-surface px-4 text-lg text-fg outline-none focus-visible:border-accent"
+        // Phones have no "Check" button (no room for it): Enter on the keyboard sends the word.
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
+          e.preventDefault();
+          if (value.trim()) onSubmit(value);
+        }}
+        className="min-h-12 w-full min-w-0 flex-1 rounded-control border-2 border-line-strong bg-surface px-4 text-lg text-fg outline-none focus-visible:border-accent"
       />
-      <Button type="submit" disabled={!value.trim()}>
+      <Button type="submit" disabled={!value.trim()} className="max-sm:hidden">
         {t('check')}
       </Button>
     </form>

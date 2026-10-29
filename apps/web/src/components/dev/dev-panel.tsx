@@ -6,7 +6,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useClock } from '@/lib/clock';
-import { isInternal, track } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 import { useDevTools } from '@/lib/dev-tools';
 import { usePlayer } from '@/lib/player';
 import { useTheme } from '@/lib/theme';
@@ -26,7 +26,8 @@ export function DevPanel() {
   const { clock, offsetMs, setOffsetMs } = useClock();
   const { resolved, setChoice } = useTheme();
   const { reachLevel, level } = usePlayer();
-  if (!enabled || !isInternal()) return null;
+  // Shown only in the developer mode (enabled is false until it is unlocked).
+  if (!enabled) return null;
   const dark = getTheme(resolved)?.colorScheme === 'dark';
 
   return (

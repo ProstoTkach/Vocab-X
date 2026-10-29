@@ -2,10 +2,19 @@
 
 import { studyModeOf, type StudyMode } from '@vocabx/core';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { isInternal, sinceFirstVisit, track } from './analytics';
+import { markInternal, sinceFirstVisit, track } from './analytics';
 import { useRepos } from './repos';
 
 interface DevTools {
+  /** The settings are read (before that, nothing is known to be unlocked). */
+  ready: boolean;
+  /** The developer mode is unlocked with the developer code. */
+  unlocked: boolean;
+  /** Asks the server whether the code is right; unlocks the mode if it is. */
+  unlock: (code: string) => Promise<boolean>;
+  /** Turns the developer mode off (the panel goes with it). */
+  lock: () => void;
+  /** The developer panel is shown (only in the unlocked mode). */
   enabled: boolean;
   setEnabled: (on: boolean) => void;
   /** How reviews are done: flash cards, the four-choice test or sentences. */
@@ -20,9 +29,14 @@ interface DevTools {
 
 const DevToolsContext = createContext<DevTools | null>(null);
 
-/** Developer panel visibility, persisted in settings; Ctrl+Shift+D toggles it anywhere. */
+/**
+ * The developer mode (unlocked with the developer code in the settings), the developer panel
+ * in it (Ctrl+Shift+D toggles it anywhere) and the study mode, persisted in settings.
+ */
 export function DevToolsProvider({ children }: { children: ReactNode }) {
   const repos = useRepos();
+  const [ready, setReady] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
   const [enabled, setState] = useState(false);
   const [mode, setModeState] = useState<StudyMode>('cards');
 
@@ -30,15 +44,41 @@ export function DevToolsProvider({ children }: { children: ReactNode }) {
     const ctrl = new AbortController();
     void repos.settings.get().then((s) => {
       if (ctrl.signal.aborted) return;
+      setUnlocked(s.devUnlocked);
       setState(s.devTools);
       setModeState(studyModeOf(s));
+      setReady(true);
     });
     return () => ctrl.abort();
   }, [repos]);
 
   const value = useMemo<DevTools>(
     () => ({
-      enabled,
+      ready,
+      unlocked,
+      unlock: async (code) => {
+        const res = await fetch('/api/dev-unlock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        }).catch(() => null);
+        const ok = !!res?.ok && ((await res.json()) as { ok?: boolean }).ok === true;
+        if (ok) {
+          setUnlocked(true);
+          void repos.settings.update({ devUnlocked: true });
+          // A developer's own use is not counted with the learners'.
+          markInternal();
+        }
+        track('dev_mode', { to: ok ? 'unlocked' : 'wrong_code' });
+        return ok;
+      },
+      lock: () => {
+        setUnlocked(false);
+        setState(false);
+        void repos.settings.update({ devUnlocked: false, devTools: false });
+        track('dev_mode', { to: 'locked' });
+      },
+      enabled: unlocked && enabled,
       setEnabled: (on) => {
         setState(on);
         void repos.settings.update({ devTools: on });
@@ -64,13 +104,13 @@ export function DevToolsProvider({ children }: { children: ReactNode }) {
         });
       },
     }),
-    [enabled, mode, repos],
+    [ready, unlocked, enabled, mode, repos],
   );
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      // The developer panel is for developers and testers only.
-      if (!isInternal()) return;
+      // The developer panel belongs to the developer mode.
+      if (!value.unlocked) return;
       if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
         e.preventDefault();
         value.setEnabled(!value.enabled);

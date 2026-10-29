@@ -67,6 +67,11 @@ interface CardProps {
   footer?: ReactNode;
   /** Test id of the top card. */
   testId?: string;
+  /**
+   * The content lays itself out within the card and never scrolls (the test, the sentences):
+   * less padding above, and the bottom padding is where the "next" bar goes on phones.
+   */
+  fit?: boolean;
   /** Front side. */
   children: ReactNode;
   /** Back side; the card turns over to it when `side` is "back". */
@@ -125,6 +130,7 @@ function SwipeCard({
   onTap,
   footer,
   testId = 'review-card',
+  fit = false,
   children,
   back,
 }: CardProps) {
@@ -239,11 +245,17 @@ function SwipeCard({
         style={{ rotateY }}
         className={cx('absolute inset-0', turning && 'transform-3d')}
       >
-        <Face hidden={flipped} swipeEnabled={swipeEnabled} footer={footer} turning={turning}>
+        <Face
+          hidden={flipped}
+          swipeEnabled={swipeEnabled}
+          footer={footer}
+          turning={turning}
+          fit={fit}
+        >
           {children}
         </Face>
         {back !== undefined && (
-          <Face hidden={!flipped} swipeEnabled={swipeEnabled} turned turning={turning}>
+          <Face hidden={!flipped} swipeEnabled={swipeEnabled} turned turning={turning} fit={fit}>
             {back}
           </Face>
         )}
@@ -270,9 +282,11 @@ function Face({
   turning,
   swipeEnabled,
   footer,
+  fit,
   children,
 }: {
   hidden: boolean;
+  fit: boolean;
   /** The back: pre-rotated so it faces the viewer once the card is turned over. */
   turned?: boolean;
   /** Mid-turn the faces are 3D (back pre-rotated, backfaces hidden); at rest they are flat. */
@@ -299,7 +313,10 @@ function Face({
       <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-brand opacity-80" />
       <div
         className={cx(
-          'z-10 flex min-h-0 flex-1 flex-col overflow-y-auto p-5 [@media(min-height:640px)]:p-8',
+          'z-10 flex min-h-0 flex-1 flex-col',
+          fit
+            ? 'overflow-hidden px-4 pt-3 pb-5 sm:p-6'
+            : 'overflow-x-hidden overflow-y-auto p-5 [@media(min-height:640px)]:p-8',
           // Same space above and below, so the content stays centred above the footer.
           !!footer && 'py-12 [@media(min-height:640px)]:py-14',
           // touch-action does not cross into a scroll container: without this the browser
@@ -309,7 +326,9 @@ function Face({
       >
         {/* Grows to the card height: content is centred, or pinned (e.g. an example at the
             bottom) by the format itself. */}
-        <div className="flex w-full flex-1 flex-col justify-center">{children}</div>
+        <div className={cx('flex w-full flex-1 flex-col justify-center', fit && 'min-h-0')}>
+          {children}
+        </div>
       </div>
       {!!footer && (
         <p className="pointer-events-none absolute inset-x-0 bottom-0 px-6 pb-4 text-center text-xs text-balance text-fg-muted">

@@ -84,24 +84,30 @@ test.beforeEach(async ({ page }) => {
   await page.route('https://api.tatoeba.org/**', (route) => route.fulfill({ json: { data: [] } }));
   await page.route('https://en.wiktionary.org/**', (route) => route.fulfill({ json: {} }));
   await onboard(page);
-  await setSettings(page, { sentenceMode: true, quizMode: false });
+  await setSettings(page, { sentenceMode: true, quizMode: false, devUnlocked: true });
   await page.goto('/uk/review');
 });
 
-test('level 1: the word left out of an example is picked from four, with its translation', async ({
+test('level 1: the word left out of an example is picked from four, its translation on request', async ({
   page,
 }) => {
   await expect(page.getByText('Слово в реченні', { exact: true })).toBeVisible();
   await expect(page.getByText('Рівень 1 з 3')).toBeVisible();
   await expect(card(page).getByText('Оберіть слово, якого бракує в реченні')).toBeVisible();
-  await expect(gap(page)).toBeVisible();
+  await expect(gap(page).first()).toBeVisible();
   await expect(options(page)).toHaveCount(4);
   await expect(page.getByRole('button', { name: 'Не знаю' })).toHaveCount(0);
+  // The translation hides behind "Show hint".
+  // Its place is kept from the start (opening it moves nothing), but it is not seen.
+  const translation = card(page).locator('p[lang="uk"]');
+  await expect(translation).toBeHidden();
+  await card(page).getByRole('button', { name: 'Показати підказку' }).click();
+  await expect(translation).toBeVisible();
 
   await options(page).first().click();
   // The word fills the gap; the whole sentence can be heard.
   await expect(gap(page)).toHaveCount(0);
-  await expect(card(page).locator('mark')).toBeVisible();
+  await expect(card(page).locator('mark').first()).toBeVisible();
   await expect(card(page).getByText(/^(Правильно!|Неправильно)$/)).toBeVisible();
   await expect(card(page).getByRole('button', { name: 'Прослухати' })).toBeVisible();
 });
@@ -128,13 +134,17 @@ test('level 2: the word is said aloud; without a microphone it is typed', async 
   await expect(card(page).getByRole('textbox', { name: 'Ваша відповідь' })).toBeVisible();
 });
 
-test('level 3: the word is typed into the sentence; "I don\'t know" shows it', async ({ page }) => {
+test('level 3: the word is typed into the sentence and sent with Enter', async ({ page }) => {
   await answeredCardAtLevel(page, 3);
   await expect(page.getByText('Впишіть у речення', { exact: true })).toBeVisible();
-  await expect(card(page).getByRole('textbox')).toBeVisible();
-  await page.getByRole('button', { name: 'Не знаю' }).click();
-  await expect(card(page).getByText('Неправильно')).toBeVisible();
-  await expect(card(page).locator('mark')).toBeVisible();
+  const field = card(page).getByRole('textbox', { name: 'Ваша відповідь' });
+  await expect(field).toBeVisible();
+  // No "I don't know" anywhere; on phones no "Check" either: Enter sends the word.
+  await expect(page.getByRole('button', { name: 'Не знаю' })).toHaveCount(0);
+  await field.fill('zzzz');
+  await field.press('Enter');
+  await expect(card(page).locator('mark').first()).toBeVisible();
+  await expect(card(page).getByText('Ваша відповідь: zzzz')).toBeVisible();
 });
 
 test('the mode is chosen in the settings', async ({ page }) => {
@@ -144,4 +154,40 @@ test('the mode is chosen in the settings', async ({ page }) => {
   await page.getByRole('radio', { name: 'Картки' }).click();
   await page.goto('/uk/review');
   await expect(gap(page)).toHaveCount(0);
+});
+
+test('above the card, the way of studying can be changed', async ({ page }) => {
+  await page.getByRole('button', { name: 'Змінити' }).click();
+  await page.getByRole('menuitemradio', { name: 'Тест із 4 варіантів' }).click();
+  await expect(page.getByText('Вибір перекладу', { exact: true })).toBeVisible();
+  await expect(gap(page)).toHaveCount(0);
+  // The choice is kept.
+  await page.reload();
+  await expect(page.getByText('Вибір перекладу', { exact: true })).toBeVisible();
+});
+
+test('the lab: any mode and level, nothing saved, the words come round', async ({ page }) => {
+  await page.getByRole('button', { name: 'Змінити' }).click();
+  await page.getByRole('menuitem', { name: 'Полігон способів навчання' }).click();
+  await expect(page).toHaveURL(/\/uk\/review\/lab$/);
+  const mode = page.getByRole('combobox', { name: 'Спосіб навчання' });
+  const level = page.getByRole('combobox', { name: 'Рівень завдання' });
+  await expect(mode).toHaveValue('sentences');
+  await level.selectOption('3');
+  await expect(card(page).getByRole('textbox', { name: 'Ваша відповідь' })).toBeVisible();
+  await mode.selectOption('quiz');
+  await level.selectOption('2');
+  await expect(card(page).getByText('Як це буде англійською?')).toBeVisible();
+  // Answers go round: the stack never gets smaller, nothing is saved.
+  await expect(page.getByText('30 карток у колоді')).toBeVisible();
+  for (let i = 0; i < 3; i++) {
+    await options(page).first().click();
+    await page
+      .getByRole('button', { name: 'Далі' })
+      .click({ timeout: 1500 })
+      .catch(() => {});
+    await expect(options(page).first()).toBeEnabled();
+  }
+  await expect(page.getByText('30 карток у колоді')).toBeVisible();
+  expect(await levels(page)).toEqual([]);
 });

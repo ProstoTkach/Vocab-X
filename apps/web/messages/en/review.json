@@ -110,7 +110,8 @@
     "hintLabel": "Hint: {hint}",
     "wrongCount": "Wrong",
     "rightCount": "Right",
-    "hotkeyPick": "Pick an option"
+    "hotkeyPick": "Pick an option",
+    "exampleHint": "Get a hint"
   },
   "quizIntro": {
     "title": "How the test works",
@@ -139,7 +140,8 @@
     "noMic": "This browser cannot listen — type the word.",
     "micDenied": "The microphone is not allowed — type the word.",
     "typeInstead": "Type it instead",
-    "heard": "Heard: “{heard}”"
+    "heard": "Heard: “{heard}”",
+    "showHint": "Show hint"
   },
   "sentenceIntro": {
     "title": "How the sentences work",
@@ -150,7 +152,16 @@
       "say": "Say the word aloud, and it goes into its place. Without a microphone you can type it.",
       "type": "Type the word yourself."
     },
-    "progress": "A right answer moves the word a level up. After a mistake the level stays, but the sentence changes. If you cannot say or write it, press “I don’t know”.",
+    "progress": "A right answer moves the word a level up. After a mistake the level stays, but the sentence changes.",
     "start": "Got it, let’s start"
+  },
+  "modeMenu": "Change how you study",
+  "lab": {
+    "title": "Study modes lab",
+    "intro": "Any mode and level on your words. Nothing is saved here, and the words come round endlessly.",
+    "mode": "How you study",
+    "level": "Task level",
+    "locked": "The lab is part of developer mode. Turn it on in the settings with the developer code.",
+    "toSettings": "To the settings"
   }
 }

@@ -246,8 +246,9 @@ test('after "+2 days" the reviewed cards are due again', async ({ page }) => {
   for (let i = 0; i < 30; i++) await page.getByRole('button', { name: /^Згадав/ }).click();
   await expect(page.getByRole('heading', { name: /^Наступна картка — через/ })).toBeVisible();
 
+  await setSettings(page, { devUnlocked: true });
   await page.goto('/uk/settings');
-  await page.getByRole('switch', { name: 'Режим розробника' }).click();
+  await page.getByRole('switch', { name: 'Панель розробника' }).click();
   const panel = page.getByTestId('dev-panel');
   // A new card starts a learning phase: it is due again in minutes.
   await panel.getByRole('button', { name: '+1 день' }).click();

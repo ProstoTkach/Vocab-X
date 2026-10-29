@@ -2,6 +2,7 @@
 
 import {
   letterHint,
+  type Cloze,
   type LangCode,
   type QuizFormat,
   type QuizOption,
@@ -9,7 +10,7 @@ import {
 } from '@vocabx/core';
 import { Check, Eye, Lightbulb, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cx } from '@/lib/cx';
 import type { Speech } from '@/lib/speech';
@@ -23,6 +24,10 @@ import {
   TypedFeedback,
 } from '../formats/parts';
 import type { TypedAnswer } from '../formats/types';
+import { ChoiceLayout, Swap, type NextProps } from './choice-layout';
+import { ClozeText } from './cloze-text';
+
+export type { NextProps };
 
 /** The test's formats: three kinds of choice, then typing the word (TYPE). */
 export type QuizCardFormat = QuizFormat;
@@ -45,8 +50,15 @@ export interface QuizCardProps {
   onPick: (index: number) => void;
   /** `hinted`: the letters hint was opened before answering. */
   onTyped: (input: string, hinted: boolean) => void;
-  /** A hint was opened: the letters of the typed word, or the heard word written out. */
-  onHint?: (kind: 'letters' | 'show_word') => void;
+  /**
+   * A hint was opened: the letters of the typed word, the heard word written out, or an
+   * example with the word left out.
+   */
+  onHint?: (kind: 'letters' | 'show_word' | 'example') => void;
+  /** Levels 1 and 2: an example of the word, shown with the word left out on request. */
+  example?: Cloze | null;
+  /** Phones: the bar filling up along the card's bottom edge and the arrow to go on. */
+  next?: NextProps | undefined;
 }
 
 /**
@@ -63,6 +75,7 @@ export function QuizCard(p: QuizCardProps) {
   const [shownFor, setShownFor] = useState<string | null>(null);
   const [hintFor, setHintFor] = useState<string | null>(null);
   const hinted = hintFor === card.id;
+  const [exampleFor, setExampleFor] = useState<string | null>(null);
   const voice = p.speech.canSpeak(p.speechLang);
 
   const prompt =
@@ -85,23 +98,26 @@ export function QuizCard(p: QuizCardProps) {
         ) : (
           <NoVoiceNotice />
         )}
-        {/* Without a voice the written word is the cue. */}
-        {answered || !voice || shownFor === card.id ? (
-          <Term word={word} size="lg" fit />
-        ) : (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setShownFor(card.id);
-              p.onHint?.('show_word');
-            }}
-            className="text-fg-muted hover:text-warning"
-          >
-            <Eye aria-hidden className="size-5" />
-            {t('quiz.showWord')}
-          </Button>
-        )}
+        {/* Without a voice the written word is the cue. Its place is kept while it is hidden,
+        so showing it moves nothing. */}
+        <Swap
+          shown={answered || !voice || shownFor === card.id}
+          first={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setShownFor(card.id);
+                p.onHint?.('show_word');
+              }}
+              className="text-fg-muted hover:text-warning"
+            >
+              <Eye aria-hidden className="size-5" />
+              {t('quiz.showWord')}
+            </Button>
+          }
+          second={<Term word={word} size="lg" fit />}
+        />
       </div>
     ) : (
       <Translations word={word} lang={p.nativeLang} size="lg" />
@@ -110,29 +126,34 @@ export function QuizCard(p: QuizCardProps) {
   if (format === 'TYPE') {
     const typed = answer && 'typed' in answer ? answer.typed : null;
     return (
-      <QuizLayout>
-        {typed ? (
-          <TypedFeedback typed={typed} />
-        ) : answered ? (
-          // "I don't know": no input to judge, just the answer.
-          <Verdict right={false} />
-        ) : (
-          <p className="text-sm text-fg-muted">{prompt}</p>
-        )}
+      <ChoiceLayout
+        top={
+          typed ? (
+            <TypedFeedback typed={typed} />
+          ) : answered ? (
+            // "I don't know": no input to judge, just the answer.
+            <Verdict right={false} />
+          ) : (
+            <p className="text-sm text-fg-muted">{prompt}</p>
+          )
+        }
+        next={p.next}
+        bottom={
+          answered ? null : (
+            <>
+              <AnswerInput lang={word.lang} onSubmit={(input) => p.onTyped(input, hinted)} />
+            </>
+          )
+        }
+      >
         {asked}
+        {/* The answer, or the letters hint in the same place (showing it moves nothing). */}
         {answered ? (
           <SpokenTerm word={word} size="lg" speechLang={p.speechLang} speech={p.speech} fit />
         ) : (
-          <>
-            {hinted ? (
-              <p
-                lang={word.lang}
-                aria-label={t('quiz.hintLabel', { hint: letterHint(word.term) })}
-                className="font-mono text-2xl font-bold tracking-[0.3em] break-all text-warning"
-              >
-                {letterHint(word.term)}
-              </p>
-            ) : (
+          <Swap
+            shown={hinted}
+            first={
               <Button
                 variant="ghost"
                 size="sm"
@@ -145,11 +166,19 @@ export function QuizCard(p: QuizCardProps) {
                 <Lightbulb aria-hidden className="size-5" />
                 {t('quiz.letters')}
               </Button>
-            )}
-            <AnswerInput lang={word.lang} onSubmit={(input) => p.onTyped(input, hinted)} />
-          </>
+            }
+            second={
+              <p
+                lang={word.lang}
+                aria-label={t('quiz.hintLabel', { hint: letterHint(word.term) })}
+                className="font-mono text-2xl font-bold tracking-[0.3em] break-all text-warning"
+              >
+                {letterHint(word.term)}
+              </p>
+            }
+          />
         )}
-      </QuizLayout>
+      </ChoiceLayout>
     );
   }
 
@@ -165,6 +194,7 @@ export function QuizCard(p: QuizCardProps) {
           prompt && <p className="text-sm text-fg-muted">{prompt}</p>
         )
       }
+      next={p.next}
       bottom={
         <Options
           options={p.options}
@@ -176,29 +206,34 @@ export function QuizCard(p: QuizCardProps) {
       }
     >
       {asked}
+      {/* The button and the example share one place: opening it moves nothing. */}
+      {p.example && (format === 'MCQ_TR' || format === 'MCQ_WORD') && (
+        <Swap
+          shown={answered || exampleFor === card.id}
+          first={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setExampleFor(card.id);
+                p.onHint?.('example');
+              }}
+              className="text-fg-muted hover:text-warning"
+            >
+              <Lightbulb aria-hidden className="size-4" />
+              {t('quiz.exampleHint')}
+            </Button>
+          }
+          second={
+            <ClozeText
+              cloze={p.example}
+              lang={word.lang}
+              className="max-w-md rounded-control bg-surface-2 px-3 py-2 text-sm leading-relaxed text-fg-muted"
+            />
+          }
+        />
+      )}
     </ChoiceLayout>
-  );
-}
-
-/**
- * The question exactly in the middle of the card, what it asks above it and the answer below:
- * right under it on wide screens, at the bottom on phones, within reach of a thumb.
- */
-export function ChoiceLayout({
-  top,
-  children,
-  bottom,
-}: {
-  top: ReactNode;
-  children: ReactNode;
-  bottom: ReactNode;
-}) {
-  return (
-    <div className="grid w-full flex-1 grid-rows-[1fr_auto_1fr] justify-items-center gap-6 text-center">
-      <div className="flex flex-col items-center justify-end gap-2 self-end">{top}</div>
-      <div className="flex w-full flex-col items-center gap-3">{children}</div>
-      <div className="flex w-full justify-center self-start max-sm:self-end">{bottom}</div>
-    </div>
   );
 }
 
@@ -230,15 +265,6 @@ export function Options({
         </li>
       ))}
     </ol>
-  );
-}
-
-/** The question and what to answer with, together in the middle of the card. */
-function QuizLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex w-full flex-1 flex-col items-center justify-center gap-8 text-center">
-      {children}
-    </div>
   );
 }
 
@@ -329,20 +355,17 @@ export function QuizBar({
   answered,
   autoMs,
   disabled,
-  onSkip,
   onNext,
 }: {
   answered: boolean;
   /** Time until the next card comes by itself; null when it waits for the button. */
   autoMs: number | null;
   disabled: boolean;
-  /** "I don't know"; without it (a choice of four) the place stays empty until the answer. */
-  onSkip?: (() => void) | undefined;
   onNext: () => void;
 }) {
   const t = useTranslations('review');
   return (
-    <div className="flex shrink-0 justify-center">
+    <div className="flex shrink-0 justify-center max-sm:hidden">
       {answered ? (
         // Focused at once: Enter or Space goes on to the next card.
         <Button
@@ -361,12 +384,9 @@ export function QuizBar({
           )}
           <span className="relative">{t('quiz.next')}</span>
         </Button>
-      ) : onSkip ? (
-        <Button variant="ghost" disabled={disabled} onClick={onSkip} className="text-fg-muted">
-          {t('quiz.dontKnow')}
-        </Button>
       ) : (
-        // Holds the place of "Next", so the card does not change its size on answering.
+        // Holds the place of "Next", so the card does not change its size on answering. Phones
+        // have no bar at all: the bar and the arrow are on the card.
         <div aria-hidden className="min-h-13" />
       )}
     </div>

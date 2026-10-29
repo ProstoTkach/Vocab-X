@@ -101,6 +101,7 @@ export const settingsPatchSchema = z.object({
   gamification: z.enum(['off', 'medium', 'max']).optional(),
   timeOffsetMs: z.number().optional(),
   devTools: z.boolean().optional(),
+  devUnlocked: z.boolean().optional(),
   quizMode: z.boolean().optional(),
   sentenceMode: z.boolean().optional(),
   tipsSeen: z.array(z.string().max(64)).max(100).optional(),
