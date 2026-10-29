@@ -21,6 +21,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   timeOffsetMs: 0,
   devTools: false,
   quizMode: false,
+  sentenceMode: false,
   tipsSeen: [],
   levelSeen: 1,
   xpBonus: 0,

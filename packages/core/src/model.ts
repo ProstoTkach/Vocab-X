@@ -64,6 +64,11 @@ export interface Deck {
   builtinId?: Id;
   /** Words of the built-in deck the learner looked at while picking and chose not to add. */
   skippedIds?: Id[];
+  /**
+   * Set once every word of the built-in deck was looked at (added or skipped): how many were
+   * saved and skipped. From then on only these numbers are shown; the words are not compared again.
+   */
+  pickSummary?: { added: number; skipped: number; doneAt: number };
   /** The learner's default deck for words added without choosing one (one per language). */
   personal?: boolean;
   /**
@@ -119,6 +124,12 @@ export interface StudySettings {
  */
 export type GamificationMode = 'off' | 'medium' | 'max';
 
+/** How reviews are done: flash cards, the four-choice test, or sentences. */
+export type StudyMode = 'cards' | 'quiz' | 'sentences';
+
+export const studyModeOf = (s: Pick<AppSettings, 'quizMode' | 'sentenceMode'>): StudyMode =>
+  s.sentenceMode ? 'sentences' : s.quizMode ? 'quiz' : 'cards';
+
 export interface AppSettings {
   themeId: string;
   study: StudySettings;
@@ -127,8 +138,10 @@ export interface AppSettings {
   timeOffsetMs: number;
   /** Shows the developer panel (time travel for demos). */
   devTools: boolean;
-  /** Dev: review with the four-choice test instead of flash cards (set in the developer panel). */
+  /** Review with the four-choice test instead of flash cards. */
   quizMode: boolean;
+  /** Review with sentences (the word left out of an example); wins over quizMode. */
+  sentenceMode: boolean;
   /** One-time tips already shown (e.g. 'four-grades'). */
   tipsSeen: string[];
   /** The highest player level already congratulated on. */

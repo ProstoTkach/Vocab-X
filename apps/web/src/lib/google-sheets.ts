@@ -1,11 +1,9 @@
-// Writes to Google spreadsheets as a service account (server only). No client library: a signed
-// JWT is exchanged for an access token, then the Sheets REST API is called directly.
-import { createSign } from 'node:crypto';
-import { systemClock } from '@vocabx/core';
+// Writes to Google spreadsheets as a service account (server only): the Sheets REST API is
+// called directly with the account's access token.
 import type { SheetCell } from './feedback';
+import { googleAccessToken } from './google-auth';
 
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
-const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const API = 'https://sheets.googleapis.com/v4/spreadsheets';
 const TIMEOUT_MS = 10_000;
 
@@ -28,43 +26,11 @@ export function sheetsConfigFromEnv(
   return { clientEmail, privateKey: privateKey.replace(/\\n/g, '\n'), spreadsheetId };
 }
 
-const base64url = (data: string | Buffer) => Buffer.from(data).toString('base64url');
-
-let cachedToken: { email: string; value: string; expiresAt: number } | null = null;
-
-async function accessToken(c: SheetsConfig): Promise<string> {
-  const now = Math.floor(systemClock.now() / 1000);
-  if (cachedToken?.email === c.clientEmail && cachedToken.expiresAt > now + 60)
-    return cachedToken.value;
-  const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
-  const claims = base64url(
-    JSON.stringify({ iss: c.clientEmail, scope: SCOPE, aud: TOKEN_URL, iat: now, exp: now + 3600 }),
-  );
-  const signature = createSign('RSA-SHA256').update(`${header}.${claims}`).sign(c.privateKey);
-  const res = await fetch(TOKEN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-      assertion: `${header}.${claims}.${base64url(signature)}`,
-    }),
-    signal: AbortSignal.timeout(TIMEOUT_MS),
-  });
-  if (!res.ok) throw new Error(`token ${res.status}`);
-  const data = (await res.json()) as { access_token: string; expires_in: number };
-  cachedToken = {
-    email: c.clientEmail,
-    value: data.access_token,
-    expiresAt: now + data.expires_in,
-  };
-  return data.access_token;
-}
-
 async function call<T>(c: SheetsConfig, path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API}/${encodeURIComponent(c.spreadsheetId)}${path}`, {
     ...init,
     headers: {
-      Authorization: `Bearer ${await accessToken(c)}`,
+      Authorization: `Bearer ${await googleAccessToken(c, SCOPE)}`,
       'Content-Type': 'application/json',
     },
     signal: AbortSignal.timeout(TIMEOUT_MS),

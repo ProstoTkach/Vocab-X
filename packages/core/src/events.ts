@@ -3,7 +3,7 @@ import { QUIZ_SCHEDULER, type SchedulerParams } from './config/params';
 import type { ReviewEvent } from './model';
 import { rngForEvent } from './rng';
 import { placeKnown, review, type CardState, type ReviewResult } from './scheduler';
-import { isQuizFormat } from './types';
+import { isQuizFormat, isSentenceFormat, isTypingFormat } from './types';
 
 export function applyEvent(
   card: CardState | null,
@@ -11,18 +11,19 @@ export function applyEvent(
     Partial<Pick<ReviewEvent, 'format'>>,
   params: SchedulerParams,
 ): ReviewResult {
-  // An answer in the four-choice test: four levels, one up after each right answer, and a
-  // smaller stability gain. The format is in the log, so replays agree.
+  // An answer in the four-choice test or the sentences: one level up after each right answer,
+  // and a smaller stability gain. The format is in the log, so replays agree.
   const p: SchedulerParams =
-    e.format && isQuizFormat(e.format)
+    e.format && (isQuizFormat(e.format) || isSentenceFormat(e.format))
       ? {
           ...params,
           maxLevel: QUIZ_SCHEDULER.maxLevel,
           k0: QUIZ_SCHEDULER.k0,
-          successGain:
-            e.format === 'TYPE'
-              ? QUIZ_SCHEDULER.successGain.typing
-              : QUIZ_SCHEDULER.successGain.choice,
+          successGain: isTypingFormat(e.format)
+            ? QUIZ_SCHEDULER.successGain.typing
+            : QUIZ_SCHEDULER.successGain.choice,
+          // A wrong sentence answer: the same task again, with another example.
+          mistakeKeepsLevel: isSentenceFormat(e.format),
         }
       : params;
   // "I know it" from the level check skips the learning phase of a new card.

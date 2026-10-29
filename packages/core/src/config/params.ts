@@ -13,9 +13,14 @@ export interface SchedulerParams {
   tau0: readonly number[];
   /**
    * The last format level; after it the formats start over. Unset: the card mode's three.
-   * Events of the four-choice test use four (see applyEvent).
+   * Events of the four-choice test and the sentences use their own (see applyEvent).
    */
   maxLevel?: Level;
+  /**
+   * A mistake keeps the format level instead of going one down (the sentences: the same task
+   * again, with another example).
+   */
+  mistakeKeepsLevel?: boolean;
   /**
    * Share of the usual stability gain a success brings (1 when unset). The four-choice test
    * uses less: recognizing a word among four is easier than recalling it, so its intervals
@@ -75,12 +80,12 @@ export const DEFAULT_SCHEDULER_PARAMS: SchedulerParams = {
 };
 
 /**
- * How the four-choice test changes the scheduler: four levels, a new level after every right
- * answer (more variety), and intervals that grow slower (choosing is easier than recalling,
- * typing a little less so).
+ * How the four-choice test and the sentences change the scheduler: three levels, a new level
+ * after every right answer (more variety), and intervals that grow slower (choosing is easier
+ * than recalling, typing a little less so).
  */
 export const QUIZ_SCHEDULER = {
-  maxLevel: 4,
+  maxLevel: 3,
   k0: 1,
   successGain: { choice: 0.35, typing: 0.6 },
 } as const;
@@ -148,6 +153,10 @@ export const DEFAULT_XP_PARAMS: XpParams = {
     MCQ_WORD: 1.25,
     MCQ_AUD: 1.25,
     TYPE: 1.75,
+    // Sentences: the word in context — picked, said aloud, typed.
+    SENT_PICK: 1.25,
+    SENT_SAY: 1.5,
+    SENT_TYPE: 1.75,
     MCQ: 1,
     MAT: 1,
     CLZ: 1.5,

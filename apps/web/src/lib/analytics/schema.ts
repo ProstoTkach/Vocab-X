@@ -37,7 +37,9 @@ export const EVENTS = {
   onboarding_restore: 'Відновлення з резервної копії на першому кроці.',
   onboarding_done: 'Налаштування завершено, відкрито головну.',
   onboarding_abandoned: 'Налаштування не завершено; останній досягнутий крок.',
-  level_test_done: 'Тест рівня завершено: рівень, скільки слів, тривалість.',
+  level_test_done:
+    'Тест рівня завершено: рівень, скільки слів, тривалість; перша спроба чи повторна.',
+  level_test_retake: 'Натиснуто «Пройти тест ще раз з іншими словами» (можна один раз).',
   level_test_quit: 'Тест рівня покинуто до кінця.',
   screen_view: 'Відкрито розділ застосунку.',
   coming_soon_view: 'Відкрито розділ, що ще в розробці (Рейтинг, Профіль).',
@@ -48,12 +50,13 @@ export const EVENTS = {
   review_more: 'Натиснуто «Ще картки».',
   review_show_now: 'Натиснуто «Показати зараз».',
   review_intro_closed: 'Закрито вікно з поясненням оцінок.',
-  answer: 'Відповідь на картку або в тесті з 4 варіантів.',
+  answer: 'Відповідь на картку, у тесті з 4 варіантів або в реченні.',
   undo: 'Скасовано останню оцінку.',
   four_grades_on: 'Увімкнено чотири оцінки.',
   four_grades_tip: 'Порада про точніші інтервали: показано / увімкнено / закрито.',
   typing_toggle: 'Перемкнуто «Вводити слово замість перевертання».',
   typed_answer: 'Перевірено введене слово.',
+  spoken_answer: 'Перевірено слово, сказане вголос у реченні: to — right / wrong.',
   quiz_skip: 'Натиснуто «Не знаю» в тесті.',
   quiz_hint: 'Підказка в тесті: літери слова або показ почутого слова.',
   quiz_next: 'Перехід до наступного питання тесту: сам чи кнопкою.',
@@ -96,7 +99,7 @@ export const EVENTS = {
   theme_change: 'Змінено тему оформлення.',
   gamification_enable_click: 'Натиснуто «Увімкнути гейміфікацію» на головній.',
   game_mode_change: 'Змінено ігровий режим: з якого на який, через скільки днів і сесій.',
-  study_mode_change: 'Змінено режим вивчення (картки ↔ 4 варіанти).',
+  study_mode_change: 'Змінено режим вивчення (картки, 4 варіанти, речення).',
   setting_change: 'Змінено інше налаштування навчання.',
   ui_lang_change: 'Змінено мову інтерфейсу.',
   data_export: 'Експорт JSON.',
@@ -135,7 +138,7 @@ export interface CommonFields {
   device: Device;
   days_since_first_visit: number;
   game_mode: string;
-  study_mode: 'cards' | 'quiz';
+  study_mode: 'cards' | 'quiz' | 'sentences';
 }
 
 export interface AnalyticsEvent extends CommonFields {
@@ -224,7 +227,7 @@ function parseCommon(o: Obj, now: number): CommonFields | null {
   if (!isBool(internal) || !isText(host) || !isTime(ts, now) || !isText(ui_lang, 10)) return null;
   if (device !== 'mobile' && device !== 'desktop') return null;
   if (!isNum(days_since_first_visit) || !isText(game_mode, 10)) return null;
-  if (study_mode !== 'cards' && study_mode !== 'quiz') return null;
+  if (study_mode !== 'cards' && study_mode !== 'quiz' && study_mode !== 'sentences') return null;
   return {
     anon_id,
     session_id,
@@ -386,7 +389,11 @@ export const EVENT_COLUMNS: Column[] = [
   { key: 'type', label: 'Подія', about: 'Тип події; опис — нижче в цьому словнику.' },
   ...COMMON_COLUMNS,
   { key: 'game_mode', label: 'Ігровий режим', about: 'max, medium або off — на момент події.' },
-  { key: 'study_mode', label: 'Режим вивчення', about: 'cards або quiz — на момент події.' },
+  {
+    key: 'study_mode',
+    label: 'Режим вивчення',
+    about: 'cards, quiz або sentences — на момент події.',
+  },
   ...EVENT_PARAM_COLUMNS,
   { key: 'params_json', label: 'Інші параметри', about: 'Решта параметрів події у JSON.' },
   // Added later: only ever at the end.
@@ -447,8 +454,16 @@ export const SESSION_COLUMNS: Column[] = [
   },
   { key: 'game_mode_start', label: 'Ігровий режим на початку', about: 'max, medium або off.' },
   { key: 'game_mode_end', label: 'Ігровий режим наприкінці', about: 'max, medium або off.' },
-  { key: 'study_mode_start', label: 'Режим вивчення на початку', about: 'cards або quiz.' },
-  { key: 'study_mode_end', label: 'Режим вивчення наприкінці', about: 'cards або quiz.' },
+  {
+    key: 'study_mode_start',
+    label: 'Режим вивчення на початку',
+    about: 'cards, quiz або sentences.',
+  },
+  {
+    key: 'study_mode_end',
+    label: 'Режим вивчення наприкінці',
+    about: 'cards, quiz або sentences.',
+  },
   {
     key: 'return_after_pause',
     label: 'Повернення після паузи',

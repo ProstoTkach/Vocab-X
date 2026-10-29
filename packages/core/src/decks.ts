@@ -33,7 +33,7 @@ export async function createDeck(
 export async function updateDeck(
   repos: DeckRepos,
   deck: Deck,
-  patch: Partial<Pick<Deck, 'title' | 'archived' | 'wordIds' | 'skippedIds'>>,
+  patch: Partial<Pick<Deck, 'title' | 'archived' | 'wordIds' | 'skippedIds' | 'pickSummary'>>,
   now: number,
 ): Promise<Deck> {
   const next: Deck = { ...deck, ...patch, updatedAt: now };
@@ -395,17 +395,54 @@ export interface BuiltinPickState {
   skipped: number;
   /** Some words were looked at, but not all of them: picking can be continued. */
   inProgress: boolean;
+  /** Every word was looked at: only the numbers remain (Deck.pickSummary). */
+  done: boolean;
 }
 
 /** How far the learner got with a built-in deck (added and skipped words). */
 export function builtinPickState(builtin: Deck, own: readonly Deck[]): BuiltinPickState {
   const copy = own.find((d) => d.origin === 'own' && d.builtinId === builtin.id);
+  const total = builtin.wordIds.length;
+  if (copy?.pickSummary)
+    return { total, ...pickCounts(copy.pickSummary), inProgress: false, done: true };
   const inCopy = new Set(copy?.wordIds);
   const skippedSet = new Set(copy?.skippedIds);
   const added = builtin.wordIds.filter((id) => inCopy.has(id)).length;
   const skipped = builtin.wordIds.filter((id) => !inCopy.has(id) && skippedSet.has(id)).length;
-  const total = builtin.wordIds.length;
-  return { total, added, skipped, inProgress: added + skipped > 0 && added + skipped < total };
+  return {
+    total,
+    added,
+    skipped,
+    inProgress: added + skipped > 0 && added + skipped < total,
+    done: false,
+  };
+}
+
+const pickCounts = (s: NonNullable<Deck['pickSummary']>) => ({
+  added: s.added,
+  skipped: s.skipped,
+});
+
+/**
+ * Called after picking or "add all": once every word of the built-in deck was added or skipped,
+ * the learner's copy keeps just the two numbers (Deck.pickSummary). Words later moved to the
+ * learned words or deleted no longer make the deck look unfinished. Returns the copy.
+ */
+export async function finishBuiltinPick(
+  repos: DeckRepos,
+  builtin: Deck,
+  ctx: Ctx,
+): Promise<Deck | undefined> {
+  const copy = await builtinCopy(repos, builtin);
+  if (!copy || copy.pickSummary) return copy;
+  const state = builtinPickState(builtin, [copy]);
+  if (state.added + state.skipped < state.total) return copy;
+  return updateDeck(
+    repos,
+    copy,
+    { pickSummary: { added: state.added, skipped: state.skipped, doneAt: ctx.now } },
+    ctx.now,
+  );
 }
 
 /** A copy that holds only skipped words (nothing added yet) is picking state, not a deck. */

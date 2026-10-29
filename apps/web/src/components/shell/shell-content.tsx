@@ -6,8 +6,8 @@ import { cx } from '@/lib/cx';
 
 /** Sections that use the whole content area (the card must sit exactly in the middle). */
 const FULL_BLEED = ['/review'];
-/** Word lists of library decks, laid out in several columns on wide screens. */
-const WIDE_PREFIXES = ['/decks/library/'];
+/** The library and its decks' word lists, laid out in several columns on wide screens. */
+const WIDE_PREFIXES = ['/decks/library'];
 /** Two columns side by side (the pasted list and its cards), each up to max-w-3xl. */
 const TWO_COLUMNS = ['/decks/import'];
 /** Home: the character with a column on each side. */

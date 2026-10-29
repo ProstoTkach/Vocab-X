@@ -178,3 +178,44 @@ test('every theme passes axe on settings', async ({ page }) => {
     expect(results.violations.map((v) => `${themeId} ${v.id}`)).toEqual([]);
   }
 });
+
+test('the survey points at every question left out and focuses the first one', async ({ page }) => {
+  await page.goto('/uk');
+  await page.getByRole('button', { name: 'Відгук' }).filter({ visible: true }).first().click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: /Коротке опитування/ }).click();
+  const groups = dialog.getByRole('radiogroup', { name: /./ });
+  // One question answered, the rest left out.
+  await groups.first().getByRole('radio', { name: '5' }).click();
+  await page.getByRole('button', { name: 'Надіслати' }).click();
+  const required = dialog.getByText('Це обовʼязкове питання');
+  const total = await dialog.locator('[data-question]').count();
+  await expect(required).toHaveCount(total - 1);
+  // The first question left out has the focus.
+  await expect(dialog.locator('[data-question]').nth(1).getByRole('radio').first()).toBeFocused();
+  // Answering one takes its mark away; the others stay.
+  await dialog.locator('[data-question]').nth(1).getByRole('radio', { name: '4' }).click();
+  await expect(required).toHaveCount(total - 2);
+});
+
+test('the phone "Back" button closes an open window instead of leaving the page', async ({
+  page,
+}) => {
+  await page.goto('/uk/decks');
+  await page.goto('/uk');
+  await page.getByRole('button', { name: 'Відгук' }).filter({ visible: true }).first().click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: /Коротке опитування/ }).click();
+  await expect(dialog).toBeVisible();
+  await page.goBack();
+  await expect(dialog).toHaveCount(0);
+  await expect(page).toHaveURL(/\/uk$/);
+
+  // Closed with its own button, the window leaves no extra step behind: "Back" leaves the page.
+  await page.getByRole('button', { name: 'Відгук' }).filter({ visible: true }).first().click();
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button', { name: 'Закрити' }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/uk\/decks$/);
+});

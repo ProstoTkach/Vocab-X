@@ -15,6 +15,8 @@ export default defineConfig({
     // statistics declined, so the consent window never covers what a test clicks. The analytics
     // tests clear it (test.use({ storageState: EMPTY })).
     storageState: 'e2e/storage-state.json',
+    // The words the tests speak stay silent.
+    launchOptions: { args: ['--mute-audio'] },
   },
   projects: [
     {
@@ -41,6 +43,8 @@ export default defineConfig({
     timeout: 300_000,
     env: {
       NEXT_PUBLIC_ENABLE_DEV_UI: '1',
+      // The words are spoken at zero volume: the system voice ignores --mute-audio.
+      NEXT_PUBLIC_SILENT_SPEECH: '1',
       // Localhost never sends analytics, except in this test build (to check the sending).
       NEXT_PUBLIC_ANALYTICS_ON_LOCALHOST: '1',
       // Tests never write to the real spreadsheets or the chat: a beacon of a closing page slips

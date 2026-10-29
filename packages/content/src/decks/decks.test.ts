@@ -37,7 +37,8 @@ describe('built-in decks', () => {
   });
 
   test('English has a deck for every CEFR level, A1 to C2', () => {
-    const en = catalog.decks.filter((d) => d.lang === 'en');
+    const levelIds = new Set(DECK_FILES.filter((f) => !f.topic).map((f) => f.id));
+    const en = catalog.decks.filter((d) => d.lang === 'en' && levelIds.has(d.id));
     expect(en.map((d) => d.cefr)).toEqual(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
     for (const d of en) expect(d.wordIds.length).toBeGreaterThanOrEqual(15);
   });
@@ -77,5 +78,15 @@ describe('built-in decks', () => {
     const twice = buildCatalog([file, { ...file, id: 'builtin:copy' }]);
     expect(twice.words).toHaveLength(file.words.length);
     expect(twice.decks[1]!.wordIds).toEqual(twice.decks[0]!.wordIds);
+  });
+
+  test('at least 15 topic decks, each with at least 15 words and a level', () => {
+    const topics = DECK_FILES.filter((f) => f.topic);
+    expect(topics.length).toBeGreaterThanOrEqual(15);
+    for (const f of topics) {
+      expect(f.words.length).toBeGreaterThanOrEqual(15);
+      expect(f.cefr).toBeTruthy();
+      expect(f.titleI18n.uk && f.titleI18n.en).toBeTruthy();
+    }
   });
 });

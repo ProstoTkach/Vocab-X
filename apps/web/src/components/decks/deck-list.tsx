@@ -277,6 +277,15 @@ function DeckCard({
           {deck.archived && <Badge tone="warning">{t('archived')}</Badge>}
         </div>
         <CardText>{t('stats', { total, due: stats?.due ?? 0, fresh: stats?.fresh ?? 0 })}</CardText>
+        {/* A library deck looked through to the end: what was saved and skipped from it. */}
+        {deck.pickSummary && (
+          <p className="text-sm text-fg-muted">
+            {t('fromLibrary', {
+              added: deck.pickSummary.added,
+              skipped: deck.pickSummary.skipped,
+            })}
+          </p>
+        )}
         {/* Share of words already in learning. */}
         <ProgressBar
           value={mastered}

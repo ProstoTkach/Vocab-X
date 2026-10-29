@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-tech",
+  "lang": "en",
+  "cefr": "B1",
+  "topic": "tech",
+  "title": "Technology and gadgets",
+  "titleI18n": {
+    "uk": "Технології та гаджети",
+    "en": "Technology and gadgets"
+  },
+  "descriptionI18n": {
+    "uk": "Телефон, ноутбук, програми й налаштування — мова сучасних пристроїв.",
+    "en": "Phones, laptops, apps and settings — the language of modern devices."
+  },
+  "words": [
+    {
+      "term": "charger",
+      "pos": "noun",
+      "translations": {
+        "uk": ["зарядний пристрій", "зарядка"]
+      },
+      "examples": [
+        {
+          "text": "I forgot my phone charger.",
+          "translations": {
+            "uk": "Я забув зарядку від телефона."
+          }
+        }
+      ]
+    },
+    {
+      "term": "battery",
+      "pos": "noun",
+      "translations": {
+        "uk": ["акумулятор", "батарея"]
+      },
+      "examples": [
+        {
+          "text": "My battery is almost dead.",
+          "translations": {
+            "uk": "Мій акумулятор майже розрядився."
+          }
+        }
+      ]
+    },
+    {
+      "term": "screen",
+      "pos": "noun",
+      "translations": {
+        "uk": ["екран"]
+      },
+      "examples": [
+        {
+          "text": "The screen is cracked.",
+          "translations": {
+            "uk": "Екран тріснув."
+          }
+        }
+      ]
+    },
+    {
+      "term": "update",
+      "pos": "noun",
+      "translations": {
+        "uk": ["оновлення"]
+      },
+      "examples": [
+        {
+          "text": "Install the latest update.",
+          "translations": {
+            "uk": "Встанови останнє оновлення."
+          }
+        }
+      ]
+    },
+    {
+      "term": "download",
+      "pos": "verb",
+      "translations": {
+        "uk": ["завантажувати"]
+      },
+      "examples": [
+        {
+          "text": "Download the app for free.",
+          "translations": {
+            "uk": "Завантаж застосунок безкоштовно."
+          }
+        }
+      ]
+    },
+    {
+      "term": "password",
+      "pos": "noun",
+      "translations": {
+        "uk": ["пароль"]
+      },
+      "examples": [
+        {
+          "text": "Choose a strong password.",
+          "translations": {
+            "uk": "Обери надійний пароль."
+          }
+        }
+      ]
+    },
+    {
+      "term": "wireless",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["бездротовий"]
+      },
+      "examples": [
+        {
+          "text": "I bought wireless headphones.",
+          "translations": {
+            "uk": "Я купив бездротові навушники."
+          }
+        }
+      ]
+    },
+    {
+      "term": "storage",
+      "pos": "noun",
+      "translations": {
+        "uk": ["пам'ять", "сховище"]
+      },
+      "examples": [
+        {
+          "text": "My phone has no storage left.",
+          "translations": {
+            "uk": "На телефоні закінчилася пам'ять."
+          }
+        }
+      ]
+    },
+    {
+      "term": "keyboard",
+      "pos": "noun",
+      "translations": {
+        "uk": ["клавіатура"]
+      },
+      "examples": [
+        {
+          "text": "This keyboard is very quiet.",
+          "translations": {
+            "uk": "Ця клавіатура дуже тиха."
+          }
+        }
+      ]
+    },
+    {
+      "term": "software",
+      "pos": "noun",
+      "translations": {
+        "uk": ["програмне забезпечення"]
+      },
+      "examples": [
+        {
+          "text": "The software is easy to use.",
+          "translations": {
+            "uk": "Програмою легко користуватися."
+          }
+        }
+      ]
+    },
+    {
+      "term": "install",
+      "pos": "verb",
+      "translations": {
+        "uk": ["встановлювати"]
+      },
+      "examples": [
+        {
+          "text": "It takes a minute to install.",
+          "translations": {
+            "uk": "Встановлення займає хвилину."
+          }
+        }
+      ]
+    },
+    {
+      "term": "backup",
+      "pos": "noun",
+      "translations": {
+        "uk": ["резервна копія"]
+      },
+      "examples": [
+        {
+          "text": "Make a backup of your photos.",
+          "translations": {
+            "uk": "Зроби резервну копію фотографій."
+          }
+        }
+      ]
+    },
+    {
+      "term": "crash",
+      "pos": "verb",
+      "translations": {
+        "uk": ["зависати", "аварійно закриватися"]
+      },
+      "examples": [
+        {
+          "text": "The app may crash when you open it.",
+          "translations": {
+            "uk": "Застосунок може аварійно закритися, коли ти його відкриєш."
+          }
+        }
+      ]
+    },
+    {
+      "term": "settings",
+      "pos": "noun",
+      "translations": {
+        "uk": ["налаштування"]
+      },
+      "examples": [
+        {
+          "text": "Open the settings and turn on Wi-Fi.",
+          "translations": {
+            "uk": "Відкрий налаштування й увімкни Wi-Fi."
+          }
+        }
+      ]
+    },
+    {
+      "term": "laptop",
+      "pos": "noun",
+      "translations": {
+        "uk": ["ноутбук"]
+      },
+      "examples": [
+        {
+          "text": "I need a new laptop.",
+          "translations": {
+            "uk": "Мені потрібен новий ноутбук."
+          }
+        }
+      ]
+    },
+    {
+      "term": "user",
+      "pos": "noun",
+      "translations": {
+        "uk": ["користувач"]
+      },
+      "examples": [
+        {
+          "text": "Every user has a profile.",
+          "translations": {
+            "uk": "Кожен користувач має профіль."
+          }
+        }
+      ]
+    }
+  ]
+}

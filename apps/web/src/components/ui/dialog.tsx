@@ -3,11 +3,37 @@
 import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Dialog as DialogPrimitive } from 'radix-ui';
-import type { ReactNode } from 'react';
+import { createContext, use, useState, type ComponentProps, type ReactNode } from 'react';
+import { useCloseOnBack } from '@/lib/close-on-back';
 import { cx } from '@/lib/cx';
 import { Button } from './button';
 
-export const Dialog = DialogPrimitive.Root;
+const CloseContext = createContext<() => void>(() => {});
+
+/** Radix Dialog.Root that also lets its content close it (the phone's "Back" button). */
+export function Dialog({
+  open,
+  defaultOpen,
+  onOpenChange,
+  ...props
+}: ComponentProps<typeof DialogPrimitive.Root>) {
+  const [inner, setInner] = useState(defaultOpen ?? false);
+  const change = (next: boolean) => {
+    if (open === undefined) setInner(next);
+    onOpenChange?.(next);
+  };
+  return (
+    <CloseContext value={() => change(false)}>
+      <DialogPrimitive.Root {...props} open={open ?? inner} onOpenChange={change} />
+    </CloseContext>
+  );
+}
+
+/** Mounted with the open content: "Back" closes the window instead of leaving the page. */
+function CloseOnBack() {
+  useCloseOnBack(true, use(CloseContext));
+  return null;
+}
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
 
@@ -28,7 +54,7 @@ export interface DialogContentProps {
 }
 
 const WIDTHS = {
-  md: 'sm:w-[min(32rem,calc(100vw-2rem))]',
+  md: 'sm:w-[min(36rem,calc(100vw-2rem))]',
   lg: 'sm:w-[min(56rem,calc(100vw-2rem))]',
 } as const;
 
@@ -62,6 +88,7 @@ export function DialogContent({
           className,
         )}
       >
+        {dismissible && <CloseOnBack />}
         <div className="flex items-start justify-between gap-4">
           <DialogPrimitive.Title className="font-display text-title font-semibold">
             {title}

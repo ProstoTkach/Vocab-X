@@ -1,10 +1,35 @@
 'use client';
 
 import { Popover as PopoverPrimitive } from 'radix-ui';
-import type { ReactNode } from 'react';
+import { createContext, use, useState, type ComponentProps, type ReactNode } from 'react';
+import { useCloseOnBack } from '@/lib/close-on-back';
 import { cx } from '@/lib/cx';
 
-export const Popover = PopoverPrimitive.Root;
+const CloseContext = createContext<() => void>(() => {});
+
+/** Radix Popover.Root that the phone's "Back" button closes. */
+export function Popover({
+  open,
+  defaultOpen,
+  onOpenChange,
+  ...props
+}: ComponentProps<typeof PopoverPrimitive.Root>) {
+  const [inner, setInner] = useState(defaultOpen ?? false);
+  const change = (next: boolean) => {
+    if (open === undefined) setInner(next);
+    onOpenChange?.(next);
+  };
+  return (
+    <CloseContext value={() => change(false)}>
+      <PopoverPrimitive.Root {...props} open={open ?? inner} onOpenChange={change} />
+    </CloseContext>
+  );
+}
+
+function CloseOnBack() {
+  useCloseOnBack(true, use(CloseContext));
+  return null;
+}
 export const PopoverTrigger = PopoverPrimitive.Trigger;
 
 export interface PopoverContentProps {
@@ -37,6 +62,7 @@ export function PopoverContent({
           className,
         )}
       >
+        <CloseOnBack />
         {children}
       </PopoverPrimitive.Content>
     </PopoverPrimitive.Portal>

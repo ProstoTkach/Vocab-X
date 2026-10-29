@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-ai",
+  "lang": "en",
+  "cefr": "B2",
+  "topic": "ai",
+  "title": "AI and the digital world",
+  "titleI18n": {
+    "uk": "Штучний інтелект і цифровий світ",
+    "en": "AI and the digital world"
+  },
+  "descriptionI18n": {
+    "uk": "Алгоритми, дані, чат-боти й кібербезпека — мова сучасних технологій.",
+    "en": "Algorithms, data, chatbots and cybersecurity — the language of modern tech."
+  },
+  "words": [
+    {
+      "term": "algorithm",
+      "pos": "noun",
+      "translations": {
+        "uk": ["алгоритм"]
+      },
+      "examples": [
+        {
+          "text": "The algorithm decides what you see.",
+          "translations": {
+            "uk": "Алгоритм вирішує, що ти бачиш."
+          }
+        }
+      ]
+    },
+    {
+      "term": "data",
+      "pos": "noun",
+      "translations": {
+        "uk": ["дані"]
+      },
+      "examples": [
+        {
+          "text": "The app collects data about users.",
+          "translations": {
+            "uk": "Застосунок збирає дані про користувачів."
+          }
+        }
+      ]
+    },
+    {
+      "term": "automation",
+      "pos": "noun",
+      "translations": {
+        "uk": ["автоматизація"]
+      },
+      "examples": [
+        {
+          "text": "Automation is changing many jobs.",
+          "translations": {
+            "uk": "Автоматизація змінює багато професій."
+          }
+        }
+      ]
+    },
+    {
+      "term": "accurate",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["точний"]
+      },
+      "examples": [
+        {
+          "text": "The results are very accurate.",
+          "translations": {
+            "uk": "Результати дуже точні."
+          }
+        }
+      ]
+    },
+    {
+      "term": "bias",
+      "pos": "noun",
+      "translations": {
+        "uk": ["упередженість"]
+      },
+      "examples": [
+        {
+          "text": "The model shows bias against women.",
+          "translations": {
+            "uk": "Модель виявляє упередженість щодо жінок."
+          }
+        }
+      ]
+    },
+    {
+      "term": "prompt",
+      "pos": "noun",
+      "translations": {
+        "uk": ["запит (до ШІ)", "підказка"]
+      },
+      "examples": [
+        {
+          "text": "Write a clear prompt.",
+          "translations": {
+            "uk": "Напиши чіткий запит."
+          }
+        }
+      ]
+    },
+    {
+      "term": "generate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["генерувати", "створювати"]
+      },
+      "examples": [
+        {
+          "text": "The tool can generate images.",
+          "translations": {
+            "uk": "Інструмент уміє генерувати зображення."
+          }
+        }
+      ]
+    },
+    {
+      "term": "chatbot",
+      "pos": "noun",
+      "translations": {
+        "uk": ["чат-бот"]
+      },
+      "examples": [
+        {
+          "text": "The chatbot answered in seconds.",
+          "translations": {
+            "uk": "Чат-бот відповів за кілька секунд."
+          }
+        }
+      ]
+    },
+    {
+      "term": "surveillance",
+      "pos": "noun",
+      "translations": {
+        "uk": ["стеження", "нагляд"]
+      },
+      "examples": [
+        {
+          "text": "Many people worry about surveillance.",
+          "translations": {
+            "uk": "Багатьох людей непокоїть стеження."
+          }
+        }
+      ]
+    },
+    {
+      "term": "transparent",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["прозорий"]
+      },
+      "examples": [
+        {
+          "text": "The process should be transparent.",
+          "translations": {
+            "uk": "Процес має бути прозорим."
+          }
+        }
+      ]
+    },
+    {
+      "term": "encrypt",
+      "pos": "verb",
+      "translations": {
+        "uk": ["шифрувати"]
+      },
+      "examples": [
+        {
+          "text": "Always encrypt your important files.",
+          "translations": {
+            "uk": "Завжди шифруй важливі файли."
+          }
+        }
+      ]
+    },
+    {
+      "term": "hacker",
+      "pos": "noun",
+      "translations": {
+        "uk": ["хакер"]
+      },
+      "examples": [
+        {
+          "text": "A hacker stole the passwords.",
+          "translations": {
+            "uk": "Хакер викрав паролі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "breach",
+      "pos": "noun",
+      "translations": {
+        "uk": ["витік", "порушення"]
+      },
+      "examples": [
+        {
+          "text": "The data breach affected millions.",
+          "translations": {
+            "uk": "Витік даних зачепив мільйони людей."
+          }
+        }
+      ]
+    },
+    {
+      "term": "cloud",
+      "pos": "noun",
+      "translations": {
+        "uk": ["хмара"]
+      },
+      "examples": [
+        {
+          "text": "All files are stored in the cloud.",
+          "translations": {
+            "uk": "Усі файли зберігаються в хмарі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "virtual",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["віртуальний"]
+      },
+      "examples": [
+        {
+          "text": "We met in a virtual room.",
+          "translations": {
+            "uk": "Ми зустрілися у віртуальній кімнаті."
+          }
+        }
+      ]
+    },
+    {
+      "term": "innovation",
+      "pos": "noun",
+      "translations": {
+        "uk": ["інновація"]
+      },
+      "examples": [
+        {
+          "text": "Innovation drives growth.",
+          "translations": {
+            "uk": "Інновації рухають зростання."
+          }
+        }
+      ]
+    }
+  ]
+}

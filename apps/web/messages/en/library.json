@@ -27,5 +27,23 @@
   "reviewed": "Reviewed {done} of {total}",
   "pickAddedCount": "Added: {count}",
   "pickSkippedCount": "Skipped: {count}",
-  "pickSaveError": "Could not save your choice. Please try again."
+  "pickSaveError": "Could not save your choice. Please try again.",
+  "search": "Search decks by name",
+  "sort": "Sort",
+  "sorts": {
+    "levelUp": "Level: A1 to C2",
+    "levelDown": "Level: C2 to A1",
+    "title": "By name"
+  },
+  "noMatches": "No decks match.",
+  "doneCounts": "{added} saved, {skipped} skipped",
+  "doneText": "You have looked through every word of this deck. The saved ones are in “My decks”.",
+  "filterLevel": "Level",
+  "filterStatus": "Progress",
+  "statuses": {
+    "inProgress": "In progress",
+    "new": "Not started",
+    "done": "Finished"
+  },
+  "filterReset": "Clear search and filters"
 }

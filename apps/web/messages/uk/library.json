@@ -27,5 +27,23 @@
   "reviewed": "Переглянуто {done} з {total}",
   "pickAddedCount": "Додано: {count}",
   "pickSkippedCount": "Пропущено: {count}",
-  "pickSaveError": "Не вдалося зберегти вибір. Спробуйте ще раз."
+  "pickSaveError": "Не вдалося зберегти вибір. Спробуйте ще раз.",
+  "search": "Пошук колоди за назвою",
+  "sort": "Сортування",
+  "sorts": {
+    "levelUp": "Рівень: від A1 до C2",
+    "levelDown": "Рівень: від C2 до A1",
+    "title": "За назвою"
+  },
+  "noMatches": "Колод за цими умовами немає.",
+  "doneCounts": "Додано {added}, пропущено {skipped}",
+  "doneText": "Ви вже переглянули всі слова цієї колоди. Збережені слова — у «Моїх колодах».",
+  "filterLevel": "Рівень",
+  "filterStatus": "Прогрес",
+  "statuses": {
+    "inProgress": "Незавершені",
+    "new": "Нерозпочаті",
+    "done": "Пройдені"
+  },
+  "filterReset": "Скинути пошук і фільтри"
 }

@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-travel",
+  "lang": "en",
+  "cefr": "A2",
+  "topic": "travel",
+  "title": "Travel and the airport",
+  "titleI18n": {
+    "uk": "Подорожі та аеропорт",
+    "en": "Travel and the airport"
+  },
+  "descriptionI18n": {
+    "uk": "Квитки, рейси, валізи й готелі — слова для поїздки за кордон.",
+    "en": "Tickets, flights, suitcases and hotels — words for a trip abroad."
+  },
+  "words": [
+    {
+      "term": "passport",
+      "pos": "noun",
+      "translations": {
+        "uk": ["паспорт"]
+      },
+      "examples": [
+        {
+          "text": "Don't forget your passport at home.",
+          "translations": {
+            "uk": "Не забудь паспорт удома."
+          }
+        }
+      ]
+    },
+    {
+      "term": "flight",
+      "pos": "noun",
+      "translations": {
+        "uk": ["рейс", "переліт"]
+      },
+      "examples": [
+        {
+          "text": "Our flight leaves at six in the morning.",
+          "translations": {
+            "uk": "Наш рейс вилітає о шостій ранку."
+          }
+        }
+      ]
+    },
+    {
+      "term": "departure",
+      "pos": "noun",
+      "translations": {
+        "uk": ["виліт", "відправлення"]
+      },
+      "examples": [
+        {
+          "text": "Check the departure time on the board.",
+          "translations": {
+            "uk": "Перевір час вильоту на табло."
+          }
+        }
+      ]
+    },
+    {
+      "term": "arrival",
+      "pos": "noun",
+      "translations": {
+        "uk": ["прибуття"]
+      },
+      "examples": [
+        {
+          "text": "The arrival of the train was delayed.",
+          "translations": {
+            "uk": "Прибуття потяга затримали."
+          }
+        }
+      ]
+    },
+    {
+      "term": "delay",
+      "pos": "noun",
+      "translations": {
+        "uk": ["затримка"]
+      },
+      "examples": [
+        {
+          "text": "There is a two-hour delay.",
+          "translations": {
+            "uk": "Є двогодинна затримка."
+          }
+        }
+      ]
+    },
+    {
+      "term": "destination",
+      "pos": "noun",
+      "translations": {
+        "uk": ["пункт призначення"]
+      },
+      "examples": [
+        {
+          "text": "Rome is our final destination.",
+          "translations": {
+            "uk": "Рим — наш кінцевий пункт призначення."
+          }
+        }
+      ]
+    },
+    {
+      "term": "suitcase",
+      "pos": "noun",
+      "translations": {
+        "uk": ["валіза"]
+      },
+      "examples": [
+        {
+          "text": "My suitcase is too heavy.",
+          "translations": {
+            "uk": "Моя валіза надто важка."
+          }
+        }
+      ]
+    },
+    {
+      "term": "reservation",
+      "pos": "noun",
+      "translations": {
+        "uk": ["бронювання"]
+      },
+      "examples": [
+        {
+          "text": "I have a reservation for two nights.",
+          "translations": {
+            "uk": "У мене бронювання на дві ночі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "passenger",
+      "pos": "noun",
+      "translations": {
+        "uk": ["пасажир"]
+      },
+      "examples": [
+        {
+          "text": "Every passenger must show a ticket.",
+          "translations": {
+            "uk": "Кожен пасажир має показати квиток."
+          }
+        }
+      ]
+    },
+    {
+      "term": "abroad",
+      "pos": "adverb",
+      "translations": {
+        "uk": ["за кордоном", "за кордон"]
+      },
+      "examples": [
+        {
+          "text": "She wants to study abroad.",
+          "translations": {
+            "uk": "Вона хоче навчатися за кордоном."
+          }
+        }
+      ]
+    },
+    {
+      "term": "sightseeing",
+      "pos": "noun",
+      "translations": {
+        "uk": ["огляд визначних місць"]
+      },
+      "examples": [
+        {
+          "text": "We spent the day sightseeing in Paris.",
+          "translations": {
+            "uk": "Ми провели день, оглядаючи визначні місця Парижа."
+          }
+        }
+      ]
+    },
+    {
+      "term": "customs",
+      "pos": "noun",
+      "translations": {
+        "uk": ["митниця"]
+      },
+      "examples": [
+        {
+          "text": "We waited an hour at customs.",
+          "translations": {
+            "uk": "Ми чекали годину на митниці."
+          }
+        }
+      ]
+    },
+    {
+      "term": "currency",
+      "pos": "noun",
+      "translations": {
+        "uk": ["валюта"]
+      },
+      "examples": [
+        {
+          "text": "What currency do they use in Japan?",
+          "translations": {
+            "uk": "Яку валюту використовують у Японії?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "guide",
+      "pos": "noun",
+      "translations": {
+        "uk": ["гід", "путівник"]
+      },
+      "examples": [
+        {
+          "text": "Our guide spoke three languages.",
+          "translations": {
+            "uk": "Наш гід розмовляв трьома мовами."
+          }
+        }
+      ]
+    },
+    {
+      "term": "souvenir",
+      "pos": "noun",
+      "translations": {
+        "uk": ["сувенір"]
+      },
+      "examples": [
+        {
+          "text": "I bought a small souvenir for my mother.",
+          "translations": {
+            "uk": "Я купив маленький сувенір для мами."
+          }
+        }
+      ]
+    },
+    {
+      "term": "hostel",
+      "pos": "noun",
+      "translations": {
+        "uk": ["хостел"]
+      },
+      "examples": [
+        {
+          "text": "We stayed in a cheap hostel.",
+          "translations": {
+            "uk": "Ми зупинилися в дешевому хостелі."
+          }
+        }
+      ]
+    }
+  ]
+}

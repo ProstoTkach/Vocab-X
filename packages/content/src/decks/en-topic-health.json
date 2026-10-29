@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-health",
+  "lang": "en",
+  "cefr": "B1",
+  "topic": "health",
+  "title": "Health and the doctor",
+  "titleI18n": {
+    "uk": "Здоров'я та лікар",
+    "en": "Health and the doctor"
+  },
+  "descriptionI18n": {
+    "uk": "Симптоми, ліки й лікування — щоб пояснити лікарю, що болить.",
+    "en": "Symptoms, medicine and treatment — to tell a doctor what hurts."
+  },
+  "words": [
+    {
+      "term": "symptom",
+      "pos": "noun",
+      "translations": {
+        "uk": ["симптом"]
+      },
+      "examples": [
+        {
+          "text": "A high temperature is a common symptom of flu.",
+          "translations": {
+            "uk": "Висока температура — поширений симптом грипу."
+          }
+        }
+      ]
+    },
+    {
+      "term": "headache",
+      "pos": "noun",
+      "translations": {
+        "uk": ["головний біль"]
+      },
+      "examples": [
+        {
+          "text": "I have a terrible headache.",
+          "translations": {
+            "uk": "У мене жахливо болить голова."
+          }
+        }
+      ]
+    },
+    {
+      "term": "prescription",
+      "pos": "noun",
+      "translations": {
+        "uk": ["рецепт (на ліки)"]
+      },
+      "examples": [
+        {
+          "text": "The doctor gave me a prescription.",
+          "translations": {
+            "uk": "Лікар виписав мені рецепт."
+          }
+        }
+      ]
+    },
+    {
+      "term": "pharmacy",
+      "pos": "noun",
+      "translations": {
+        "uk": ["аптека"]
+      },
+      "examples": [
+        {
+          "text": "Is there a pharmacy nearby?",
+          "translations": {
+            "uk": "Тут поблизу є аптека?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "injury",
+      "pos": "noun",
+      "translations": {
+        "uk": ["травма"]
+      },
+      "examples": [
+        {
+          "text": "He missed the game because of an injury.",
+          "translations": {
+            "uk": "Він пропустив гру через травму."
+          }
+        }
+      ]
+    },
+    {
+      "term": "recover",
+      "pos": "verb",
+      "translations": {
+        "uk": ["одужувати"]
+      },
+      "examples": [
+        {
+          "text": "It took her a week to recover.",
+          "translations": {
+            "uk": "Їй знадобився тиждень, щоб одужати."
+          }
+        }
+      ]
+    },
+    {
+      "term": "treatment",
+      "pos": "noun",
+      "translations": {
+        "uk": ["лікування"]
+      },
+      "examples": [
+        {
+          "text": "The treatment worked well.",
+          "translations": {
+            "uk": "Лікування добре подіяло."
+          }
+        }
+      ]
+    },
+    {
+      "term": "cough",
+      "pos": "noun",
+      "translations": {
+        "uk": ["кашель"]
+      },
+      "examples": [
+        {
+          "text": "My cough is getting worse.",
+          "translations": {
+            "uk": "Мій кашель посилюється."
+          }
+        }
+      ]
+    },
+    {
+      "term": "fever",
+      "pos": "noun",
+      "translations": {
+        "uk": ["гарячка", "висока температура"]
+      },
+      "examples": [
+        {
+          "text": "The child has a fever.",
+          "translations": {
+            "uk": "У дитини гарячка."
+          }
+        }
+      ]
+    },
+    {
+      "term": "allergy",
+      "pos": "noun",
+      "translations": {
+        "uk": ["алергія"]
+      },
+      "examples": [
+        {
+          "text": "I have an allergy to cats.",
+          "translations": {
+            "uk": "У мене алергія на котів."
+          }
+        }
+      ]
+    },
+    {
+      "term": "painful",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["болісний", "болючий"]
+      },
+      "examples": [
+        {
+          "text": "The cut was painful.",
+          "translations": {
+            "uk": "Поріз був болючим."
+          }
+        }
+      ]
+    },
+    {
+      "term": "surgery",
+      "pos": "noun",
+      "translations": {
+        "uk": ["операція", "хірургія"]
+      },
+      "examples": [
+        {
+          "text": "He needs surgery on his knee.",
+          "translations": {
+            "uk": "Йому потрібна операція на коліні."
+          }
+        }
+      ]
+    },
+    {
+      "term": "vaccine",
+      "pos": "noun",
+      "translations": {
+        "uk": ["вакцина"]
+      },
+      "examples": [
+        {
+          "text": "The vaccine is free for children.",
+          "translations": {
+            "uk": "Вакцина для дітей безкоштовна."
+          }
+        }
+      ]
+    },
+    {
+      "term": "diet",
+      "pos": "noun",
+      "translations": {
+        "uk": ["дієта", "раціон"]
+      },
+      "examples": [
+        {
+          "text": "A healthy diet includes fruit.",
+          "translations": {
+            "uk": "Здоровий раціон містить фрукти."
+          }
+        }
+      ]
+    },
+    {
+      "term": "exhausted",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["виснажений"]
+      },
+      "examples": [
+        {
+          "text": "I was exhausted after the long shift.",
+          "translations": {
+            "uk": "Я був виснажений після довгої зміни."
+          }
+        }
+      ]
+    },
+    {
+      "term": "patient",
+      "pos": "noun",
+      "translations": {
+        "uk": ["пацієнт"]
+      },
+      "examples": [
+        {
+          "text": "The patient is waiting in room five.",
+          "translations": {
+            "uk": "Пацієнт чекає в п'ятому кабінеті."
+          }
+        }
+      ]
+    }
+  ]
+}

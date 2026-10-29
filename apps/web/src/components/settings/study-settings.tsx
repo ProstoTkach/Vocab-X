@@ -33,7 +33,7 @@ export function StudySettingsForm() {
   const repos = useRepos();
   const [study, setStudy] = useState<StudySettings | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const { quiz, setQuiz } = useDevTools();
+  const { mode, setMode } = useDevTools();
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -80,14 +80,15 @@ export function StudySettingsForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Flash cards or the four-choice test (the same words, levels and progress). */}
+      {/* Flash cards, the four-choice test or sentences (the same words, levels and progress). */}
       <Segmented
         label={t('studyMode')}
-        value={quiz ? 'quiz' : 'cards'}
-        onChange={(v) => setQuiz(v === 'quiz', 'settings')}
+        value={mode}
+        onChange={(v) => setMode(v, 'settings')}
         options={[
           { value: 'cards', label: t('studyModes.cards') },
           { value: 'quiz', label: t('studyModes.quiz') },
+          { value: 'sentences', label: t('studyModes.sentences') },
         ]}
       />
       <SelectField

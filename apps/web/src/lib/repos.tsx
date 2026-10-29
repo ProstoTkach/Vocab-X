@@ -29,7 +29,7 @@ function applyVariant(repo: LocalStorageRepo, storage: KeyValueStorage) {
   const t = getTracker();
   if (!t || storage.getItem('vocabx:v1:profile')) return;
   const { gamification, quizMode } = variantSettings(t.identity.variant);
-  void repo.settings.update({ gamification, quizMode });
+  void repo.settings.update({ gamification, quizMode, sentenceMode: false });
 }
 
 function createRepo(): LocalStorageRepo {

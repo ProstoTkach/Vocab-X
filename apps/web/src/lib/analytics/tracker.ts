@@ -38,7 +38,7 @@ export interface TrackContext {
   ui_lang: string;
   device: Device;
   game_mode: string;
-  study_mode: 'cards' | 'quiz';
+  study_mode: 'cards' | 'quiz' | 'sentences';
 }
 
 export interface TrackerDeps {

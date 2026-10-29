@@ -10,9 +10,13 @@ import {
   gradeTypedAnswer,
   loadStudyStack,
   nextReturnAt,
+  clozeForReview,
   isQuizFormat,
+  isSentenceFormat,
+  isTypingFormat,
   quizChoices,
   quizFormatForLevel,
+  sentenceFormatForLevel,
   seededRng,
   sessionDone,
   sessionReducer,
@@ -23,7 +27,9 @@ import {
   type Deck,
   type Grade,
   type Profile,
+  type QuizFormat,
   type ReviewOutcome,
+  type SentenceFormat,
   type SessionState,
   type StudyCard,
   type StudySettings,
@@ -37,6 +43,7 @@ import { localeInfo } from '@/i18n/locales';
 import { useClock } from '@/lib/clock';
 import { useDevTools } from '@/lib/dev-tools';
 import { track } from '@/lib/analytics';
+import { BackLink } from '@/components/back-link';
 import { useFeedback } from '@/components/feedback/feedback-provider';
 import {
   QUIZ_INVITE_AFTER,
@@ -45,19 +52,21 @@ import {
 } from '@/components/feedback/feedback-provider';
 import { useGamification } from '@/lib/gamification';
 import { newId } from '@/lib/ids';
+import { useExampleTopUp } from '@/lib/lexicon/example-top-up';
 import { useRepos } from '@/lib/repos';
 import { cx } from '@/lib/cx';
 import { useSpeech } from '@/lib/speech';
 import { createStopwatch } from '@/lib/stopwatch';
 import { Celebration } from './celebration';
 import { FOUR_GRADES_TIP, FOUR_GRADES_TIP_STREAK, FourGradesTip } from './four-grades-tip';
-import { QUIZ_INTRO, REVIEW_INTRO, ReviewIntro } from './review-intro';
+import { QUIZ_INTRO, REVIEW_INTRO, ReviewIntro, SENTENCE_INTRO } from './review-intro';
 import { CardStage } from './card-stage';
 import { acceptedAnswers } from './formats/parts';
 import { formatOf, rendererFor } from './formats/registry';
 import type { TypedAnswer } from './formats/types';
 import { GRADE_NAME, GRADE_SWIPE_TONE, GradeBar } from './grade-bar';
-import { QuizBar, QuizCard, type QuizAnswer, type QuizCardFormat } from './quiz/quiz-card';
+import { QuizBar, QuizCard, type QuizAnswer } from './quiz/quiz-card';
+import { SentenceCard } from './quiz/sentence-card';
 import { SessionAside } from './session-aside';
 import { SessionSummary } from './session-summary';
 import {
@@ -83,6 +92,8 @@ interface Setup {
   tipsSeen: string[];
   /** Words the wrong options of the four-choice test come from: the learner's and built-in. */
   pool: Word[];
+  /** The words of this review (the sentences look up more examples for them). */
+  words: Word[];
 }
 
 /** An answer of the four-choice test, kept until "Next" records it. */
@@ -97,6 +108,8 @@ interface QuizResult {
 
 /** How long the result stays before the next card: a glance when right, time to read when not. */
 const QUIZ_NEXT_MS = { right: 600, wrong: 2000 } as const;
+/** A test answer is saved this long after it is given, once its result is on screen. */
+const PRESAVE_MS = 150;
 
 const ALL_GRADES: readonly Grade[] = [1, 2, 3, 4];
 const TWO_GRADES: readonly Grade[] = [1, 3];
@@ -104,7 +117,7 @@ const TWO_GRADES: readonly Grade[] = [1, 3];
 const toTwoGrades = (g: Grade): Grade => (g === 1 ? 1 : 3);
 
 /** How a grade was given, for the statistics. */
-type AnswerInput = 'swipe' | 'button' | 'key' | 'option' | 'typed' | 'skip';
+type AnswerInput = 'swipe' | 'button' | 'key' | 'option' | 'typed' | 'spoken' | 'skip';
 
 function isTextInput(target: EventTarget | null) {
   return (
@@ -121,6 +134,7 @@ function isTextInput(target: EventTarget | null) {
  */
 export function ReviewSession() {
   const t = useTranslations('review');
+  const tn = useTranslations('nav');
   const locale = useLocale();
   const deckParam = useSearchParams().get('deck');
   const repos = useRepos();
@@ -148,7 +162,7 @@ export function ReviewSession() {
   const reviewStats = useRef({ startedAt: 0, ended: true, reviewsBefore: 0 });
   const gamification = useGamification();
   // Dev: the four-choice test replaces flash cards (same words, levels and progress).
-  const { quiz } = useDevTools();
+  const { mode: studyMode, quiz, sentences } = useDevTools();
   const feedback = useFeedback();
   /** Answers given in the test so far (all sessions), until the survey invitation was made. */
   const quizAnswered = useRef<number | null>(null);
@@ -161,6 +175,12 @@ export function ReviewSession() {
   const [revealed, setRevealed] = useState(false);
   const [typed, setTyped] = useState<TypedAnswer | null>(null);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
+  /**
+   * A test answer is saved while its result is on screen, so "Next" only moves the card on:
+   * reading and writing the log on a phone would otherwise stall the swipe.
+   */
+  const presaved = useRef<{ key: string; outcome: Promise<ReviewOutcome> } | null>(null);
+  const presaveTimer = useRef(0);
   /** Answers already recorded, by event: an undo brings the card back with its result. */
   const quizAnswers = useRef(new Map<string, QuizResult>());
   const [exitDir, setExitDir] = useState<PhysicalDir | null>(null);
@@ -218,6 +238,7 @@ export function ReviewSession() {
         xpBefore: todayStats?.xp ?? 0,
         tipsSeen: settings.tipsSeen,
         pool,
+        words: cards.map((c) => c.word),
       });
       setSession(startSession<StudyCard, ReviewOutcome>(cards));
       reviewStats.current = {
@@ -269,7 +290,7 @@ export function ReviewSession() {
     if (finished) endReviewRef.current();
   }, [finished]);
   // Flash cards and the test each explain themselves once.
-  const introTip = quiz ? QUIZ_INTRO : REVIEW_INTRO;
+  const introTip = sentences ? SENTENCE_INTRO : quiz ? QUIZ_INTRO : REVIEW_INTRO;
   const introOpen = !!setup && !introClosed && !setup.tipsSeen.includes(introTip);
   const closeIntro = () => {
     setIntroClosed(true);
@@ -284,32 +305,61 @@ export function ReviewSession() {
     rtl: localeInfo(locale).dir === 'rtl',
     mirrored: settings?.swipeLayout === 'mirrored',
     // The test only knows right and wrong, so it always counts in two grades.
-    twoGrades: (settings?.twoGrades ?? false) || quiz,
+    twoGrades: (settings?.twoGrades ?? false) || quiz || sentences,
   };
   const grades = swipe.twoGrades ? TWO_GRADES : ALL_GRADES;
   const cardKey = card ? `${card.id}:${session.reviewed}` : null;
   const nativeLang = setup?.profile.nativeLang ?? 'uk';
-  // The four-choice test: the options of the current card, the same on every render.
-  const quizLevelFormat: QuizCardFormat | null =
-    quiz && card ? quizFormatForLevel(card.progress?.card.level ?? 1) : null;
-  const quizOptions = useMemo(
-    () =>
-      card && setup && quizLevelFormat && quizLevelFormat !== 'TYPE'
-        ? quizChoices({
-            word: card.word,
-            pool: setup.pool,
-            offer: quizLevelFormat === 'MCQ_WORD' ? 'term' : 'translation',
-            nativeLang,
-            rng: seededRng(`quiz:${cardKey}`),
-          })
-        : [],
-    [card, setup, quizLevelFormat, nativeLang, cardKey],
+  const level = card?.progress?.card.level ?? 1;
+  // Sentences: the example for this answer (they take turns, so a wrong answer comes back with
+  // another one). A word with no example holding it is asked as a choice of four instead.
+  const cloze = useMemo(
+    () => (sentences && card ? clozeForReview(card.word, card.progress?.card.reps ?? 0) : null),
+    [sentences, card],
   );
+  useExampleTopUp(setup?.words ?? null, sentences);
+  const levelFormat: QuizFormat | SentenceFormat | null = !card
+    ? null
+    : cloze
+      ? sentenceFormatForLevel(level)
+      : quiz || sentences
+        ? quizFormatForLevel(level)
+        : null;
+  const offersChoice =
+    levelFormat === 'MCQ_TR' ||
+    levelFormat === 'MCQ_WORD' ||
+    levelFormat === 'MCQ_AUD' ||
+    levelFormat === 'SENT_PICK';
+  // The test and the sentences: the options of the current card, the same on every render.
+  const quizOptions = useMemo(() => {
+    if (!card || !setup || !offersChoice) return [];
+    const options = quizChoices({
+      word: card.word,
+      pool: setup.pool,
+      offer: levelFormat === 'MCQ_WORD' || levelFormat === 'SENT_PICK' ? 'term' : 'translation',
+      nativeLang,
+      rng: seededRng(`quiz:${cardKey}`),
+    });
+    if (!cloze) return options;
+    // The word as the sentence has it ("achieved"), in lower case like the others unless the
+    // word itself is written with a capital.
+    const term = card.word.term;
+    const shown =
+      term === term.toLocaleLowerCase(card.word.lang)
+        ? cloze.answer.toLocaleLowerCase(card.word.lang)
+        : cloze.answer;
+    return options.map((o) => (o.correct ? { ...o, text: shown } : o));
+  }, [card, setup, offersChoice, levelFormat, nativeLang, cardKey, cloze]);
   // Too few other words to choose from: the word is typed in instead.
-  const quizFormat: QuizCardFormat | null =
-    quizLevelFormat && quizLevelFormat !== 'TYPE' && quizOptions.length < 2
-      ? 'TYPE'
-      : quizLevelFormat;
+  const quizFormat: QuizFormat | SentenceFormat | null =
+    offersChoice && quizOptions.length < 2
+      ? levelFormat === 'SENT_PICK'
+        ? 'SENT_TYPE'
+        : 'TYPE'
+      : levelFormat;
+  const sentenceFormat = quizFormat && isSentenceFormat(quizFormat) ? quizFormat : null;
+  /** For the statistics: which mode the card was answered in. */
+  const answerMode = sentenceFormat ? 'sentences' : quizFormat ? 'quiz' : 'card';
   const format = quizFormat ?? (card ? formatOf(card) : 'REC');
   const renderer = rendererFor(quizFormat ? 'PROD' : format);
   const typing = !!settings?.typing && renderer.supportsTyping;
@@ -378,17 +428,42 @@ export function ReviewSession() {
     setSide('back');
   };
 
-  /** The test is answered: the result is shown and kept until "Next" records it. */
+  const record = (g: Grade, responseMs: number) => {
+    if (!card || !setup) throw new Error('No card to record');
+    const now = clock.now();
+    return submitReview(repos, {
+      word: card.word,
+      progress: card.progress,
+      grade: g,
+      format,
+      responseMs,
+      now,
+      today: dayOf(now),
+      settings: setup.settings,
+      params: DEFAULT_SCHEDULER_PARAMS,
+      newId,
+    });
+  };
+
+  /** The test is answered: the result is shown and kept until "Next" moves on. */
   const answerQuiz = (answer: QuizAnswer, g: Grade, right: boolean) => {
-    if (!card || quizResult) return;
+    if (!card || !cardKey || quizResult) return;
+    const responseMs = watch.elapsedMs();
     setQuizResult({
       answer,
       grade: g,
-      responseMs: watch.elapsedMs(),
+      responseMs,
       // Typing the word: twice as long to look at what was typed against the answer.
-      autoMs: (right ? QUIZ_NEXT_MS.right : QUIZ_NEXT_MS.wrong) * (quizFormat === 'TYPE' ? 2 : 1),
+      autoMs:
+        (right ? QUIZ_NEXT_MS.right : QUIZ_NEXT_MS.wrong) *
+        (isTypingFormat(format) || format === 'SENT_SAY' ? 2 : 1),
     });
     reveal();
+    // Saved once the result is painted and the "Next" bar is filling (an animation the
+    // compositor runs on its own), never in the frame of the answer itself.
+    presaveTimer.current = window.setTimeout(() => {
+      presaved.current = { key: cardKey, outcome: record(g, responseMs) };
+    }, PRESAVE_MS);
   };
   const pickOption = (i: number) => {
     const option = quizOptions[i];
@@ -398,19 +473,41 @@ export function ReviewSession() {
     if (!card) return;
     const result = gradeTypedAnswer({
       input,
-      accepted: acceptedAnswers(card),
+      accepted: accepted(),
       responseMs: watch.elapsedMs(),
       adapter: adapterFor(card.word.lang),
       params: DEFAULT_GRADING_PARAMS,
     });
     // With the letters shown, a right answer is at most "Hard".
     const g = hinted ? (Math.min(result.grade, 2) as Grade) : result.grade;
-    track('typed_answer', { mode: 'quiz', to: result.verdict, hint_used: hinted });
+    track('typed_answer', { mode: answerMode, to: result.verdict, hint_used: hinted });
     answerQuiz(
       { typed: { input, result } },
       swipe.twoGrades ? toTwoGrades(g) : g,
       result.verdict === 'exact',
     );
+  };
+  /** What counts as the word: its forms, and in a sentence the form the sentence has. */
+  const accepted = () => (card ? [...acceptedAnswers(card), ...(cloze ? [cloze.answer] : [])] : []);
+  /**
+   * The word said aloud: right when any of what was heard (or a word of it, as in "the word is
+   * achieve") is the word, as typing it would be.
+   */
+  const sayQuiz = (variants: string[]) => {
+    if (!card) return;
+    const candidates = variants.flatMap((v) => [v, ...v.split(/\s+/)]);
+    const right = candidates.some(
+      (input) =>
+        gradeTypedAnswer({
+          input,
+          accepted: accepted(),
+          responseMs: watch.elapsedMs(),
+          adapter: adapterFor(card.word.lang),
+          params: DEFAULT_GRADING_PARAMS,
+        }).verdict !== 'wrong',
+    );
+    track('spoken_answer', { to: right ? 'right' : 'wrong', count: variants.length });
+    answerQuiz({ said: { heard: variants[0] ?? '', right } }, right ? 3 : 1, right);
   };
 
   const nextCard = () => {
@@ -431,19 +528,13 @@ export function ReviewSession() {
     // A card can be graded (swiped away) without flipping it first.
     if (!card || !setup || busy) return;
     setBusy(true);
-    const now = clock.now();
-    const outcome = await submitReview(repos, {
-      word: card.word,
-      progress: card.progress,
-      grade: g,
-      format,
-      responseMs,
-      now,
-      today: dayOf(now),
-      settings: setup.settings,
-      params: DEFAULT_SCHEDULER_PARAMS,
-      newId,
-    });
+    // "Next" pressed before the answer was saved: it is saved here instead.
+    window.clearTimeout(presaveTimer.current);
+    const saved = presaved.current;
+    presaved.current = null;
+    const outcome =
+      quizAnswer && saved?.key === cardKey ? await saved.outcome : await record(g, responseMs);
+    const now = outcome.event.at;
     const updated: StudyCard = {
       ...card,
       progress: outcome.progress,
@@ -455,7 +546,7 @@ export function ReviewSession() {
     if (quizAnswer) quizAnswers.current.set(outcome.event.id, quizAnswer);
     const p = card.progress;
     track('answer', {
-      mode: quizFormat ? 'quiz' : 'card',
+      mode: answerMode,
       card_level: p?.card.level ?? 1,
       format,
       grade: g,
@@ -474,7 +565,7 @@ export function ReviewSession() {
     if (reviewStats.current.reviewsBefore + session.reviewed + 1 === DEFAULT_XP_PARAMS.dailyDecayN0)
       track('xp_decay_reached', { count: DEFAULT_XP_PARAMS.dailyDecayN0 });
     // After enough answers in the test, ask once what the learner thinks of it.
-    if (isQuizFormat(format) && quizAnswered.current !== null) {
+    if ((isQuizFormat(format) || isSentenceFormat(format)) && quizAnswered.current !== null) {
       quizAnswered.current += 1;
       if (quizAnswered.current >= QUIZ_INVITE_AFTER) {
         quizAnswered.current = null;
@@ -530,8 +621,13 @@ export function ReviewSession() {
     const last = session?.history.at(-1);
     if (!last || busy) return;
     setBusy(true);
+    // The card on screen was answered and saved already: that answer goes too.
+    window.clearTimeout(presaveTimer.current);
+    const saved = presaved.current;
+    presaved.current = null;
+    if (saved) await undoReview(repos, await saved.outcome);
     await undoReview(repos, last.token);
-    track('undo', { mode: quizFormat ? 'quiz' : 'card' });
+    track('undo', { mode: answerMode });
     setExitDir(null);
     setSession((s) => s && sessionReducer(s, { type: 'undo' }));
     setEndedAt(null);
@@ -545,8 +641,9 @@ export function ReviewSession() {
   const nextQuiz = (auto = false) => {
     if (!quizResult) return;
     track('quiz_next', { auto, card_level: card?.progress?.card.level ?? 1 });
+    const a = quizResult.answer;
     const input: AnswerInput =
-      'typed' in quizResult.answer ? 'typed' : quizResult.answer.picked < 0 ? 'skip' : 'option';
+      'typed' in a ? 'typed' : 'said' in a ? 'spoken' : a.picked < 0 ? 'skip' : 'option';
     void grade(quizResult.grade, undefined, quizResult.responseMs, quizResult, input);
   };
   // The result shows for a moment, then the next card comes by itself.
@@ -587,7 +684,7 @@ export function ReviewSession() {
         // A focused button ("Next", an option) handles its own Enter and Space.
         const onButton =
           e.target instanceof HTMLButtonElement || e.target instanceof HTMLAnchorElement;
-        if (!quizResult && quizFormat !== 'TYPE' && /^[1-4]$/.test(e.key)) {
+        if (!quizResult && quizOptions.length >= 2 && /^[1-4]$/.test(e.key)) {
           e.preventDefault();
           pickOption(Number(e.key) - 1);
         } else if (quizResult && !onButton && (e.key === ' ' || e.key === 'Enter')) {
@@ -644,6 +741,7 @@ export function ReviewSession() {
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-8 px-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,36rem)_minmax(0,1fr)] xl:px-8">
           <div aria-hidden className="hidden xl:block" />
           <section className="mx-auto flex min-h-0 w-full max-w-xl flex-col gap-3 py-3 md:py-6">
+            <BackLink href="/" label={tn('home')} />
             <SessionTopBar
               done={done}
               total={session.total}
@@ -685,8 +783,8 @@ export function ReviewSession() {
                   </span>
                   <span>
                     {t('level', {
-                      level: Math.min(card.progress?.card.level ?? 1, quiz ? 4 : 3),
-                      max: quiz ? 4 : 3,
+                      level: Math.min(level, 3),
+                      max: 3,
                     })}
                   </span>
                 </div>
@@ -701,27 +799,48 @@ export function ReviewSession() {
                       actionFor={() => null}
                       onSwipe={() => {}}
                     >
-                      <QuizCard
-                        card={card}
-                        format={quizFormat}
-                        options={quizOptions}
-                        answer={quizResult?.answer ?? null}
-                        nativeLang={nativeLang}
-                        speechLang={speechLang}
-                        speech={speech}
-                        onPick={pickOption}
-                        onTyped={typeQuiz}
-                        onHint={(kind) => track('quiz_hint', { to: kind })}
-                      />
+                      {sentenceFormat && cloze ? (
+                        <SentenceCard
+                          card={card}
+                          format={sentenceFormat}
+                          cloze={cloze}
+                          options={quizOptions}
+                          answer={quizResult?.answer ?? null}
+                          nativeLang={nativeLang}
+                          speechLang={speechLang}
+                          speech={speech}
+                          onPick={pickOption}
+                          onTyped={(input) => typeQuiz(input, false)}
+                          onSaid={sayQuiz}
+                        />
+                      ) : (
+                        <QuizCard
+                          card={card}
+                          format={quizFormat as QuizFormat}
+                          options={quizOptions}
+                          answer={quizResult?.answer ?? null}
+                          nativeLang={nativeLang}
+                          speechLang={speechLang}
+                          speech={speech}
+                          onPick={pickOption}
+                          onTyped={typeQuiz}
+                          onHint={(kind) => track('quiz_hint', { to: kind })}
+                        />
+                      )}
                     </CardStage>
                     <QuizBar
                       answered={!!quizResult}
                       disabled={busy}
                       autoMs={quizResult?.autoMs ?? null}
-                      onSkip={() => {
-                        track('quiz_skip', { card_level: card.progress?.card.level ?? 1 });
-                        answerQuiz({ picked: -1 }, 1, false);
-                      }}
+                      // A choice of four has no "I don't know": one of them is picked.
+                      onSkip={
+                        quizOptions.length >= 2
+                          ? undefined
+                          : () => {
+                              track('quiz_skip', { card_level: level });
+                              answerQuiz({ picked: -1 }, 1, false);
+                            }
+                      }
                       onNext={() => nextQuiz()}
                     />
                   </>
@@ -790,14 +909,14 @@ export function ReviewSession() {
               </>
             )}
           </section>
-          <SessionAside session={session} swipe={swipe} goal={goal} />
+          <SessionAside session={session} swipe={swipe} goal={goal} quiz={quiz || sentences} />
         </div>
       </div>
       <ReviewIntro
         open={introOpen}
         mirrored={swipe.mirrored}
         rtl={swipe.rtl}
-        quiz={quiz}
+        mode={studyMode}
         onClose={closeIntro}
       />
       <FourGradesTip

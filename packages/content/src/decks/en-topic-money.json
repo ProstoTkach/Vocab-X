@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-money",
+  "lang": "en",
+  "cefr": "B1",
+  "topic": "money",
+  "title": "Money and shopping",
+  "titleI18n": {
+    "uk": "Гроші та покупки",
+    "en": "Money and shopping"
+  },
+  "descriptionI18n": {
+    "uk": "Знижки, борги, бюджет і підписки — щоб розумітися на грошах.",
+    "en": "Discounts, debts, budgets and subscriptions — to handle money with ease."
+  },
+  "words": [
+    {
+      "term": "discount",
+      "pos": "noun",
+      "translations": {
+        "uk": ["знижка"]
+      },
+      "examples": [
+        {
+          "text": "There is a 20% discount today.",
+          "translations": {
+            "uk": "Сьогодні знижка 20%."
+          }
+        }
+      ]
+    },
+    {
+      "term": "refund",
+      "pos": "noun",
+      "translations": {
+        "uk": ["повернення грошей"]
+      },
+      "examples": [
+        {
+          "text": "Can I get a refund?",
+          "translations": {
+            "uk": "Можна повернути гроші?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "cash",
+      "pos": "noun",
+      "translations": {
+        "uk": ["готівка"]
+      },
+      "examples": [
+        {
+          "text": "Do you pay by card or in cash?",
+          "translations": {
+            "uk": "Ви платите карткою чи готівкою?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "loan",
+      "pos": "noun",
+      "translations": {
+        "uk": ["позика", "кредит"]
+      },
+      "examples": [
+        {
+          "text": "They took a loan to buy a car.",
+          "translations": {
+            "uk": "Вони взяли кредит, щоб купити авто."
+          }
+        }
+      ]
+    },
+    {
+      "term": "debt",
+      "pos": "noun",
+      "translations": {
+        "uk": ["борг"]
+      },
+      "examples": [
+        {
+          "text": "He paid off his debt.",
+          "translations": {
+            "uk": "Він виплатив свій борг."
+          }
+        }
+      ]
+    },
+    {
+      "term": "budget",
+      "pos": "noun",
+      "translations": {
+        "uk": ["бюджет"]
+      },
+      "examples": [
+        {
+          "text": "We need to plan our budget.",
+          "translations": {
+            "uk": "Нам треба спланувати бюджет."
+          }
+        }
+      ]
+    },
+    {
+      "term": "save",
+      "pos": "verb",
+      "translations": {
+        "uk": ["заощаджувати"]
+      },
+      "examples": [
+        {
+          "text": "I save some money every month.",
+          "translations": {
+            "uk": "Я щомісяця заощаджую трохи грошей."
+          }
+        }
+      ]
+    },
+    {
+      "term": "spend",
+      "pos": "verb",
+      "translations": {
+        "uk": ["витрачати"]
+      },
+      "examples": [
+        {
+          "text": "Don't spend everything at once.",
+          "translations": {
+            "uk": "Не витрачай усе одразу."
+          }
+        }
+      ]
+    },
+    {
+      "term": "bargain",
+      "pos": "noun",
+      "translations": {
+        "uk": ["вигідна покупка"]
+      },
+      "examples": [
+        {
+          "text": "This jacket was a real bargain.",
+          "translations": {
+            "uk": "Ця куртка була справді вигідною покупкою."
+          }
+        }
+      ]
+    },
+    {
+      "term": "price",
+      "pos": "noun",
+      "translations": {
+        "uk": ["ціна"]
+      },
+      "examples": [
+        {
+          "text": "The price has gone up.",
+          "translations": {
+            "uk": "Ціна зросла."
+          }
+        }
+      ]
+    },
+    {
+      "term": "invoice",
+      "pos": "noun",
+      "translations": {
+        "uk": ["рахунок-фактура"]
+      },
+      "examples": [
+        {
+          "text": "Send the invoice by email.",
+          "translations": {
+            "uk": "Надішліть рахунок-фактуру електронною поштою."
+          }
+        }
+      ]
+    },
+    {
+      "term": "tax",
+      "pos": "noun",
+      "translations": {
+        "uk": ["податок"]
+      },
+      "examples": [
+        {
+          "text": "The tax is included.",
+          "translations": {
+            "uk": "Податок включено."
+          }
+        }
+      ]
+    },
+    {
+      "term": "income",
+      "pos": "noun",
+      "translations": {
+        "uk": ["дохід"]
+      },
+      "examples": [
+        {
+          "text": "Her income has doubled.",
+          "translations": {
+            "uk": "Її дохід подвоївся."
+          }
+        }
+      ]
+    },
+    {
+      "term": "withdraw",
+      "pos": "verb",
+      "translations": {
+        "uk": ["знімати (гроші)"]
+      },
+      "examples": [
+        {
+          "text": "I need to withdraw some money.",
+          "translations": {
+            "uk": "Мені треба зняти трохи грошей."
+          }
+        }
+      ]
+    },
+    {
+      "term": "subscription",
+      "pos": "noun",
+      "translations": {
+        "uk": ["підписка"]
+      },
+      "examples": [
+        {
+          "text": "Cancel the subscription before May.",
+          "translations": {
+            "uk": "Скасуй підписку до травня."
+          }
+        }
+      ]
+    },
+    {
+      "term": "wallet",
+      "pos": "noun",
+      "translations": {
+        "uk": ["гаманець"]
+      },
+      "examples": [
+        {
+          "text": "I lost my wallet on the bus.",
+          "translations": {
+            "uk": "Я загубив гаманець в автобусі."
+          }
+        }
+      ]
+    }
+  ]
+}

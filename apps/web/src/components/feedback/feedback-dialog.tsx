@@ -238,6 +238,12 @@ function SurveyForm({ onSubmit }: { onSubmit: (f: Feedback) => void }) {
       const { rating, note } = draft[q];
       if (rating === null) {
         setMissing(true);
+        // The first question left out gets the focus (and comes into view).
+        const first = e.currentTarget.querySelector<HTMLElement>(
+          `[data-question="${q}"] [role="radio"]`,
+        );
+        first?.focus({ preventScroll: true });
+        first?.scrollIntoView({ block: 'center', behavior: 'smooth' });
         return;
       }
       answers[q] = rating < RATING_MAX && note.trim() ? { rating, note: note.trim() } : { rating };
@@ -278,14 +284,13 @@ function SurveyForm({ onSubmit }: { onSubmit: (f: Feedback) => void }) {
           {questions.map((q) => {
             const { rating, note } = draft[q];
             return (
-              <div key={q} className="flex flex-col gap-2">
+              <div key={q} data-question={q} className="flex flex-col gap-2">
                 <RatingScale
                   label={t(`survey.questions.${q}`)}
                   value={rating}
-                  onChange={(r) => {
-                    setAnswer(q, { rating: r });
-                    setMissing(false);
-                  }}
+                  error={missing && rating === null ? t('survey.required') : null}
+                  // Each mark goes away as its question is answered; the others stay.
+                  onChange={(r) => setAnswer(q, { rating: r })}
                   lowLabel={t('survey.low')}
                   highLabel={t('survey.high')}
                 />
@@ -374,7 +379,7 @@ function SurveyForm({ onSubmit }: { onSubmit: (f: Feedback) => void }) {
         </div>
       </SurveyPart>
 
-      {missing && (
+      {missing && rated < SURVEY_QUESTIONS.length && (
         <p role="alert" className="text-sm font-medium text-danger">
           {t('survey.missing', { left: SURVEY_QUESTIONS.length - rated })}
         </p>

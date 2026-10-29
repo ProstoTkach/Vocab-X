@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-career",
+  "lang": "en",
+  "cefr": "B1",
+  "topic": "career",
+  "title": "Job interviews and career",
+  "titleI18n": {
+    "uk": "Співбесіда та кар'єра",
+    "en": "Job interviews and career"
+  },
+  "descriptionI18n": {
+    "uk": "Резюме, навички й співбесіда — щоб упевнено шукати роботу.",
+    "en": "CVs, skills and interviews — to look for a job with confidence."
+  },
+  "words": [
+    {
+      "term": "interview",
+      "pos": "noun",
+      "translations": {
+        "uk": ["співбесіда"]
+      },
+      "examples": [
+        {
+          "text": "I have a job interview tomorrow.",
+          "translations": {
+            "uk": "Завтра в мене співбесіда."
+          }
+        }
+      ]
+    },
+    {
+      "term": "candidate",
+      "pos": "noun",
+      "translations": {
+        "uk": ["кандидат"]
+      },
+      "examples": [
+        {
+          "text": "She was the best candidate.",
+          "translations": {
+            "uk": "Вона була найкращою кандидаткою."
+          }
+        }
+      ]
+    },
+    {
+      "term": "skill",
+      "pos": "noun",
+      "translations": {
+        "uk": ["навичка"]
+      },
+      "examples": [
+        {
+          "text": "Communication is an important skill.",
+          "translations": {
+            "uk": "Спілкування — важлива навичка."
+          }
+        }
+      ]
+    },
+    {
+      "term": "qualification",
+      "pos": "noun",
+      "translations": {
+        "uk": ["кваліфікація"]
+      },
+      "examples": [
+        {
+          "text": "What qualification do you have?",
+          "translations": {
+            "uk": "Яка у вас кваліфікація?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "apply",
+      "pos": "verb",
+      "translations": {
+        "uk": ["подавати заявку"]
+      },
+      "examples": [
+        {
+          "text": "I want to apply for this job.",
+          "translations": {
+            "uk": "Я хочу подати заявку на цю роботу."
+          }
+        }
+      ]
+    },
+    {
+      "term": "hire",
+      "pos": "verb",
+      "translations": {
+        "uk": ["наймати"]
+      },
+      "examples": [
+        {
+          "text": "They plan to hire two designers.",
+          "translations": {
+            "uk": "Вони планують найняти двох дизайнерів."
+          }
+        }
+      ]
+    },
+    {
+      "term": "strength",
+      "pos": "noun",
+      "translations": {
+        "uk": ["сильна сторона"]
+      },
+      "examples": [
+        {
+          "text": "What is your greatest strength?",
+          "translations": {
+            "uk": "Яка ваша найсильніша сторона?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "weakness",
+      "pos": "noun",
+      "translations": {
+        "uk": ["слабка сторона", "слабкість"]
+      },
+      "examples": [
+        {
+          "text": "Talk about one weakness.",
+          "translations": {
+            "uk": "Розкажіть про одну слабку сторону."
+          }
+        }
+      ]
+    },
+    {
+      "term": "goal",
+      "pos": "noun",
+      "translations": {
+        "uk": ["мета", "ціль"]
+      },
+      "examples": [
+        {
+          "text": "My goal is to become a team leader.",
+          "translations": {
+            "uk": "Моя мета — стати керівником команди."
+          }
+        }
+      ]
+    },
+    {
+      "term": "internship",
+      "pos": "noun",
+      "translations": {
+        "uk": ["стажування"]
+      },
+      "examples": [
+        {
+          "text": "He did an internship at a bank.",
+          "translations": {
+            "uk": "Він проходив стажування в банку."
+          }
+        }
+      ]
+    },
+    {
+      "term": "reference",
+      "pos": "noun",
+      "translations": {
+        "uk": ["рекомендація"]
+      },
+      "examples": [
+        {
+          "text": "Can you give me a reference?",
+          "translations": {
+            "uk": "Можете дати мені рекомендацію?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "ambitious",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["амбітний"]
+      },
+      "examples": [
+        {
+          "text": "She is young and ambitious.",
+          "translations": {
+            "uk": "Вона молода й амбітна."
+          }
+        }
+      ]
+    },
+    {
+      "term": "benefit",
+      "pos": "noun",
+      "translations": {
+        "uk": ["пільга", "перевага"]
+      },
+      "examples": [
+        {
+          "text": "Health insurance is a nice benefit.",
+          "translations": {
+            "uk": "Медична страховка — приємна пільга."
+          }
+        }
+      ]
+    },
+    {
+      "term": "contract",
+      "pos": "noun",
+      "translations": {
+        "uk": ["договір", "контракт"]
+      },
+      "examples": [
+        {
+          "text": "Read the contract before you sign it.",
+          "translations": {
+            "uk": "Прочитай договір, перш ніж підписати."
+          }
+        }
+      ]
+    },
+    {
+      "term": "position",
+      "pos": "noun",
+      "translations": {
+        "uk": ["посада"]
+      },
+      "examples": [
+        {
+          "text": "The position is still open.",
+          "translations": {
+            "uk": "Посада досі вакантна."
+          }
+        }
+      ]
+    },
+    {
+      "term": "freelance",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["позаштатний", "фрилансовий"]
+      },
+      "examples": [
+        {
+          "text": "She does freelance work from home.",
+          "translations": {
+            "uk": "Вона працює фрилансеркою з дому."
+          }
+        }
+      ]
+    }
+  ]
+}

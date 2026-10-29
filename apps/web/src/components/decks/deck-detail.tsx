@@ -14,10 +14,11 @@ import {
   type Profile,
   type Word,
 } from '@vocabx/core';
-import { ArrowLeft, Copy, ListPlus, Play, Plus, Search } from 'lucide-react';
+import { Copy, ListPlus, Play, Plus, Search } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Button, buttonClass } from '@/components/ui/button';
+import { BackLink } from '@/components/back-link';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { inputClass } from '@/components/ui/field';
 import { useToast } from '@/components/ui/toast';
@@ -186,13 +187,7 @@ export function DeckDetail({ deckId }: { deckId: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <Link
-        href="/decks"
-        className="inline-flex min-h-11 items-center gap-2 self-start rounded-control text-sm font-semibold text-fg-muted hover:text-fg"
-      >
-        <ArrowLeft aria-hidden className="size-4 rtl:-scale-x-100" />
-        {t('back')}
-      </Link>
+      <BackLink href="/decks" label={t('back')} />
 
       <header className="flex flex-col gap-4">
         <div className="min-w-0">

@@ -45,10 +45,11 @@ export function createTatoebaProvider(o: TatoebaOptions): LexiconProvider {
         lang: code,
         q: term,
         sort: 'relevance',
-        // Long enough to show the word in use, short enough to read at a glance.
-        word_count: '5-14',
+        // Long enough to show the word in use, short enough to read at a glance. More than are
+        // kept: the thin ones ("Is it convenient for you?") are dropped later.
+        word_count: '6-16',
         showtrans: 'none',
-        limit: String(o.maxExamples ?? 4),
+        limit: String(o.maxExamples ?? 10),
       });
       const data = (await getJson(
         o.fetch,

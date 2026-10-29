@@ -80,15 +80,30 @@ export function SessionAside({
   session,
   swipe,
   goal,
+  quiz = false,
 }: {
   session: SessionState<StudyCard, ReviewOutcome>;
   swipe: SwipeOptions;
   goal: DailyGoal;
+  /** The four-choice test: answers are wrong or right, picked with the keys 1–4. */
+  quiz?: boolean;
 }) {
   const t = useTranslations('review');
   const grades = swipe.twoGrades ? ([1, 3] as const) : ([1, 2, 3, 4] as const);
   const [keysOpen, setKeysOpen] = useState(false);
   const keysId = useId();
+  const c = session.counts;
+  // The test grades a wrong answer "again" and a right one "hard", "good" or "easy".
+  const stats = quiz
+    ? [
+        { key: 'wrong', label: t('quiz.wrongCount'), value: c.again },
+        { key: 'right', label: t('quiz.rightCount'), value: c.hard + c.good + c.easy },
+      ]
+    : grades.map((g) => ({
+        key: GRADE_NAME[g],
+        label: t(`grades.${GRADE_NAME[g]}`),
+        value: c[GRADE_NAME[g]],
+      }));
   return (
     <aside className="hidden w-64 max-w-full flex-col gap-6 py-6 min-[80rem]:flex">
       <section>
@@ -113,14 +128,32 @@ export function SessionAside({
           hidden={!keysOpen}
           className="mt-2 absolute flex flex-col gap-2 px-3 text-sm"
         >
-          <div className="flex items-center justify-between gap-2">
-            <dt>{t('hotkeyFlip')}</dt>
-            <dd className="flex gap-1">
-              <Kbd>{t('keys.space')}</Kbd>
-              <Kbd>{t('keys.enter')}</Kbd>
-            </dd>
-          </div>
-          {grades.map((g) => {
+          {quiz && (
+            <>
+              <div className="flex items-center justify-between gap-2">
+                <dt>{t('quiz.hotkeyPick')}</dt>
+                <dd className="flex gap-1">
+                  <Kbd>1</Kbd>–<Kbd>4</Kbd>
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <dt>{t('quiz.next')}</dt>
+                <dd>
+                  <Kbd>{t('keys.enter')}</Kbd>
+                </dd>
+              </div>
+            </>
+          )}
+          {!quiz && (
+            <div className="flex items-center justify-between gap-2">
+              <dt>{t('hotkeyFlip')}</dt>
+              <dd className="flex gap-1">
+                <Kbd>{t('keys.space')}</Kbd>
+                <Kbd>{t('keys.enter')}</Kbd>
+              </dd>
+            </div>
+          )}
+          {(quiz ? [] : grades).map((g) => {
             const dir = directionForGrade(g, swipe);
             return (
               <div key={g} className="flex items-center justify-between gap-2">
@@ -162,10 +195,10 @@ export function SessionAside({
         <section>
           <h2 className="mb-3 text-sm font-semibold text-fg-muted">{t('sessionStats')}</h2>
           <dl className="grid grid-cols-2 gap-2 text-sm">
-            {grades.map((g) => (
-              <div key={g} className="rounded-control bg-surface-2 px-3 py-2">
-                <dt className="text-fg-muted">{t(`grades.${GRADE_NAME[g]}`)}</dt>
-                <dd className="text-lg font-semibold">{session.counts[GRADE_NAME[g]]}</dd>
+            {stats.map((s) => (
+              <div key={s.key} className="rounded-control bg-surface-2 px-3 py-2">
+                <dt className="text-fg-muted">{s.label}</dt>
+                <dd className="text-lg font-semibold">{s.value}</dd>
               </div>
             ))}
           </dl>

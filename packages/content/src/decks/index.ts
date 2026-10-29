@@ -16,6 +16,21 @@ import enB2Advanced from './en-b2-advanced.json';
 import enC1Proficient from './en-c1-proficient.json';
 import enC2Mastery from './en-c2-mastery.json';
 import ukA2Essentials from './uk-a2-essentials.json';
+import enTopicTravel from './en-topic-travel.json';
+import enTopicFood from './en-topic-food.json';
+import enTopicHome from './en-topic-home.json';
+import enTopicEmotions from './en-topic-emotions.json';
+import enTopicSport from './en-topic-sport.json';
+import enTopicHealth from './en-topic-health.json';
+import enTopicWork from './en-topic-work.json';
+import enTopicCareer from './en-topic-career.json';
+import enTopicTech from './en-topic-tech.json';
+import enTopicSocial from './en-topic-social.json';
+import enTopicMoney from './en-topic-money.json';
+import enTopicEducation from './en-topic-education.json';
+import enTopicClimate from './en-topic-climate.json';
+import enTopicAi from './en-topic-ai.json';
+import enTopicSociety from './en-topic-society.json';
 
 export interface DeckFileWord {
   term: string;
@@ -33,13 +48,15 @@ export interface DeckFile {
   id: string;
   lang: LangCode;
   cefr: Cefr;
+  /** A deck on a topic (travel, work…) rather than one of the level decks A1–C2. */
+  topic?: string;
   title: string;
   titleI18n: Partial<Record<LangCode, string>>;
   descriptionI18n: Partial<Record<LangCode, string>>;
   words: DeckFileWord[];
 }
 
-/** English decks go from A1 up: the level check walks them in this order. */
+/** The level decks first, English from A1 up; then the topic decks. */
 export const DECK_FILES: readonly DeckFile[] = [
   enA1Basics as DeckFile,
   enA2Everyday as DeckFile,
@@ -48,6 +65,22 @@ export const DECK_FILES: readonly DeckFile[] = [
   enC1Proficient as DeckFile,
   enC2Mastery as DeckFile,
   ukA2Essentials as DeckFile,
+  // Topic decks: everyday themes, each at a typical level.
+  enTopicTravel as DeckFile,
+  enTopicFood as DeckFile,
+  enTopicHome as DeckFile,
+  enTopicEmotions as DeckFile,
+  enTopicSport as DeckFile,
+  enTopicHealth as DeckFile,
+  enTopicWork as DeckFile,
+  enTopicCareer as DeckFile,
+  enTopicTech as DeckFile,
+  enTopicSocial as DeckFile,
+  enTopicMoney as DeckFile,
+  enTopicEducation as DeckFile,
+  enTopicClimate as DeckFile,
+  enTopicAi as DeckFile,
+  enTopicSociety as DeckFile,
 ];
 
 /** Stable id of a built-in word: language + lemma, shared by every deck that contains it. */

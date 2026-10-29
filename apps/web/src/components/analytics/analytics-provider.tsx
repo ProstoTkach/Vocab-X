@@ -1,5 +1,6 @@
 'use client';
 
+import { studyModeOf } from '@vocabx/core';
 import { ShieldCheck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
@@ -16,7 +17,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { usePathname } from '@/i18n/navigation';
-import { getTracker, isInternal, readKey, track, writeKey, type Consent } from '@/lib/analytics';
+import {
+  getTracker,
+  isInternal,
+  readKey,
+  sendsFromLocalhost,
+  track,
+  writeKey,
+  type Consent,
+} from '@/lib/analytics';
 import { isLocalHost, KEYS } from '@/lib/analytics/identity';
 import { useClock } from '@/lib/clock';
 import { useDevTools } from '@/lib/dev-tools';
@@ -84,7 +93,7 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   const repos = useRepos();
   const { dayOf, clock } = useClock();
   const { ready: gameReady, mode } = useGamification();
-  const { quiz } = useDevTools();
+  const { mode: studyMode } = useDevTools();
   const [consent, setConsentState] = useState<Consent>(null);
   const [asking, setAsking] = useState(false);
   const [started, setStarted] = useState(false);
@@ -96,9 +105,9 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
       ui_lang: locale,
       device: isMobile() ? 'mobile' : 'desktop',
       ...(gameReady ? { game_mode: mode } : {}),
-      study_mode: quiz ? 'quiz' : 'cards',
+      study_mode: studyMode,
     });
-  }, [locale, gameReady, mode, quiz]);
+  }, [locale, gameReady, mode, studyMode]);
 
   // Start once the settings are known, so the session begins with the right modes.
   useEffect(() => {
@@ -109,7 +118,7 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
       ([s, profile, game]) => {
         if (ctrl.signal.aborted) return;
         tracker.setContext({
-          study_mode: s.quizMode ? 'quiz' : 'cards',
+          study_mode: studyModeOf(s),
           game_mode: s.gamification,
         });
         setConsentState(tracker.consent);
@@ -264,7 +273,8 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   // Onboarding asks at once, on its first page; elsewhere never in the middle of a review.
   const wantsAsk = started && consent === null && !pathname.startsWith('/review');
   useEffect(() => {
-    if (!wantsAsk) return;
+    // Nothing is ever sent from a developer's machine, so there is nothing to ask about.
+    if (!wantsAsk || (isLocalHost(window.location.hostname) && !sendsFromLocalhost)) return;
     const id = window.setTimeout(() => setAsking(true), onboarding ? 0 : ASK_DELAY_MS);
     return () => window.clearTimeout(id);
   }, [wantsAsk, onboarding]);
@@ -282,7 +292,7 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
       tracker.setConsent(granted);
       setConsentState(granted ? 'granted' : 'denied');
       setAsking(false);
-      // A developer's machine: a reminder that nothing is sent from here.
+      // A developer's machine (switched on in the settings): a reminder that nothing is sent.
       if (granted && isLocalHost(window.location.hostname)) window.alert(t('localhostAlert'));
     },
     [t],

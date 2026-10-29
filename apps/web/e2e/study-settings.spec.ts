@@ -76,7 +76,7 @@ test('typing the word', async ({ page }) => {
 });
 
 test('auto-speak off', async ({ page }) => {
-  await page.getByRole('switch', { name: /Озвучувати слово/ }).click();
+  await page.getByRole('switch', { name: /озвучувати слово/i }).click();
   await openReview(page);
   await page.keyboard.press('Space');
   await expect(card(page)).toHaveAttribute('data-side', 'back');

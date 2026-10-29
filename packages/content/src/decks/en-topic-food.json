@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-food",
+  "lang": "en",
+  "cefr": "A2",
+  "topic": "food",
+  "title": "Food and cooking",
+  "titleI18n": {
+    "uk": "Їжа та кухня",
+    "en": "Food and cooking"
+  },
+  "descriptionI18n": {
+    "uk": "Страви, смаки й способи готування — для кухні та ресторану.",
+    "en": "Dishes, tastes and ways of cooking — for the kitchen and the restaurant."
+  },
+  "words": [
+    {
+      "term": "vegetable",
+      "pos": "noun",
+      "translations": {
+        "uk": ["овоч"]
+      },
+      "examples": [
+        {
+          "text": "Eat a vegetable with every meal.",
+          "translations": {
+            "uk": "Їж овоч до кожної страви."
+          }
+        }
+      ]
+    },
+    {
+      "term": "meal",
+      "pos": "noun",
+      "translations": {
+        "uk": ["прийом їжі", "страва"]
+      },
+      "examples": [
+        {
+          "text": "Breakfast is my favourite meal.",
+          "translations": {
+            "uk": "Сніданок — мій улюблений прийом їжі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "boil",
+      "pos": "verb",
+      "translations": {
+        "uk": ["варити", "кип'ятити"]
+      },
+      "examples": [
+        {
+          "text": "Boil the water before you add the pasta.",
+          "translations": {
+            "uk": "Закип'яти воду, перш ніж додати пасту."
+          }
+        }
+      ]
+    },
+    {
+      "term": "fry",
+      "pos": "verb",
+      "translations": {
+        "uk": ["смажити"]
+      },
+      "examples": [
+        {
+          "text": "She likes to fry eggs for breakfast.",
+          "translations": {
+            "uk": "Вона любить смажити яйця на сніданок."
+          }
+        }
+      ]
+    },
+    {
+      "term": "bake",
+      "pos": "verb",
+      "translations": {
+        "uk": ["пекти"]
+      },
+      "examples": [
+        {
+          "text": "We bake bread every Sunday.",
+          "translations": {
+            "uk": "Ми печемо хліб щонеділі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "ingredient",
+      "pos": "noun",
+      "translations": {
+        "uk": ["інгредієнт"]
+      },
+      "examples": [
+        {
+          "text": "Milk is the main ingredient.",
+          "translations": {
+            "uk": "Молоко — головний інгредієнт."
+          }
+        }
+      ]
+    },
+    {
+      "term": "spicy",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["гострий", "пряний"]
+      },
+      "examples": [
+        {
+          "text": "This soup is too spicy for me.",
+          "translations": {
+            "uk": "Цей суп надто гострий для мене."
+          }
+        }
+      ]
+    },
+    {
+      "term": "sweet",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["солодкий"]
+      },
+      "examples": [
+        {
+          "text": "The cake is very sweet.",
+          "translations": {
+            "uk": "Торт дуже солодкий."
+          }
+        }
+      ]
+    },
+    {
+      "term": "sour",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["кислий"]
+      },
+      "examples": [
+        {
+          "text": "Lemons are sour.",
+          "translations": {
+            "uk": "Лимони кислі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "flour",
+      "pos": "noun",
+      "translations": {
+        "uk": ["борошно"]
+      },
+      "examples": [
+        {
+          "text": "You need two cups of flour.",
+          "translations": {
+            "uk": "Тобі потрібно дві склянки борошна."
+          }
+        }
+      ]
+    },
+    {
+      "term": "knife",
+      "pos": "noun",
+      "translations": {
+        "uk": ["ніж"]
+      },
+      "examples": [
+        {
+          "text": "Cut the bread with a sharp knife.",
+          "translations": {
+            "uk": "Наріж хліб гострим ножем."
+          }
+        }
+      ]
+    },
+    {
+      "term": "menu",
+      "pos": "noun",
+      "translations": {
+        "uk": ["меню"]
+      },
+      "examples": [
+        {
+          "text": "Can I see the menu, please?",
+          "translations": {
+            "uk": "Можна подивитися меню?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "waiter",
+      "pos": "noun",
+      "translations": {
+        "uk": ["офіціант"]
+      },
+      "examples": [
+        {
+          "text": "The waiter brought our drinks.",
+          "translations": {
+            "uk": "Офіціант приніс наші напої."
+          }
+        }
+      ]
+    },
+    {
+      "term": "tasty",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["смачний"]
+      },
+      "examples": [
+        {
+          "text": "The pizza was really tasty.",
+          "translations": {
+            "uk": "Піца була дуже смачна."
+          }
+        }
+      ]
+    },
+    {
+      "term": "dessert",
+      "pos": "noun",
+      "translations": {
+        "uk": ["десерт"]
+      },
+      "examples": [
+        {
+          "text": "What would you like for dessert?",
+          "translations": {
+            "uk": "Що бажаєте на десерт?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "vegetarian",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["вегетаріанський"]
+      },
+      "examples": [
+        {
+          "text": "Do you have a vegetarian option?",
+          "translations": {
+            "uk": "У вас є вегетаріанський варіант?"
+          }
+        }
+      ]
+    }
+  ]
+}

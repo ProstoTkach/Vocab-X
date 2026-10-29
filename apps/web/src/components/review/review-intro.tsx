@@ -6,18 +6,22 @@ import {
   ArrowRight,
   Keyboard,
   Languages,
+  ListChecks,
+  Mic,
   RefreshCw,
   Volume2,
   type LucideIcon,
 } from 'lucide-react';
+import type { StudyMode } from '@vocabx/core';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cx } from '@/lib/cx';
 
-/** Tip ids stored in AppSettings.tipsSeen once shown: flash cards and the four-choice test. */
+/** Tip ids stored in AppSettings.tipsSeen once shown: flash cards, the test, the sentences. */
 export const REVIEW_INTRO = 'review-intro';
 export const QUIZ_INTRO = 'review-intro-quiz';
+export const SENTENCE_INTRO = 'review-intro-sentences';
 
 interface Step {
   key: 'introRemembered' | 'introForgot' | 'introFlip';
@@ -25,17 +29,31 @@ interface Step {
   tone: string;
 }
 
-/** The four levels of the test, easiest first. */
-const QUIZ_LEVELS = [
-  { key: 'translation', icon: Languages },
-  { key: 'word', icon: ArrowLeftRight },
-  { key: 'audio', icon: Volume2 },
-  { key: 'type', icon: Keyboard },
-] as const;
+/** The levels of the test and of the sentences, easiest first. */
+const LEVELS = {
+  quiz: [
+    { key: 'translation', icon: Languages },
+    { key: 'word', icon: ArrowLeftRight },
+    { key: 'audio', icon: Volume2 },
+  ],
+  sentences: [
+    { key: 'pick', icon: ListChecks },
+    { key: 'say', icon: Mic },
+    { key: 'type', icon: Keyboard },
+  ],
+} as const;
 
-/** The first visit to the four-choice test: how to answer and what the four levels are. */
-function QuizIntro({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const t = useTranslations('review.quizIntro');
+/** The first visit to the test or the sentences: how to answer and what the levels are. */
+function LevelsIntro({
+  mode,
+  open,
+  onClose,
+}: {
+  mode: 'quiz' | 'sentences';
+  open: boolean;
+  onClose: () => void;
+}) {
+  const t = useTranslations(mode === 'quiz' ? 'review.quizIntro' : 'review.sentenceIntro');
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
@@ -48,7 +66,7 @@ function QuizIntro({ open, onClose }: { open: boolean; onClose: () => void }) {
         }
       >
         <ol className="flex flex-col gap-2">
-          {QUIZ_LEVELS.map(({ key, icon: Icon }, i) => (
+          {LEVELS[mode].map(({ key, icon: Icon }, i) => (
             <li key={key} className="flex items-center gap-3 rounded-control bg-surface-2 p-3">
               <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/15 text-accent">
                 <Icon aria-hidden className="size-5" />
@@ -74,18 +92,18 @@ export function ReviewIntro({
   open,
   mirrored,
   rtl,
-  quiz = false,
+  mode = 'cards',
   onClose,
 }: {
   open: boolean;
   mirrored: boolean;
   rtl: boolean;
-  /** The four-choice test instead of flash cards: its own explanation. */
-  quiz?: boolean;
+  /** The test and the sentences explain their levels instead of the swipes. */
+  mode?: StudyMode;
   onClose: () => void;
 }) {
   const t = useTranslations('review');
-  if (quiz) return <QuizIntro open={open} onClose={onClose} />;
+  if (mode !== 'cards') return <LevelsIntro mode={mode} open={open} onClose={onClose} />;
   // "Remembered" is toward the inline end in the default layout.
   const rememberedRight = mirrored === rtl;
   const steps: Step[] = [

@@ -6,7 +6,7 @@ import { letterHint, quizChoices } from './quiz';
 import { seededRng } from './rng';
 import type { CardState } from './scheduler';
 import { DAY_MS as DAY } from './time';
-import { quizFormatForLevel, type ExerciseFormat } from './types';
+import { quizFormatForLevel, sentenceFormatForLevel, type ExerciseFormat } from './types';
 
 const word = (id: string, term: string, uk: string[], pos: Word['pos'] = 'noun'): Word => ({
   id,
@@ -106,23 +106,23 @@ describe('levels of the four-choice test', () => {
   const answer = (c: CardState, format: ExerciseFormat, grade: 1 | 3 = 3) =>
     applyEvent(c, { id: 'e', grade, at: 10 * DAY, retention: 0.9, format }, p).card;
 
-  test('formats: word → translation, translation → word, heard word, typing', () => {
+  test('formats: word → translation, translation → word, heard word', () => {
     expect(([1, 2, 3, 4] as const).map(quizFormatForLevel)).toEqual([
       'MCQ_TR',
       'MCQ_WORD',
       'MCQ_AUD',
-      'TYPE',
+      'MCQ_AUD',
     ]);
   });
 
-  test('a test answer at level 3 leads to level 4; the card mode starts over instead', () => {
-    expect(answer(card(3), 'MCQ_AUD').level).toBe(4);
+  test('after level 3 the levels start over, as in the card mode', () => {
+    expect(answer(card(3), 'MCQ_AUD').level).toBe(1);
     expect(answer(card(3), 'PROD').level).toBe(1);
   });
 
-  test('after level 4 the levels start over; a mistake there goes one down', () => {
+  test('a card left at the former typing level 4 starts over; a mistake there goes one down', () => {
     expect(answer(card(4), 'TYPE').level).toBe(1);
-    expect(answer(card(4), 'MCQ_TR', 1).level).toBe(3);
+    expect(answer(card(4), 'MCQ_TR', 1).level).toBe(2);
   });
 
   test('a level-4 card in the card mode is treated as its last level', () => {
@@ -142,6 +142,35 @@ describe('levels of the four-choice test', () => {
     expect(choice).toBeGreaterThan(start.stability);
     expect(choice).toBeLessThan(typing);
     expect(typing).toBeLessThan(cards);
+  });
+});
+
+describe('levels of the sentences', () => {
+  const card = (level: CardState['level']): CardState => ({
+    stability: 10,
+    difficulty: 4,
+    lastReviewAt: 0,
+    level,
+    levelStreak: 1,
+    lapses: 0,
+    reps: 9,
+  });
+  const answer = (c: CardState, format: ExerciseFormat, grade: 1 | 3 = 3) =>
+    applyEvent(c, { id: 'e', grade, at: 10 * DAY, retention: 0.9, format }, p).card;
+
+  test('formats: pick the word, say it, type it', () => {
+    expect(([1, 2, 3] as const).map(sentenceFormatForLevel)).toEqual([
+      'SENT_PICK',
+      'SENT_SAY',
+      'SENT_TYPE',
+    ]);
+  });
+
+  test('a right answer moves on, a mistake keeps the level', () => {
+    expect(answer(card(1), 'SENT_PICK').level).toBe(2);
+    expect(answer(card(2), 'SENT_SAY', 1).level).toBe(2);
+    expect(answer(card(3), 'SENT_TYPE').level).toBe(1);
+    expect(answer(card(4), 'SENT_TYPE', 1).level).toBe(3);
   });
 });
 

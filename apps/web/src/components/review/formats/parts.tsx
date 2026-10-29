@@ -4,7 +4,7 @@
 import type { Example, LangCode, StudyCard, Word } from '@vocabx/core';
 import { Volume2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { HighlightedText } from '@/components/words/highlighted-text';
 import { track } from '@/lib/analytics';
@@ -16,16 +16,35 @@ export const acceptedAnswers = (card: StudyCard) => [
   ...new Set([card.word.term, card.word.lemma, ...(card.word.variants ?? [])]),
 ];
 
-export function Term({ word, size = 'xl' }: { word: Word; size?: 'xl' | 'lg' }) {
+/**
+ * On phones, how much smaller a word of this length is drawn when it has to fit on one line
+ * (the four-choice test, where the listen button takes room at its side).
+ */
+export function phoneFit(term: string): number {
+  const n = term.length;
+  return n <= 8 ? 1 : n <= 11 ? 0.85 : n <= 14 ? 0.72 : n <= 18 ? 0.6 : 0.5;
+}
+
+export function Term({
+  word,
+  size = 'xl',
+  fit = false,
+}: {
+  word: Word;
+  size?: 'xl' | 'lg';
+  /** Phones: a long word shrinks to stay on one line. */
+  fit?: boolean;
+}) {
   return (
     <p
       lang={word.lang}
+      style={fit ? ({ '--fit': phoneFit(word.term) } as CSSProperties) : undefined}
       className={cx(
         'font-display font-bold break-words text-balance',
         // Smaller on phones, so a long word still fits on one line.
         size === 'xl'
-          ? 'text-[calc(1.75rem*var(--card-scale,1))] sm:text-[calc(2.5rem*var(--card-scale,1))]'
-          : 'text-[calc(1.375rem*var(--card-scale,1))] sm:text-[calc(1.75rem*var(--card-scale,1))]',
+          ? 'text-[calc(1.75rem*var(--card-scale,1)*var(--fit,1))] sm:text-[calc(2.5rem*var(--card-scale,1))]'
+          : 'text-[calc(1.375rem*var(--card-scale,1)*var(--fit,1))] sm:text-[calc(1.75rem*var(--card-scale,1))]',
       )}
     >
       {word.term}
@@ -68,12 +87,17 @@ export function Translations({
 export function SpokenTerm({
   word,
   size,
+  fit = false,
   speechLang,
   speech,
-}: Pick<FormatProps, 'speechLang' | 'speech'> & { word: Word; size?: 'xl' | 'lg' }) {
+}: Pick<FormatProps, 'speechLang' | 'speech'> & {
+  word: Word;
+  size?: 'xl' | 'lg';
+  fit?: boolean;
+}) {
   return (
     <div className="relative max-w-full px-12">
-      <Term word={word} {...(size ? { size } : {})} />
+      <Term word={word} fit={fit} {...(size ? { size } : {})} />
       <div className="absolute end-0 top-1/2 -translate-y-1/2">
         <SpeakButton text={word.term} speechLang={speechLang} speech={speech} />
       </div>

@@ -9,7 +9,8 @@
     "sync-media": "node scripts/sync-media.mjs",
     "start": "next start",
     "typecheck": "tsc --noEmit -p .",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "e2e:changed": "node scripts/e2e-changed.mjs"
   },
   "dependencies": {
     "@vocabx/content": "workspace:*",

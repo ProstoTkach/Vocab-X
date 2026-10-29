@@ -28,33 +28,43 @@ function run(answers: boolean[], levels = LEVELS) {
 }
 
 describe('placement test', () => {
-  test('four words per level, easiest first', () => {
-    const { s, asked } = run(Array<boolean>(8).fill(true));
-    expect(asked).toEqual(['A1-0', 'A1-1', 'A1-2', 'A1-3', 'A2-0', 'A2-1', 'A2-2', 'A2-3']);
-    expect(placementWord(s, LEVELS)).toBe('B1-0');
+  test('three words at A1 and one more at each level up, easiest first', () => {
+    const { s, asked } = run(Array<boolean>(12).fill(true));
+    expect(asked).toEqual([
+      ...['A1-0', 'A1-1', 'A1-2'],
+      ...['A2-0', 'A2-1', 'A2-2', 'A2-3'],
+      ...['B1-0', 'B1-1', 'B1-2', 'B1-3', 'B1-4'],
+    ]);
+    expect(placementWord(s, LEVELS)).toBe('B2-0');
+    expect(s.planned).toBe(6);
+    expect(s.seen).toEqual(asked);
   });
 
   test('a word not known adds three more of the same level', () => {
-    const { s, asked } = run([true, false, true, true, true, true, true]);
+    const { s, asked } = run([true, false, true, true, true, true]);
     expect(asked.every((w) => w.startsWith('A1'))).toBe(true);
-    expect(asked).toHaveLength(7);
+    expect(asked).toHaveLength(6);
     expect(placementWord(s, LEVELS)).toBe('A2-0');
     expect(s.result).toBeNull();
   });
 
   test('a second mistake in a level ends the test there', () => {
-    const { s } = run([...Array<boolean>(8).fill(true), true, false, false]);
+    const { s } = run([...Array<boolean>(7).fill(true), true, false, false]);
     expect(s.result).toBe(2); // B1
     expect(placementWord(s, LEVELS)).toBeNull();
     // Known words are remembered, the ones not known are not.
-    expect(s.known).toHaveLength(9);
+    expect(s.known).toHaveLength(8);
     expect(s.known).not.toContain('B1-1');
   });
 
   test('mistakes do not carry over between levels', () => {
-    // One mistake in A1 (7 words), one in A2 (7 words): both levels are passed.
-    const once = [false, ...Array<boolean>(6).fill(true)];
-    const { s } = run([...once, ...once]);
+    // One mistake in A1 (6 words), one in A2 (7 words): both levels are passed.
+    const { s } = run([
+      false,
+      ...Array<boolean>(5).fill(true),
+      false,
+      ...Array<boolean>(6).fill(true),
+    ]);
     expect(s.result).toBeNull();
     expect(s.level).toBe(2);
   });
@@ -66,8 +76,8 @@ describe('placement test', () => {
 
   test('a small level runs out of extra words without breaking', () => {
     const levels = [level('A1', 5), level('A2')];
-    const { s, asked } = run([false, true, true, true, true, true], levels);
-    expect(asked.slice(0, 5)).toEqual(['A1-0', 'A1-1', 'A1-2', 'A1-3', 'A1-4']);
+    const { s, asked } = run([false, true, true, true, true], levels);
+    expect(asked).toEqual(['A1-0', 'A1-1', 'A1-2', 'A1-3', 'A1-4']);
     expect(s.level).toBe(1);
   });
 });

@@ -4,6 +4,7 @@ import {
   addWords,
   addWordsFromBuiltin,
   builtinPickState,
+  finishBuiltinPick,
   isPickOnlyCopy,
   memoryOrder,
   skipBuiltinWords,
@@ -247,6 +248,25 @@ describe('deck management', () => {
       added: 2,
       skipped: B1.wordIds.length - 2,
       inProgress: false,
+    });
+  });
+
+  test('a deck looked through to the end keeps only its numbers', async () => {
+    const [a, b] = B1.wordIds;
+    await addWordsFromBuiltin(repo, B1, [a!, b!], 'uk', ctx);
+    // Not every word seen yet: nothing is summed up.
+    expect((await finishBuiltinPick(repo, B1, ctx))?.pickSummary).toBeUndefined();
+    await skipBuiltinWords(repo, B1, B1.wordIds, 'uk', ctx);
+    const copy = await finishBuiltinPick(repo, B1, ctx);
+    expect(copy?.pickSummary).toEqual({ added: 2, skipped: B1.wordIds.length - 2, doneAt: NOW });
+    // A word moved to the learned words leaves the copy, yet the deck stays finished.
+    await markWordLearned(repo, { id: a!, lang: 'en' }, 'Learned', ctx);
+    const own = (await repo.decks.list()).filter((d) => d.origin === 'own');
+    expect(builtinPickState(B1, own)).toMatchObject({
+      added: 2,
+      skipped: B1.wordIds.length - 2,
+      inProgress: false,
+      done: true,
     });
   });
 

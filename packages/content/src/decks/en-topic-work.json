@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-work",
+  "lang": "en",
+  "cefr": "B1",
+  "topic": "work",
+  "title": "Work and the office",
+  "titleI18n": {
+    "uk": "Робота та офіс",
+    "en": "Work and the office"
+  },
+  "descriptionI18n": {
+    "uk": "Колеги, наради, дедлайни й зарплата — повсякденна мова роботи.",
+    "en": "Colleagues, meetings, deadlines and pay — the everyday language of work."
+  },
+  "words": [
+    {
+      "term": "colleague",
+      "pos": "noun",
+      "translations": {
+        "uk": ["колега"]
+      },
+      "examples": [
+        {
+          "text": "My colleague helped me with the slides.",
+          "translations": {
+            "uk": "Колега допоміг мені зі слайдами."
+          }
+        }
+      ]
+    },
+    {
+      "term": "deadline",
+      "pos": "noun",
+      "translations": {
+        "uk": ["дедлайн", "кінцевий термін"]
+      },
+      "examples": [
+        {
+          "text": "The deadline is on Friday.",
+          "translations": {
+            "uk": "Дедлайн — у п'ятницю."
+          }
+        }
+      ]
+    },
+    {
+      "term": "meeting",
+      "pos": "noun",
+      "translations": {
+        "uk": ["нарада", "зустріч"]
+      },
+      "examples": [
+        {
+          "text": "We have a meeting at ten.",
+          "translations": {
+            "uk": "У нас нарада о десятій."
+          }
+        }
+      ]
+    },
+    {
+      "term": "salary",
+      "pos": "noun",
+      "translations": {
+        "uk": ["зарплата"]
+      },
+      "examples": [
+        {
+          "text": "She asked for a higher salary.",
+          "translations": {
+            "uk": "Вона попросила вищу зарплату."
+          }
+        }
+      ]
+    },
+    {
+      "term": "manager",
+      "pos": "noun",
+      "translations": {
+        "uk": ["менеджер", "керівник"]
+      },
+      "examples": [
+        {
+          "text": "Talk to your manager about it.",
+          "translations": {
+            "uk": "Поговори про це зі своїм керівником."
+          }
+        }
+      ]
+    },
+    {
+      "term": "task",
+      "pos": "noun",
+      "translations": {
+        "uk": ["завдання"]
+      },
+      "examples": [
+        {
+          "text": "This task will take an hour.",
+          "translations": {
+            "uk": "Це завдання займе годину."
+          }
+        }
+      ]
+    },
+    {
+      "term": "schedule",
+      "pos": "noun",
+      "translations": {
+        "uk": ["розклад", "графік"]
+      },
+      "examples": [
+        {
+          "text": "My schedule is full this week.",
+          "translations": {
+            "uk": "Цього тижня мій графік заповнений."
+          }
+        }
+      ]
+    },
+    {
+      "term": "employee",
+      "pos": "noun",
+      "translations": {
+        "uk": ["працівник"]
+      },
+      "examples": [
+        {
+          "text": "Every employee gets a free lunch.",
+          "translations": {
+            "uk": "Кожен працівник отримує безкоштовний обід."
+          }
+        }
+      ]
+    },
+    {
+      "term": "remote",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["дистанційний", "віддалений"]
+      },
+      "examples": [
+        {
+          "text": "Many people now have remote jobs.",
+          "translations": {
+            "uk": "Зараз багато людей працюють дистанційно."
+          }
+        }
+      ]
+    },
+    {
+      "term": "promotion",
+      "pos": "noun",
+      "translations": {
+        "uk": ["підвищення (на посаді)"]
+      },
+      "examples": [
+        {
+          "text": "He got a promotion last month.",
+          "translations": {
+            "uk": "Минулого місяця його підвищили."
+          }
+        }
+      ]
+    },
+    {
+      "term": "overtime",
+      "pos": "noun",
+      "translations": {
+        "uk": ["понаднормова робота"]
+      },
+      "examples": [
+        {
+          "text": "We worked overtime to finish on time.",
+          "translations": {
+            "uk": "Ми працювали понаднормово, щоб устигнути."
+          }
+        }
+      ]
+    },
+    {
+      "term": "report",
+      "pos": "noun",
+      "translations": {
+        "uk": ["звіт"]
+      },
+      "examples": [
+        {
+          "text": "Please send me the report.",
+          "translations": {
+            "uk": "Надішли мені, будь ласка, звіт."
+          }
+        }
+      ]
+    },
+    {
+      "term": "shift",
+      "pos": "noun",
+      "translations": {
+        "uk": ["зміна"]
+      },
+      "examples": [
+        {
+          "text": "The night shift starts at ten.",
+          "translations": {
+            "uk": "Нічна зміна починається о десятій."
+          }
+        }
+      ]
+    },
+    {
+      "term": "department",
+      "pos": "noun",
+      "translations": {
+        "uk": ["відділ"]
+      },
+      "examples": [
+        {
+          "text": "She works in the sales department.",
+          "translations": {
+            "uk": "Вона працює у відділі продажів."
+          }
+        }
+      ]
+    },
+    {
+      "term": "resign",
+      "pos": "verb",
+      "translations": {
+        "uk": ["звільнятися"]
+      },
+      "examples": [
+        {
+          "text": "He decided to resign after five years.",
+          "translations": {
+            "uk": "Він вирішив звільнитися через п'ять років."
+          }
+        }
+      ]
+    },
+    {
+      "term": "workload",
+      "pos": "noun",
+      "translations": {
+        "uk": ["навантаження"]
+      },
+      "examples": [
+        {
+          "text": "My workload is too heavy.",
+          "translations": {
+            "uk": "У мене надто велике навантаження."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -200,7 +200,9 @@ export function reviewGraded(
   // start over from the first, so a well-known word keeps being met in every format.
   // A card may come from the other mode with a level above this one's last.
   const maxLevel = p.maxLevel ?? MAX_LEVEL;
-  if (!recalled && c.level > 1) {
+  if (!recalled && p.mistakeKeepsLevel) {
+    c.level = Math.min(c.level, maxLevel) as Level;
+  } else if (!recalled && c.level > 1) {
     c.level = (Math.min(c.level, maxLevel) - 1) as Level;
   } else if (recalled && c.levelStreak >= p.k0) {
     if (c.level >= maxLevel) {

@@ -27,7 +27,10 @@
     "MCQ_TR": "Pick the translation",
     "MCQ_WORD": "Pick the word",
     "MCQ_AUD": "Listen and pick",
-    "TYPE": "Type the word"
+    "TYPE": "Type the word",
+    "SENT_PICK": "Word in a sentence",
+    "SENT_SAY": "Say the word",
+    "SENT_TYPE": "Type it into the sentence"
   },
   "translateTo": "{lang, select, en {How do you say it in English?} uk {How do you say it in Ukrainian?} de {How do you say it in German?} es {How do you say it in Spanish?} other {How do you say it in this language?}}",
   "listen": "Listen",
@@ -104,19 +107,50 @@
     "dontKnow": "I don't know",
     "next": "Next",
     "letters": "Show a hint",
-    "hintLabel": "Hint: {hint}"
+    "hintLabel": "Hint: {hint}",
+    "wrongCount": "Wrong",
+    "rightCount": "Right",
+    "hotkeyPick": "Pick an option"
   },
   "quizIntro": {
     "title": "How the test works",
-    "text": "Pick the right answer out of four. Every word goes through four levels, from the easiest to the hardest:",
+    "text": "Pick the right answer out of four. Every word goes through three levels, from the easiest to the hardest:",
     "level": "Level {n}.",
     "levels": {
       "translation": "You see the word — pick its translation.",
       "word": "You see the translation — pick the word.",
-      "audio": "You hear the word — pick its translation. The word can be shown.",
-      "type": "You see the translation — type the word yourself. A letters hint is there."
+      "audio": "You hear the word — pick its translation. The word can be shown."
     },
-    "progress": "A right answer moves the word a level up, a mistake a level down. Don't know? Tap \"I don't know\" and we show the answer.",
+    "progress": "A right answer moves the word a level up, a mistake moves it down.",
     "start": "Got it, let's start"
+  },
+  "sentence": {
+    "prompt": {
+      "SENT_PICK": "Pick the word missing from the sentence",
+      "SENT_SAY": "Say the missing word aloud",
+      "SENT_TYPE": "Type the missing word"
+    },
+    "gap": "missing word",
+    "say": "Tap and say the word",
+    "stop": "Stop",
+    "listening": "Listening…",
+    "noSpeech": "Nothing heard. Try again closer to the microphone.",
+    "failed": "Could not recognize it. Try again.",
+    "noMic": "This browser cannot listen — type the word.",
+    "micDenied": "The microphone is not allowed — type the word.",
+    "typeInstead": "Type it instead",
+    "heard": "Heard: “{heard}”"
+  },
+  "sentenceIntro": {
+    "title": "How the sentences work",
+    "text": "A word is missing from the sentence, and its translation is below. Every word goes through three levels:",
+    "level": "Level {n}.",
+    "levels": {
+      "pick": "Pick the missing word out of four.",
+      "say": "Say the word aloud, and it goes into its place. Without a microphone you can type it.",
+      "type": "Type the word yourself."
+    },
+    "progress": "A right answer moves the word a level up. After a mistake the level stays, but the sentence changes. If you cannot say or write it, press “I don’t know”.",
+    "start": "Got it, let’s start"
   }
 }

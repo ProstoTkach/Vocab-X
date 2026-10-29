@@ -2,6 +2,7 @@
 
 import {
   addWordsFromBuiltin,
+  finishBuiltinPick,
   skipBuiltinWords,
   type Deck,
   type Id,
@@ -13,6 +14,7 @@ import { CircleCheck, Plus, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { CardStage, type SwipeAction } from '@/components/review/card-stage';
+import { Term } from '@/components/review/formats/parts';
 import type { PhysicalDir } from '@/components/review/swipe';
 import { Button, buttonClass } from '@/components/ui/button';
 import { ProgressBar } from '@/components/ui/progress-bar';
@@ -21,6 +23,7 @@ import { HighlightedText } from '@/components/words/highlighted-text';
 import { Link } from '@/i18n/navigation';
 import { localeInfo } from '@/i18n/locales';
 import { useClock } from '@/lib/clock';
+import { useCloseOnBack } from '@/lib/close-on-back';
 import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
 import { track } from '@/lib/analytics';
@@ -86,7 +89,11 @@ export function WordPicker({
       skipped_n: seen - added,
       finished: seen >= words.length,
     });
-    enqueue(async () => setSaved(added));
+    // Every word of the deck seen: from now on only the numbers are kept.
+    enqueue(async () => {
+      await finishBuiltinPick(repos, deck, { now: clock.now(), newId });
+      setSaved(added);
+    });
   };
 
   const decide = (add: boolean, dir: PhysicalDir) => {
@@ -106,6 +113,9 @@ export function WordPicker({
     setIndex(index + 1);
     if (index + 1 >= words.length) finish(nextAdded, index + 1);
   };
+
+  // The phone's "Back" leaves picking for the deck, once the saves in flight are done.
+  useCloseOnBack(true, () => void queue.current.then(onClose));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -197,9 +207,7 @@ export function WordPicker({
               testId="picker-card"
             >
               <div className="flex flex-col items-center gap-3 text-center">
-                <p lang={word.lang} className="font-display text-4xl font-bold break-words">
-                  {word.term}
-                </p>
+                <Term word={word} fit />
                 <p lang={nativeLang} className="text-xl font-semibold">
                   {(word.translations[nativeLang] ?? []).join(', ')}
                 </p>

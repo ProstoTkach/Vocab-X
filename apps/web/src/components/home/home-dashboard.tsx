@@ -319,14 +319,17 @@ function EnableGamification() {
         track('gamification_enable_click');
         setMode('max', 'home_button');
       }}
-      className="group flex w-full items-center gap-4 rounded-card border border-accent/25 bg-linear-to-br from-accent/15 to-accent-2/10 p-4 text-start transition-colors motion-fast hover:border-accent/50 hover:shadow-card md:p-5"
+      // Phones: a slim bar (the title alone); the full card from `sm` up.
+      className="group flex w-full items-center gap-3 rounded-card border border-accent/25 bg-linear-to-br from-accent/15 to-accent-2/10 px-3 py-2.5 text-start transition-colors motion-fast hover:border-accent/50 hover:shadow-card sm:gap-4 sm:p-4 md:p-5"
     >
-      <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-brand text-on-accent shadow-glow">
-        <Sparkles aria-hidden className="size-6" />
+      <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-brand text-on-accent shadow-glow sm:size-12">
+        <Sparkles aria-hidden className="size-5 sm:size-6" />
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="font-display text-lg leading-tight font-semibold">{t('enableTitle')}</span>
-        <span className="text-sm text-pretty text-fg-muted">{t('enableText')}</span>
+        <span className="font-display text-base leading-tight font-semibold sm:text-lg">
+          {t('enableTitle')}
+        </span>
+        <span className="text-sm text-pretty text-fg-muted max-sm:hidden">{t('enableText')}</span>
       </span>
       <ChevronRight
         aria-hidden

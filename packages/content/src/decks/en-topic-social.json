@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-social",
+  "lang": "en",
+  "cefr": "B1",
+  "topic": "social",
+  "title": "Social media and the internet",
+  "titleI18n": {
+    "uk": "Соцмережі та інтернет",
+    "en": "Social media and the internet"
+  },
+  "descriptionI18n": {
+    "uk": "Дописи, підписники, тренди й приватність — мова соцмереж.",
+    "en": "Posts, followers, trends and privacy — the language of social media."
+  },
+  "words": [
+    {
+      "term": "post",
+      "pos": "noun",
+      "translations": {
+        "uk": ["допис", "публікація"]
+      },
+      "examples": [
+        {
+          "text": "Her post got a thousand likes.",
+          "translations": {
+            "uk": "Її допис зібрав тисячу вподобань."
+          }
+        }
+      ]
+    },
+    {
+      "term": "follower",
+      "pos": "noun",
+      "translations": {
+        "uk": ["підписник"]
+      },
+      "examples": [
+        {
+          "text": "Every new follower gets a welcome message.",
+          "translations": {
+            "uk": "Кожен новий підписник отримує вітальне повідомлення."
+          }
+        }
+      ]
+    },
+    {
+      "term": "share",
+      "pos": "verb",
+      "translations": {
+        "uk": ["поширювати", "ділитися"]
+      },
+      "examples": [
+        {
+          "text": "Share this video with your friends.",
+          "translations": {
+            "uk": "Поділися цим відео з друзями."
+          }
+        }
+      ]
+    },
+    {
+      "term": "comment",
+      "pos": "noun",
+      "translations": {
+        "uk": ["коментар"]
+      },
+      "examples": [
+        {
+          "text": "Leave a comment below.",
+          "translations": {
+            "uk": "Залиш коментар нижче."
+          }
+        }
+      ]
+    },
+    {
+      "term": "profile",
+      "pos": "noun",
+      "translations": {
+        "uk": ["профіль"]
+      },
+      "examples": [
+        {
+          "text": "Update your profile picture.",
+          "translations": {
+            "uk": "Онови фото профілю."
+          }
+        }
+      ]
+    },
+    {
+      "term": "trend",
+      "pos": "noun",
+      "translations": {
+        "uk": ["тренд"]
+      },
+      "examples": [
+        {
+          "text": "This dance is the new trend.",
+          "translations": {
+            "uk": "Цей танець — новий тренд."
+          }
+        }
+      ]
+    },
+    {
+      "term": "viral",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["вірусний"]
+      },
+      "examples": [
+        {
+          "text": "The video went viral.",
+          "translations": {
+            "uk": "Відео стало вірусним."
+          }
+        }
+      ]
+    },
+    {
+      "term": "subscribe",
+      "pos": "verb",
+      "translations": {
+        "uk": ["підписуватися"]
+      },
+      "examples": [
+        {
+          "text": "Subscribe to our channel.",
+          "translations": {
+            "uk": "Підпишіться на наш канал."
+          }
+        }
+      ]
+    },
+    {
+      "term": "privacy",
+      "pos": "noun",
+      "translations": {
+        "uk": ["приватність", "конфіденційність"]
+      },
+      "examples": [
+        {
+          "text": "Think about your privacy online.",
+          "translations": {
+            "uk": "Подбай про свою приватність в інтернеті."
+          }
+        }
+      ]
+    },
+    {
+      "term": "account",
+      "pos": "noun",
+      "translations": {
+        "uk": ["обліковий запис", "акаунт"]
+      },
+      "examples": [
+        {
+          "text": "I deleted my old account.",
+          "translations": {
+            "uk": "Я видалив свій старий акаунт."
+          }
+        }
+      ]
+    },
+    {
+      "term": "notification",
+      "pos": "noun",
+      "translations": {
+        "uk": ["сповіщення"]
+      },
+      "examples": [
+        {
+          "text": "I got a notification about the sale.",
+          "translations": {
+            "uk": "Я отримав сповіщення про розпродаж."
+          }
+        }
+      ]
+    },
+    {
+      "term": "stream",
+      "pos": "verb",
+      "translations": {
+        "uk": ["транслювати"]
+      },
+      "examples": [
+        {
+          "text": "They stream games every evening.",
+          "translations": {
+            "uk": "Вони щовечора транслюють ігри."
+          }
+        }
+      ]
+    },
+    {
+      "term": "influencer",
+      "pos": "noun",
+      "translations": {
+        "uk": ["інфлюенсер", "блогер"]
+      },
+      "examples": [
+        {
+          "text": "She is a fashion influencer.",
+          "translations": {
+            "uk": "Вона модна блогерка."
+          }
+        }
+      ]
+    },
+    {
+      "term": "block",
+      "pos": "verb",
+      "translations": {
+        "uk": ["блокувати"]
+      },
+      "examples": [
+        {
+          "text": "You can block rude users.",
+          "translations": {
+            "uk": "Ти можеш блокувати грубих користувачів."
+          }
+        }
+      ]
+    },
+    {
+      "term": "fake",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["фейковий", "підроблений"]
+      },
+      "examples": [
+        {
+          "text": "That news story is fake.",
+          "translations": {
+            "uk": "Ця новина фейкова."
+          }
+        }
+      ]
+    },
+    {
+      "term": "hashtag",
+      "pos": "noun",
+      "translations": {
+        "uk": ["хештег"]
+      },
+      "examples": [
+        {
+          "text": "Use a hashtag to find the photos.",
+          "translations": {
+            "uk": "Використай хештег, щоб знайти фото."
+          }
+        }
+      ]
+    }
+  ]
+}

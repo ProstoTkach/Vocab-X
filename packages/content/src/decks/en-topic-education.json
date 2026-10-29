@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-education",
+  "lang": "en",
+  "cefr": "B1",
+  "topic": "education",
+  "title": "Study and education",
+  "titleI18n": {
+    "uk": "Навчання та освіта",
+    "en": "Study and education"
+  },
+  "descriptionI18n": {
+    "uk": "Лекції, іспити, оцінки й дипломи — слова для школи та університету.",
+    "en": "Lectures, exams, grades and degrees — words for school and university."
+  },
+  "words": [
+    {
+      "term": "lecture",
+      "pos": "noun",
+      "translations": {
+        "uk": ["лекція"]
+      },
+      "examples": [
+        {
+          "text": "The lecture starts at nine.",
+          "translations": {
+            "uk": "Лекція починається о дев'ятій."
+          }
+        }
+      ]
+    },
+    {
+      "term": "exam",
+      "pos": "noun",
+      "translations": {
+        "uk": ["іспит"]
+      },
+      "examples": [
+        {
+          "text": "The exam lasts two hours.",
+          "translations": {
+            "uk": "Іспит триває дві години."
+          }
+        }
+      ]
+    },
+    {
+      "term": "grade",
+      "pos": "noun",
+      "translations": {
+        "uk": ["оцінка"]
+      },
+      "examples": [
+        {
+          "text": "She got a good grade in maths.",
+          "translations": {
+            "uk": "Вона отримала гарну оцінку з математики."
+          }
+        }
+      ]
+    },
+    {
+      "term": "degree",
+      "pos": "noun",
+      "translations": {
+        "uk": ["ступінь", "диплом"]
+      },
+      "examples": [
+        {
+          "text": "He has a degree in law.",
+          "translations": {
+            "uk": "Він має диплом юриста."
+          }
+        }
+      ]
+    },
+    {
+      "term": "homework",
+      "pos": "noun",
+      "translations": {
+        "uk": ["домашнє завдання"]
+      },
+      "examples": [
+        {
+          "text": "I finished my homework.",
+          "translations": {
+            "uk": "Я закінчив домашнє завдання."
+          }
+        }
+      ]
+    },
+    {
+      "term": "scholarship",
+      "pos": "noun",
+      "translations": {
+        "uk": ["стипендія"]
+      },
+      "examples": [
+        {
+          "text": "She won a scholarship to Oxford.",
+          "translations": {
+            "uk": "Вона виграла стипендію в Оксфорд."
+          }
+        }
+      ]
+    },
+    {
+      "term": "revise",
+      "pos": "verb",
+      "translations": {
+        "uk": ["повторювати (матеріал)"]
+      },
+      "examples": [
+        {
+          "text": "I need to revise for the test.",
+          "translations": {
+            "uk": "Мені треба повторити матеріал до тесту."
+          }
+        }
+      ]
+    },
+    {
+      "term": "essay",
+      "pos": "noun",
+      "translations": {
+        "uk": ["есе", "твір"]
+      },
+      "examples": [
+        {
+          "text": "Write an essay about your city.",
+          "translations": {
+            "uk": "Напиши есе про своє місто."
+          }
+        }
+      ]
+    },
+    {
+      "term": "library",
+      "pos": "noun",
+      "translations": {
+        "uk": ["бібліотека"]
+      },
+      "examples": [
+        {
+          "text": "We study in the library.",
+          "translations": {
+            "uk": "Ми навчаємося в бібліотеці."
+          }
+        }
+      ]
+    },
+    {
+      "term": "semester",
+      "pos": "noun",
+      "translations": {
+        "uk": ["семестр"]
+      },
+      "examples": [
+        {
+          "text": "The semester ends in June.",
+          "translations": {
+            "uk": "Семестр закінчується в червні."
+          }
+        }
+      ]
+    },
+    {
+      "term": "graduate",
+      "pos": "verb",
+      "translations": {
+        "uk": ["закінчувати (навчання)"]
+      },
+      "examples": [
+        {
+          "text": "She will graduate next year.",
+          "translations": {
+            "uk": "Вона закінчить навчання наступного року."
+          }
+        }
+      ]
+    },
+    {
+      "term": "tutor",
+      "pos": "noun",
+      "translations": {
+        "uk": ["репетитор"]
+      },
+      "examples": [
+        {
+          "text": "My tutor helps me with English.",
+          "translations": {
+            "uk": "Репетитор допомагає мені з англійською."
+          }
+        }
+      ]
+    },
+    {
+      "term": "research",
+      "pos": "noun",
+      "translations": {
+        "uk": ["дослідження"]
+      },
+      "examples": [
+        {
+          "text": "The research took three years.",
+          "translations": {
+            "uk": "Дослідження тривало три роки."
+          }
+        }
+      ]
+    },
+    {
+      "term": "cheat",
+      "pos": "verb",
+      "translations": {
+        "uk": ["списувати", "шахраювати"]
+      },
+      "examples": [
+        {
+          "text": "Don't cheat in the exam.",
+          "translations": {
+            "uk": "Не списуй на іспиті."
+          }
+        }
+      ]
+    },
+    {
+      "term": "subject",
+      "pos": "noun",
+      "translations": {
+        "uk": ["предмет"]
+      },
+      "examples": [
+        {
+          "text": "History is my favourite subject.",
+          "translations": {
+            "uk": "Історія — мій улюблений предмет."
+          }
+        }
+      ]
+    },
+    {
+      "term": "curious",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["допитливий"]
+      },
+      "examples": [
+        {
+          "text": "Children are naturally curious.",
+          "translations": {
+            "uk": "Діти від природи допитливі."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
+import { answerLevelTest } from './fixtures';
 
 /**
  * Onboarding with the level test. The learner knows A1 and A2 (4 words each), then in B1
@@ -37,9 +38,7 @@ async function completeOnboarding(page: Page, { knownInB1 }: { knownInB1: number
 
   await expect(page.getByRole('heading', { level: 1, name: 'З чого почнемо?' })).toBeVisible();
   await page.getByRole('button', { name: 'Пройти тест' }).click();
-  const answers = [...Array<boolean>(8 + knownInB1).fill(true), false, false];
-  for (const knows of answers)
-    await page.getByRole('button', { name: knows ? 'Знаю' : 'Не знаю', exact: true }).click();
+  await answerLevelTest(page, [...Array<boolean>(7 + knownInB1).fill(true), false, false]);
   await expect(page.getByRole('heading', { level: 1, name: 'Ваш рівень — B1' })).toBeVisible();
   await page.getByRole('button', { name: 'Почати навчання' }).click();
   await expect(page).toHaveURL(/\/uk$/);
@@ -78,8 +77,7 @@ test('an English speaker can learn Ukrainian', async ({ page }) => {
   await page.getByRole('button', { name: 'Next', exact: true }).click();
   // Ukrainian has one levelled deck: two misses place the learner there with all 30 words.
   await page.getByRole('button', { name: 'Take the test' }).click();
-  for (let i = 0; i < 2; i++)
-    await page.getByRole('button', { name: 'I don’t know', exact: true }).click();
+  await answerLevelTest(page, [false, false], { native: 'en', dontKnow: 'I don’t know' });
   await page.getByRole('button', { name: 'Start learning' }).click();
   await expect(page).toHaveURL(/\/en$/);
   await expect(page.getByText('Learning: Ukrainian')).toBeVisible();
@@ -148,4 +146,34 @@ test('languages without ready-made decks cannot be chosen yet', async ({ page })
     await expect(box).not.toBeChecked();
   }
   await expect(page.getByRole('checkbox', { name: /^Англійська/ })).toBeEnabled();
+});
+
+test('the level test is a four-choice question and can be retaken once with other words', async ({
+  page,
+}) => {
+  await page.goto('/uk/onboarding');
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Далі' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Мови' })).toBeVisible({
+      timeout: 1000,
+    });
+  }).toPass();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.getByRole('button', { name: 'Пройти тест' }).click();
+  const card = page.getByTestId('level-card');
+  // Four translations to pick from, no swiping.
+  await expect(card.getByRole('button')).toHaveCount(4);
+  const first = await card.locator('p[lang]').first().textContent();
+  // A wrong pick shows the right answer, then the next word comes.
+  await answerLevelTest(page, [false, false]);
+  await expect(page.getByRole('heading', { level: 1, name: 'Ваш рівень — A1' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Пройти тест ще раз з іншими словами' }).click();
+  await expect(card.locator('p[lang]').first()).not.toHaveText(first ?? '');
+  // Three A1 words (the A1 level), then two misses at A2.
+  await answerLevelTest(page, [true, true, true, false, false]);
+  await expect(page.getByRole('heading', { level: 1, name: 'Ваш рівень — A2' })).toBeVisible();
+  // Only once.
+  await expect(page.getByRole('button', { name: /Пройти тест ще раз/ })).toHaveCount(0);
 });

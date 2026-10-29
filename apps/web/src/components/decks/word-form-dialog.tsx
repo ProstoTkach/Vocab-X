@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  mergeExamples,
   splitTranslations,
   type LangCode,
   type Word,
@@ -95,10 +96,20 @@ export function WordFormDialog({
       setError(t('required'));
       return;
     }
+    // The example chosen comes first (it is the one cards show); up to four more that hold the
+    // word are kept for the sentence tasks: the word's own others, then the ones found.
+    const chosen = draft.example.trim();
+    const found =
+      lookup.state === 'done' && lookup.term === draft.term.trim() ? lookup.examples : [];
+    const examples = mergeExamples(
+      { lang: wordLang, term: draft.term.trim(), lemma: draft.term.trim() },
+      chosen ? [{ text: chosen }] : [],
+      [...(word?.examples.slice(1) ?? []), ...found.map((text) => ({ text }))],
+    );
     await onSubmit({
       term: draft.term,
       translations: { ...word?.translations, [nativeLang]: translations },
-      examples: draft.example.trim() ? [{ text: draft.example.trim() }] : [],
+      examples,
       ...(word?.variants ? { variants: word.variants } : {}),
     });
     opened.current.saved = true;
@@ -152,6 +163,10 @@ export function WordFormDialog({
               value={draft.term}
               lang={wordLang}
               onChange={(e) => set({ term: e.target.value })}
+              // Words are written in lower case: no capital letter at the start on phones.
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               autoComplete="off"
               maxLength={200}
             />

@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-climate",
+  "lang": "en",
+  "cefr": "B2",
+  "topic": "climate",
+  "title": "Environment and climate",
+  "titleI18n": {
+    "uk": "Довкілля та клімат",
+    "en": "Environment and climate"
+  },
+  "descriptionI18n": {
+    "uk": "Забруднення, викиди, переробка й посухи — щоб говорити про клімат.",
+    "en": "Pollution, emissions, recycling and droughts — to talk about the climate."
+  },
+  "words": [
+    {
+      "term": "pollution",
+      "pos": "noun",
+      "translations": {
+        "uk": ["забруднення"]
+      },
+      "examples": [
+        {
+          "text": "Air pollution is a problem in big cities.",
+          "translations": {
+            "uk": "Забруднення повітря — проблема великих міст."
+          }
+        }
+      ]
+    },
+    {
+      "term": "emission",
+      "pos": "noun",
+      "translations": {
+        "uk": ["викид"]
+      },
+      "examples": [
+        {
+          "text": "The factory cut its carbon emission by half.",
+          "translations": {
+            "uk": "Завод удвічі скоротив викид вуглецю."
+          }
+        }
+      ]
+    },
+    {
+      "term": "renewable",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["відновлюваний"]
+      },
+      "examples": [
+        {
+          "text": "Solar power is a renewable source of energy.",
+          "translations": {
+            "uk": "Сонячна енергія — відновлюване джерело енергії."
+          }
+        }
+      ]
+    },
+    {
+      "term": "recycle",
+      "pos": "verb",
+      "translations": {
+        "uk": ["переробляти"]
+      },
+      "examples": [
+        {
+          "text": "We recycle paper and glass.",
+          "translations": {
+            "uk": "Ми переробляємо папір і скло."
+          }
+        }
+      ]
+    },
+    {
+      "term": "drought",
+      "pos": "noun",
+      "translations": {
+        "uk": ["посуха"]
+      },
+      "examples": [
+        {
+          "text": "The drought destroyed the crops.",
+          "translations": {
+            "uk": "Посуха знищила врожай."
+          }
+        }
+      ]
+    },
+    {
+      "term": "flood",
+      "pos": "noun",
+      "translations": {
+        "uk": ["повінь"]
+      },
+      "examples": [
+        {
+          "text": "The flood damaged many homes.",
+          "translations": {
+            "uk": "Повінь пошкодила багато будинків."
+          }
+        }
+      ]
+    },
+    {
+      "term": "species",
+      "pos": "noun",
+      "translations": {
+        "uk": ["вид (тварин, рослин)"]
+      },
+      "examples": [
+        {
+          "text": "This species is in danger.",
+          "translations": {
+            "uk": "Цей вид під загрозою."
+          }
+        }
+      ]
+    },
+    {
+      "term": "carbon",
+      "pos": "noun",
+      "translations": {
+        "uk": ["вуглець"]
+      },
+      "examples": [
+        {
+          "text": "Trees absorb carbon.",
+          "translations": {
+            "uk": "Дерева поглинають вуглець."
+          }
+        }
+      ]
+    },
+    {
+      "term": "waste",
+      "pos": "noun",
+      "translations": {
+        "uk": ["відходи"]
+      },
+      "examples": [
+        {
+          "text": "Reduce food waste at home.",
+          "translations": {
+            "uk": "Зменшуй харчові відходи вдома."
+          }
+        }
+      ]
+    },
+    {
+      "term": "conservation",
+      "pos": "noun",
+      "translations": {
+        "uk": ["охорона природи", "збереження"]
+      },
+      "examples": [
+        {
+          "text": "Wildlife conservation needs funding.",
+          "translations": {
+            "uk": "Охорона дикої природи потребує фінансування."
+          }
+        }
+      ]
+    },
+    {
+      "term": "deforestation",
+      "pos": "noun",
+      "translations": {
+        "uk": ["вирубка лісів"]
+      },
+      "examples": [
+        {
+          "text": "Deforestation is a serious problem.",
+          "translations": {
+            "uk": "Вирубка лісів — серйозна проблема."
+          }
+        }
+      ]
+    },
+    {
+      "term": "extinction",
+      "pos": "noun",
+      "translations": {
+        "uk": ["вимирання"]
+      },
+      "examples": [
+        {
+          "text": "Many animals face extinction.",
+          "translations": {
+            "uk": "Багатьом тваринам загрожує вимирання."
+          }
+        }
+      ]
+    },
+    {
+      "term": "footprint",
+      "pos": "noun",
+      "translations": {
+        "uk": ["слід (вуглецевий)"]
+      },
+      "examples": [
+        {
+          "text": "Try to reduce your carbon footprint.",
+          "translations": {
+            "uk": "Намагайся зменшити свій вуглецевий слід."
+          }
+        }
+      ]
+    },
+    {
+      "term": "habitat",
+      "pos": "noun",
+      "translations": {
+        "uk": ["середовище існування"]
+      },
+      "examples": [
+        {
+          "text": "The forest is their natural habitat.",
+          "translations": {
+            "uk": "Ліс — їхнє природне середовище існування."
+          }
+        }
+      ]
+    },
+    {
+      "term": "disposable",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["одноразовий"]
+      },
+      "examples": [
+        {
+          "text": "Avoid disposable cups.",
+          "translations": {
+            "uk": "Уникай одноразових стаканчиків."
+          }
+        }
+      ]
+    },
+    {
+      "term": "heatwave",
+      "pos": "noun",
+      "translations": {
+        "uk": ["хвиля спеки"]
+      },
+      "examples": [
+        {
+          "text": "Europe had a long heatwave.",
+          "translations": {
+            "uk": "Європа пережила довгу хвилю спеки."
+          }
+        }
+      ]
+    }
+  ]
+}

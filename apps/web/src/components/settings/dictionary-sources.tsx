@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 
 /** The free sources behind word suggestions (names are proper nouns, not translated). */
 const SOURCES = [
-  { name: 'MyMemory', role: 'mymemory', url: 'https://mymemory.translated.net/' },
+  { name: 'Google Translate', role: 'googleTranslate', url: 'https://translate.google.com/' },
   { name: 'Free Dictionary', role: 'freeDictionary', url: 'https://dictionaryapi.dev/' },
   { name: 'Wiktionary', role: 'wiktionary', url: 'https://en.wiktionary.org/' },
   { name: 'Tatoeba', role: 'tatoeba', url: 'https://tatoeba.org/' },

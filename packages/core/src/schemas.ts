@@ -55,6 +55,13 @@ export const deckSchema = z.object({
   origin: z.enum(['own', 'builtin']),
   builtinId: id.optional(),
   skippedIds: z.array(id).max(100_000).optional(),
+  pickSummary: z
+    .object({
+      added: z.number().int().min(0).max(100_000),
+      skipped: z.number().int().min(0).max(100_000),
+      doneAt: time,
+    })
+    .optional(),
   personal: z.boolean().optional(),
   learned: z.boolean().optional(),
   archived: z.boolean(),
@@ -95,6 +102,7 @@ export const settingsPatchSchema = z.object({
   timeOffsetMs: z.number().optional(),
   devTools: z.boolean().optional(),
   quizMode: z.boolean().optional(),
+  sentenceMode: z.boolean().optional(),
   tipsSeen: z.array(z.string().max(64)).max(100).optional(),
   levelSeen: z.number().int().min(1).optional(),
   xpBonus: z.number().int().nonnegative().optional(),

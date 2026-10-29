@@ -50,12 +50,25 @@ export async function markKnown(
 export interface PlacementLevel {
   cefr: string;
   deckId: Id;
+  /** Words asked, in order: the first ones, then the extra ones a mistake brings. */
   wordIds: readonly Id[];
+  /** Words the wrong options are taken from (the rest of the level's deck). */
+  poolIds?: readonly Id[];
 }
 
-/** Words asked per level; a wrong answer adds PLACEMENT_EXTRA more from the same level. */
-export const PLACEMENT_FIRST = 4;
+/**
+ * Words asked first in a level: three at A1 and one more at each level up (A2 4, B1 5, B2 6…),
+ * so a harder level takes more proof. A wrong answer adds PLACEMENT_EXTRA more from the level.
+ */
+export const PLACEMENT_FIRST = 3;
 export const PLACEMENT_EXTRA = 3;
+const CEFR_ORDER = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+
+/** How many words a level starts with (never more than it has). */
+export function placementFirst(level: PlacementLevel, index: number): number {
+  const rank = CEFR_ORDER.indexOf(level.cefr.toUpperCase());
+  return Math.min(PLACEMENT_FIRST + (rank >= 0 ? rank : index), level.wordIds.length);
+}
 /** The second "don't know" within a level ends the test at that level. */
 const PLACEMENT_MAX_ERRORS = 2;
 
@@ -68,6 +81,8 @@ export interface PlacementState {
   planned: number;
   errors: number;
   known: Id[];
+  /** Every word asked, in order (a retake starts with other words). */
+  seen: Id[];
   /** Index of the level to study, once the test is over. */
   result: number | null;
 }
@@ -76,9 +91,10 @@ export function startPlacement(levels: readonly PlacementLevel[]): PlacementStat
   return {
     level: 0,
     asked: 0,
-    planned: Math.min(PLACEMENT_FIRST, levels[0]?.wordIds.length ?? 0),
+    planned: levels[0] ? placementFirst(levels[0], 0) : 0,
     errors: 0,
     known: [],
+    seen: [],
     result: levels.length === 0 ? 0 : null,
   };
 }
@@ -104,20 +120,22 @@ export function answerPlacement(
   const level = levels[s.level]!;
   const errors = s.errors + (knows ? 0 : 1);
   const known = knows ? [...s.known, word] : s.known;
+  const seen = [...s.seen, word];
   if (errors >= PLACEMENT_MAX_ERRORS)
-    return { ...s, errors, known, asked: s.asked + 1, result: s.level };
+    return { ...s, errors, known, seen, asked: s.asked + 1, result: s.level };
   const planned = knows ? s.planned : Math.min(level.wordIds.length, s.planned + PLACEMENT_EXTRA);
   const asked = s.asked + 1;
-  if (asked < planned) return { ...s, asked, planned, errors, known };
+  if (asked < planned) return { ...s, asked, planned, errors, known, seen };
   // Level passed: on to the next one, or done after the last.
   const next = s.level + 1;
-  if (next >= levels.length) return { ...s, asked, planned, errors, known, result: s.level };
+  if (next >= levels.length) return { ...s, asked, planned, errors, known, seen, result: s.level };
   return {
     level: next,
     asked: 0,
-    planned: Math.min(PLACEMENT_FIRST, levels[next]!.wordIds.length),
+    planned: placementFirst(levels[next]!, next),
     errors: 0,
     known,
+    seen,
     result: null,
   };
 }

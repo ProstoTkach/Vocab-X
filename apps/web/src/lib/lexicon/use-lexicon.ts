@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { browserStorage } from '../repos';
 import { cachedLexicon, cachedTranslations } from './cached';
 import { createFreeDictionaryProvider } from './free-dictionary';
-import { createMyMemoryProvider } from './mymemory';
+import { createGoogleTranslateProvider } from './google-translate';
 import { proxiedFetch } from './proxy';
 import { mergedLexicon, mergedTranslations } from './suggest';
 import { createTatoebaProvider } from './tatoeba';
@@ -24,26 +24,18 @@ export interface Lexicon {
   dictionary: LexiconProvider;
 }
 
-/**
- * Contact address for MyMemory: with it the free quota is 50,000 characters a day instead of
- * 5,000. It is sent with every translation request.
- */
-const MYMEMORY_EMAIL = 'danieltkachenko093@gmail.com';
-
 const CACHE = { maxEntries: 400, ttlMs: 30 * DAY_MS, now: () => systemClock.now() };
 
 function createLexicon(): Lexicon {
   const storage = browserStorage();
-  // MyMemory keeps going straight from the browser: its free quota is counted per address.
   const fetchJson = proxiedFetch((url, init) => fetch(url, init));
   return {
-    // MyMemory gives one or two translations of a single word; the translation tables of the
+    // Google Translate gives the main translation of a word; the translation tables of the
     // English Wiktionary add the other senses (several variants to choose from).
     translations: mergedTranslations([
       cachedTranslations(
-        createMyMemoryProvider({ fetch: fetchJson, email: MYMEMORY_EMAIL }),
-        // Versioned: results cached before the cleanup of broken variants are not reused.
-        createLookupCache<string[]>(storage, 'translations-v2', CACHE),
+        createGoogleTranslateProvider({ fetch: (url, init) => fetch(url, init) }),
+        createLookupCache<string[]>(storage, 'google-translations', CACHE),
       ),
       cachedTranslations(
         createWiktionaryTranslations({ fetch: fetchJson }),

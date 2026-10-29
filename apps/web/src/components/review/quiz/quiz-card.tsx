@@ -27,8 +27,12 @@ import type { TypedAnswer } from '../formats/types';
 /** The test's formats: three kinds of choice, then typing the word (TYPE). */
 export type QuizCardFormat = QuizFormat;
 
-/** How the current card was answered: an option picked (-1: "I don't know"), or the word typed in. */
-export type QuizAnswer = { picked: number } | { typed: TypedAnswer };
+/**
+ * How the current card was answered: an option picked (-1: "I don't know"), the word typed in,
+ * or said aloud (the sentences).
+ */
+export type QuizAnswer =
+  { picked: number } | { typed: TypedAnswer } | { said: { heard: string; right: boolean } };
 
 export interface QuizCardProps {
   card: StudyCard;
@@ -73,7 +77,7 @@ export function QuizCard(p: QuizCardProps) {
   // What is asked.
   const asked =
     format === 'MCQ_TR' ? (
-      <SpokenTerm word={word} speechLang={p.speechLang} speech={p.speech} />
+      <SpokenTerm word={word} speechLang={p.speechLang} speech={p.speech} fit />
     ) : format === 'MCQ_AUD' ? (
       <div className="flex flex-col items-center gap-3">
         {voice ? (
@@ -83,7 +87,7 @@ export function QuizCard(p: QuizCardProps) {
         )}
         {/* Without a voice the written word is the cue. */}
         {answered || !voice || shownFor === card.id ? (
-          <Term word={word} size="lg" />
+          <Term word={word} size="lg" fit />
         ) : (
           <Button
             variant="ghost"
@@ -117,7 +121,7 @@ export function QuizCard(p: QuizCardProps) {
         )}
         {asked}
         {answered ? (
-          <SpokenTerm word={word} size="lg" speechLang={p.speechLang} speech={p.speech} />
+          <SpokenTerm word={word} size="lg" speechLang={p.speechLang} speech={p.speech} fit />
         ) : (
           <>
             {hinted ? (
@@ -153,41 +157,92 @@ export function QuizCard(p: QuizCardProps) {
   const right = picked !== null && p.options[picked]?.correct;
   const optionLang = format === 'MCQ_WORD' ? word.lang : p.nativeLang;
   return (
-    <QuizLayout>
-      {answered ? (
-        <Verdict right={!!right} />
-      ) : (
-        prompt && <p className="text-sm text-fg-muted">{prompt}</p>
-      )}
+    <ChoiceLayout
+      top={
+        answered ? (
+          <Verdict right={!!right} />
+        ) : (
+          prompt && <p className="text-sm text-fg-muted">{prompt}</p>
+        )
+      }
+      bottom={
+        <Options
+          options={p.options}
+          lang={optionLang}
+          picked={picked}
+          answered={answered}
+          onPick={p.onPick}
+        />
+      }
+    >
       {asked}
-      {/* Two by two even on phones, right under the question. */}
-      <ol className="mt-3 grid w-full max-w-md grid-cols-2 gap-2">
-        {p.options.map((o, i) => (
-          <li key={o.wordId} className="flex">
-            <OptionButton
-              n={i + 1}
-              text={o.text}
-              lang={optionLang}
-              state={!answered ? 'idle' : o.correct ? 'right' : i === picked ? 'wrong' : 'other'}
-              onClick={() => p.onPick(i)}
-            />
-          </li>
-        ))}
-      </ol>
-    </QuizLayout>
+    </ChoiceLayout>
+  );
+}
+
+/**
+ * The question exactly in the middle of the card, what it asks above it and the answer below:
+ * right under it on wide screens, at the bottom on phones, within reach of a thumb.
+ */
+export function ChoiceLayout({
+  top,
+  children,
+  bottom,
+}: {
+  top: ReactNode;
+  children: ReactNode;
+  bottom: ReactNode;
+}) {
+  return (
+    <div className="grid w-full flex-1 grid-rows-[1fr_auto_1fr] justify-items-center gap-6 text-center">
+      <div className="flex flex-col items-center justify-end gap-2 self-end">{top}</div>
+      <div className="flex w-full flex-col items-center gap-3">{children}</div>
+      <div className="flex w-full justify-center self-start max-sm:self-end">{bottom}</div>
+    </div>
+  );
+}
+
+/** Four options, two by two even on phones. */
+export function Options({
+  options,
+  lang,
+  picked,
+  answered,
+  onPick,
+}: {
+  options: readonly QuizOption[];
+  lang: LangCode;
+  picked: number | null;
+  answered: boolean;
+  onPick: (index: number) => void;
+}) {
+  return (
+    <ol className="grid w-full max-w-md grid-cols-2 gap-2">
+      {options.map((o, i) => (
+        <li key={o.wordId} className="flex">
+          <OptionButton
+            n={i + 1}
+            text={o.text}
+            lang={lang}
+            state={!answered ? 'idle' : o.correct ? 'right' : i === picked ? 'wrong' : 'other'}
+            onClick={() => onPick(i)}
+          />
+        </li>
+      ))}
+    </ol>
   );
 }
 
 /** The question and what to answer with, together in the middle of the card. */
 function QuizLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex w-full flex-1 flex-col items-center justify-center gap-6 text-center">
+    <div className="flex w-full flex-1 flex-col items-center justify-center gap-8 text-center">
       {children}
     </div>
   );
 }
 
-function Verdict({ right }: { right: boolean }) {
+export function Verdict({ right }: { right: boolean }) {
   const t = useTranslations('review');
   return (
     <p
@@ -211,7 +266,7 @@ const OPTION_STATE = {
   other: 'border-line/70 bg-surface opacity-60 motion-normal',
 } as const;
 
-function OptionButton({
+export function OptionButton({
   n,
   text,
   lang,
@@ -233,17 +288,17 @@ function OptionButton({
       aria-pressed={state === 'wrong' || undefined}
       data-state={state}
       className={cx(
-        'flex min-h-12 w-full items-center justify-center gap-3 rounded-control border-2 px-2 py-2 text-center font-semibold transition-colors sm:justify-start sm:px-3 sm:text-start',
+        'flex min-h-11 w-full items-center justify-center gap-3 rounded-control border-2 px-2 py-2 text-center text-[0.9375rem] leading-snug transition-colors sm:justify-start sm:px-3 sm:text-start',
         'disabled:cursor-default',
         OPTION_STATE[state],
       )}
     >
-      {/* The key that picks it (1–4); phones have no keys, and the word needs the room. */}
+      {/* The key that picks it (1–4), then a check or a cross. Phones have no keys, and the
+      word needs the room: the colour of the option says it all there. */}
       <span
         aria-hidden
         className={cx(
-          'inline-flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors motion-slow',
-          (state === 'idle' || state === 'other') && 'max-sm:hidden',
+          'inline-flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors motion-slow max-sm:hidden',
           state === 'right'
             ? 'bg-success text-on-success'
             : state === 'wrong'
@@ -281,7 +336,8 @@ export function QuizBar({
   /** Time until the next card comes by itself; null when it waits for the button. */
   autoMs: number | null;
   disabled: boolean;
-  onSkip: () => void;
+  /** "I don't know"; without it (a choice of four) the place stays empty until the answer. */
+  onSkip?: (() => void) | undefined;
   onNext: () => void;
 }) {
   const t = useTranslations('review');
@@ -305,10 +361,13 @@ export function QuizBar({
           )}
           <span className="relative">{t('quiz.next')}</span>
         </Button>
-      ) : (
+      ) : onSkip ? (
         <Button variant="ghost" disabled={disabled} onClick={onSkip} className="text-fg-muted">
           {t('quiz.dontKnow')}
         </Button>
+      ) : (
+        // Holds the place of "Next", so the card does not change its size on answering.
+        <div aria-hidden className="min-h-13" />
       )}
     </div>
   );

@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-emotions",
+  "lang": "en",
+  "cefr": "A2",
+  "topic": "emotions",
+  "title": "Emotions and feelings",
+  "titleI18n": {
+    "uk": "Емоції та почуття",
+    "en": "Emotions and feelings"
+  },
+  "descriptionI18n": {
+    "uk": "Як сказати, що ви відчуваєте: від радості до розчарування.",
+    "en": "How to say what you feel: from joy to disappointment."
+  },
+  "words": [
+    {
+      "term": "angry",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["злий", "сердитий"]
+      },
+      "examples": [
+        {
+          "text": "Why are you angry with me?",
+          "translations": {
+            "uk": "Чому ти на мене сердишся?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "proud",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["гордий"]
+      },
+      "examples": [
+        {
+          "text": "I am proud of you.",
+          "translations": {
+            "uk": "Я пишаюся тобою."
+          }
+        }
+      ]
+    },
+    {
+      "term": "nervous",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["знервований"]
+      },
+      "examples": [
+        {
+          "text": "I feel nervous before exams.",
+          "translations": {
+            "uk": "Я нервую перед іспитами."
+          }
+        }
+      ]
+    },
+    {
+      "term": "lonely",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["самотній"]
+      },
+      "examples": [
+        {
+          "text": "He felt lonely in the new city.",
+          "translations": {
+            "uk": "Він почувався самотнім у новому місті."
+          }
+        }
+      ]
+    },
+    {
+      "term": "excited",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["схвильований", "у захваті"]
+      },
+      "examples": [
+        {
+          "text": "The kids are excited about the trip.",
+          "translations": {
+            "uk": "Діти в захваті від поїздки."
+          }
+        }
+      ]
+    },
+    {
+      "term": "bored",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["знуджений"]
+      },
+      "examples": [
+        {
+          "text": "I was bored at the party.",
+          "translations": {
+            "uk": "Мені було нудно на вечірці."
+          }
+        }
+      ]
+    },
+    {
+      "term": "jealous",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["ревнивий", "заздрісний"]
+      },
+      "examples": [
+        {
+          "text": "She is jealous of her sister.",
+          "translations": {
+            "uk": "Вона заздрить своїй сестрі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "grateful",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["вдячний"]
+      },
+      "examples": [
+        {
+          "text": "I am grateful for your help.",
+          "translations": {
+            "uk": "Я вдячний за твою допомогу."
+          }
+        }
+      ]
+    },
+    {
+      "term": "embarrassed",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["збентежений"]
+      },
+      "examples": [
+        {
+          "text": "He was embarrassed by the mistake.",
+          "translations": {
+            "uk": "Він був збентежений через помилку."
+          }
+        }
+      ]
+    },
+    {
+      "term": "upset",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["засмучений"]
+      },
+      "examples": [
+        {
+          "text": "She was upset about the news.",
+          "translations": {
+            "uk": "Вона була засмучена новиною."
+          }
+        }
+      ]
+    },
+    {
+      "term": "relaxed",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["розслаблений"]
+      },
+      "examples": [
+        {
+          "text": "I feel relaxed on holiday.",
+          "translations": {
+            "uk": "У відпустці я почуваюся розслабленим."
+          }
+        }
+      ]
+    },
+    {
+      "term": "scared",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["наляканий"]
+      },
+      "examples": [
+        {
+          "text": "The child was scared of the dark.",
+          "translations": {
+            "uk": "Дитина боялася темряви."
+          }
+        }
+      ]
+    },
+    {
+      "term": "surprised",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["здивований"]
+      },
+      "examples": [
+        {
+          "text": "We were surprised to see him.",
+          "translations": {
+            "uk": "Ми здивувалися, побачивши його."
+          }
+        }
+      ]
+    },
+    {
+      "term": "calm",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["спокійний"]
+      },
+      "examples": [
+        {
+          "text": "Stay calm and breathe.",
+          "translations": {
+            "uk": "Залишайся спокійним і дихай."
+          }
+        }
+      ]
+    },
+    {
+      "term": "disappointed",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["розчарований"]
+      },
+      "examples": [
+        {
+          "text": "I was disappointed with the film.",
+          "translations": {
+            "uk": "Я був розчарований фільмом."
+          }
+        }
+      ]
+    },
+    {
+      "term": "shy",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["сором'язливий"]
+      },
+      "examples": [
+        {
+          "text": "He is too shy to sing.",
+          "translations": {
+            "uk": "Він надто сором'язливий, щоб співати."
+          }
+        }
+      ]
+    }
+  ]
+}

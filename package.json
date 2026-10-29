@@ -16,6 +16,7 @@
     "dev": "pnpm --filter @vocabx/web dev",
     "build": "pnpm --filter @vocabx/web build",
     "e2e": "pnpm --filter @vocabx/web e2e --project mobile --project desktop",
+    "e2e:changed": "pnpm --filter @vocabx/web e2e:changed",
     "screenshots": "pnpm --filter @vocabx/web e2e --project screenshots"
   },
   "devDependencies": {

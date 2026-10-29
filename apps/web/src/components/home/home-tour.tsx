@@ -20,6 +20,7 @@ import { track } from '@/lib/analytics';
 import { cx } from '@/lib/cx';
 import { useGamification } from '@/lib/gamification';
 import { markTourSeen, tourSeen, type TourPart } from '@/lib/home-tour';
+import { useCloseOnBack } from '@/lib/close-on-back';
 import { IMAGE_QUALITY } from '@/lib/images';
 
 type StepId =
@@ -313,6 +314,9 @@ export function HomeTour() {
     setBox(null);
   };
 
+  // The phone's "Back" ends the tour, as Escape does.
+  useCloseOnBack(!!run, () => finish('skipped'));
+
   const go = (dir: 1 | -1) => {
     if (!run) return;
     const next = steps[index + dir];
@@ -476,15 +480,14 @@ export function HomeTour() {
           )}
           {id === 'enable' ? (
             <>
-              
               <Button ref={primary} size="sm" onClick={enable}>
                 <Sparkles aria-hidden className="size-4" />
                 {t('turnOn')}
               </Button>
               <Button ref={primary} size="sm" onClick={() => (last ? finish('done') : go(1))}>
-              {last ? t('done') : t('next')}
-              {!last && <ArrowRight aria-hidden className="size-4 rtl:-scale-x-100" />}
-            </Button>
+                {last ? t('done') : t('next')}
+                {!last && <ArrowRight aria-hidden className="size-4 rtl:-scale-x-100" />}
+              </Button>
             </>
           ) : (
             <Button ref={primary} size="sm" onClick={() => (last ? finish('done') : go(1))}>

@@ -110,5 +110,6 @@
   "addList": "Add a word list",
   "copyText": "Copy cards as text",
   "copied": "{count, plural, one {# card copied} other {# cards copied}}",
-  "copyFailed": "Couldn't copy: the browser blocked access to the clipboard."
+  "copyFailed": "Couldn't copy: the browser blocked access to the clipboard.",
+  "fromLibrary": "From the library: {added} saved, {skipped} skipped"
 }

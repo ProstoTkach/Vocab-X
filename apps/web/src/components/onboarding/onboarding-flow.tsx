@@ -1,20 +1,33 @@
 'use client';
 
-import { builtinCatalog, learnableLanguages, translationLanguages } from '@vocabx/content';
+import {
+  builtinCatalog,
+  learnableLanguages,
+  placementTest,
+  translationLanguages,
+} from '@vocabx/content';
 import {
   completeOnboarding,
   DAILY_GOAL_PRESETS,
   DEFAULT_SCHEDULER_PARAMS,
   systemClock,
   type DailyGoalPreset,
-  type PlacementLevel,
   type Word,
 } from '@vocabx/core';
-import { BookOpenCheck, Brain, GraduationCap, Layers, Sparkles, Sprout, Wifi } from 'lucide-react';
+import {
+  BookOpenCheck,
+  Brain,
+  GraduationCap,
+  Layers,
+  RotateCcw,
+  Sparkles,
+  Sprout,
+  Wifi,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { RadioGroup } from 'radix-ui';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { track, writeKey } from '@/lib/analytics';
 import { KEYS } from '@/lib/analytics/identity';
 import { LocalePicker } from '@/components/settings/locale-picker';
@@ -39,7 +52,6 @@ const STEPS = ['welcome', 'languages', 'goal', 'start'] as const;
 type Step = (typeof STEPS)[number] | 'check' | 'result';
 /** Onboarding keeps the choice simple; every theme is in Settings later. */
 const BASIC_THEMES = [SYSTEM_THEME_ID, SYSTEM_THEMES.light, SYSTEM_THEMES.dark];
-const CEFR_ORDER = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 /** One width for the header, the content and the buttons, so they line up. */
 const FRAME = 'mx-auto w-full max-w-5xl px-4 md:px-8';
 const WELCOME_POINTS = [
@@ -55,13 +67,6 @@ function defaultTarget(native: string): string {
   const others = learnableLanguages().filter((l) => l.code !== native);
   const withDecks = others.find((l) => builtinCatalog().decks.some((d) => d.lang === l.code));
   return (withDecks ?? others[0]!).code;
-}
-/** The built-in decks of a language with a CEFR level, easiest first: the level test's steps. */
-function placementLevels(lang: string): PlacementLevel[] {
-  return builtinCatalog()
-    .decks.filter((d) => d.lang === lang && d.cefr)
-    .sort((a, b) => CEFR_ORDER.indexOf(a.cefr!) - CEFR_ORDER.indexOf(b.cefr!))
-    .map((d) => ({ cefr: d.cefr!, deckId: d.id, wordIds: d.wordIds }));
 }
 
 export function OnboardingFlow() {
@@ -80,6 +85,8 @@ export function OnboardingFlow() {
   const [targets, setTargets] = useState<string[]>(() => [defaultTarget(initialNative)]);
   const [goal, setGoal] = useState<DailyGoalPreset>('regular');
   const [result, setResult] = useState<PlacementResult | null>(null);
+  /** The test can be taken once more, with other words: the first try's words, then 1. */
+  const [retake, setRetake] = useState(false);
   const [saving, setSaving] = useState(false);
   /** When the onboarding and the current step began (real time), for the statistics. */
   const timing = useRef({ started: 0, step: 0 });
@@ -87,8 +94,12 @@ export function OnboardingFlow() {
   const langName = (code: string) => tl(code as 'en');
   const targetOptions = learnableLanguages().filter((l) => l.code !== nativeLang);
   // The test runs for the first chosen language that has levelled decks.
-  const testLang = targets.find((l) => placementLevels(l).length > 0);
-  const levels = testLang ? placementLevels(testLang) : [];
+  const testLang = targets.find((l) => placementTest(l).length > 0);
+  // The retake has its own list of words, none of them asked the first time.
+  const levels = useMemo(
+    () => (testLang ? placementTest(testLang, retake ? 1 : 0) : []),
+    [testLang, retake],
+  );
   const wordsById = new Map(catalog.words.map((w) => [w.id, w]));
 
   // Setup runs once: an onboarded learner opening this page goes home (no duplicate decks).
@@ -171,12 +182,16 @@ export function OnboardingFlow() {
     return (
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col px-4">
         <LevelCheck
+          key={retake ? 'retake' : 'first'}
           levels={levels}
           words={wordsById}
+          nativeLang={nativeLang}
+          round={retake ? 1 : 0}
           onDone={(r) => {
             track('level_test_done', {
               to: r.level.cefr,
               count: r.known.length,
+              source: retake ? 'retake' : 'first',
               duration_s: Math.round((systemClock.now() - timing.current.step) / 1000),
             });
             setResult(r);
@@ -215,9 +230,28 @@ export function OnboardingFlow() {
             count: toLearn,
           })}
         </p>
-        <Button size="lg" onClick={() => void finish(result.known, [result.level.deckId])}>
-          {t('finish')}
-        </Button>
+        <div className="flex flex-col items-center gap-2">
+          <Button size="lg" onClick={() => void finish(result.known, [result.level.deckId])}>
+            {t('finish')}
+          </Button>
+          {/* Once: the same test with other words, in case luck played a part. */}
+          {!retake && (
+            <Button
+              variant="ghost"
+              className="text-fg-muted"
+              onClick={() => {
+                track('level_test_retake', { from: result.level.cefr });
+                timing.current.step = systemClock.now();
+                setRetake(true);
+                setResult(null);
+                setStep('check');
+              }}
+            >
+              <RotateCcw aria-hidden className="size-4" />
+              {t('retake')}
+            </Button>
+          )}
+        </div>
       </div>
     );
   }

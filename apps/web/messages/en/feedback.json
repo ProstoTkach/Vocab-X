@@ -122,7 +122,8 @@
       "somewhat": "Somewhat disappointed",
       "not": "Not disappointed",
       "stopped": "I no longer use it"
-    }
+    },
+    "required": "This question is required"
   },
   "back": "Back",
   "send": "Send",

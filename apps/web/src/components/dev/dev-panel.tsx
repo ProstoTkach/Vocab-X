@@ -22,7 +22,7 @@ const DEMO_LEVEL = 15;
 export function DevPanel() {
   const t = useTranslations('dev');
   const format = useFormatter();
-  const { enabled, setEnabled, quiz, setQuiz } = useDevTools();
+  const { enabled, setEnabled, quiz, sentences, setMode } = useDevTools();
   const { clock, offsetMs, setOffsetMs } = useClock();
   const { resolved, setChoice } = useTheme();
   const { reachLevel, level } = usePlayer();
@@ -83,7 +83,12 @@ export function DevPanel() {
       <Switch
         label={t('quizMode')}
         checked={quiz}
-        onCheckedChange={(on) => setQuiz(on, 'dev_panel')}
+        onCheckedChange={(on) => setMode(on ? 'quiz' : 'cards', 'dev_panel')}
+      />
+      <Switch
+        label={t('sentenceMode')}
+        checked={sentences}
+        onCheckedChange={(on) => setMode(on ? 'sentences' : 'cards', 'dev_panel')}
       />
       <Button
         size="sm"

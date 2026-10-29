@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-society",
+  "lang": "en",
+  "cefr": "B2",
+  "topic": "society",
+  "title": "News and society",
+  "titleI18n": {
+    "uk": "Новини та суспільство",
+    "en": "News and society"
+  },
+  "descriptionI18n": {
+    "uk": "Вибори, закони, протести й новини — щоб розуміти, що відбувається у світі.",
+    "en": "Elections, laws, protests and the news — to follow what is happening in the world."
+  },
+  "words": [
+    {
+      "term": "election",
+      "pos": "noun",
+      "translations": {
+        "uk": ["вибори"]
+      },
+      "examples": [
+        {
+          "text": "The election is in October.",
+          "translations": {
+            "uk": "Вибори відбудуться в жовтні."
+          }
+        }
+      ]
+    },
+    {
+      "term": "government",
+      "pos": "noun",
+      "translations": {
+        "uk": ["уряд"]
+      },
+      "examples": [
+        {
+          "text": "The government raised taxes.",
+          "translations": {
+            "uk": "Уряд підвищив податки."
+          }
+        }
+      ]
+    },
+    {
+      "term": "vote",
+      "pos": "verb",
+      "translations": {
+        "uk": ["голосувати"]
+      },
+      "examples": [
+        {
+          "text": "Everyone over 18 can vote.",
+          "translations": {
+            "uk": "Кожен, кому понад 18, може голосувати."
+          }
+        }
+      ]
+    },
+    {
+      "term": "law",
+      "pos": "noun",
+      "translations": {
+        "uk": ["закон"]
+      },
+      "examples": [
+        {
+          "text": "The new law protects workers.",
+          "translations": {
+            "uk": "Новий закон захищає працівників."
+          }
+        }
+      ]
+    },
+    {
+      "term": "citizen",
+      "pos": "noun",
+      "translations": {
+        "uk": ["громадянин"]
+      },
+      "examples": [
+        {
+          "text": "Every citizen has rights.",
+          "translations": {
+            "uk": "Кожен громадянин має права."
+          }
+        }
+      ]
+    },
+    {
+      "term": "protest",
+      "pos": "noun",
+      "translations": {
+        "uk": ["протест"]
+      },
+      "examples": [
+        {
+          "text": "Thousands joined the protest.",
+          "translations": {
+            "uk": "Тисячі людей долучилися до протесту."
+          }
+        }
+      ]
+    },
+    {
+      "term": "policy",
+      "pos": "noun",
+      "translations": {
+        "uk": ["політика (курс)"]
+      },
+      "examples": [
+        {
+          "text": "The company changed its policy.",
+          "translations": {
+            "uk": "Компанія змінила свою політику."
+          }
+        }
+      ]
+    },
+    {
+      "term": "headline",
+      "pos": "noun",
+      "translations": {
+        "uk": ["заголовок"]
+      },
+      "examples": [
+        {
+          "text": "The headline was misleading.",
+          "translations": {
+            "uk": "Заголовок вводив в оману."
+          }
+        }
+      ]
+    },
+    {
+      "term": "journalist",
+      "pos": "noun",
+      "translations": {
+        "uk": ["журналіст"]
+      },
+      "examples": [
+        {
+          "text": "The journalist interviewed the mayor.",
+          "translations": {
+            "uk": "Журналіст узяв інтерв’ю в мера."
+          }
+        }
+      ]
+    },
+    {
+      "term": "refugee",
+      "pos": "noun",
+      "translations": {
+        "uk": ["біженець"]
+      },
+      "examples": [
+        {
+          "text": "The refugee found a new home in Poland.",
+          "translations": {
+            "uk": "Біженець знайшов новий дім у Польщі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "volunteer",
+      "pos": "noun",
+      "translations": {
+        "uk": ["волонтер"]
+      },
+      "examples": [
+        {
+          "text": "She works as a volunteer at the hospital.",
+          "translations": {
+            "uk": "Вона волонтерить у лікарні."
+          }
+        }
+      ]
+    },
+    {
+      "term": "crisis",
+      "pos": "noun",
+      "translations": {
+        "uk": ["криза"]
+      },
+      "examples": [
+        {
+          "text": "The country is in an economic crisis.",
+          "translations": {
+            "uk": "Країна в економічній кризі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "corruption",
+      "pos": "noun",
+      "translations": {
+        "uk": ["корупція"]
+      },
+      "examples": [
+        {
+          "text": "Corruption is a big problem.",
+          "translations": {
+            "uk": "Корупція — велика проблема."
+          }
+        }
+      ]
+    },
+    {
+      "term": "inequality",
+      "pos": "noun",
+      "translations": {
+        "uk": ["нерівність"]
+      },
+      "examples": [
+        {
+          "text": "Income inequality is growing.",
+          "translations": {
+            "uk": "Нерівність доходів зростає."
+          }
+        }
+      ]
+    },
+    {
+      "term": "freedom",
+      "pos": "noun",
+      "translations": {
+        "uk": ["свобода"]
+      },
+      "examples": [
+        {
+          "text": "Freedom of speech matters.",
+          "translations": {
+            "uk": "Свобода слова важлива."
+          }
+        }
+      ]
+    },
+    {
+      "term": "misinformation",
+      "pos": "noun",
+      "translations": {
+        "uk": ["дезінформація"]
+      },
+      "examples": [
+        {
+          "text": "Misinformation spreads fast online.",
+          "translations": {
+            "uk": "Дезінформація швидко поширюється в мережі."
+          }
+        }
+      ]
+    }
+  ]
+}

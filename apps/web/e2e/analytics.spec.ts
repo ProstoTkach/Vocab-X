@@ -4,7 +4,7 @@ import { expect, test, type Page } from '@playwright/test';
 test.use({ storageState: { cookies: [], origins: [] } });
 
 const consent = (page: Page) =>
-  page.getByRole('dialog', { name: 'Допоможіть нам зробити VocabX кращим' });
+  page.getByRole('dialog', { name: 'Допоможіть нам зробити VocabX кращим!' });
 
 /** Requests to /api/track, answered locally (the spreadsheet is never touched by tests). */
 async function trackRequests(page: Page) {

@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-sport",
+  "lang": "en",
+  "cefr": "A2",
+  "topic": "sport",
+  "title": "Sport and fitness",
+  "titleI18n": {
+    "uk": "Спорт і фітнес",
+    "en": "Sport and fitness"
+  },
+  "descriptionI18n": {
+    "uk": "Тренування, матчі й команди — слова для залу та стадіону.",
+    "en": "Workouts, matches and teams — words for the gym and the stadium."
+  },
+  "words": [
+    {
+      "term": "exercise",
+      "pos": "noun",
+      "translations": {
+        "uk": ["вправа", "фізичні вправи"]
+      },
+      "examples": [
+        {
+          "text": "Exercise is good for your heart.",
+          "translations": {
+            "uk": "Фізичні вправи корисні для серця."
+          }
+        }
+      ]
+    },
+    {
+      "term": "team",
+      "pos": "noun",
+      "translations": {
+        "uk": ["команда"]
+      },
+      "examples": [
+        {
+          "text": "Our team won the match.",
+          "translations": {
+            "uk": "Наша команда виграла матч."
+          }
+        }
+      ]
+    },
+    {
+      "term": "match",
+      "pos": "noun",
+      "translations": {
+        "uk": ["матч"]
+      },
+      "examples": [
+        {
+          "text": "The match starts at eight.",
+          "translations": {
+            "uk": "Матч починається о восьмій."
+          }
+        }
+      ]
+    },
+    {
+      "term": "coach",
+      "pos": "noun",
+      "translations": {
+        "uk": ["тренер"]
+      },
+      "examples": [
+        {
+          "text": "The coach shouted at the players.",
+          "translations": {
+            "uk": "Тренер кричав на гравців."
+          }
+        }
+      ]
+    },
+    {
+      "term": "win",
+      "pos": "verb",
+      "translations": {
+        "uk": ["вигравати", "перемагати"]
+      },
+      "examples": [
+        {
+          "text": "We want to win the cup.",
+          "translations": {
+            "uk": "Ми хочемо виграти кубок."
+          }
+        }
+      ]
+    },
+    {
+      "term": "lose",
+      "pos": "verb",
+      "translations": {
+        "uk": ["програвати"]
+      },
+      "examples": [
+        {
+          "text": "They often lose away games.",
+          "translations": {
+            "uk": "Вони часто програють на виїзді."
+          }
+        }
+      ]
+    },
+    {
+      "term": "score",
+      "pos": "noun",
+      "translations": {
+        "uk": ["рахунок"]
+      },
+      "examples": [
+        {
+          "text": "What's the score?",
+          "translations": {
+            "uk": "Який рахунок?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "gym",
+      "pos": "noun",
+      "translations": {
+        "uk": ["спортзал"]
+      },
+      "examples": [
+        {
+          "text": "I go to the gym twice a week.",
+          "translations": {
+            "uk": "Я ходжу в спортзал двічі на тиждень."
+          }
+        }
+      ]
+    },
+    {
+      "term": "muscle",
+      "pos": "noun",
+      "translations": {
+        "uk": ["м'яз"]
+      },
+      "examples": [
+        {
+          "text": "Warm up the muscle slowly.",
+          "translations": {
+            "uk": "Повільно розігрій м'яз."
+          }
+        }
+      ]
+    },
+    {
+      "term": "stretch",
+      "pos": "verb",
+      "translations": {
+        "uk": ["розтягуватися"]
+      },
+      "examples": [
+        {
+          "text": "Stretch before you run.",
+          "translations": {
+            "uk": "Розімнися перед пробіжкою."
+          }
+        }
+      ]
+    },
+    {
+      "term": "marathon",
+      "pos": "noun",
+      "translations": {
+        "uk": ["марафон"]
+      },
+      "examples": [
+        {
+          "text": "She ran her first marathon.",
+          "translations": {
+            "uk": "Вона пробігла свій перший марафон."
+          }
+        }
+      ]
+    },
+    {
+      "term": "champion",
+      "pos": "noun",
+      "translations": {
+        "uk": ["чемпіон"]
+      },
+      "examples": [
+        {
+          "text": "He became world champion.",
+          "translations": {
+            "uk": "Він став чемпіоном світу."
+          }
+        }
+      ]
+    },
+    {
+      "term": "tired",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["втомлений"]
+      },
+      "examples": [
+        {
+          "text": "I'm tired after training.",
+          "translations": {
+            "uk": "Я втомлений після тренування."
+          }
+        }
+      ]
+    },
+    {
+      "term": "fit",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["у формі", "підтягнутий"]
+      },
+      "examples": [
+        {
+          "text": "He keeps fit by swimming.",
+          "translations": {
+            "uk": "Він підтримує форму плаванням."
+          }
+        }
+      ]
+    },
+    {
+      "term": "referee",
+      "pos": "noun",
+      "translations": {
+        "uk": ["суддя"]
+      },
+      "examples": [
+        {
+          "text": "The referee stopped the game.",
+          "translations": {
+            "uk": "Суддя зупинив гру."
+          }
+        }
+      ]
+    },
+    {
+      "term": "racket",
+      "pos": "noun",
+      "translations": {
+        "uk": ["ракетка"]
+      },
+      "examples": [
+        {
+          "text": "I need a new tennis racket.",
+          "translations": {
+            "uk": "Мені потрібна нова тенісна ракетка."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -2,10 +2,16 @@ import { createLookupCache, MemoryStorage } from '@vocabx/data';
 import { describe, expect, test, vi } from 'vitest';
 import { cachedTranslations } from './cached';
 import { createFreeDictionaryProvider } from './free-dictionary';
+import { createGoogleTranslateProvider } from './google-translate';
 import type { FetchLike } from './http';
-import { createMyMemoryProvider, looksBroken } from './mymemory';
 import { proxiedFetch } from './proxy';
-import { isSentence, mergedLexicon, mergedTranslations, suggestWord } from './suggest';
+import {
+  contextWords,
+  isSentence,
+  mergedLexicon,
+  mergedTranslations,
+  suggestWord,
+} from './suggest';
 import { createTatoebaProvider } from './tatoeba';
 import { createWiktionaryProvider } from './wiktionary';
 import { createWiktionaryTranslations, translationsFromWikitext } from './wiktionary-translations';
@@ -13,43 +19,35 @@ import { createWiktionaryTranslations, translationsFromWikitext } from './wiktio
 const json = (body: unknown, status = 200) =>
   Promise.resolve(new Response(JSON.stringify(body), { status }));
 
-// Shape captured from a real api.mymemory.translated.net response (en → uk, "journey").
-const MYMEMORY = {
-  responseStatus: 200,
-  quotaFinished: false,
-  responseData: { translatedText: 'подорож ', match: 1 },
-  matches: [
-    { translation: 'подорож ', quality: 74, match: 1 },
-    { translation: 'ПОДОРОЖ&#x0D;', quality: '74', match: 0.98 },
-    { translation: 'мандрівка.', quality: 70, match: 0.95 },
-    { translation: 'журнал', quality: 90, match: 0.5 },
-  ],
-};
+// What /api/translate answers for "journey" (en → uk).
+const GOOGLE = { translations: ['Подорож.'] };
 
-describe('MyMemory', () => {
-  test('cleans, dedupes and ranks translations', async () => {
-    const fetch = vi.fn<FetchLike>(() => json(MYMEMORY));
-    const p = createMyMemoryProvider({ fetch });
-    expect(await p.translate({ text: 'journey', from: 'en', to: 'uk' })).toEqual([
-      'подорож',
-      'мандрівка',
-    ]);
-    const url = new URL(fetch.mock.calls[0]![0]);
-    expect(url.searchParams.get('langpair')).toBe('en|uk');
-    expect(url.searchParams.has('de')).toBe(false);
+describe('Google Translate', () => {
+  test('asks the app server, cleans the answer', async () => {
+    const fetch = vi.fn<FetchLike>(() => json(GOOGLE));
+    const p = createGoogleTranslateProvider({ fetch });
+    expect(await p.translate({ text: 'journey', from: 'en', to: 'uk' })).toEqual(['подорож']);
+    const url = new URL(fetch.mock.calls[0]![0], 'http://x');
+    expect(url.pathname).toBe('/api/translate');
+    expect(Object.fromEntries(url.searchParams)).toEqual({ q: 'journey', from: 'en', to: 'uk' });
   });
 
-  test('quota, HTTP and network errors give an empty result', async () => {
-    const quota = createMyMemoryProvider({
-      fetch: () => json({ ...MYMEMORY, quotaFinished: true }),
+  test('a capitalized word keeps its case; the word itself is no translation', async () => {
+    const p = createGoogleTranslateProvider({
+      fetch: () => json({ translations: ['Лондон', 'London'] }),
     });
-    expect(await quota.translate({ text: 'a', from: 'en', to: 'uk' })).toEqual([]);
-    const http = createMyMemoryProvider({ fetch: () => json({}, 500) });
+    expect(await p.translate({ text: 'London', from: 'en', to: 'uk' })).toEqual(['Лондон']);
+  });
+
+  test('HTTP and network errors and odd answers give an empty result', async () => {
+    const http = createGoogleTranslateProvider({ fetch: () => json({}, 500) });
     expect(await http.translate({ text: 'a', from: 'en', to: 'uk' })).toEqual([]);
-    const offline = createMyMemoryProvider({
+    const offline = createGoogleTranslateProvider({
       fetch: () => Promise.reject(new TypeError('offline')),
     });
     expect(await offline.translate({ text: 'a', from: 'en', to: 'uk' })).toEqual([]);
+    const odd = createGoogleTranslateProvider({ fetch: () => json({ translations: 'x' }) });
+    expect(await odd.translate({ text: 'a', from: 'en', to: 'uk' })).toEqual([]);
   });
 
   test('times out', async () => {
@@ -57,7 +55,7 @@ describe('MyMemory', () => {
       new Promise((_, reject) =>
         init?.signal?.addEventListener('abort', () => reject(new Error('abort'))),
       );
-    const p = createMyMemoryProvider({ fetch: hang, timeoutMs: 20 });
+    const p = createGoogleTranslateProvider({ fetch: hang, timeoutMs: 20 });
     expect(await p.translate({ text: 'a', from: 'en', to: 'uk' })).toEqual([]);
   });
 });
@@ -104,13 +102,13 @@ describe('Wiktionary', () => {
 
 describe('cache', () => {
   test('answers repeated lookups without the network', async () => {
-    const fetch = vi.fn<FetchLike>(() => json(MYMEMORY));
+    const fetch = vi.fn<FetchLike>(() => json({ translations: ['подорож', 'мандрівка'] }));
     const cache = createLookupCache<string[]>(new MemoryStorage(), 'tr', {
       maxEntries: 10,
       ttlMs: 1e9,
       now: () => 0,
     });
-    const p = cachedTranslations(createMyMemoryProvider({ fetch }), cache);
+    const p = cachedTranslations(createGoogleTranslateProvider({ fetch }), cache);
     await p.translate({ text: 'Journey', from: 'en', to: 'uk' });
     expect(await p.translate({ text: 'journey ', from: 'en', to: 'uk' })).toEqual([
       'подорож',
@@ -266,9 +264,11 @@ describe('Wiktionary translation tables', () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
-  test('joined with MyMemory: its best variant first, no repeats, a failing source skipped', async () => {
+  test('joined with Google Translate: its variant first, no repeats, a failing source skipped', async () => {
     const merged = mergedTranslations([
-      createMyMemoryProvider({ fetch: () => json(MYMEMORY) }),
+      createGoogleTranslateProvider({
+        fetch: () => json({ translations: ['подорож', 'мандрівка'] }),
+      }),
       createWiktionaryTranslations({
         fetch: () => json({ parse: { wikitext: JOURNEY_WIKITEXT } }),
       }),
@@ -285,14 +285,14 @@ describe('Wiktionary translation tables', () => {
 });
 
 describe('dictionary proxy', () => {
-  test('dictionaries go through /api/dictionary, MyMemory straight', async () => {
+  test('dictionaries go through /api/dictionary, other addresses straight', async () => {
     const fetch = vi.fn<FetchLike>(() => json(null));
     const p = proxiedFetch(fetch);
     await p('https://api.dictionaryapi.dev/api/v2/entries/en/hello');
-    await p('https://api.mymemory.translated.net/get?q=hello');
+    await p('/api/translate?q=hello');
     expect(fetch.mock.calls.map((c) => c[0])).toEqual([
       '/api/dictionary?url=https%3A%2F%2Fapi.dictionaryapi.dev%2Fapi%2Fv2%2Fentries%2Fen%2Fhello',
-      'https://api.mymemory.translated.net/get?q=hello',
+      '/api/translate?q=hello',
     ]);
   });
 
@@ -311,27 +311,11 @@ describe('cleaning up what the sources give', () => {
     expect(translationsFromWikitext(wikitext, 'uk')).toEqual(['англійський', 'англійська мова']);
   });
 
-  test('MyMemory: memories of the word itself first, text split apart dropped', async () => {
-    // Shape captured from a real response (en → uk, "achieve").
-    const fetch = vi.fn<FetchLike>(() =>
-      json({
-        responseStatus: 200,
-        responseData: { translatedText: 'р езуль татами . ', match: 0.97 },
-        matches: [
-          { segment: 'achieve. ', translation: 'р езуль татами . ', quality: 74, match: 0.97 },
-          { segment: 'achieve', translation: 'досягти', quality: 70, match: 0.85 },
-          { segment: 'Achieve Type', translation: 'Тип досягнення', quality: 74, match: 0.85 },
-        ],
-      }),
-    );
-    const p = createMyMemoryProvider({ fetch });
-    expect(await p.translate({ text: 'achieve', from: 'en', to: 'uk' })).toEqual(['досягти']);
-  });
-
-  test('a lone letter that is no word gives broken text away', () => {
-    expect(looksBroken('р езуль татами', 'uk')).toBe(true);
-    expect(looksBroken('йти в школу', 'uk')).toBe(false);
-    expect(looksBroken('a b c', 'xx')).toBe(false);
+  test('examples: a sentence of little words and the word itself tells nothing', () => {
+    expect(contextWords('When is convenient for you?', 'convenient', 'en')).toBe(0);
+    expect(contextWords("It doesn't seem convenient.", 'convenient', 'en')).toBe(0);
+    expect(contextWords('The bus stop is convenient for the office.', 'convenient', 'en')).toBe(3);
+    expect(contextWords('Ми їдемо в подорож улітку.', 'подорож', 'uk')).toBe(2);
   });
 
   test('examples: sentences are kept, bare phrases are not', () => {
@@ -359,7 +343,7 @@ describe('cleaning up what the sources give', () => {
     ]);
     const url = new URL(fetch.mock.calls[0]![0]);
     expect(url.searchParams.get('lang')).toBe('eng');
-    expect(url.searchParams.get('word_count')).toBe('5-14');
+    expect(url.searchParams.get('word_count')).toBe('6-16');
     expect(await p.lookup('reliable', 'xx')).toEqual([]);
   });
 });

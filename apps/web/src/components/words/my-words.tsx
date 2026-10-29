@@ -186,7 +186,7 @@ export function MyWords() {
       )}
 
       {/* Adding words first, then where the words come from: the same cards as on Home. */}
-      <div className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-3 max-lg:mt-6">
+      <div className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-3">
         <AddWordCard layout="row" onClick={() => setAdding(true)} disabled={!state} />
         <AddListCard layout="row" />
         <ActionCardLink

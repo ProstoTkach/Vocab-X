@@ -1,0 +1,257 @@
+{
+  "id": "builtin:en-topic-home",
+  "lang": "en",
+  "cefr": "A2",
+  "topic": "home",
+  "title": "Home and renting",
+  "titleI18n": {
+    "uk": "Дім та оренда житла",
+    "en": "Home and renting"
+  },
+  "descriptionI18n": {
+    "uk": "Квартира, меблі, оренда й побут — слова для життя вдома.",
+    "en": "Flat, furniture, rent and chores — words for life at home."
+  },
+  "words": [
+    {
+      "term": "rent",
+      "pos": "noun",
+      "translations": {
+        "uk": ["оренда", "орендна плата"]
+      },
+      "examples": [
+        {
+          "text": "The rent is due on the first of the month.",
+          "translations": {
+            "uk": "Орендну плату треба внести першого числа."
+          }
+        }
+      ]
+    },
+    {
+      "term": "landlord",
+      "pos": "noun",
+      "translations": {
+        "uk": ["орендодавець"]
+      },
+      "examples": [
+        {
+          "text": "Call the landlord about the leak.",
+          "translations": {
+            "uk": "Подзвони орендодавцю щодо протікання."
+          }
+        }
+      ]
+    },
+    {
+      "term": "flat",
+      "pos": "noun",
+      "translations": {
+        "uk": ["квартира"]
+      },
+      "examples": [
+        {
+          "text": "They live in a small flat.",
+          "translations": {
+            "uk": "Вони живуть у маленькій квартирі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "furniture",
+      "pos": "noun",
+      "translations": {
+        "uk": ["меблі"]
+      },
+      "examples": [
+        {
+          "text": "The flat comes with furniture.",
+          "translations": {
+            "uk": "Квартира здається з меблями."
+          }
+        }
+      ]
+    },
+    {
+      "term": "kitchen",
+      "pos": "noun",
+      "translations": {
+        "uk": ["кухня"]
+      },
+      "examples": [
+        {
+          "text": "The kitchen is very bright.",
+          "translations": {
+            "uk": "Кухня дуже світла."
+          }
+        }
+      ]
+    },
+    {
+      "term": "bedroom",
+      "pos": "noun",
+      "translations": {
+        "uk": ["спальня"]
+      },
+      "examples": [
+        {
+          "text": "Our bedroom faces the garden.",
+          "translations": {
+            "uk": "Наша спальня виходить на сад."
+          }
+        }
+      ]
+    },
+    {
+      "term": "balcony",
+      "pos": "noun",
+      "translations": {
+        "uk": ["балкон"]
+      },
+      "examples": [
+        {
+          "text": "We have breakfast on the balcony.",
+          "translations": {
+            "uk": "Ми снідаємо на балконі."
+          }
+        }
+      ]
+    },
+    {
+      "term": "heating",
+      "pos": "noun",
+      "translations": {
+        "uk": ["опалення"]
+      },
+      "examples": [
+        {
+          "text": "The heating doesn't work.",
+          "translations": {
+            "uk": "Опалення не працює."
+          }
+        }
+      ]
+    },
+    {
+      "term": "tidy",
+      "pos": "adjective",
+      "translations": {
+        "uk": ["охайний", "прибраний"]
+      },
+      "examples": [
+        {
+          "text": "Keep your room tidy.",
+          "translations": {
+            "uk": "Тримай свою кімнату в порядку."
+          }
+        }
+      ]
+    },
+    {
+      "term": "repair",
+      "pos": "verb",
+      "translations": {
+        "uk": ["ремонтувати", "лагодити"]
+      },
+      "examples": [
+        {
+          "text": "Who will repair the roof?",
+          "translations": {
+            "uk": "Хто полагодить дах?"
+          }
+        }
+      ]
+    },
+    {
+      "term": "move",
+      "pos": "verb",
+      "translations": {
+        "uk": ["переїжджати"]
+      },
+      "examples": [
+        {
+          "text": "We move to a new flat in May.",
+          "translations": {
+            "uk": "У травні ми переїжджаємо в нову квартиру."
+          }
+        }
+      ]
+    },
+    {
+      "term": "key",
+      "pos": "noun",
+      "translations": {
+        "uk": ["ключ"]
+      },
+      "examples": [
+        {
+          "text": "I can't find my key.",
+          "translations": {
+            "uk": "Не можу знайти свій ключ."
+          }
+        }
+      ]
+    },
+    {
+      "term": "laundry",
+      "pos": "noun",
+      "translations": {
+        "uk": ["прання", "білизна"]
+      },
+      "examples": [
+        {
+          "text": "I do the laundry on Saturdays.",
+          "translations": {
+            "uk": "Я перу білизну по суботах."
+          }
+        }
+      ]
+    },
+    {
+      "term": "carpet",
+      "pos": "noun",
+      "translations": {
+        "uk": ["килим"]
+      },
+      "examples": [
+        {
+          "text": "The carpet is soft and warm.",
+          "translations": {
+            "uk": "Килим м'який і теплий."
+          }
+        }
+      ]
+    },
+    {
+      "term": "shelf",
+      "pos": "noun",
+      "translations": {
+        "uk": ["полиця"]
+      },
+      "examples": [
+        {
+          "text": "Put the books on the shelf.",
+          "translations": {
+            "uk": "Постав книжки на полицю."
+          }
+        }
+      ]
+    },
+    {
+      "term": "deposit",
+      "pos": "noun",
+      "translations": {
+        "uk": ["застава", "депозит"]
+      },
+      "examples": [
+        {
+          "text": "We paid a deposit of one month's rent.",
+          "translations": {
+            "uk": "Ми внесли заставу в розмірі місячної оренди."
+          }
+        }
+      ]
+    }
+  ]
+}
