@@ -99,7 +99,7 @@ test('level 1: the word left out of an example is picked from four, its translat
   await expect(page.getByRole('button', { name: 'Не знаю' })).toHaveCount(0);
   // The translation hides behind "Show hint".
   // Its place is kept from the start (opening it moves nothing), but it is not seen.
-  const translation = card(page).locator('p[lang="uk"]');
+  const translation = card(page).locator('span[lang="uk"]');
   await expect(translation).toBeHidden();
   await card(page).getByRole('button', { name: 'Показати підказку' }).click();
   await expect(translation).toBeVisible();
@@ -160,13 +160,16 @@ test('above the card, the way of studying can be changed', async ({ page }) => {
   await page.getByRole('button', { name: 'Змінити' }).click();
   await page.getByRole('menuitemradio', { name: 'Тест із 4 варіантів' }).click();
   await expect(page.getByText('Вибір перекладу', { exact: true })).toBeVisible();
-  await expect(gap(page)).toHaveCount(0);
+  // The test's example hint keeps its place unseen until asked for.
+  await expect(gap(page).first()).toBeHidden();
   // The choice is kept.
   await page.reload();
   await expect(page.getByText('Вибір перекладу', { exact: true })).toBeVisible();
 });
 
 test('the lab: any mode and level, nothing saved, the words come round', async ({ page }) => {
+  // Onboarding already saved the words marked as known: the lab adds nothing to them.
+  const before = await levels(page);
   await page.getByRole('button', { name: 'Змінити' }).click();
   await page.getByRole('menuitem', { name: 'Полігон способів навчання' }).click();
   await expect(page).toHaveURL(/\/uk\/review\/lab$/);
@@ -189,5 +192,5 @@ test('the lab: any mode and level, nothing saved, the words come round', async (
     await expect(options(page).first()).toBeEnabled();
   }
   await expect(page.getByText('30 карток у колоді')).toBeVisible();
-  expect(await levels(page)).toEqual([]);
+  expect(await levels(page)).toEqual(before);
 });

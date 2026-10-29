@@ -1,13 +1,15 @@
 // Runs only the end-to-end tests that cover what changed, instead of the whole suite.
 //
-//   pnpm e2e:changed               changes not yet committed (staged, unstaged, new files)
+//   pnpm e2e:changed               what changed since the last run that passed (commits and
+//                                  changes not yet committed alike; the first time: since the
+//                                  commit before the last one)
 //   pnpm e2e:changed --base main   everything that differs from a branch or commit
 //   pnpm e2e:changed --list        only prints which tests would run
 //
 // Any other argument goes to Playwright (e.g. --project mobile). The whole suite stays
 // `pnpm e2e` — run it before pushing.
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -23,14 +25,28 @@ const take = (flag) => {
   const [, value] = args.splice(i, 2);
   return value ?? '';
 };
-const base = take('--base');
+/**
+ * The last commit all chosen tests passed on, kept in .git (never committed). The work is
+ * committed before a run, so "not committed yet" alone would often be nothing.
+ */
+const lastPassFile = join(root, '.git', 'vocabx-e2e-last-pass');
+const lastPass = existsSync(lastPassFile) ? readFileSync(lastPassFile, 'utf8').trim() : '';
+const known = (rev) => {
+  try {
+    git('cat-file', '-e', `${rev}^{commit}`);
+    return true;
+  } catch {
+    return false;
+  }
+};
+const base = take('--base') ?? (lastPass && known(lastPass) ? lastPass : 'HEAD~1');
 const listOnly = args.includes('--list');
 const passThrough = args.filter((a) => a !== '--list');
 
 // Paths from the repository root.
 const changed = [
   ...new Set([
-    ...git('diff', '--name-only', base ?? 'HEAD'),
+    ...git('diff', '--name-only', base),
     ...git('ls-files', '--others', '--exclude-standard'),
   ]),
 ];
@@ -140,4 +156,6 @@ const result = spawnSync(
   ],
   { cwd: web, stdio: 'inherit', shell: process.platform === 'win32' },
 );
+// Passed: the next run starts from here.
+if (result.status === 0 && !listOnly) writeFileSync(lastPassFile, git('rev-parse', 'HEAD')[0]);
 process.exit(result.status ?? 1);
