@@ -8,6 +8,7 @@ test('once visited, the app opens and reviews offline; reminders can be turned o
   page,
   context,
 }) => {
+  await context.grantPermissions(['notifications']);
   await onboard(page);
   // The worker has kept the main pages and their files.
   await expect(page.locator('html[data-offline="ready"]')).toHaveCount(1, { timeout: 60_000 });

@@ -195,7 +195,7 @@ test('the lab: any mode and level, nothing saved, the words come round', async (
   await expect(card(page).getByRole('textbox', { name: 'Ваша відповідь' })).toBeVisible();
   await mode.selectOption('quiz');
   await level.selectOption('2');
-  await expect(page.getByText('Вибір слова', { exact: true })).toBeVisible();
+  await expect(options(page)).toHaveCount(4);
   // Answers go round: the stack never gets smaller, nothing is saved.
   await expect(page.getByText('15 карток у колоді')).toBeVisible();
   for (let i = 0; i < 3; i++) {

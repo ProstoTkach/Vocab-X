@@ -60,7 +60,11 @@ export async function reminderState(): Promise<ReminderState> {
   if (needsInstall()) return 'install';
   const reg = await registration();
   if (!reg || typeof Notification === 'undefined') return 'unsupported';
-  if (Notification.permission === 'denied') return 'denied';
+  // What push itself is allowed (the notification permission can say otherwise in some browsers).
+  const allowed = await reg.pushManager
+    .permissionState({ userVisibleOnly: true })
+    .catch(() => Notification.permission);
+  if (allowed === 'denied') return 'denied';
   return (await reg.pushManager.getSubscription()) ? 'on' : 'off';
 }
 

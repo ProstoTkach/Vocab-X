@@ -90,8 +90,22 @@ test('mirrored swipe layout swaps Again and Good on arrows', async ({ page }) =>
   await expect(deckCount(page)).toHaveText('14 карток у колоді');
 });
 
+test('text size of the whole app: at once, and kept from the first paint', async ({ page }) => {
+  await page
+    .getByRole('radiogroup', { name: 'Розмір тексту' })
+    .getByRole('radio', { name: 'Великий' })
+    .click();
+  const size = () => page.evaluate(() => document.documentElement.style.fontSize);
+  expect(await size()).toBe('125%');
+  await page.reload();
+  expect(await size()).toBe('125%');
+});
+
 test('card font size', async ({ page }) => {
-  await page.getByRole('radio', { name: 'Великий' }).click();
+  await page
+    .getByRole('radiogroup', { name: 'Розмір шрифту картки' })
+    .getByRole('radio', { name: 'Великий' })
+    .click();
   await openReview(page);
   const scale = await page
     .locator('[style*="--card-scale"]')
