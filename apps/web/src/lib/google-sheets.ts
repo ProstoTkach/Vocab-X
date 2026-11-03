@@ -283,6 +283,12 @@ export async function upsertRows(
   await appendRows(c, title, fresh);
 }
 
+/** The rows of a tab under its header, as the sheet shows them (text). */
+export async function readRows(c: SheetsConfig, title: string): Promise<string[][]> {
+  const res = await call<{ values?: string[][] }>(c, `/values/${range(title, 'A2:Z')}`);
+  return res.values ?? [];
+}
+
 /** Replaces the whole content of a tab (e.g. a reference sheet), header included. */
 export async function replaceSheet(
   c: SheetsConfig,

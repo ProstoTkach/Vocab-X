@@ -9,12 +9,13 @@ import {
   type LangCode,
   type Word,
 } from '@vocabx/core';
+import { getLanguage } from '@vocabx/content';
 import { MotionConfig } from 'motion/react';
 import { CircleCheck, Plus, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { CardStage, type SwipeAction } from '@/components/review/card-stage';
-import { Term } from '@/components/review/formats/parts';
+import { SpokenTerm } from '@/components/review/formats/parts';
 import type { PhysicalDir } from '@/components/review/swipe';
 import { Button, buttonClass } from '@/components/ui/button';
 import { ProgressBar } from '@/components/ui/progress-bar';
@@ -26,6 +27,7 @@ import { useClock } from '@/lib/clock';
 import { useCloseOnBack } from '@/lib/close-on-back';
 import { newId } from '@/lib/ids';
 import { useRepos } from '@/lib/repos';
+import { useSpeech } from '@/lib/speech';
 import { track } from '@/lib/analytics';
 
 /**
@@ -69,6 +71,25 @@ export function WordPicker({
   // Saves run one after another: each reads and rewrites the learner's copy of the deck.
   const queue = useRef<Promise<unknown>>(Promise.resolve());
   const word = words[index];
+  const speech = useSpeech();
+  const speechLang = word ? (getLanguage(word.lang)?.speechLang ?? word.lang) : '';
+  // Each word is heard as its card comes, as in the review (unless spoken words are off).
+  const [autoSpeak, setAutoSpeak] = useState(false);
+  useEffect(() => {
+    const ctrl = new AbortController();
+    void repos.settings.get().then((s) => {
+      if (!ctrl.signal.aborted) setAutoSpeak(s.study.autoSpeak);
+    });
+    return () => ctrl.abort();
+  }, [repos]);
+  const spokenFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!autoSpeak || !word || spokenFor.current === word.id) return;
+    // Voices load a moment after the page: spoken once one is there.
+    if (!speech.canSpeak(speechLang)) return;
+    spokenFor.current = word.id;
+    void speech.speak(word.term, speechLang);
+  }, [autoSpeak, word, speech, speechLang]);
 
   // "Add" is toward the inline end (right in LTR), "skip" toward the start.
   const endDir: PhysicalDir = rtl ? 'left' : 'right';
@@ -144,9 +165,9 @@ export function WordPicker({
           <Link href="/decks" className={buttonClass('primary')}>
             {t('toWords')}
           </Link>
-          <Button variant="secondary" onClick={onClose}>
+          <Link href="/decks/library" className={buttonClass('secondary')}>
             {t('back')}
-          </Button>
+          </Link>
         </div>
       </section>
     );
@@ -206,15 +227,15 @@ export function WordPicker({
               onSwipe={(dir) => decide(dir === endDir, dir)}
               testId="picker-card"
             >
-              <div className="flex flex-col items-center gap-3 text-center">
-                <Term word={word} fit />
+              <div className="flex flex-1 flex-col items-center justify-evenly gap-3 text-center">
+                <SpokenTerm word={word} fit speechLang={speechLang} speech={speech} />
                 <p lang={nativeLang} className="text-xl font-semibold">
                   {(word.translations[nativeLang] ?? []).join(', ')}
                 </p>
                 {word.examples[0] && (
                   <p
                     lang={word.lang}
-                    className="mt-2 max-w-md rounded-control bg-surface-2 px-4 py-3 text-start"
+                    className="max-w-md rounded-control bg-surface-2 px-4 py-3 text-start"
                   >
                     <HighlightedText
                       text={word.examples[0].text}

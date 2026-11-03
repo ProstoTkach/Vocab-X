@@ -50,7 +50,7 @@ export function PageTour({
   ready,
   onFinish,
 }: {
-  tour: Exclude<TourPart, 'home' | 'game' | 'addWord'>;
+  tour: Exclude<TourPart, 'home' | 'game'>;
   steps: readonly TourStep[];
   ready: boolean;
   onFinish?: () => void;

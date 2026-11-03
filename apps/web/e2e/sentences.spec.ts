@@ -93,7 +93,6 @@ test('level 1: the word left out of an example is picked from four, its translat
 }) => {
   await expect(page.getByText('Слово в реченні', { exact: true })).toBeVisible();
   await expect(page.getByText('Рівень 1 з 3')).toBeVisible();
-  await expect(card(page).getByText('Оберіть слово, якого бракує в реченні')).toBeVisible();
   await expect(gap(page).first()).toBeVisible();
   await expect(options(page)).toHaveCount(4);
   await expect(page.getByRole('button', { name: 'Не знаю' })).toHaveCount(0);
@@ -196,9 +195,9 @@ test('the lab: any mode and level, nothing saved, the words come round', async (
   await expect(card(page).getByRole('textbox', { name: 'Ваша відповідь' })).toBeVisible();
   await mode.selectOption('quiz');
   await level.selectOption('2');
-  await expect(card(page).getByText('Як це буде англійською?')).toBeVisible();
+  await expect(page.getByText('Вибір слова', { exact: true })).toBeVisible();
   // Answers go round: the stack never gets smaller, nothing is saved.
-  await expect(page.getByText('30 карток у колоді')).toBeVisible();
+  await expect(page.getByText('15 карток у колоді')).toBeVisible();
   for (let i = 0; i < 3; i++) {
     await options(page).first().click();
     await page
@@ -207,7 +206,7 @@ test('the lab: any mode and level, nothing saved, the words come round', async (
       .catch(() => {});
     await expect(options(page).first()).toBeEnabled();
   }
-  await expect(page.getByText('30 карток у колоді')).toBeVisible();
+  await expect(page.getByText('15 карток у колоді')).toBeVisible();
   // The last answers can be taken back here too.
   const undo = page.getByRole('button', { name: 'Скасувати останню оцінку' });
   await expect(undo).toBeEnabled();

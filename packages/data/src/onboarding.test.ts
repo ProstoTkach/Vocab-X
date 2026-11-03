@@ -47,11 +47,12 @@ describe('completeOnboarding', () => {
     const own = (await repo.decks.list({ lang: 'en' })).filter((d) => d.origin === 'own');
     expect(own).toHaveLength(1);
     expect(own[0]).toMatchObject({ title: 'Англійська B1: основне', builtinId: deck.id });
-    // Known words are left out of the imported deck, as if skipped in the library.
+    // Known words are left out of the imported deck, as if skipped in the library; of the rest
+    // only the first 15 are taken, the others wait in the library.
     expect(own[0]!.skippedIds).toEqual(['en:achieve', 'en:advice']);
-    expect(builtinPickState(deck, own)).toMatchObject({ added: 28, skipped: 2, inProgress: false });
+    expect(builtinPickState(deck, own)).toMatchObject({ added: 15, skipped: 2, inProgress: true });
     expect(own[0]!.wordIds).toEqual(
-      deck.wordIds.filter((id) => !['en:achieve', 'en:advice'].includes(id)),
+      deck.wordIds.filter((id) => !['en:achieve', 'en:advice'].includes(id)).slice(0, 15),
     );
 
     const stack = await loadStudyStack(repo, {
@@ -61,8 +62,8 @@ describe('completeOnboarding', () => {
       settings: settings.study,
       params,
     });
-    // No daily caps: the whole deck except the two known words.
-    expect(stack).toHaveLength(28);
+    // No daily caps: every word taken.
+    expect(stack).toHaveLength(15);
     expect(stack.map((c) => c.id)).not.toContain('en:achieve');
     expect(stack.every((c) => c.word.translations.uk?.length)).toBe(true);
   });

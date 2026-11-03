@@ -95,10 +95,5 @@
       "title": "A deck",
       "text": "“Review” goes through its words only. The “⋯” menu renames, duplicates, archives or deletes it."
     }
-  },
-  "addWord": {
-    "title": "The “Find” button",
-    "text": "Type a word and press “Find”: its translations and examples show up. Pick the ones you need, and the word is ready.",
-    "ok": "Got it"
   }
 }

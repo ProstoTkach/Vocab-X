@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     gradeButtonsOnPhone: false,
   },
   gamification: 'max',
+  fontScale: 1,
   timeOffsetMs: 0,
   devTools: false,
   devUnlocked: false,

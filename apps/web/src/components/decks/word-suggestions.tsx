@@ -72,7 +72,8 @@ export function SuggestButton({
   const t = useTranslations('decks.form');
   const loading = lookup.state === 'loading';
   return (
-    <Tooltip content={t('suggestHint')} side="top">
+    // What it does, only on a long hover (a long press on phones): the label says enough.
+    <Tooltip content={t('suggestHint')} side="top" long>
       <Button
         size="sm"
         onClick={onSuggest}

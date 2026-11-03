@@ -65,7 +65,7 @@ describe('review flow', () => {
     });
     // The reviewed word leaves the deck until it is due again.
     const after = await stackAt(T0 + 1000);
-    expect(after).toHaveLength(29);
+    expect(after).toHaveLength(14);
     expect(after.map((c) => c.id)).not.toContain(card!.id);
   });
 

@@ -34,7 +34,8 @@ async function answerAny(page: Page) {
 test('the four-choice test replaces flash cards', async ({ page }) => {
   await expect(page.getByText('Вибір перекладу', { exact: true })).toBeVisible();
   await expect(page.getByText('Рівень 1 з 3')).toBeVisible();
-  await expect(card(page).getByText('Оберіть переклад')).toBeVisible();
+  // No line saying what to do: the card speaks for itself.
+  await expect(card(page).getByText('Оберіть переклад')).toHaveCount(0);
   await expect(options(page)).toHaveCount(4);
   // No grade buttons and no "I don't know": one of the four is picked.
   await expect(page.getByRole('button', { name: 'Знаю', exact: true })).toHaveCount(0);

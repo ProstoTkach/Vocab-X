@@ -637,7 +637,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
       // last few answers can be taken back.
       setLabHistory((h) => [...h, session].slice(-LAB_UNDO));
       setSession((s) => s && labAnswer(s, g));
-      setExitDir(dir ?? directionForGrade(g, swipe));
+      setExitDir(dir ?? (quizAnswer ? null : directionForGrade(g, swipe)));
       nextCard();
       return;
     }
@@ -726,7 +726,9 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
       setTipOpen(true);
       log('four_grades_tip', { to: 'shown' });
     }
-    setExitDir(dir ?? directionForGrade(g, swipe));
+    // The test and the sentences go on by themselves: the card just fades out (light on
+    // phones); a flight to the side is for a grade given by hand.
+    setExitDir(dir ?? (quizAnswer ? null : directionForGrade(g, swipe)));
     nextCard();
     setBusy(false);
   };

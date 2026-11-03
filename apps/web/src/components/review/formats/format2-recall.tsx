@@ -1,6 +1,5 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import {
   AnswerInput,
   CardLayout,
@@ -18,7 +17,6 @@ import type { FormatProps, FormatRenderer } from './types';
  */
 function Format2Recall(p: FormatProps) {
   const { card, side, nativeLang } = p;
-  const t = useTranslations('review');
   if (side === 'back') {
     return (
       <CardLayout
@@ -37,7 +35,6 @@ function Format2Recall(p: FormatProps) {
   }
   return (
     <CardLayout
-      above={<p className="text-sm text-fg-muted">{t('translateTo', { lang: card.word.lang })}</p>}
       below={
         p.typing && !p.typed && <AnswerInput lang={card.word.lang} onSubmit={p.onTypedSubmit} />
       }

@@ -44,8 +44,8 @@ test.beforeEach(async ({ page }) => {
     };
   });
   await onboard(page);
-  // One big deck, no daily caps: all 30 words of the starter deck.
-  await expect(page.getByRole('heading', { name: /^30 карток чекають/ })).toBeVisible();
+  // One big deck, no daily caps: the 15 words the level check added.
+  await expect(page.getByRole('heading', { name: /^15 карток чекають/ })).toBeVisible();
   await page.getByRole('link', { name: 'Повторювати' }).click();
   await expect(page).toHaveURL(/\/uk\/review$/);
   await expect(card(page)).toBeVisible();
@@ -91,7 +91,7 @@ test('the first visit explains how to review, once', async ({ page }) => {
   await expect(intro).toContainText('перевернути');
   // Keys do not grade behind the instructions.
   await page.keyboard.press('3');
-  await expect(page.getByText('30 карток у колоді')).toBeVisible();
+  await expect(page.getByText('15 карток у колоді')).toBeVisible();
   await intro.getByRole('button', { name: 'Зрозуміло, почнімо' }).click();
   await page.reload();
   await expect(card(page)).toBeVisible();
@@ -116,7 +116,7 @@ test('a new level is congratulated with what it opened', async ({ page }) => {
 
 test('the navigation stays available during review', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: 'Основна навігація' })).toBeVisible();
-  await expect(deckCount(page)).toHaveText('30 карток у колоді');
+  await expect(deckCount(page)).toHaveText('15 карток у колоді');
 });
 
 test('flips back and forth; the word is spoken only on the first flip', async ({ page }) => {
@@ -138,7 +138,7 @@ test('flips back and forth; the word is spoken only on the first flip', async ({
   expect(await spoken()).toBe(voice ? 1 : 0);
 
   await page.keyboard.press('3');
-  await expect(deckCount(page)).toHaveText('29 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток у колоді');
   // Grading (or swiping) away never speaks.
   expect(await spoken()).toBe(voice ? 1 : 0);
 });
@@ -151,18 +151,18 @@ test('desktop: keyboard grades, undo, and the whole deck to the end', async ({
   await page.keyboard.press('Space');
   const firstWord = await card(page).locator('[lang="en"]').first().textContent();
   await page.keyboard.press('3');
-  await expect(deckCount(page)).toHaveText('29 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток у колоді');
 
   // Undo brings the same card back, front side up.
   await page.keyboard.press('z');
-  await expect(deckCount(page)).toHaveText('30 карток у колоді');
+  await expect(deckCount(page)).toHaveText('15 карток у колоді');
   await expect(card(page)).toHaveAttribute('data-side', 'front');
   await expect(card(page).locator('[lang="en"]').first()).toHaveText(firstWord!);
 
   // "Forgot" takes the card off the stack for a few minutes; it then comes back on top.
   await page.keyboard.press('Enter');
   await page.keyboard.press('1');
-  await expect(deckCount(page)).toHaveText('29 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток у колоді');
 
   // No limit: the learner can go through all of it. New words then wait for their next step.
   for (let i = 0; i < 29; i++) {
@@ -181,17 +181,17 @@ test('desktop: swipes with the mouse', async ({ page, isMobile }) => {
   await card(page).click();
   await expect(card(page)).toHaveAttribute('data-side', 'back');
   await mouseSwipe(page, 0, -220); // ↑ Easy
-  await expect(deckCount(page)).toHaveText('29 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток у колоді');
 
   await card(page).click();
   await expect(card(page)).toHaveAttribute('data-side', 'back');
   await mouseSwipe(page, -240, 0); // ← Forgot: back in a few minutes
   await expect(card(page)).toHaveAttribute('data-side', 'front');
-  await expect(deckCount(page)).toHaveText('28 карток у колоді');
+  await expect(deckCount(page)).toHaveText('13 карток у колоді');
 
   // A card can be swiped away without flipping it.
   await mouseSwipe(page, 240, 0); // → Good
-  await expect(deckCount(page)).toHaveText('27 карток у колоді');
+  await expect(deckCount(page)).toHaveText('12 карток у колоді');
 });
 
 test('mobile: tap to flip and swipe to grade', async ({ page, isMobile }) => {
@@ -199,34 +199,34 @@ test('mobile: tap to flip and swipe to grade', async ({ page, isMobile }) => {
   await card(page).tap();
   await expect(card(page)).toHaveAttribute('data-side', 'back');
   await touchSwipe(page, 0, -220); // ↑ Easy
-  await expect(deckCount(page)).toHaveText('29 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток у колоді');
 
   await card(page).tap();
   await touchSwipe(page, -220, 0); // ← Forgot: the card comes back in a few minutes
   await expect(card(page)).toHaveAttribute('data-side', 'front');
-  await expect(deckCount(page)).toHaveText('28 карток у колоді');
+  await expect(deckCount(page)).toHaveText('13 карток у колоді');
 
   // A short drag is not a swipe.
   await card(page).tap();
   await expect(card(page)).toHaveAttribute('data-side', 'back');
   await touchSwipe(page, 30, 0);
   await expect(card(page)).toHaveAttribute('data-side', 'back');
-  await expect(deckCount(page)).toHaveText('28 карток у колоді');
+  await expect(deckCount(page)).toHaveText('13 карток у колоді');
 
   await page.getByRole('button', { name: /^Згадав/ }).click();
-  await expect(deckCount(page)).toHaveText('27 карток у колоді');
+  await expect(deckCount(page)).toHaveText('12 карток у колоді');
 
   // Swiping without flipping first also grades.
   await expect(card(page)).toHaveAttribute('data-side', 'front');
   await touchSwipe(page, 220, 0); // → Good
-  await expect(deckCount(page)).toHaveText('26 карток у колоді');
+  await expect(deckCount(page)).toHaveText('11 карток у колоді');
 });
 
 test('keys grade without flipping', async ({ page, isMobile }) => {
   test.skip(isMobile, 'keyboard flow');
   await expect(card(page)).toHaveAttribute('data-side', 'front');
   await page.keyboard.press('4');
-  await expect(deckCount(page)).toHaveText('29 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток у колоді');
 });
 
 test('a review can be left halfway and continued later', async ({ page }) => {
@@ -238,12 +238,12 @@ test('a review can be left halfway and continued later', async ({ page }) => {
     .getByRole('navigation', { name: 'Основна навігація' })
     .getByRole('link', { name: 'Головна' })
     .click();
-  await expect(page.getByRole('heading', { name: /^27 карток чекають/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^12 карток чекають/ })).toBeVisible();
 });
 
 test('after "+2 days" the reviewed cards are due again', async ({ page }) => {
   // The grade buttons are always there: no need to flip each card first.
-  for (let i = 0; i < 30; i++) await page.getByRole('button', { name: /^Згадав/ }).click();
+  for (let i = 0; i < 15; i++) await page.getByRole('button', { name: /^Згадав/ }).click();
   await expect(page.getByRole('heading', { name: /^Наступна картка — через/ })).toBeVisible();
 
   await setSettings(page, { devUnlocked: true });
@@ -257,7 +257,7 @@ test('after "+2 days" the reviewed cards are due again', async ({ page }) => {
 
   await page.goto('/uk');
   await expect(
-    page.getByText(/^30 (повторити|повт\.) · 0 нових$/).filter({ visible: true }),
+    page.getByText(/^15 (повторити|повт\.) · 0 нових$/).filter({ visible: true }),
   ).toBeVisible();
 });
 

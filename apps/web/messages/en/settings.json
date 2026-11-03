@@ -6,6 +6,8 @@
   "selected": "Selected",
   "language": "Interface language",
   "languageHint": "Language of buttons and hints. The language you study is set separately.",
+  "textSize": "Text size",
+  "textSizeHint": "The size of all text in the app: buttons, menus and cards.",
   "study": "Learning",
   "studyHint": "Changes apply immediately.",
   "targetLang": "Language you are learning",
@@ -63,5 +65,19 @@
   },
   "tour": "Tips",
   "tourHint": "A short tour of the home screen and the pages of the app.",
-  "tourAgain": "Show the tour again"
+  "tourAgain": "Show the tour again",
+  "reminders": {
+    "title": "Reminders",
+    "hint": "Once a day, a notification about the words waiting for review, even with the app closed. Offline, it arrives as soon as the phone is back online.",
+    "toggle": "Remind me every day",
+    "unsupported": "This browser does not show notifications from websites.",
+    "install": "On iPhone reminders come only from the app on the home screen: Share → Add to Home Screen, then turn them on here.",
+    "denied": "Notifications are blocked in the browser settings. Allow them for this site to get reminders.",
+    "failed": "Could not turn the reminders on. Try again later.",
+    "push": {
+      "title": "VocabX",
+      "waiting": "Words waiting for review: {count}. A few minutes, and they stay with you.",
+      "idle": "A few minutes of learning today keeps your streak going."
+    }
+  }
 }

@@ -20,13 +20,11 @@ const ROUND =
   'absolute top-1/2 inline-flex size-11 items-center justify-center rounded-full border-2 border-accent/70 bg-surface/50 text-accent backdrop-blur-sm transition motion-fast hover:border-accent hover:bg-surface/80 motion-safe:animate-pop disabled:opacity-50';
 
 /**
- * The card of a test or a sentence task, never scrolled: what it asks above, the question in
- * the middle of the card, the answer (options, a field, the microphone) at the bottom on
- * phones and right under the question on wide screens.
- *
- * The space above and below the question is shared equally, so it sits exactly in the middle
- * while everything fits. When the answer needs more room, the space above gives way first (the
- * question moves up); `fit` then makes the question's text smaller as a last resort.
+ * The card of a test or a sentence task, never scrolled: the result line (once answered) above,
+ * the question, and the answer (options, a field, the microphone), spread evenly down the card
+ * on phones and wide screens alike. The result line has its place from the start (`reserve`),
+ * so answering moves nothing. When the card is too small, `fit` makes the question's text
+ * smaller as a last resort.
  *
  * On phones, once answered, a bar along the bottom edge of the card fills up until the next
  * card comes, and an arrow at the side goes on at once.
@@ -37,6 +35,7 @@ export function ChoiceLayout({
   bottom,
   next,
   fitRef,
+  reserve = 'line',
 }: {
   top: ReactNode;
   children: ReactNode;
@@ -44,6 +43,8 @@ export function ChoiceLayout({
   next?: NextProps | undefined;
   /** An element in the middle whose text shrinks when the card is too small for everything. */
   fitRef?: RefObject<HTMLElement | null>;
+  /** Room kept for the result: one line, or the listen button and two lines (the sentences). */
+  reserve?: 'line' | 'tall';
 }) {
   const box = useRef<HTMLDivElement>(null);
   useShrinkToFit(box, fitRef);
@@ -51,15 +52,18 @@ export function ChoiceLayout({
     <>
       <div
         ref={box}
-        className="flex min-h-0 w-full min-w-0 flex-1 flex-col items-center overflow-hidden text-center"
+        className="flex min-h-0 w-full min-w-0 flex-1 flex-col items-center justify-evenly gap-3 overflow-hidden text-center"
       >
-        <div className="flex min-h-min w-full flex-[1_1_0] flex-col items-center justify-end gap-2 pb-4">
+        <div
+          className={cx(
+            'flex w-full shrink-0 flex-col items-center justify-end gap-2',
+            reserve === 'tall' ? 'min-h-24' : 'min-h-9',
+          )}
+        >
           {top}
         </div>
         <div className="flex w-full min-w-0 shrink-0 flex-col items-center gap-3">{children}</div>
-        <div className="flex min-h-min w-full min-w-0 flex-[1_1_0] flex-col items-center justify-end pt-4 sm:justify-start sm:pt-6">
-          {bottom}
-        </div>
+        <div className="flex w-full min-w-0 shrink-0 flex-col items-center">{bottom}</div>
       </div>
       {next && <NextBar {...next} />}
     </>

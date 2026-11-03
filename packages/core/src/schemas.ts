@@ -97,6 +97,7 @@ export const studySettingsSchema = z.object({
 /** Stored settings are partial: missing fields fall back to defaults. */
 export const settingsPatchSchema = z.object({
   themeId: z.string().max(64).optional(),
+  fontScale: z.number().min(0.75).max(1.5).optional(),
   study: studySettingsSchema.partial().optional(),
   gamification: z.enum(['off', 'medium', 'max']).optional(),
   timeOffsetMs: z.number().optional(),

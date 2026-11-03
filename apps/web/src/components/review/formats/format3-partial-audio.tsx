@@ -46,9 +46,7 @@ function Format3PartialAudio(p: FormatProps) {
   }
   return (
     <CardLayout
-      above={
-        voice ? <p className="text-sm text-fg-muted">{t('listenPrompt')}</p> : <NoVoiceNotice />
-      }
+      above={!voice && <NoVoiceNotice />}
       belowAt="start"
       below={
         <>

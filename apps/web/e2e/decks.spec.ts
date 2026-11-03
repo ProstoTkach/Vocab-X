@@ -54,9 +54,9 @@ test('my words: list with learning bars and details', async ({ page }) => {
   await page.goto('/uk/review');
   await expect(page.getByTestId('review-card')).toBeVisible();
   await page.keyboard.press('3');
-  await expect(page.getByText('29 карток у колоді')).toBeVisible();
+  await expect(page.getByText('14 карток у колоді')).toBeVisible();
   await page.goto('/uk/decks');
-  await expect(page.getByText('30 слів', { exact: true })).toBeVisible();
+  await expect(page.getByText('15 слів', { exact: true })).toBeVisible();
   // Streak and daily goal live on the home page only.
   await expect(page.getByRole('region', { name: 'Ваш прогрес' })).toHaveCount(0);
 
@@ -75,7 +75,7 @@ test('my words: list with learning bars and details', async ({ page }) => {
   await page.getByLabel('Сортування').selectOption({ label: 'Скоро повторювати' });
   // Drawn ten at a time as the end comes into view (how many depends on the screen height).
   await expect(page.getByRole('button', { name: /^Показати ще/ })).toBeVisible();
-  expect(await page.getByRole('main').getByRole('listitem').count()).toBeLessThan(30);
+  expect(await page.getByRole('main').getByRole('listitem').count()).toBeLessThan(15);
   await wordButton(page, 'advice').click();
   await expect(page.getByText("Ще не вивчалося — з'явиться серед нових.")).toBeVisible();
 });
@@ -92,7 +92,7 @@ test('add a word from my words goes to "My words"', async ({ page }) => {
   await expect(dialog.getByLabel('Приклад речення')).toHaveValue('Revenue grew by 10%.');
   await dialog.getByRole('button', { name: 'Додати', exact: true }).click();
 
-  await expect(page.getByText('31 слово', { exact: true })).toBeVisible();
+  await expect(page.getByText('16 слів', { exact: true })).toBeVisible();
   // Long lists show ten words at a time: find the new one by searching.
   await page.getByRole('searchbox', { name: 'Пошук слів' }).fill('revenue');
   await wordButton(page, 'revenue').click();
@@ -106,22 +106,25 @@ test('"I have learned it" moves a word to the learned words, out of the reviews'
   page,
 }) => {
   await page.goto('/uk/decks');
-  await expect(page.getByText('30 слів', { exact: true })).toBeVisible();
+  await expect(page.getByText('15 слів', { exact: true })).toBeVisible();
   await wordButton(page, 'achieve').click();
   await page.getByRole('button', { name: 'Я вивчив!' }).click();
   await expect(
     page.getByText('Слово «achieve» перенесено до колоди «Вивчені слова»').first(),
   ).toBeVisible();
-  await expect(page.getByText('29 слів', { exact: true })).toBeVisible();
+  await expect(page.getByText('14 слів', { exact: true })).toBeVisible();
   await page.goto('/uk');
-  await expect(page.getByRole('heading', { name: /^29 карток чекають/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^14 карток чекають/ })).toBeVisible();
   await page.goto('/uk/decks/mine');
   await expect(page.getByText('Вивчені слова').first()).toBeVisible();
 });
 
 test('library: pick single words by swiping, then add the rest', async ({ page }) => {
   await page.goto('/uk/decks/library');
-  await expect(page.getByText('Уся колода додана')).toBeVisible(); // B1 from onboarding
+  // B1 from onboarding: its first 15 words, the rest still to pick.
+  await expect(
+    page.getByRole('listitem').filter({ hasText: 'Англійська B1' }).first(),
+  ).toContainText('Додано 15 з 30');
   await page
     .getByRole('listitem')
     .filter({ hasText: 'Англійська B2: новий рівень' })
@@ -142,11 +145,14 @@ test('library: pick single words by swiping, then add the rest', async ({ page }
   await page.getByRole('button', { name: 'Готово' }).click();
   await expect(page.getByRole('heading', { name: 'Додано 2 слова' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Бібліотека' }).click();
-  await expect(page.getByText('Додано 2 з 30')).toBeVisible();
-  await expect(page.getByText('Відбір не завершено · Переглянуто 3 з 30')).toBeVisible();
+  // "Library" goes to the library itself.
+  await page.getByRole('main').getByRole('link', { name: 'Бібліотека' }).click();
+  await expect(page).toHaveURL(/\/uk\/decks\/library$/);
+  const b2Item = page.getByRole('listitem').filter({ hasText: 'Англійська B2' }).first();
+  await expect(b2Item).toContainText('Додано 2 з 30');
+  await expect(b2Item).toContainText('Відбір не завершено');
   await page.goto('/uk');
-  await expect(heroCount(page, 32)).toBeVisible();
+  await expect(heroCount(page, 17)).toBeVisible();
 
   // Each choice was saved at once: picking continues after the three words seen.
   await page.goto('/uk/decks/library');
@@ -160,13 +166,20 @@ test('library: pick single words by swiping, then add the rest', async ({ page }
   await expect(page.getByText('Додано: 2')).toBeVisible();
   await expect(page.getByText('Пропущено: 1')).toBeVisible();
   await page.getByRole('button', { name: 'Готово' }).click();
-  await page.getByRole('button', { name: 'Бібліотека' }).click();
+  await page.getByRole('main').getByRole('link', { name: 'Бібліотека' }).click();
+  await page
+    .getByRole('listitem')
+    .filter({ hasText: 'Англійська B2' })
+    .first()
+    .getByRole('link')
+    .first()
+    .click();
   await page.getByRole('button', { name: 'Додати всю колоду' }).click();
   // Saving the whole deck goes back to the library with a notice.
   await expect(page).toHaveURL(/\/uk\/decks\/library$/);
   await expect(page.getByText(/збережено до ваших слів/).first()).toBeVisible();
   await page.goto('/uk');
-  await expect(heroCount(page, 60)).toBeVisible();
+  await expect(heroCount(page, 45)).toBeVisible();
 
   // Every word seen: only the numbers stay. A word moved to the learned words later does not
   // make the deck look unfinished again.
@@ -190,9 +203,11 @@ test('library: search by name and sort by level; a deck opens from anywhere on i
 }) => {
   await page.goto('/uk/decks/library');
   const names = page.getByRole('main').getByRole('listitem');
-  await expect(names.first()).toContainText('A1');
+  // B1, picked halfway by the onboarding, comes first whatever the sort.
+  await expect(names.first()).toContainText('B1');
+  await expect(names.nth(1)).toContainText('A1');
   await page.getByLabel('Сортування').selectOption('levelDown');
-  await expect(names.first()).toContainText('C2');
+  await expect(names.nth(1)).toContainText('C2');
   await page.getByRole('searchbox', { name: 'Пошук колоди за назвою' }).fill('подорож');
   await expect(names).toHaveCount(1);
   await expect(names.first()).toContainText('Подорожі та аеропорт');
@@ -203,7 +218,9 @@ test('library: search by name and sort by level; a deck opens from anywhere on i
 test('library: filters by level and progress; unfinished decks come first', async ({ page }) => {
   await page.goto('/uk/decks/library');
   const decks = page.getByRole('main').getByRole('listitem');
-  await expect(decks.first()).toContainText('A1');
+  // B1, picked halfway by the onboarding, is first.
+  await expect(decks.first()).toContainText('B1');
+  await expect(decks.nth(1)).toContainText('A1');
 
   // A deck left halfway moves to the top, whatever the sort.
   await decks.filter({ hasText: 'Англійська C1' }).getByRole('link').click();
@@ -218,8 +235,8 @@ test('library: filters by level and progress; unfinished decks come first', asyn
     visible: test.info().project.name === 'desktop',
   });
   await page.goto('/uk/decks/library');
-  await expect(decks.first()).toContainText('Англійська C1');
-  await expect(decks.first()).toContainText('Відбір не завершено');
+  await expect(decks.nth(1)).toContainText('Англійська C1');
+  await expect(decks.nth(1)).toContainText('Відбір не завершено');
 
   await page.getByRole('button', { name: 'Рівень' }).click();
   await page.getByRole('menuitemcheckbox', { name: 'B2' }).click();
@@ -232,13 +249,14 @@ test('library: filters by level and progress; unfinished decks come first', asyn
   await page.getByRole('button', { name: /Прогрес/ }).click();
   await page.getByRole('menuitemcheckbox', { name: 'Незавершені' }).click();
   await page.keyboard.press('Escape');
-  await expect(decks).toHaveCount(1);
-  await expect(decks.first()).toContainText('Англійська C1');
+  // C1 and B1 (the onboarding took 15 of its words).
+  await expect(decks).toHaveCount(2);
+  await expect(decks.filter({ hasText: 'Англійська C1' })).toHaveCount(1);
 
   await page.getByRole('searchbox', { name: 'Пошук колоди за назвою' }).fill('немає такої');
   await expect(page.getByText('Колод за цими умовами немає.')).toBeVisible();
   await page.getByRole('button', { name: 'Скинути пошук і фільтри' }).click();
-  await expect(decks.first()).toContainText('Англійська C1');
+  await expect(decks.nth(1)).toContainText('Англійська C1');
   expect(await decks.count()).toBeGreaterThan(15);
 });
 
@@ -288,7 +306,7 @@ test('deck page: edit and remove words', async ({ page }) => {
   await page.getByRole('dialog').getByRole('button', { name: 'Прибрати з колоди' }).click();
   await expect(rows.filter({ hasText: 'achieve' })).toHaveCount(0);
   await page.goto('/uk');
-  await expect(heroCount(page, 29)).toBeVisible();
+  await expect(heroCount(page, 14)).toBeVisible();
 });
 
 test('archiving pauses a deck', async ({ page }) => {

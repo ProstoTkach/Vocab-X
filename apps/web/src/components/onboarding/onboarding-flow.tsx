@@ -8,6 +8,7 @@ import {
 } from '@vocabx/content';
 import {
   completeOnboarding,
+  ONBOARDING_DECK_WORDS,
   DAILY_GOAL_PRESETS,
   DEFAULT_SCHEDULER_PARAMS,
   systemClock,
@@ -211,7 +212,9 @@ export function OnboardingFlow() {
   if (step === 'result' && result) {
     const deck = catalog.decks.find((d) => d.id === result.level.deckId);
     const known = new Set(result.known.map((w) => w.id));
-    const toLearn = deck ? deck.wordIds.filter((id) => !known.has(id)).length : 0;
+    const toLearn = deck
+      ? Math.min(ONBOARDING_DECK_WORDS, deck.wordIds.filter((id) => !known.has(id)).length)
+      : 0;
     return (
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-5 px-4 py-10 text-center">
         <span className="inline-flex size-20 items-center justify-center rounded-full bg-brand text-on-accent shadow-glow">

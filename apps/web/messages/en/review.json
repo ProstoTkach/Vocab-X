@@ -32,7 +32,6 @@
     "SENT_SAY": "Say the word",
     "SENT_TYPE": "Type it into the sentence"
   },
-  "translateTo": "{lang, select, en {How do you say it in English?} uk {How do you say it in Ukrainian?} de {How do you say it in German?} es {How do you say it in Spanish?} other {How do you say it in this language?}}",
   "listen": "Listen",
   "listenPrompt": "Listen and recall the word",
   "noVoice": "No voice for this language on your device — showing a text hint instead.",
@@ -99,8 +98,6 @@
   "libraryTitle": "New words are in the library",
   "libraryText": "Ready-made decks by topic and level: quickly pick words and add them to your study right away.",
   "quiz": {
-    "pickTranslation": "Pick the translation",
-    "listenPick": "Listen to the word and pick its translation",
     "showWord": "Show the word",
     "right": "Correct!",
     "wrong": "Wrong",
@@ -127,11 +124,6 @@
     "start": "Got it, let's start"
   },
   "sentence": {
-    "prompt": {
-      "SENT_PICK": "Pick the word missing from the sentence",
-      "SENT_SAY": "Say the missing word aloud",
-      "SENT_TYPE": "Type the missing word"
-    },
     "gap": "missing word",
     "say": "Tap and say the word",
     "stop": "Stop",

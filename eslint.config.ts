@@ -84,5 +84,11 @@ export default defineConfig(
       globals: globals.node,
     },
   },
+  {
+    // The service worker runs on its own: its own globals, and the real time (no app clock).
+    files: ['apps/web/public/sw.js'],
+    languageOptions: { globals: globals.serviceworker },
+    rules: { 'no-restricted-syntax': 'off' },
+  },
   prettier,
 );

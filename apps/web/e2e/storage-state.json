@@ -35,10 +35,6 @@
         {
           "name": "vocabx:tour:mine",
           "value": "seen"
-        },
-        {
-          "name": "vocabx:tour:addWord",
-          "value": "seen"
         }
       ]
     }

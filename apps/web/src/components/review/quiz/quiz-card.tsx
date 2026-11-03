@@ -70,15 +70,6 @@ export function QuizCard(p: QuizCardProps) {
   const hinted = hintFor === card.id;
   const voice = p.speech.canSpeak(p.speechLang);
 
-  const prompt =
-    format === 'MCQ_TR'
-      ? t('quiz.pickTranslation')
-      : format === 'MCQ_AUD'
-        ? voice
-          ? t('quiz.listenPick')
-          : null
-        : t('translateTo', { lang: word.lang });
-
   // What is asked.
   const asked =
     format === 'MCQ_TR' ? (
@@ -112,7 +103,8 @@ export function QuizCard(p: QuizCardProps) {
         />
       </div>
     ) : (
-      <Translations word={word} lang={p.nativeLang} size="lg" />
+      // As big as the word on the first level.
+      <Translations word={word} lang={p.nativeLang} size="xl" />
     );
 
   if (format === 'TYPE') {
@@ -125,9 +117,7 @@ export function QuizCard(p: QuizCardProps) {
           ) : answered ? (
             // "I don't know": no input to judge, just the answer.
             <Verdict right={false} />
-          ) : (
-            <p className="text-sm text-fg-muted">{prompt}</p>
-          )
+          ) : null
         }
         next={p.next}
         bottom={
@@ -179,13 +169,7 @@ export function QuizCard(p: QuizCardProps) {
   const optionLang = format === 'MCQ_WORD' ? word.lang : p.nativeLang;
   return (
     <ChoiceLayout
-      top={
-        answered ? (
-          <Verdict right={!!right} />
-        ) : (
-          prompt && <p className="text-sm text-fg-muted">{prompt}</p>
-        )
-      }
+      top={answered ? <Verdict right={!!right} /> : null}
       next={p.next}
       bottom={
         <Options

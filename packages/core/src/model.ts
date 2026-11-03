@@ -137,6 +137,8 @@ export const studyModeOf = (
 
 export interface AppSettings {
   themeId: string;
+  /** The size of all text in the app, as a share of the usual (1). */
+  fontScale: number;
   study: StudySettings;
   gamification: GamificationMode;
   /** Demo/dev: offset applied to the clock, ms. */

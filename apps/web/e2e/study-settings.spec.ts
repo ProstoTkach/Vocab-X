@@ -87,7 +87,7 @@ test('mirrored swipe layout swaps Again and Good on arrows', async ({ page }) =>
   await page.getByRole('radio', { name: '← Згадав · → Забув' }).click();
   await openReview(page);
   await page.keyboard.press('ArrowLeft'); // now "Good": the card leaves the deck
-  await expect(deckCount(page)).toHaveText('29 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток у колоді');
 });
 
 test('card font size', async ({ page }) => {
@@ -136,5 +136,5 @@ test('animations off still reviews', async ({ page }) => {
   await openReview(page);
   await page.keyboard.press('Space');
   await page.keyboard.press('3');
-  await expect(deckCount(page)).toHaveText('29 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток у колоді');
 });

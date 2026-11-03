@@ -6,7 +6,9 @@ import { DataSettings } from '@/components/settings/data-settings';
 import { DictionarySources } from '@/components/settings/dictionary-sources';
 import { GamificationSettings } from '@/components/settings/gamification-settings';
 import { LocalePicker } from '@/components/settings/locale-picker';
+import { ReminderSettings } from '@/components/settings/reminder-settings';
 import { StudySettingsForm } from '@/components/settings/study-settings';
+import { TextSizePicker } from '@/components/settings/text-size-picker';
 import { ThemePicker } from '@/components/settings/theme-picker';
 import { TourRestart } from '@/components/settings/tour-restart';
 import { Card, CardText, CardTitle } from '@/components/ui/card';
@@ -29,6 +31,11 @@ export default async function SettingsPage() {
           <CardText className="mt-1 mb-5">{t('studyHint')}</CardText>
           <StudySettingsForm />
         </Card>
+        <Card aria-labelledby="settings-reminders">
+          <CardTitle id="settings-reminders">{t('reminders.title')}</CardTitle>
+          <CardText className="mt-1 mb-4">{t('reminders.hint')}</CardText>
+          <ReminderSettings />
+        </Card>
         <Card aria-labelledby="settings-gamification">
           <CardTitle id="settings-gamification">{t('gamification')}</CardTitle>
           <CardText className="mt-1 mb-4">{t('gamificationHint')}</CardText>
@@ -38,6 +45,11 @@ export default async function SettingsPage() {
           <CardTitle id="settings-theme">{t('theme')}</CardTitle>
           <CardText className="mt-1 mb-4">{t('themeHint')}</CardText>
           <ThemePicker />
+        </Card>
+        <Card aria-labelledby="settings-text-size">
+          <CardTitle id="settings-text-size">{t('textSize')}</CardTitle>
+          <CardText className="mt-1 mb-4">{t('textSizeHint')}</CardText>
+          <TextSizePicker />
         </Card>
         <Card aria-labelledby="settings-language">
           <CardTitle id="settings-language">{t('language')}</CardTitle>

@@ -1,4 +1,4 @@
-// Applies stored theme and sidebar state to <html> before first paint (no flash) and
+// Applies stored theme, text size and sidebar state to <html> before first paint (no flash) and
 // redirects to onboarding when it has not been completed.
 // It runs twice: inline in <head> on page load, and from Providers when React remounts
 // <html> (a locale switch clears its attributes). It reads localStorage directly because
@@ -25,7 +25,7 @@ interface BootConfig {
 // Self-contained: serialized with toString(), so it must not reference outer scope.
 function boot(c: BootConfig) {
   const d = document.documentElement;
-  let s: { themeId?: string } = {};
+  let s: { themeId?: string; fontScale?: number } = {};
   try {
     // eslint-disable-next-line no-restricted-globals -- runs before repositories exist
     s = JSON.parse(localStorage.getItem(c.key) ?? '{}') as typeof s;
@@ -43,6 +43,9 @@ function boot(c: BootConfig) {
   d.dataset.theme = id;
   d.dataset.themeChoice = choice;
   d.style.colorScheme = c.schemes[id] ?? 'light';
+  // The text size of the whole app: everything is sized in rem.
+  if (typeof s.fontScale === 'number' && s.fontScale !== 1)
+    d.style.fontSize = `${s.fontScale * 100}%`;
   // Sidebar: expanded only on the configured pages (path after the locale segment), and only in
   // a wide enough window.
   const path = '/' + location.pathname.split('/').slice(2).join('/');
@@ -94,6 +97,13 @@ export function bootScript(): string {
     '(' + gate.toString() + ')(' + JSON.stringify(gateConfig) + ')',
     '(' + boot.toString() + ')(' + JSON.stringify(config()) + ')',
   ].join(';');
+}
+
+/** The text size of the whole app, at once (as the boot script does on load). */
+export function applyFontScale(scale: number): void {
+  const style = document.documentElement.style;
+  if (scale === 1) style.removeProperty('font-size');
+  else style.fontSize = `${scale * 100}%`;
 }
 
 /** Re-applies the stored root attributes if something removed them. */

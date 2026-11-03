@@ -4,10 +4,9 @@ import { readKey, writeKey } from './analytics';
  * The guided tours, each shown once and remembered in this browser. Home has two parts: `home`
  * — what the screen and the pages are for (the first visit), `game` — the character, level and
  * wardrobe (once gamification is on, also when it is switched on later). The other pages have
- * one each (the review, my words, the library, my decks), and the window for a new word its
- * own short instruction (`addWord`).
+ * one each (the review, my words, the library, my decks).
  */
-export type TourPart = 'home' | 'game' | 'review' | 'words' | 'library' | 'mine' | 'addWord';
+export type TourPart = 'home' | 'game' | 'review' | 'words' | 'library' | 'mine';
 
 export const TOUR_KEYS: Record<TourPart, string> = {
   home: 'vocabx:tour:home',
@@ -16,7 +15,6 @@ export const TOUR_KEYS: Record<TourPart, string> = {
   words: 'vocabx:tour:words',
   library: 'vocabx:tour:library',
   mine: 'vocabx:tour:mine',
-  addWord: 'vocabx:tour:addWord',
 };
 
 /** Also kept for this tab, for browsers that block storage: the tour never repeats there. */

@@ -17,6 +17,9 @@ export const DAILY_GOAL_PRESETS: Record<DailyGoalPreset, Pick<StudySettings, 'da
   intense: { dailyGoalXp: 200 },
 };
 
+/** The level check adds this many words of the deck for the learner's level; the rest wait in the library. */
+export const ONBOARDING_DECK_WORDS = 15;
+
 interface Ctx {
   now: number;
   newId: () => string;
@@ -25,7 +28,8 @@ interface Ctx {
 /**
  * Copies a built-in deck into the learner's own decks (words stay shared, read-only). Words in
  * `skip` (e.g. already known from the level check) are left out and recorded as skipped, so the
- * library sees the deck as fully gone through rather than picked halfway.
+ * library does not offer them again. With a `limit`, the words past it are neither taken nor
+ * skipped: the library shows the deck as picked halfway, the rest to be added from there.
  */
 export async function importBuiltinDeck(
   repos: Pick<Repos, 'decks'>,
@@ -33,13 +37,15 @@ export async function importBuiltinDeck(
   uiLocale: LangCode,
   ctx: Ctx,
   skip: ReadonlySet<Id> = new Set(),
+  /** At most this many words are taken (in the deck's order); the rest stay to be picked. */
+  limit = Number.POSITIVE_INFINITY,
 ): Promise<Deck> {
   const deck: Deck = {
     id: ctx.newId(),
     title: builtin.titleI18n?.[uiLocale] ?? builtin.title,
     ...(builtin.cefr ? { cefr: builtin.cefr } : {}),
     lang: builtin.lang,
-    wordIds: builtin.wordIds.filter((id) => !skip.has(id)),
+    wordIds: builtin.wordIds.filter((id) => !skip.has(id)).slice(0, limit),
     ...(builtin.wordIds.some((id) => skip.has(id))
       ? { skippedIds: builtin.wordIds.filter((id) => skip.has(id)) }
       : {}),
@@ -77,7 +83,7 @@ export async function completeOnboarding(
   for (const id of c.builtinDeckIds) {
     const builtin = await repos.decks.get(id);
     if (builtin?.origin === 'builtin')
-      await importBuiltinDeck(repos, builtin, c.uiLocale, ctx, known);
+      await importBuiltinDeck(repos, builtin, c.uiLocale, ctx, known, ONBOARDING_DECK_WORDS);
   }
   await markKnown(repos, c.knownWords, { ...ctx, retention: settings.study.retention });
   const profile: Profile = {

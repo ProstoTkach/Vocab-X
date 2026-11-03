@@ -36,7 +36,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   return (
     <ToastContext value={value}>
-      <ToastPrimitive.Provider swipeDirection="down" label={t('close')}>
+      <ToastPrimitive.Provider swipeDirection="up" label={t('close')}>
         {children}
         {items.map((item) => (
           <ToastPrimitive.Root
@@ -63,7 +63,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             </ToastPrimitive.Close>
           </ToastPrimitive.Root>
         ))}
-        <ToastPrimitive.Viewport className="fixed inset-x-4 bottom-24 z-50 flex flex-col gap-2 outline-none md:start-auto md:end-6 md:top-6 md:bottom-auto md:w-96" />
+        {/* At the top on every screen (on wide ones in the corner): never over what is answered. */}
+        <ToastPrimitive.Viewport className="fixed inset-x-4 top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 flex flex-col gap-2 outline-none md:start-auto md:end-6 md:top-6 md:w-96" />
       </ToastPrimitive.Provider>
     </ToastContext>
   );

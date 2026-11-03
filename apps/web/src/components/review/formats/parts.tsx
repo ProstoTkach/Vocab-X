@@ -4,7 +4,7 @@
 import type { Example, LangCode, StudyCard, Word } from '@vocabx/core';
 import { Volume2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { HighlightedText } from '@/components/words/highlighted-text';
 import { track } from '@/lib/analytics';
@@ -16,13 +16,22 @@ export const acceptedAnswers = (card: StudyCard) => [
   ...new Set([card.word.term, card.word.lemma, ...(card.word.variants ?? [])]),
 ];
 
+/** The smallest share of its size a word is drawn at to stay on one line. */
+const FIT_MIN = 0.5;
+const FIT_STEP = 0.04;
+
 /**
- * On phones, how much smaller a word of this length is drawn when it has to fit on one line
- * (the four-choice test, where the listen button takes room at its side).
+ * A word drawn on one line, as big as the room allows: smaller step by step only while it does
+ * not fit (measured, not guessed from its length); below the smallest size it wraps instead.
  */
-export function phoneFit(term: string): number {
-  const n = term.length;
-  return n <= 8 ? 1 : n <= 11 ? 0.85 : n <= 14 ? 0.72 : n <= 18 ? 0.6 : 0.5;
+function fitOneLine(el: HTMLElement) {
+  const style = el.style;
+  style.whiteSpace = 'nowrap';
+  for (let f = 1; f >= FIT_MIN; f -= FIT_STEP) {
+    style.setProperty('--fit', String(f));
+    if (el.scrollWidth <= el.clientWidth + 1) return;
+  }
+  style.whiteSpace = '';
 }
 
 export function Term({
@@ -32,19 +41,29 @@ export function Term({
 }: {
   word: Word;
   size?: 'xl' | 'lg';
-  /** Phones: a long word shrinks to stay on one line. */
+  /** A long word gets smaller to stay on one line, only as much as it has to. */
   fit?: boolean;
 }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!fit || !el) return;
+    const run = () => fitOneLine(el);
+    run();
+    // Again when the room changes (turning the phone, a window resized, fonts loaded).
+    const observer = new ResizeObserver(run);
+    if (el.parentElement) observer.observe(el.parentElement);
+    return () => observer.disconnect();
+  }, [fit, word.term]);
   return (
     <p
+      ref={ref}
       lang={word.lang}
-      style={fit ? ({ '--fit': phoneFit(word.term) } as CSSProperties) : undefined}
       className={cx(
-        'font-display font-bold break-words text-balance',
-        // Smaller on phones, so a long word still fits on one line.
+        'max-w-full font-display font-bold break-words text-balance',
         size === 'xl'
-          ? 'text-[calc(1.75rem*var(--card-scale,1)*var(--fit,1))] sm:text-[calc(2.5rem*var(--card-scale,1))]'
-          : 'text-[calc(1.375rem*var(--card-scale,1)*var(--fit,1))] sm:text-[calc(1.75rem*var(--card-scale,1))]',
+          ? 'text-[calc(2.25rem*var(--card-scale,1)*var(--fit,1))] sm:text-[calc(2.5rem*var(--card-scale,1)*var(--fit,1))]'
+          : 'text-[calc(1.75rem*var(--card-scale,1)*var(--fit,1))] sm:text-[calc(1.75rem*var(--card-scale,1)*var(--fit,1))]',
       )}
     >
       {word.term}
@@ -69,7 +88,7 @@ export function Translations({
       className={cx(
         'break-words text-balance',
         size === 'xl'
-          ? 'font-display text-[calc(1.75rem*var(--card-scale,1))] leading-tight font-bold sm:text-[calc(2.5rem*var(--card-scale,1))]'
+          ? 'font-display text-[calc(2.25rem*var(--card-scale,1))] leading-tight font-bold sm:text-[calc(2.5rem*var(--card-scale,1))]'
           : size === 'lg'
             ? 'font-display text-[calc(1.5rem*var(--card-scale,1))] leading-tight font-bold sm:text-[calc(2rem*var(--card-scale,1))]'
             : 'text-[calc(1.125rem*var(--card-scale,1))] font-semibold sm:text-[calc(1.375rem*var(--card-scale,1))]',
@@ -96,7 +115,7 @@ export function SpokenTerm({
   fit?: boolean;
 }) {
   return (
-    <div className="relative max-w-full px-12">
+    <div className="relative max-w-full px-11">
       <Term word={word} fit={fit} {...(size ? { size } : {})} />
       <div className="absolute end-0 top-1/2 -translate-y-1/2">
         <SpeakButton text={word.term} speechLang={speechLang} speech={speech} />

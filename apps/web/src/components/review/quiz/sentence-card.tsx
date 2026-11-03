@@ -123,10 +123,9 @@ export function SentenceCard(p: SentenceCardProps) {
               </>
             )}
           </>
-        ) : (
-          <p className="text-sm text-fg-muted">{t(`sentence.prompt.${format}`)}</p>
-        )
+        ) : null
       }
+      reserve="tall"
       next={p.next}
       fitRef={sentenceRef}
       bottom={
