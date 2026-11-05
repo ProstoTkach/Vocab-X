@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { StubPage } from '@/components/stub-page';
+import { ProfileView } from '@/components/profile/profile-view';
+import { signInConfigured } from '@/lib/auth';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pages');
@@ -8,5 +9,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
-  return <StubPage page="profile" stage="A7" />;
+  return <ProfileView accounts={signInConfigured()} />;
 }

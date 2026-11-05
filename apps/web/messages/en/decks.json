@@ -105,7 +105,9 @@
     "save": "{count, plural, =0 {Nothing to add} one {Add # word} other {Add # words}}",
     "saved": "{count, plural, one {# word added} other {# words added}} to the deck \"{name}\"",
     "parseAgain": "Parse anew",
-    "backToDeck": "Back to the deck"
+    "backToDeck": "Back to the deck",
+    "autofill": "Fill in everything",
+    "autofilling": "Filling in… {done} of {total}"
   },
   "addList": "Add a word list",
   "copyText": "Copy cards as text",

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/toast';
 import { track } from '@/lib/analytics';
+import { useReminderSync } from '@/lib/reminder-sync';
 import {
   reminderState,
   turnRemindersOff,
@@ -22,6 +23,7 @@ export function ReminderSettings() {
   const toast = useToast();
   const [state, setState] = useState<ReminderState | null>(null);
   const [busy, setBusy] = useState(false);
+  const sync = useReminderSync();
 
   useEffect(() => {
     let live = true;
@@ -32,7 +34,7 @@ export function ReminderSettings() {
   }, []);
 
   if (state === null) return <div aria-busy className="h-12" />;
-  if (state === 'unsupported' || state === 'install' || state === 'denied')
+  if (state === 'unsupported' || state === 'unset' || state === 'install' || state === 'denied')
     return <p className="text-sm text-fg-muted">{t(state)}</p>;
 
   const toggle = async (on: boolean) => {
@@ -42,6 +44,8 @@ export function ReminderSettings() {
       track('reminders', { to: result });
       if (result === 'failed') toast({ title: t('failed'), tone: 'danger' });
       else setState(result);
+      // The first reminder planned at once (when words will be waiting).
+      if (result === 'on') await sync();
     } else {
       await turnRemindersOff(locale);
       track('reminders', { to: 'off' });

@@ -12,7 +12,7 @@ const PAGES = [
   { path: '/uk/decks/library', heading: null },
   { path: '/uk/decks/import', heading: null },
   { path: '/uk/league', heading: 'Рейтинг' },
-  { path: '/uk/profile', heading: 'Профіль' },
+  { path: '/uk/profile', heading: 'Учень без імені' },
   { path: '/uk/settings', heading: 'Налаштування' },
   { path: '/en', heading: 'Home' },
 ];

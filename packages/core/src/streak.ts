@@ -8,6 +8,14 @@ export function shiftDateKey(key: string, days: number): string {
 }
 
 /** Days on which the daily goal was met. */
+/** The seven days, Monday first, of the week `weeksBack` weeks before the one holding `today`. */
+export function weekDays(today: string, weeksBack = 0): string[] {
+  const [y, m, d] = today.split('-').map(Number) as [number, number, number];
+  const sinceMonday = (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7;
+  const monday = shiftDateKey(today, -sinceMonday - 7 * weeksBack);
+  return Array.from({ length: 7 }, (_, i) => shiftDateKey(monday, i));
+}
+
 export function goalDays(stats: readonly DailyStats[], goal: number): Set<string> {
   return new Set(stats.filter((s) => s.xp >= goal).map((s) => s.date));
 }

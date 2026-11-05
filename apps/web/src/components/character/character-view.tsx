@@ -142,3 +142,52 @@ export function CharacterView({
     </div>
   );
 }
+
+/**
+ * Only the head, with whatever is worn on it (glasses, a hat): a portrait for the profile. The
+ * box takes the shape of the head and its things together.
+ */
+export function CharacterHead({
+  look,
+  label,
+  className,
+}: {
+  look: Look;
+  label: string;
+  className?: string;
+}) {
+  const { head } = layersOf(look, 'joy');
+  const left = Math.min(...head.map((l) => l.x));
+  const top = Math.min(...head.map((l) => l.y));
+  const width = Math.max(...head.map((l) => l.x + l.width)) - left;
+  const height = Math.max(...head.map((l) => l.y + l.height)) - top;
+  return (
+    <div
+      role="img"
+      aria-label={label}
+      dir="ltr"
+      className={cx('relative', className)}
+      style={{ aspectRatio: `${width} / ${height}` }}
+    >
+      {head.map((layer) => (
+        <Image
+          key={layer.key}
+          src={layer.src}
+          alt=""
+          width={layer.width}
+          height={layer.height}
+          quality={IMAGE_QUALITY}
+          draggable={false}
+          className="absolute select-none"
+          style={{
+            left: `${((layer.x - left) / width) * 100}%`,
+            top: `${((layer.y - top) / height) * 100}%`,
+            width: `${(layer.width / width) * 100}%`,
+            height: `${(layer.height / height) * 100}%`,
+            ...(layer.filter ? { filter: layer.filter } : {}),
+          }}
+        />
+      ))}
+    </div>
+  );
+}

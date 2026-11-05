@@ -72,6 +72,7 @@ import type { TypedAnswer } from './formats/types';
 import { GRADE_NAME, GRADE_SWIPE_TONE, GradeBar } from './grade-bar';
 import { QuizBar, QuizCard, type QuizAnswer } from './quiz/quiz-card';
 import { SentenceCard } from './quiz/sentence-card';
+import { REMINDER_OFFER_AFTER, REMINDER_OFFER_TIP, requestReminderOffer } from '@/lib/reminders';
 import { SessionAside } from './session-aside';
 import { SessionSummary } from './session-summary';
 import {
@@ -242,7 +243,12 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   /** The answer was seen at least once: gates auto-speech. */
   const [revealed, setRevealed] = useState(false);
   const [typed, setTyped] = useState<TypedAnswer | null>(null);
-  const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
+  const [ownResult, setQuizResult] = useState<QuizResult | null>(null);
+  /**
+   * Answers taken back on the way to an earlier card (by card and place in the session): going
+   * forward again, the card comes with its result, and is not to be answered anew.
+   */
+  const [passed, setPassed] = useState<ReadonlyMap<string, QuizResult>>(new Map());
   /**
    * A test answer is saved while its result is on screen, so "Next" only moves the card on:
    * reading and writing the log on a phone would otherwise stall the swipe.
@@ -331,6 +337,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
       setRevealed(false);
       setTyped(null);
       setQuizResult(null);
+      setPassed(new Map());
       setEndedAt(null);
     })();
     return () => ctrl.abort();
@@ -369,6 +376,22 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
       onHide();
     };
   }, []);
+  // Left after enough answers: the next page offers the reminders (once, if they are off).
+  const offerRef = useRef(false);
+  useEffect(() => {
+    offerRef.current =
+      !lab &&
+      !!session &&
+      !!setup &&
+      session.reviewed >= REMINDER_OFFER_AFTER &&
+      !setup.tipsSeen.includes(REMINDER_OFFER_TIP);
+  });
+  useEffect(
+    () => () => {
+      if (offerRef.current) requestReminderOffer();
+    },
+    [],
+  );
   // The stack is done: summed up at once.
   const finished = !!session && session.queue.length === 0 && session.waiting.length === 0;
   useEffect(() => {
@@ -403,6 +426,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   };
   const grades = swipe.twoGrades ? TWO_GRADES : ALL_GRADES;
   const cardKey = card ? `${card.id}:${session.reviewed}` : null;
+  const quizResult = ownResult ?? (cardKey ? passed.get(cardKey) : null) ?? null;
   const nativeLang = setup?.profile.nativeLang ?? 'uk';
   const level: Level = mixStep ? mixStep.level : lab ? labLevel : (card?.progress?.card.level ?? 1);
   // Sentences: the example for this answer (they take turns, so a wrong answer comes back with
@@ -616,6 +640,9 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
 
   const nextCard = () => {
     sentenceSaid.current = null;
+    // The card leaves the screen, and with it what was remembered for it.
+    if (cardKey && passed.has(cardKey))
+      setPassed((m) => new Map([...m].filter(([key]) => key !== cardKey)));
     setSide('front');
     setRevealed(false);
     setTyped(null);
@@ -757,6 +784,12 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     setSession((s) => s && sessionReducer(s, { type: 'undo' }));
     setEndedAt(null);
     nextCard();
+    // The answer on screen goes from the log with this step back, but it was given: the card
+    // shows it again on the way forward, and "Next" saves it again.
+    if (quizResult && cardKey) {
+      const { pausedMs: _paused, ...kept } = quizResult;
+      setPassed((m) => new Map(m).set(cardKey, { ...kept, autoMs: null, restored: true }));
+    }
     // A test card comes back answered, with its result, not to be answered again.
     const answered = quizAnswers.current.get(last.token.event.id);
     if (answered) setQuizResult({ ...answered, autoMs: null, restored: true });
@@ -768,6 +801,8 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     else setMode(next, 'review');
     // A way of studying tried for the first time explains itself too.
     setIntroClosed(false);
+    // Other tasks now: the answers kept for the old ones mean nothing.
+    setPassed(new Map());
     nextCard();
   };
   const changeLevel = (next: Level) => {
@@ -890,6 +925,10 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
         onNext: () => nextQuiz(),
         paused: quizResult.pausedMs !== undefined,
         onPause: canPause ? togglePause : undefined,
+        // A right answer goes on quickly by itself: no arrow (unless it waits: undo, pause).
+        noArrow:
+          quizResult.grade >= 2 &&
+          (quizResult.autoMs !== null || quizResult.pausedMs !== undefined),
       }
     : undefined;
   const suggested = typed

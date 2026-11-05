@@ -51,11 +51,21 @@ export function useWordSuggest(lexicon: Lexicon, wordLang: LangCode, nativeLang:
 const alreadyShown = (lookup: SuggestLookup, term: string) =>
   lookup.state === 'done' && !lookup.hidden && lookup.term === term.trim();
 
+const same = (a: string, b: string) => a.toLocaleLowerCase() === b.toLocaleLowerCase();
+
 /** The translations field with one more variant, unless it is already there. */
 export function withTranslation(field: string, variant: string): string {
   const list = splitTranslations(field);
-  if (list.some((s) => s.toLocaleLowerCase() === variant.toLocaleLowerCase())) return field;
+  if (list.some((s) => same(s, variant))) return field;
   return [...list, variant].join(', ');
+}
+
+/** A variant tapped again: taken out of the field; otherwise added to it. */
+export function toggleTranslation(field: string, variant: string): string {
+  const list = splitTranslations(field);
+  return list.some((s) => same(s, variant))
+    ? list.filter((s) => !same(s, variant)).join(', ')
+    : withTranslation(field, variant);
 }
 
 export function SuggestButton({
@@ -104,7 +114,11 @@ export function HideSuggestionsButton({
       variant="ghost"
       size="sm"
       onClick={onHide}
-      className={cx('justify-center text-fg-muted', className)}
+      // As wide as whatever is above it (never widening it): a long label wraps instead.
+      className={cx(
+        'h-auto w-0 min-w-full justify-center py-1.5 text-center leading-tight whitespace-normal text-fg-muted',
+        className,
+      )}
     >
       <EyeOff aria-hidden className="size-4" />
       {t('hideSuggestions')}
@@ -121,17 +135,18 @@ function NotFound({ text }: { text: string }) {
   );
 }
 
-/** Translation variants as chips; a tap adds one to the field. */
+/** Translation variants as chips; a tap adds one to the field, a second tap takes it out. */
 export function TranslationSuggestions({
   found,
   value,
   lang,
-  onAdd,
+  onChange,
 }: {
   found: WordSuggestions | null;
   value: string;
   lang: LangCode;
-  onAdd: (variant: string) => void;
+  /** The field with the variant added or taken out. */
+  onChange: (field: string) => void;
 }) {
   const t = useTranslations('decks.form');
   if (!found) return null;
@@ -149,11 +164,12 @@ export function TranslationSuggestions({
               type="button"
               lang={lang}
               aria-pressed={on}
-              disabled={on}
-              onClick={() => onAdd(s)}
+              onClick={() => onChange(toggleTranslation(value, s))}
               className={cx(
                 'inline-flex min-h-9 items-center gap-1 rounded-full border bg-surface px-3 text-sm transition-colors motion-fast',
-                on ? 'border-accent text-fg' : 'border-line hover:border-accent',
+                on
+                  ? 'border-accent text-fg hover:border-danger hover:text-danger'
+                  : 'border-line hover:border-accent',
               )}
             >
               {on ? (

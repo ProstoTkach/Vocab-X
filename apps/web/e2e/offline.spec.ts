@@ -13,7 +13,7 @@ test('once visited, the app opens and reviews offline; reminders can be turned o
   // The worker has kept the main pages and their files.
   await expect(page.locator('html[data-offline="ready"]')).toHaveCount(1, { timeout: 60_000 });
   await page.goto('/uk/settings');
-  await expect(page.getByRole('switch', { name: 'Нагадувати щодня' })).toBeVisible();
+  await expect(page.getByRole('switch', { name: 'Нагадувати про повторення' })).toBeVisible();
 
   await context.setOffline(true);
   await page.goto('/uk/review');

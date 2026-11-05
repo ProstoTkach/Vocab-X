@@ -322,7 +322,7 @@ export function importedBuiltinIds(own: readonly Deck[]): Set<Id> {
 }
 
 /** The learner's copy of a built-in deck, if any. */
-async function builtinCopy(repos: DeckRepos, builtin: Deck): Promise<Deck | undefined> {
+export async function builtinCopy(repos: DeckRepos, builtin: Deck): Promise<Deck | undefined> {
   return (await repos.decks.list({ includeArchived: true })).find(
     (d) => d.origin === 'own' && d.builtinId === builtin.id,
   );
@@ -385,6 +385,20 @@ export async function skipBuiltinWords(
     (id) => wordIds.includes(id) && !own.wordIds.includes(id) && !prev.includes(id),
   );
   return updateDeck(repos, own, { skippedIds: [...prev, ...add] }, ctx.now);
+}
+
+/**
+ * Undo while picking: puts the learner's copy back as it was before the last choice (`before`,
+ * taken with builtinCopy); a copy made by that choice goes again.
+ */
+export async function restoreBuiltinCopy(
+  repos: DeckRepos,
+  builtin: Deck,
+  before: Deck | undefined,
+): Promise<void> {
+  if (before) return repos.decks.save(before);
+  const made = await builtinCopy(repos, builtin);
+  if (made) await repos.decks.remove(made.id);
 }
 
 export interface BuiltinPickState {

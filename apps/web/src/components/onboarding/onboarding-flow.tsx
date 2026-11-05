@@ -31,8 +31,6 @@ import { RadioGroup } from 'radix-ui';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { track, writeKey } from '@/lib/analytics';
 import { KEYS } from '@/lib/analytics/identity';
-import { LocalePicker } from '@/components/settings/locale-picker';
-import { ImportBackup } from '@/components/settings/import-backup';
 import { ThemePicker } from '@/components/settings/theme-picker';
 import { Button } from '@/components/ui/button';
 import { CheckCard, RadioCard } from '@/components/ui/choice';
@@ -233,7 +231,7 @@ export function OnboardingFlow() {
             count: toLearn,
           })}
         </p>
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-7">
           <Button size="lg" onClick={() => void finish(result.known, [result.level.deckId])}>
             {t('finish')}
           </Button>
@@ -283,65 +281,45 @@ export function OnboardingFlow() {
       <div className="relative min-h-0 flex-1 overflow-y-auto">
         <section
           aria-labelledby="onboarding-step"
-          className={cx(
-            'mx-auto flex w-full flex-col gap-6 px-4 py-6 md:px-8 md:py-10',
-            // The first step spreads over two columns; the others are short forms that read
-            // better in a narrower column.
-            step === 'welcome' ? 'max-w-5xl' : 'max-w-3xl',
-          )}
+          className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 md:px-8 md:py-10"
         >
           {step === 'welcome' && (
-            // Wide screens: the introduction on one side, the first settings on the other.
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-12">
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-start">
-                  <Image
-                    src="/male/_wolf/wolf_head_joy.png"
-                    alt=""
-                    width={286}
-                    height={369}
-                    quality={IMAGE_QUALITY}
-                    loading="eager"
-                    className="h-32 w-auto shrink-0 drop-shadow-xl sm:h-40"
-                  />
-                  <StepTitle ref={heading} text={t('welcomeTitle')} intro={t('welcomeText')} />
-                </div>
-                <ul className="grid gap-3 sm:grid-cols-2">
-                  {WELCOME_POINTS.map(({ key, icon: Icon }) => (
-                    <li
-                      key={key}
-                      className="flex gap-3 rounded-control border border-line/70 bg-surface p-4"
-                    >
-                      <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-2 text-accent">
-                        <Icon aria-hidden className="size-5" />
-                      </span>
-                      <span>
-                        <span className="block font-semibold">{t(`${key}Title`)}</span>
-                        <span className="block text-sm text-fg-muted">{t(`${key}Text`)}</span>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+            // Only a greeting: the wolf, what VocabX is about and why it works.
+            <div className="flex flex-col items-center gap-8 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <Image
+                  src="/male/_wolf/wolf_head_joy.png"
+                  alt=""
+                  width={286}
+                  height={369}
+                  quality={IMAGE_QUALITY}
+                  loading="eager"
+                  className="h-36 w-auto shrink-0 drop-shadow-xl motion-safe:animate-pop sm:h-44"
+                />
+                <StepTitle ref={heading} text={t('welcomeTitle')} intro={t('welcomeText')} />
               </div>
-              <div className="flex flex-col gap-6 lg:rounded-card lg:border lg:border-line/70 lg:bg-surface/60 lg:p-6 lg:self-start">
-                <Field label={t('uiLanguage')}>
-                  <LocalePicker />
-                </Field>
-                <Field label={t('restoreTitle')} hint={t('restoreHint')}>
-                  <ImportBackup
-                    onImported={() => {
-                      track('onboarding_restore');
-                      window.location.assign('/' + locale);
-                    }}
-                  />
-                </Field>
-              </div>
+              <ul className="grid w-full gap-3 text-start sm:grid-cols-2">
+                {WELCOME_POINTS.map(({ key, icon: Icon }) => (
+                  <li
+                    key={key}
+                    className="flex gap-3 rounded-control border border-line/70 bg-surface p-4"
+                  >
+                    <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-2 text-accent">
+                      <Icon aria-hidden className="size-5" />
+                    </span>
+                    <span>
+                      <span className="block font-semibold">{t(`${key}Title`)}</span>
+                      <span className="block text-sm text-fg-muted">{t(`${key}Text`)}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
           {step === 'languages' && (
             <>
-              <StepTitle ref={heading} text={t('languagesTitle')} />
+              <StepTitle ref={heading} text={t('languagesTitle')} hidden />
               <div className="grid gap-6 md:grid-cols-2 md:gap-8">
                 <Field label={t('nativeLanguage')} hint={t('nativeHint')}>
                   <RadioGroup.Root
@@ -392,7 +370,7 @@ export function OnboardingFlow() {
 
           {step === 'goal' && (
             <>
-              <StepTitle ref={heading} text={t('goalTitle')} />
+              <StepTitle ref={heading} text={t('goalTitle')} hidden />
               <div className="grid gap-6 md:grid-cols-2 md:gap-8">
                 <Field label={t('goalLabel')}>
                   <RadioGroup.Root
@@ -422,7 +400,7 @@ export function OnboardingFlow() {
 
           {step === 'start' && (
             <>
-              <StepTitle ref={heading} text={t('startTitle')} intro={t('startHint')} />
+              <StepTitle ref={heading} text={t('startTitle')} hidden />
               <div className="grid gap-3">
                 {testLang && (
                   <StartOption
@@ -487,13 +465,16 @@ function StepTitle({
   ref,
   text,
   intro,
+  hidden = false,
 }: {
   ref: React.Ref<HTMLHeadingElement>;
   text: string;
   intro?: string;
+  /** Only for screen readers (and focus): the fields of the step say enough on screen. */
+  hidden?: boolean;
 }) {
   return (
-    <div>
+    <div className={hidden ? 'sr-only' : undefined}>
       <h1
         id="onboarding-step"
         ref={ref}
@@ -524,13 +505,16 @@ function StartOption({
   onClick: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-card border border-line/70 bg-surface p-5 shadow-card sm:flex-row sm:items-center">
-      <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-surface-2 text-accent">
-        {icon}
-      </span>
-      <div className="min-w-0 flex-1">
-        <h2 className="font-display text-lg font-semibold">{title}</h2>
-        <p className="mt-1 text-sm text-fg-muted text-pretty">{text}</p>
+    <div className="flex flex-col gap-4 rounded-card border border-line/70 bg-surface p-5 shadow-card sm:flex-row sm:items-center">
+      {/* The icon beside the title and text on phones too: no empty row around it. */}
+      <div className="flex min-w-0 flex-1 items-center gap-4">
+        <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-surface-2 text-accent">
+          {icon}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-display text-lg font-semibold">{title}</h2>
+          <p className="mt-1 text-sm text-fg-muted text-pretty">{text}</p>
+        </div>
       </div>
       <Button
         variant={primary ? 'primary' : 'secondary'}

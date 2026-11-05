@@ -283,9 +283,12 @@ export async function upsertRows(
   await appendRows(c, title, fresh);
 }
 
-/** The rows of a tab under its header, as the sheet shows them (text). */
-export async function readRows(c: SheetsConfig, title: string): Promise<string[][]> {
-  const res = await call<{ values?: string[][] }>(c, `/values/${range(title, 'A2:Z')}`);
+/** The rows of a tab under its header, as stored (numbers, booleans and text, not formatted). */
+export async function readRows(c: SheetsConfig, title: string): Promise<unknown[][]> {
+  const res = await call<{ values?: unknown[][] }>(
+    c,
+    `/values/${range(title, 'A2:Z')}?valueRenderOption=UNFORMATTED_VALUE`,
+  );
   return res.values ?? [];
 }
 

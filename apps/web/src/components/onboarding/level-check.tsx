@@ -156,26 +156,47 @@ export function LevelCheck({
         </ol>
         <p className="text-sm text-fg-muted">{t('checkHint')}</p>
       </header>
-      <section
-        aria-label={t('checkProgress', { current: state.asked + 1, total: state.planned })}
-        data-testid="level-card"
-        className="flex min-h-72 flex-col items-center justify-center gap-6 rounded-card border border-line bg-surface px-4 py-8 text-center shadow-card"
-      >
-        <Term word={word} fit />
-        <ol className="grid w-full max-w-md grid-cols-2 gap-2">
-          {options.map((o, i) => (
-            <li key={o.wordId} className="flex">
-              <OptionButton
-                n={i + 1}
-                text={o.text}
-                lang={nativeLang}
-                state={!answered ? 'idle' : o.correct ? 'right' : i === picked ? 'wrong' : 'other'}
-                onClick={() => pick(i)}
-              />
-            </li>
-          ))}
-        </ol>
-      </section>
+      {/* As a card of the review: a deck behind it, the brand's hairline on top, the word big in
+      the middle and the four options under it. Each new word fades in. */}
+      <div className="relative mb-4">
+        {[1, 2].map((i) => (
+          <div
+            key={i}
+            aria-hidden
+            className="absolute inset-0 rounded-card border border-line/70 bg-surface shadow-card"
+            style={{
+              transform: `translateY(${i * 9}px) scale(${1 - i * 0.05})`,
+              transformOrigin: 'bottom center',
+              opacity: 1 - i * 0.22,
+              zIndex: -i,
+            }}
+          />
+        ))}
+        <section
+          key={word.id}
+          aria-label={t('checkProgress', { current: state.asked + 1, total: state.planned })}
+          data-testid="level-card"
+          className="relative flex min-h-80 flex-col items-center justify-evenly gap-6 overflow-hidden rounded-card border border-line/70 bg-surface surface-sheen px-4 pt-8 pb-6 text-center shadow-pop motion-safe:animate-fade-in sm:px-6"
+        >
+          <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-brand opacity-80" />
+          <Term word={word} fit />
+          <ol className="grid w-full max-w-md grid-cols-2 gap-2">
+            {options.map((o, i) => (
+              <li key={o.wordId} className="flex">
+                <OptionButton
+                  n={i + 1}
+                  text={o.text}
+                  lang={nativeLang}
+                  state={
+                    !answered ? 'idle' : o.correct ? 'right' : i === picked ? 'wrong' : 'other'
+                  }
+                  onClick={() => pick(i)}
+                />
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
       <div className="flex flex-col items-center justify-between gap-4">
         <Button
           variant="ghost"

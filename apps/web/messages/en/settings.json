@@ -68,8 +68,8 @@
   "tourAgain": "Show the tour again",
   "reminders": {
     "title": "Reminders",
-    "hint": "Once a day, a notification about the words waiting for review, even with the app closed. Offline, it arrives as soon as the phone is back online.",
-    "toggle": "Remind me every day",
+    "hint": "A notification once 15 words are waiting for review (not sooner than an hour and a half after you leave the app), even with the app closed. Offline, it arrives as soon as the phone is back online.",
+    "toggle": "Remind me to review",
     "unsupported": "This browser does not show notifications from websites.",
     "install": "On iPhone reminders come only from the app on the home screen: Share → Add to Home Screen, then turn them on here.",
     "denied": "Notifications are blocked in the browser settings. Allow them for this site to get reminders.",
@@ -78,6 +78,16 @@
       "title": "VocabX",
       "waiting": "Words waiting for review: {count}. A few minutes, and they stay with you.",
       "idle": "A few minutes of learning today keeps your streak going."
+    },
+    "unset": "Reminders are not set up on the server yet (no push key).",
+    "offer": {
+      "title": "Remind you when words are waiting?",
+      "text": "Great work! Review your words on time so they stay with you — we will tell you when.",
+      "note": "A notification comes once 15 words are waiting, but not sooner than an hour and a half from now. Turn it off any time in the settings.",
+      "accept": "Remind me",
+      "later": "Not now",
+      "done": "Reminders are on",
+      "failed": "Could not turn the reminders on. Try in the settings."
     }
   }
 }

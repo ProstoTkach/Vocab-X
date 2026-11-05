@@ -45,5 +45,6 @@
     "new": "Not started",
     "done": "Finished"
   },
-  "filterReset": "Clear search and filters"
+  "filterReset": "Clear search and filters",
+  "pickUndo": "Undo the last choice"
 }

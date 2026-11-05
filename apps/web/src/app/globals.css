@@ -126,6 +126,14 @@
     }
   }
 
+  /* A new card (the level check): fades in and rises a little into place. */
+  --animate-fade-in: vx-fade-in 0.25s cubic-bezier(0.2, 0, 0, 1);
+  @keyframes vx-fade-in {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+  }
   /* A right answer: the check mark pops in, overshoots a little and settles. */
   --animate-pop: vx-pop 0.35s cubic-bezier(0.2, 0, 0, 1);
   @keyframes vx-pop {

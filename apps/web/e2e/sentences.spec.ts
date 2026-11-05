@@ -36,6 +36,17 @@ async function putAllAtLevel(page: Page, level: number) {
   }, level);
 }
 
+/** Goes on from an answer: "Next" if it is there (a mistake), or the card goes by itself. */
+async function goOn(page: Page) {
+  await page
+    .getByRole('button', { name: 'Далі' })
+    .click({ timeout: 1500 })
+    .catch(() => {});
+  await expect(card(page).getByText(/^(Правильно!|Неправильно)$/)).toHaveCount(0, {
+    timeout: 10_000,
+  });
+}
+
 /** Levels of the words' cards, as saved. */
 const levels = (page: Page) =>
   page.evaluate(() => {
@@ -121,7 +132,7 @@ test('an answer taken back comes with its result, waiting for "Next": nothing to
   page,
 }) => {
   await options(page).first().click();
-  await page.getByRole('button', { name: 'Далі' }).click();
+  await goOn(page);
   await page.getByRole('button', { name: 'Скасувати останню оцінку' }).click();
   await expect(card(page).locator('mark').first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Зупинити перехід' })).toHaveCount(0);
@@ -238,7 +249,7 @@ test('the mixed mode: first and recommended, explained once, each right answer a
   await options(page)
     .nth(await quizRightIndex(page))
     .click();
-  await page.getByRole('button', { name: 'Далі' }).click();
+  await goOn(page);
   // The word answered right is at the next step: the sentence, level 1.
   const steps = await page.evaluate(() => {
     const out: (number | undefined)[] = [];

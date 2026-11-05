@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { goalDays, goalStreak, shiftDateKey } from './streak';
+import { weekDays, goalDays, goalStreak, shiftDateKey } from './streak';
 
 const stat = (date: string, xp: number) => ({ date, xp, reviews: 1, newCards: 0, correct: 1 });
 
@@ -27,5 +27,18 @@ describe('streak', () => {
     const done = new Set(['2026-10-13', '2026-10-14']);
     expect(goalStreak(done, '2026-10-15')).toBe(2);
     expect(goalStreak(done, '2026-10-16')).toBe(0);
+  });
+});
+
+describe('weekDays', () => {
+  test('Monday first, whatever the day; earlier weeks by the number', () => {
+    // 2026-11-04 is a Wednesday.
+    const week = weekDays('2026-11-04');
+    expect(week).toHaveLength(7);
+    expect(week[0]).toBe('2026-11-02');
+    expect(week[6]).toBe('2026-11-08');
+    expect(weekDays('2026-11-02')[0]).toBe('2026-11-02');
+    expect(weekDays('2026-11-08')[0]).toBe('2026-11-02');
+    expect(weekDays('2026-11-04', 1)[0]).toBe('2026-10-26');
   });
 });

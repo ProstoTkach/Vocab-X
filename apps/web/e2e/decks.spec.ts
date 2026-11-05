@@ -87,6 +87,11 @@ test('add a word from my words goes to "My words"', async ({ page }) => {
   await dialog.getByLabel('Слово або вираз').fill('revenue');
   await dialog.getByRole('button', { name: 'Знайти' }).click();
   await dialog.getByRole('button', { name: 'дохід' }).click();
+  // A variant tapped again comes out of the field; a third tap puts it back.
+  await dialog.getByRole('button', { name: 'дохід' }).click();
+  await expect(dialog.getByLabel(/Переклади/)).toHaveValue('');
+  await dialog.getByRole('button', { name: 'дохід' }).click();
+  await expect(dialog.getByLabel(/Переклади/)).toHaveValue('дохід');
   await dialog.getByRole('button', { name: 'Revenue grew by 10%.' }).click();
   await expect(dialog.getByLabel('Приклад речення')).toHaveValue('Revenue grew by 10%.');
   await dialog.getByRole('button', { name: 'Додати', exact: true }).click();
@@ -139,6 +144,12 @@ test('library: pick single words by swiping, then add the rest', async ({ page }
   await mouseSwipe(page, 'picker-card', 240); // → add
   await expect(page.getByTestId('picker-card')).toContainText('consequence');
   await page.keyboard.press('ArrowLeft'); // ← skip
+  await expect(page.getByTestId('picker-card')).toContainText('reluctant');
+  // The last choice taken back, as in the review: the word comes again, nothing counted.
+  await page.getByRole('button', { name: 'Скасувати останній вибір' }).click();
+  await expect(page.getByTestId('picker-card')).toContainText('consequence');
+  await expect(page.getByText('Пропущено: 0')).toBeVisible();
+  await page.keyboard.press('ArrowLeft'); // ← skip again
   await expect(page.getByTestId('picker-card')).toContainText('reluctant');
   await page.getByRole('button', { name: 'Додати', exact: true }).click();
   await page.getByRole('button', { name: 'Готово' }).click();

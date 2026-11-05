@@ -13,6 +13,8 @@ export interface NextProps {
   /** The sentences: going on by itself can be paused (and resumed) to read and listen. */
   paused?: boolean;
   onPause?: (() => void) | undefined;
+  /** The arrow is left out (a right answer, going on by itself). */
+  noArrow?: boolean;
 }
 
 /** Round, see-through, the border and the icon in the primary colour: quiet over the card. */
@@ -74,7 +76,7 @@ export function ChoiceLayout({
  * Phones only. Positioned against the card itself (the nearest positioned box): the bar lies
  * in the card's bottom padding, the arrow over its side.
  */
-function NextBar({ autoMs, disabled, onNext, paused, onPause }: NextProps) {
+function NextBar({ autoMs, disabled, onNext, paused, onPause, noArrow }: NextProps) {
   const t = useTranslations('review');
   // The sentences (where it can pause): a little lower, off the sentence, and fainter.
   const place = onPause
@@ -90,17 +92,19 @@ function NextBar({ autoMs, disabled, onNext, paused, onPause }: NextProps) {
           />
         )}
       </span>
-      <button
-        type="button"
-        // Focused at once: Enter goes on, as with "Next" under the card on wide screens.
-        autoFocus
-        disabled={disabled}
-        onClick={onNext}
-        aria-label={t('quiz.next')}
-        className={cx(ROUND, place, 'end-2')}
-      >
-        <ChevronRight aria-hidden className="size-6 rtl:-scale-x-100" />
-      </button>
+      {!noArrow && (
+        <button
+          type="button"
+          // Focused at once: Enter goes on, as with "Next" under the card on wide screens.
+          autoFocus
+          disabled={disabled}
+          onClick={onNext}
+          aria-label={t('quiz.next')}
+          className={cx(ROUND, place, 'end-2')}
+        >
+          <ChevronRight aria-hidden className="size-6 rtl:-scale-x-100" />
+        </button>
+      )}
       {onPause && (
         <button
           type="button"

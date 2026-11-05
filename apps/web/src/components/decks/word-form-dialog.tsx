@@ -21,7 +21,6 @@ import {
   SuggestButton,
   TranslationSuggestions,
   useWordSuggest,
-  withTranslation,
 } from './word-suggestions';
 import { track } from '@/lib/analytics';
 
@@ -84,9 +83,9 @@ export function WordFormDialog({
     if (!word) track('word_add_open', { source });
   }, [word, source]);
 
-  const addTranslation = (s: string) => {
+  const pickTranslations = (translations: string) => {
     opened.current.suggested = true;
-    set({ translations: withTranslation(draft.translations, s) });
+    set({ translations });
     setError(null);
   };
 
@@ -194,7 +193,7 @@ export function WordFormDialog({
             found={found}
             value={draft.translations}
             lang={nativeLang}
-            onAdd={addTranslation}
+            onChange={pickTranslations}
           />
 
           <TextAreaField

@@ -17,6 +17,11 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+/** The address shared links point to (images in link previews need it in full). */
+const SITE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : 'https://vocabx-sigma.vercel.app';
+
 export async function generateMetadata({
   params,
 }: {
@@ -25,9 +30,21 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: 'meta' });
+  // What a shared link shows (messengers, social networks): an invitation, with the wolf.
+  const share = { title: t('shareTitle'), description: t('shareDescription') };
+  const image = { url: '/og.png', width: 1200, height: 630, alt: 'VocabX' };
   return {
+    metadataBase: new URL(SITE_URL),
     title: { default: t('title'), template: '%s · VocabX' },
     description: t('description'),
+    openGraph: {
+      ...share,
+      siteName: 'VocabX',
+      type: 'website',
+      locale: locale === 'uk' ? 'uk_UA' : 'en_US',
+      images: [image],
+    },
+    twitter: { card: 'summary_large_image', ...share, images: [image.url] },
   };
 }
 

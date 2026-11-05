@@ -7,6 +7,7 @@ import { DevRouteWarmup } from './dev-route-warmup';
 import { MobileTopBar } from './mobile-top-bar';
 import { NavStateProvider } from './nav-state';
 import { OfflineSupport } from './offline-support';
+import { ReminderOffer } from './reminder-offer';
 import { OnboardingGate } from './onboarding-gate';
 import { ShellContent } from './shell-content';
 import { Sidebar } from './sidebar';
@@ -23,6 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <OnboardingGate />
         {process.env.NODE_ENV === 'development' && <DevRouteWarmup />}
         <OfflineSupport />
+        <ReminderOffer />
         {/* A card swiped off the screen must not widen the page (a scrollbar, the bottom
         navigation pushed away); clip, unlike hidden, keeps sticky parts working. */}
         <div className="min-h-dvh overflow-x-clip md:flex">

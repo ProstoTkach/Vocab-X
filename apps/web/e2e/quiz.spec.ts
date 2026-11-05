@@ -55,6 +55,35 @@ test('the four-choice test replaces flash cards', async ({ page }) => {
   expect(await page.evaluate(() => (window as unknown as { spoken: number }).spoken)).toBe(0);
 });
 
+test('a right answer goes on by itself: no arrow on the card', async ({ page }) => {
+  await options(page)
+    .nth(await quizRightIndex(page))
+    .click();
+  await expect(card(page).getByText('Правильно!')).toBeVisible();
+  await expect(card(page).getByRole('button', { name: 'Далі' })).toHaveCount(0);
+  await expect(verdict(page)).toHaveCount(0, { timeout: 5000 });
+});
+
+test('a wrong answer taken back at once still counts on the way forward', async ({ page }) => {
+  // The first card, so there is one to go back to.
+  await answerAny(page);
+  const right = await quizRightIndex(page);
+  await options(page)
+    .nth(right === 0 ? 1 : 0)
+    .click();
+  await expect(card(page).getByText('Неправильно')).toBeVisible();
+  // Back while the result is still showing, to the first card, and forward again.
+  await page.keyboard.press('z');
+  await expect(options(page).first()).toBeDisabled();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  // Its wrong answer is there, not a new chance; and it is saved again on going on.
+  await expect(card(page).getByText('Неправильно')).toBeVisible();
+  await expect(options(page).first()).toBeDisabled();
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await expect(verdict(page)).toHaveCount(0);
+  await expect(options(page).first()).toBeEnabled();
+});
+
 test('a mistake stays longer; an undo brings the card back with its result', async ({ page }) => {
   const right = await quizRightIndex(page);
   await options(page)

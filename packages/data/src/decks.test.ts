@@ -3,6 +3,7 @@ import {
   addWord,
   addWords,
   addWordsFromBuiltin,
+  builtinCopy,
   builtinPickState,
   finishBuiltinPick,
   isPickOnlyCopy,
@@ -27,6 +28,7 @@ import {
   removeWordEverywhere,
   removeWordFromDeck,
   resetWordProgress,
+  restoreBuiltinCopy,
   updateDeck,
   wordStatus,
   dueOrder,
@@ -249,6 +251,22 @@ describe('deck management', () => {
       skipped: B1.wordIds.length - 2,
       inProgress: false,
     });
+  });
+
+  test('a choice taken back puts the copy back as it was; a copy it made goes', async () => {
+    const [a, b] = B1.wordIds;
+    const own = async () => (await repo.decks.list()).filter((d) => d.origin === 'own');
+    // The first choice made the copy: undone, there is none.
+    const none = await builtinCopy(repo, B1);
+    await addWordsFromBuiltin(repo, B1, [a!], 'uk', ctx);
+    await restoreBuiltinCopy(repo, B1, none);
+    expect(await own()).toHaveLength(0);
+    // A later one: the copy as before it.
+    await addWordsFromBuiltin(repo, B1, [a!], 'uk', ctx);
+    const before = await builtinCopy(repo, B1);
+    await skipBuiltinWords(repo, B1, [b!], 'uk', ctx);
+    await restoreBuiltinCopy(repo, B1, before);
+    expect(builtinPickState(B1, await own())).toMatchObject({ added: 1, skipped: 0 });
   });
 
   test('a deck looked through to the end keeps only its numbers', async () => {

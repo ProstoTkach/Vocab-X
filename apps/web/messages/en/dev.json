@@ -20,5 +20,17 @@
   "codeText": "Developer mode is opened with a code. Enter it to turn the mode on.",
   "codeLabel": "Code",
   "codeSubmit": "Turn on",
-  "codeWrong": "Wrong code."
+  "codeWrong": "Wrong code.",
+  "reminder": {
+    "show": "Reminder",
+    "push": "Push from server",
+    "result": {
+      "shown": "Reminder shown. Not seeing it? Check the browser’s notifications in the system settings.",
+      "sent": "Push sent: the reminder arrives in a few seconds.",
+      "denied": "Notifications are blocked for this site.",
+      "unsupported": "No service worker: production build and a browser with push only.",
+      "no-subscription": "Turn on “Remind me to review” in the settings first.",
+      "failed": "Could not send the push (no keys on the server, or more often than every 15 s)."
+    }
+  }
 }

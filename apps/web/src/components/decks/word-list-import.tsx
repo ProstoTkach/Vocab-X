@@ -13,7 +13,7 @@ import {
   type Profile,
   type WordListRow,
 } from '@vocabx/core';
-import { ListChecks, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ListChecks, Pencil, Plus, Trash2, WandSparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,7 @@ import { useRouter } from '@/i18n/navigation';
 import { useClock } from '@/lib/clock';
 import { cx } from '@/lib/cx';
 import { newId } from '@/lib/ids';
+import { suggestWord } from '@/lib/lexicon/suggest';
 import { useLexicon, type Lexicon } from '@/lib/lexicon/use-lexicon';
 import { useRepos } from '@/lib/repos';
 import {
@@ -33,7 +34,6 @@ import {
   SuggestButton,
   TranslationSuggestions,
   useWordSuggest,
-  withTranslation,
 } from './word-suggestions';
 import { track } from '@/lib/analytics';
 
@@ -46,6 +46,9 @@ interface Row extends WordListRow {
 
 const isValid = (r: WordListRow) => !!r.term.trim() && splitTranslations(r.translation).length > 0;
 
+/** Words looked up at a time by "Fill in everything" (the dictionaries are free services). */
+const FILL_PARALLEL = 3;
+
 /** One parsed line as an editable card: word and translation side by side, the example below. */
 function ImportRow({
   row,
@@ -55,6 +58,7 @@ function ImportRow({
   nativeLang,
   onChange,
   onRemove,
+  hideSignal,
 }: {
   row: Row;
   n: number;
@@ -63,9 +67,18 @@ function ImportRow({
   nativeLang: LangCode;
   onChange: (patch: Partial<WordListRow>) => void;
   onRemove: () => void;
+  /** Changes when the variants of every card are to be folded away ("Fill in everything"). */
+  hideSignal: number;
 }) {
   const t = useTranslations('decks.import');
   const { lookup, found, suggest, hide } = useWordSuggest(lexicon, wordLang, nativeLang);
+  const hideRef = useRef(hide);
+  useEffect(() => {
+    hideRef.current = hide;
+  });
+  useEffect(() => {
+    if (hideSignal > 0) hideRef.current();
+  }, [hideSignal]);
   const bad = !isValid(row);
   return (
     <li
@@ -107,7 +120,7 @@ function ImportRow({
               found={found}
               value={row.translation}
               lang={nativeLang}
-              onAdd={(s) => onChange({ translation: withTranslation(row.translation, s) })}
+              onChange={(translation) => onChange({ translation })}
             />
           </div>
         </div>
@@ -223,6 +236,52 @@ export function WordListImport({ deckId }: { deckId?: string }) {
   const addRow = () =>
     setRows((list) => [...(list ?? []), keyed({ term: '', translation: '', example: '' })]);
 
+  /** "Fill in everything": the words done so far, while it runs. */
+  const [filling, setFilling] = useState<{ done: number; total: number } | null>(null);
+  const [hideSignal, setHideSignal] = useState(0);
+  /**
+   * Every card with a word and an empty translation or example gets the first translation and
+   * the first example the dictionaries find; what was typed stays. The variants are not shown.
+   */
+  const fillAll = async () => {
+    if (!profile || !rows || filling) return;
+    const todo = rows.filter((r) => r.term.trim() && (!r.translation.trim() || !r.example.trim()));
+    setHideSignal((n) => n + 1);
+    setFilling({ done: 0, total: todo.length });
+    let filled = 0;
+    for (let i = 0; i < todo.length; i += FILL_PARALLEL) {
+      await Promise.all(
+        todo.slice(i, i + FILL_PARALLEL).map(async (r) => {
+          const found = await suggestWord(lexicon, {
+            term: r.term.trim(),
+            from: profile.activeTargetLang,
+            to: profile.nativeLang,
+          }).catch(() => null);
+          const translation = found?.translations[0];
+          const example = found?.examples[0]?.slice(0, EXAMPLE_MAX);
+          if (translation || example) filled += 1;
+          // The card as it is now: the learner may have typed into it meanwhile.
+          setRows(
+            (list) =>
+              list &&
+              list.map((x) =>
+                x.key !== r.key
+                  ? x
+                  : {
+                      ...x,
+                      translation: x.translation.trim() || translation || '',
+                      example: x.example.trim() || example || '',
+                    },
+              ),
+          );
+          setFilling((f) => f && { ...f, done: f.done + 1 });
+        }),
+      );
+    }
+    track('import_autofill', { count: todo.length, ok_n: filled });
+    setFilling(null);
+  };
+
   const valid = (rows ?? []).filter(isValid);
   const skipped = (rows?.length ?? 0) - valid.length;
 
@@ -264,10 +323,29 @@ export function WordListImport({ deckId }: { deckId?: string }) {
   return (
     <div className="flex flex-col gap-6">
       {collapsed ? (
-        <Button variant="secondary" size="lg" className="self-center" onClick={reopen}>
-          <Pencil aria-hidden className="size-5" />
-          {t('parseAgain')}
-        </Button>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button variant="secondary" size="lg" onClick={reopen}>
+            <Pencil aria-hidden className="size-5" />
+            {t('parseAgain')}
+          </Button>
+          {rows && rows.length > 0 && (
+            <Button
+              size="lg"
+              className={cx(!filling && 'shine')}
+              disabled={!!filling}
+              onClick={() => void fillAll()}
+              aria-live="polite"
+            >
+              <WandSparkles
+                aria-hidden
+                className={cx('size-5', filling && 'motion-safe:animate-pulse')}
+              />
+              {filling
+                ? t('autofilling', { done: filling.done, total: filling.total })
+                : t('autofill')}
+            </Button>
+          )}
+        </div>
       ) : (
         <section className="mx-auto flex w-full max-w-3xl flex-col gap-5 rounded-card border border-line/70 bg-surface/60 p-4 md:p-6">
           <div ref={textArea}>
@@ -336,6 +414,7 @@ export function WordListImport({ deckId }: { deckId?: string }) {
                       nativeLang={profile.nativeLang}
                       onChange={(patch) => update(r.key, patch)}
                       onRemove={() => remove(r.key)}
+                      hideSignal={hideSignal}
                     />
                   ))}
                 </ol>

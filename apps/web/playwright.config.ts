@@ -52,6 +52,12 @@ export default defineConfig({
       NEXT_PUBLIC_ANALYTICS_ON_LOCALHOST: '1',
       // Tests never write to the real spreadsheets or the chat: a beacon of a closing page slips
       // past page.route, so the test server simply has no place to send anything.
+      DATABASE_URL: '',
+      // Signing in is offered but never reaches Google: the tests answer its requests themselves.
+      GOOGLE_CLIENT_ID: 'test-client',
+      GOOGLE_CLIENT_SECRET: 'test-secret',
+      NEXTAUTH_SECRET: 'test-secret',
+      NEXTAUTH_URL: `http://localhost:${PORT}`,
       GOOGLE_SPREADSHEET_ANALYTICS_ID: '',
       GOOGLE_SPREADSHEET_POLLS_ID: '',
       TELEGRAM_BOT_TOKEN: '',

@@ -11,6 +11,7 @@ import { useDevTools } from '@/lib/dev-tools';
 import { usePlayer } from '@/lib/player';
 import { useTheme } from '@/lib/theme';
 import { getTheme, SYSTEM_THEMES } from '@/themes/registry';
+import { ReminderTestButtons } from './reminder-test';
 
 /**
  * Demo helper: moves the app clock forward so spaced repetition can be shown without waiting.
@@ -101,6 +102,7 @@ export function DevPanel() {
         <Crown aria-hidden className="size-4" />
         {t('reachLevel', { level: DEMO_LEVEL })}
       </Button>
+      <ReminderTestButtons />
       <p className="mt-3 text-xs text-fg-muted pointer-coarse:hidden">{t('hint')}</p>
     </section>
   );

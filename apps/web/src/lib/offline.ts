@@ -1,8 +1,8 @@
 'use client';
 
 // The service worker (public/sw.js): the app opens and works offline once it has been visited,
-// and the daily reminder shows with the app closed. Production only: in development it would
-// keep stale code between edits.
+// and the daily reminder shows with the app closed. In development it is registered for the
+// reminders only (sw.js?dev keeps nothing: it would serve stale code between edits).
 
 /** The tabs kept for offline use, besides the page open now (paths after the locale). */
 const OFFLINE_PAGES = [
@@ -16,10 +16,10 @@ const OFFLINE_PAGES = [
   '/league',
 ];
 
+const DEV = process.env.NODE_ENV !== 'production';
+
 export const offlineSupported = () =>
-  process.env.NODE_ENV === 'production' &&
-  typeof navigator !== 'undefined' &&
-  'serviceWorker' in navigator;
+  typeof navigator !== 'undefined' && 'serviceWorker' in navigator;
 
 /**
  * Registers the service worker and asks it to keep the main pages and the files this page has
@@ -32,7 +32,8 @@ export async function startOffline(locale: string): Promise<void> {
     navigator.serviceWorker.addEventListener('message', (e: MessageEvent<{ type?: string }>) => {
       if (e.data.type === 'warmed') document.documentElement.dataset.offline = 'ready';
     });
-    await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.register(DEV ? '/sw.js?dev' : '/sw.js');
+    if (DEV) return;
     const registration = await navigator.serviceWorker.ready;
     const assets = performance
       .getEntriesByType('resource')

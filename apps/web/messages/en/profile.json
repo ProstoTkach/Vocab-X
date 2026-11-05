@@ -1,0 +1,37 @@
+{
+  "noName": "Nameless learner",
+  "nameLabel": "Name",
+  "nameEdit": "Change the name",
+  "nameSave": "Save the name",
+  "character": "Your character",
+  "level": "Level {level} · {xp} XP",
+  "numbersTitle": "Your progress",
+  "daysValue": "{count, plural, one {# day} other {# days}}",
+  "numbers": {
+    "reviews": "reviews in all",
+    "accuracy": "right answers",
+    "streak": "current streak",
+    "bestStreak": "longest streak",
+    "activeDays": "days of learning",
+    "bestDay": "reviews on the best day",
+    "learning": "words being learned",
+    "mastered": "words firmly remembered"
+  },
+  "right": "Right",
+  "wrong": "Wrong",
+  "day": "Day",
+  "chartThis": "Answers this week",
+  "chartPrevious": "Answers last week",
+  "thisWeek": "This week",
+  "previousWeek": "Previous week",
+  "weekTotal": "Total for the week: {count}",
+  "chartTip": "{day}: {right} right, {wrong} wrong",
+  "account": {
+    "title": "Account",
+    "signedOut": "Sign in with Google to link the profile to your email. Words and progress stay on this device for now: syncing comes later.",
+    "signedIn": "Words and progress stay on this device for now: syncing comes later.",
+    "signIn": "Sign in with Google",
+    "signOut": "Sign out",
+    "failed": "Could not sign in. Please try again."
+  }
+}
