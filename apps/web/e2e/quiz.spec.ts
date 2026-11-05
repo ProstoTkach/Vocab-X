@@ -75,11 +75,12 @@ test('a wrong answer taken back at once still counts on the way forward', async 
   // Back while the result is still showing, to the first card, and forward again.
   await page.keyboard.press('z');
   await expect(options(page).first()).toBeDisabled();
-  await page.getByRole('button', { name: 'Далі' }).click();
+  // The card going away keeps its own button for a moment, disabled.
+  await page.getByRole('button', { name: 'Далі', disabled: false }).click();
   // Its wrong answer is there, not a new chance; and it is saved again on going on.
   await expect(card(page).getByText('Неправильно')).toBeVisible();
   await expect(options(page).first()).toBeDisabled();
-  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.getByRole('button', { name: 'Далі', disabled: false }).click();
   await expect(verdict(page)).toHaveCount(0);
   await expect(options(page).first()).toBeEnabled();
 });

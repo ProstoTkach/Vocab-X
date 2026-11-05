@@ -1,13 +1,23 @@
 import { expect, test } from '@playwright/test';
-import { onboard } from './fixtures';
+import { onboard, quizRightIndex, setSettings } from './fixtures';
 
 test('the profile: the name can be changed; the numbers and the chart of the week follow the answers', async ({
   page,
 }) => {
   await onboard(page);
+  await setSettings(page, { quizMode: true });
   await page.goto('/uk/review');
-  await page.keyboard.press('3');
-  await page.keyboard.press('1');
+  const card = page.getByTestId('review-card');
+  const options = card.getByRole('list').getByRole('button');
+  await options.nth(await quizRightIndex(page)).click();
+  await expect(card.getByText('Правильно!')).toBeVisible();
+  await expect(card.getByText('Правильно!')).toHaveCount(0, { timeout: 5000 });
+  const right = await quizRightIndex(page);
+  await options.nth(right === 0 ? 1 : 0).click();
+  await expect(card.getByText('Неправильно')).toBeVisible();
+  await page.getByRole('button', { name: 'Далі', disabled: false }).click();
+  await expect(card.getByText('Неправильно')).toHaveCount(0);
+  await expect(options.first()).toBeEnabled();
   await page.goto('/uk/profile');
   await expect(page.getByRole('img', { name: 'Ваш персонаж' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 1, name: 'Учень без імені' })).toBeVisible();
@@ -45,7 +55,8 @@ test('the account: a failed sign-in is told once; signed in, the address and sig
   );
   await page.goto('/uk/profile');
   await page.getByRole('button', { name: 'Увійти через Google' }).click();
-  await expect(page.getByText('Не вдалося увійти')).toBeVisible();
+  // Exact: the toast's text is also announced for a moment, with its close button's name.
+  await expect(page.getByText('Не вдалося увійти. Спробуйте ще раз.', { exact: true })).toBeVisible();
   await expect(page).toHaveURL(/\/uk\/profile$/);
 
   await page.route('**/api/auth/session', (route) =>

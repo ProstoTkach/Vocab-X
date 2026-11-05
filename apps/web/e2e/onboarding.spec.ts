@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { answerLevelTest } from './fixtures';
+import { answerLevelTest, onboard } from './fixtures';
 
 /**
  * Onboarding with the level test. The learner knows A1 and A2 (4 words each), then in B1
@@ -104,16 +104,19 @@ test('export → reset → import restores the state', async ({ page }) => {
   await expect(page).toHaveURL(/\/uk\/onboarding$/);
   await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'dark');
 
-  // Restore straight from the first onboarding screen. A file picked before hydration is lost;
-  // pick it again until the confirmation opens.
+  // Onboarding again, this time without the dark theme: the backup brings it back from the
+  // settings. A file picked before hydration is lost; pick it again until the confirmation opens.
+  await onboard(page);
+  await page.goto('/uk/settings');
+  await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'dark');
   await expect(async () => {
     await page.getByTestId('import-file').setInputFiles(file);
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 1000 });
   }).toPass();
   await page.getByRole('dialog').getByRole('button', { name: 'Імпортувати JSON' }).click();
-  await expect(page).toHaveURL(/\/uk$/);
-  await expect(page.getByRole('heading', { name: /^15 карток чекають/ })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.goto('/uk');
+  await expect(page.getByRole('heading', { name: /^15 карток чекають/ })).toBeVisible();
 });
 
 test('a broken backup is rejected without touching data', async ({ page }) => {
