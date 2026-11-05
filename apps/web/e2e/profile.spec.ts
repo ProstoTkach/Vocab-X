@@ -56,7 +56,9 @@ test('the account: a failed sign-in is told once; signed in, the address and sig
   await page.goto('/uk/profile');
   await page.getByRole('button', { name: 'Увійти через Google' }).click();
   // Exact: the toast's text is also announced for a moment, with its close button's name.
-  await expect(page.getByText('Не вдалося увійти. Спробуйте ще раз.', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Не вдалося увійти. Спробуйте ще раз.', { exact: true }),
+  ).toBeVisible();
   await expect(page).toHaveURL(/\/uk\/profile$/);
 
   await page.route('**/api/auth/session', (route) =>

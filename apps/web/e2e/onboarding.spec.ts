@@ -86,6 +86,8 @@ test('an English speaker can learn Ukrainian', async ({ page }) => {
 });
 
 test('export → reset → import restores the state', async ({ page }) => {
+  // Onboarding twice.
+  test.slow();
   await completeOnboarding(page, { knownInB1: 0 });
   await page.goto('/uk/settings');
 

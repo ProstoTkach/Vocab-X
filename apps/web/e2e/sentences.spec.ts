@@ -102,6 +102,8 @@ test.beforeEach(async ({ page }) => {
 test('level 1: the word left out of an example is picked from four, its translation on request', async ({
   page,
 }) => {
+  // It waits out the pause and then the card's own delay.
+  test.slow();
   await expect(page.getByText('Слово в реченні', { exact: true })).toBeVisible();
   await expect(page.getByText('Рівень 1 з 3')).toBeVisible();
   await expect(gap(page).first()).toBeVisible();
