@@ -284,9 +284,11 @@ test('the first review: the screen is shown step by step, then how to answer', a
   await setSettings(page, { tipsSeen: ['feedback-survey'] });
   await page.goto('/uk/review');
   const tour = page.getByTestId('page-tour');
-  // Only the undo button and the way of studying (the other steps are hidden for now).
+  // The undo button, the speech button and the way of studying (the rest hidden for now).
   await expect(tour).toContainText('Скасувати відповідь');
-  await expect(tour).toContainText('1 з 2');
+  await expect(tour).toContainText('1 з 3');
+  await tour.getByRole('button', { name: 'Далі' }).click();
+  await expect(tour).toContainText('Озвучування');
   await tour.getByRole('button', { name: 'Далі' }).click();
   await expect(tour).toContainText('Спосіб навчання');
   await page.keyboard.press('Escape');

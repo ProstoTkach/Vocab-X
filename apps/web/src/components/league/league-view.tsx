@@ -203,7 +203,12 @@ function LeagueCard({
   const next = LEAGUE_TIERS[tier + 1];
   return (
     <Card className="flex flex-col gap-4">
-      <div className="relative flex items-center gap-3 sm:gap-4">
+      {/* A press anywhere on the row folds the details out; the arrow is the same thing as a
+      button for the keyboard and screen readers (its click comes up here). */}
+      <div
+        className="flex cursor-pointer items-center gap-3 sm:gap-4"
+        onClick={() => setOpen((o) => !o)}
+      >
         <TierBadge tier={tier} className="size-16 sm:size-20" />
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-title font-bold">
@@ -211,24 +216,26 @@ function LeagueCard({
           </h2>
           <p className="text-sm text-fg-muted">{subtitle}</p>
         </div>
-        {/* Above the arrow's press area, which covers the whole row. */}
         <Button
           variant="secondary"
           size="icon"
-          className="relative z-10 rounded-full"
+          className="rounded-full"
           aria-label={t('rewards')}
-          onClick={() => setRewards(true)}
+          onClick={(e) => {
+            // The rewards, not the details.
+            e.stopPropagation();
+            setRewards(true);
+          }}
         >
           <Gift aria-hidden className="size-5" />
         </Button>
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full after:absolute after:inset-0 after:rounded-control"
+          className="rounded-full"
           aria-label={t('details')}
           aria-expanded={open}
           aria-controls={panel}
-          onClick={() => setOpen((o) => !o)}
         >
           <ChevronDown
             aria-hidden

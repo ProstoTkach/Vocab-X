@@ -141,18 +141,16 @@ test('the developer panel switches the mode', async ({ page }) => {
   await expect(options(page)).toHaveCount(0);
 });
 
-test('after 15 answers in the test, the survey is offered once', async ({ page }) => {
+test('15 answers in the test interrupt nothing: the survey is offered only at level 5', async ({
+  page,
+}) => {
+  // Onboarding and 15 answers: longer than most.
+  test.slow();
   await setSettings(page, { tipsSeen: ['review-intro', 'review-intro-quiz'] });
   await page.goto('/uk/review');
   for (let i = 0; i < 15; i++) await answerAny(page);
-  const dialog = page.getByRole('dialog', { name: 'Як вам тест із 4 варіантів?' });
-  await expect(dialog).toBeVisible();
-  // Keys behind the window do nothing.
-  await page.keyboard.press('1');
-  await dialog.getByRole('button', { name: 'Пізніше' }).click();
-  await expect(dialog).toHaveCount(0);
-  // The key pressed behind the window answered nothing.
-  await expect(card(page).getByText('Неправильно')).toHaveCount(0);
+  await page.waitForTimeout(1000);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
 test('the first test explains its three levels instead of the swipes', async ({ page }) => {

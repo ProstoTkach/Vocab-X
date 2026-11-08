@@ -103,10 +103,16 @@ test('a full group: the first with the whole character, the next two side by sid
   const row = (n: number) =>
     group
       .getByRole('listitem')
-      .filter({ hasText: new RegExp(`Учень ${n}(\\D|$)`) })
+      // By the name alone: in the row's text it runs into the points ("Учень 370 XP").
+      .filter({ has: page.getByText(new RegExp(`^Учень ${n}(\\D|$)`)) })
       .last();
   await expect(row(3)).toHaveAttribute('data-zone', 'up');
-  await expect(row(4)).not.toHaveAttribute('data-zone');
+  // The learner's own row (4th) shows their own name, marked "(ви)".
+  const mine = group
+    .getByRole('listitem')
+    .filter({ has: page.getByText('(ви)') })
+    .last();
+  await expect(mine).not.toHaveAttribute('data-zone');
   await expect(row(8)).toHaveClass(/bg-danger/);
 
   // Coming back asks without joining again.

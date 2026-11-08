@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
-import { seedOnboarded, setSettings, onboard } from './fixtures';
+import { seedOnboarded, setSettings } from './fixtures';
 
 const ROUTES = ['/uk', '/uk/review', '/uk/decks', '/uk/league', '/uk/profile', '/uk/settings'];
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) < 768;
@@ -254,9 +254,10 @@ test('without the developer mode the lab stays closed', async ({ page }) => {
 });
 
 test('the survey invitation comes once, at level 5, and never again', async ({ page }) => {
-  await onboard(page);
-  // Level 4: nothing yet.
-  await setSettings(page, { xpBonus: 600, levelSeen: 4 });
+  // Already onboarded (beforeEach); the settings are written from a page of the app.
+  await page.goto('/uk');
+  // Level 4: nothing yet. The seed marks the survey as sent, which would stop every invitation.
+  await setSettings(page, { xpBonus: 600, levelSeen: 4, tipsSeen: ['review-intro'] });
   await page.goto('/uk');
   await expect(page.getByRole('heading', { name: /Вже \d+ рівень/ })).toHaveCount(0, {
     timeout: 2500,
