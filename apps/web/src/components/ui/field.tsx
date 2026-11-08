@@ -1,6 +1,7 @@
 'use client';
 
-import { useId, type ComponentProps, type ReactNode } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
+import { useId, useState, type ComponentProps, type ReactNode } from 'react';
 import { cx } from '@/lib/cx';
 
 export const inputClass = cx(
@@ -57,6 +58,47 @@ export function TextField({
           className={inputClass}
           {...input}
         />
+      )}
+    </FieldShell>
+  );
+}
+
+/** A password, with an eye at its end to see what was typed. */
+export function PasswordField({
+  label,
+  hint,
+  showLabel,
+  hideLabel,
+  className,
+  ...input
+}: Omit<ComponentProps<'input'>, 'id' | 'type'> & {
+  label: string;
+  hint?: string;
+  showLabel: string;
+  hideLabel: string;
+}) {
+  const [shown, setShown] = useState(false);
+  const Icon = shown ? EyeOff : Eye;
+  return (
+    <FieldShell label={label} {...(hint ? { hint } : {})} {...(className ? { className } : {})}>
+      {(id, describedBy) => (
+        <div className="relative">
+          <input
+            id={id}
+            aria-describedby={describedBy}
+            type={shown ? 'text' : 'password'}
+            className={cx(inputClass, 'pe-11')}
+            {...input}
+          />
+          <button
+            type="button"
+            aria-label={shown ? hideLabel : showLabel}
+            onClick={() => setShown((s) => !s)}
+            className="absolute inset-y-0 end-0 inline-flex w-11 items-center justify-center rounded-control text-fg-muted transition-colors motion-fast hover:text-fg"
+          >
+            <Icon aria-hidden className="size-5" />
+          </button>
+        </div>
       )}
     </FieldShell>
   );

@@ -15,6 +15,7 @@ export default defineConfig(
       '**/dist/**',
       '**/.next/**',
       '**/coverage/**',
+      '**/.tmp-*/**',
       '**/next-env.d.ts',
       '**/playwright-report/**',
       '**/test-results/**',

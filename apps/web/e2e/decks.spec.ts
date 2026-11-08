@@ -54,7 +54,7 @@ test('my words: list with learning bars and details', async ({ page }) => {
   await page.goto('/uk/review');
   await expect(page.getByTestId('review-card')).toBeVisible();
   await page.keyboard.press('3');
-  await expect(page.getByText('14 карток у колоді')).toBeVisible();
+  await expect(page.getByText('14 карток', { exact: true })).toBeVisible();
   await page.goto('/uk/decks');
   await expect(page.getByText('15 слів', { exact: true })).toBeVisible();
   // Streak and daily goal live on the home page only.
@@ -293,7 +293,7 @@ test('my decks: create a deck, add a word, review only that deck', async ({ page
     .getByRole('link', { name: 'Повторити' })
     .click();
   await expect(page.getByText('Колода: Бізнес')).toBeVisible();
-  await expect(page.getByText('1 картка в колоді')).toBeVisible();
+  await expect(page.getByText('1 картка', { exact: true })).toBeVisible();
 });
 
 test('deck page: edit and remove words', async ({ page }) => {

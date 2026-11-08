@@ -1,5 +1,6 @@
 // Runtime schemas for data crossing a trust boundary: imported files now, sync payloads in
 // phase B. They mirror model.ts; unknown fields are stripped.
+import { FRAME_FILLS, FRAME_MOODS, FRAME_RINGS, type FrameRing } from './league';
 import { z } from 'zod';
 
 const id = z.string().min(1).max(200);
@@ -106,6 +107,7 @@ export const settingsPatchSchema = z.object({
   quizMode: z.boolean().optional(),
   sentenceMode: z.boolean().optional(),
   mixedMode: z.boolean().optional(),
+  leagueJoined: z.boolean().optional(),
   tipsSeen: z.array(z.string().max(64)).max(100).optional(),
   levelSeen: z.number().int().min(1).optional(),
   xpBonus: z.number().int().nonnegative().optional(),
@@ -140,6 +142,12 @@ export const dailyStatsSchema = z.object({
   xp: z.number().int(),
 });
 
+export const frameSchema = z.object({
+  bg: z.enum(FRAME_FILLS),
+  ring: z.enum(FRAME_RINGS as unknown as [FrameRing, ...FrameRing[]]),
+  mood: z.enum(FRAME_MOODS).optional(),
+});
+
 export const gamificationSchema = z.object({
   xpTotal: z.number().int().nonnegative(),
   streakDays: z.number().int().nonnegative(),
@@ -149,4 +157,5 @@ export const gamificationSchema = z.object({
   inventory: z.array(id),
   equipped: z.record(z.string(), id),
   wardrobeSeen: z.array(id),
+  avatarFrame: frameSchema.optional(),
 });

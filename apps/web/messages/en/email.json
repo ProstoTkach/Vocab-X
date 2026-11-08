@@ -1,0 +1,17 @@
+{
+  "fallback": "Button not working? Copy this link into your browser:",
+  "verify": {
+    "subject": "Confirm your email for VocabX",
+    "title": "Welcome to VocabX!",
+    "body": "One step left: confirm that this email is yours. Then you are signed in right away, with your progress on all your devices.",
+    "button": "Confirm my email",
+    "footer": "The link works for a day. If you did not sign up for VocabX, simply ignore this letter."
+  },
+  "already": {
+    "subject": "You already have a VocabX account",
+    "title": "The account already exists",
+    "body": "Someone tried to sign up with this email, but it already has an account. If that was you, simply sign in.",
+    "button": "Sign in to VocabX",
+    "footer": "If it was not you, there is nothing to do: your account is safe."
+  }
+}

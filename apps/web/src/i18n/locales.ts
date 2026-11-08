@@ -46,5 +46,6 @@ export const NAMESPACES = [
   'analytics',
   'tours',
   'profile',
+  'league',
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];

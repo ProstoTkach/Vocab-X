@@ -17,6 +17,10 @@
       "title": "Undo an answer",
       "text": "Answered wrong by mistake? This button (or the Z key) brings the last card back."
     },
+    "speech": {
+      "title": "Speech",
+      "text": "Words and sentences are said by themselves when you answer. This button turns automatic speech off and on again."
+    },
     "task": {
       "title": "Task and level",
       "text": "On the left what to do now, on the right the level of this word. Each right answer moves it up, and the task gets harder."
@@ -58,24 +62,6 @@
     "list": {
       "title": "Your words",
       "text": "The bar shows how well a word is remembered. Tap a word for details, an example and “I have learned it”."
-    },
-    "backup": {
-      "title": "Backup",
-      "text": "Your words live in this browser only. Save a copy to a file so nothing gets lost."
-    }
-  },
-  "library": {
-    "hello": {
-      "title": "Deck library",
-      "text": "Ready decks by level and topic. Take a whole deck or just the words you need."
-    },
-    "tools": {
-      "title": "Search and filters",
-      "text": "Find a deck by name, filter by level or progress and sort. Unfinished decks always come first."
-    },
-    "deck": {
-      "title": "A deck",
-      "text": "Tap a deck: all its words, “Add the whole deck” and picking words by swiping."
     }
   },
   "mine": {

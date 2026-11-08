@@ -19,18 +19,19 @@ import {
   BookOpenCheck,
   Brain,
   GraduationCap,
-  Layers,
   RotateCcw,
   Sparkles,
   Sprout,
-  Wifi,
+  Zap,
 } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { RadioGroup } from 'radix-ui';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { track, writeKey } from '@/lib/analytics';
 import { KEYS } from '@/lib/analytics/identity';
+import { SignInDialog } from '@/components/account/sign-in-dialog';
 import { ThemePicker } from '@/components/settings/theme-picker';
 import { Button } from '@/components/ui/button';
 import { CheckCard, RadioCard } from '@/components/ui/choice';
@@ -55,9 +56,8 @@ const BASIC_THEMES = [SYSTEM_THEME_ID, SYSTEM_THEMES.light, SYSTEM_THEMES.dark];
 const FRAME = 'mx-auto w-full max-w-5xl px-4 md:px-8';
 const WELCOME_POINTS = [
   { key: 'pointMemory', icon: Brain },
-  { key: 'pointLevels', icon: Layers },
   { key: 'pointBuddy', icon: Sparkles },
-  { key: 'pointOffline', icon: Wifi },
+  { key: 'pointOffline', icon: Zap },
 ] as const;
 const GOALS = Object.keys(DAILY_GOAL_PRESETS) as DailyGoalPreset[];
 
@@ -68,7 +68,8 @@ function defaultTarget(native: string): string {
   return (withDecks ?? others[0]!).code;
 }
 
-export function OnboardingFlow() {
+export function OnboardingFlow({ accounts }: { accounts: boolean }) {
+  const [signingIn, setSigningIn] = useState(false);
   const t = useTranslations('onboarding');
   const tl = useTranslations('languages');
   const locale = useLocale();
@@ -298,14 +299,14 @@ export function OnboardingFlow() {
                 />
                 <StepTitle ref={heading} text={t('welcomeTitle')} intro={t('welcomeText')} />
               </div>
-              <ul className="grid w-full gap-3 text-start sm:grid-cols-2">
+              <ul className="grid w-full gap-3 text-start sm:grid-cols-3 sm:text-center">
                 {WELCOME_POINTS.map(({ key, icon: Icon }) => (
                   <li
                     key={key}
-                    className="flex gap-3 rounded-control border border-line/70 bg-surface p-4"
+                    className="flex items-center gap-3 rounded-control border border-line/70 bg-surface p-4 sm:flex-col"
                   >
-                    <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-2 text-accent">
-                      <Icon aria-hidden className="size-5" />
+                    <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                      <Icon aria-hidden className="size-6" />
                     </span>
                     <span>
                       <span className="block font-semibold">{t(`${key}Title`)}</span>
@@ -314,6 +315,13 @@ export function OnboardingFlow() {
                   </li>
                 ))}
               </ul>
+              {accounts && (
+                <Button variant="ghost" onClick={() => setSigningIn(true)}>
+                  <LogIn aria-hidden className="size-4" />
+                  {t('haveAccount')}
+                </Button>
+              )}
+              <SignInDialog open={signingIn} onOpenChange={setSigningIn} google />
             </div>
           )}
 

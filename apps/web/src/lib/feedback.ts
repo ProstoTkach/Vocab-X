@@ -350,13 +350,6 @@ export function formatFeedback({ feedback: f, locale, level }: FeedbackPayload):
   return messages;
 }
 
-/**
- * The four-choice test is new: after this many answers in it, the learner is asked once what
- * they think (in the session, between two cards).
- */
-export const QUIZ_INVITE_AFTER = 15;
-export const QUIZ_INVITE_TIP = 'feedback-invite-quiz';
-
 // ---------------------------------------------------------------------------------------------
 // The spreadsheet row: one row per sent form, the columns below in this order. Read by the
 // developer only, so it is not translated.

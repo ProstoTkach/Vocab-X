@@ -28,8 +28,9 @@ export const COLOR_TOKENS = [
 
 export type ColorToken = (typeof COLOR_TOKENS)[number];
 
-/** How a theme becomes available. The prototype supports `free` and `level:N`. */
-export type Unlock = 'free' | `level:${number}` | `achievement:${string}` | `purchase:${string}`;
+/** How a theme or item becomes available. `league:N`: while in league N (0 = the first) or higher. */
+export type Unlock =
+  'free' | `level:${number}` | `league:${number}` | `achievement:${string}` | `purchase:${string}`;
 
 export interface Theme {
   id: string;

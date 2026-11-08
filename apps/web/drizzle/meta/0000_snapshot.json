@@ -114,12 +114,8 @@
           "name": "card_progress_user_id_users_id_fk",
           "tableFrom": "card_progress",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -127,10 +123,7 @@
       "compositePrimaryKeys": {
         "card_progress_user_id_word_id_pk": {
           "name": "card_progress_user_id_word_id_pk",
-          "columns": [
-            "user_id",
-            "word_id"
-          ]
+          "columns": ["user_id", "word_id"]
         }
       },
       "uniqueConstraints": {},
@@ -215,12 +208,8 @@
           "name": "decks_user_id_users_id_fk",
           "tableFrom": "decks",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -228,10 +217,7 @@
       "compositePrimaryKeys": {
         "decks_user_id_id_pk": {
           "name": "decks_user_id_id_pk",
-          "columns": [
-            "user_id",
-            "id"
-          ]
+          "columns": ["user_id", "id"]
         }
       },
       "uniqueConstraints": {},
@@ -406,12 +392,8 @@
           "name": "review_events_user_id_users_id_fk",
           "tableFrom": "review_events",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -419,10 +401,7 @@
       "compositePrimaryKeys": {
         "review_events_user_id_id_pk": {
           "name": "review_events_user_id_id_pk",
-          "columns": [
-            "user_id",
-            "id"
-          ]
+          "columns": ["user_id", "id"]
         }
       },
       "uniqueConstraints": {},
@@ -488,12 +467,8 @@
           "name": "user_state_user_id_users_id_fk",
           "tableFrom": "user_state",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -565,9 +540,7 @@
         "users_google_sub_unique": {
           "name": "users_google_sub_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "google_sub"
-          ]
+          "columns": ["google_sub"]
         }
       },
       "policies": {},
@@ -657,12 +630,8 @@
           "name": "words_user_id_users_id_fk",
           "tableFrom": "words",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -670,10 +639,7 @@
       "compositePrimaryKeys": {
         "words_user_id_id_pk": {
           "name": "words_user_id_id_pk",
-          "columns": [
-            "user_id",
-            "id"
-          ]
+          "columns": ["user_id", "id"]
         }
       },
       "uniqueConstraints": {},

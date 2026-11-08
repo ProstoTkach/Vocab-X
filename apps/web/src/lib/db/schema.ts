@@ -3,12 +3,13 @@
 // keyed by the app's own string ids (built-in words are "en:achieve"), so nothing is renumbered.
 // Every synced row carries `server_seq` (set by a trigger on each write): a device asks for
 // what changed after the last number it saw, and deleted rows stay as tombstones so it learns.
-import type { CardState, Deck, Word } from '@vocabx/core';
+import type { AvatarFrame, CardState, Deck, LeagueResult, PublishedLook, Word } from '@vocabx/core';
 import { sql } from 'drizzle-orm';
 import {
   bigint,
   boolean,
   check,
+  date,
   doublePrecision,
   index,
   integer,
@@ -32,7 +33,17 @@ export const users = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     email: text('email').notNull(),
-    googleSub: text('google_sub').notNull().unique(),
+    /** Set once they sign in with Google; empty for an account with a password only. */
+    googleSub: text('google_sub').unique(),
+    passwordHash: text('password_hash'),
+    /** Until then, an account with a password cannot sign in. */
+    emailVerifiedAt: time('email_verified_at'),
+    /** Hash of the token in the letter; only the letter holds the token itself. */
+    verifyTokenHash: text('verify_token_hash'),
+    verifyExpiresAt: time('verify_expires_at'),
+    verifySentAt: time('verify_sent_at'),
+    loginFailures: smallint('login_failures').notNull().default(0),
+    lockedUntil: time('locked_until'),
     createdAt: time('created_at').notNull().defaultNow(),
     deletedAt: time('deleted_at'),
   },
@@ -40,6 +51,7 @@ export const users = pgTable(
     uniqueIndex('users_email_uq')
       .on(sql`lower(${t.email})`)
       .where(sql`deleted_at IS NULL`),
+    index('users_verify_token_idx').on(t.verifyTokenHash),
   ],
 );
 
@@ -140,6 +152,8 @@ export const reviewEvents = pgTable(
     retention: doublePrecision('retention').notNull(),
     xp: integer('xp').notNull(),
     kind: text('kind'),
+    /** What the server counted for the league: never more than `xp`, see creditXp. */
+    creditedXp: integer('credited_xp').notNull().default(0),
     deletedAt: time('deleted_at'),
     ...synced,
   },
@@ -150,5 +164,42 @@ export const reviewEvents = pgTable(
     index('review_events_word_idx').on(t.userId, t.wordId, t.at),
     check('review_events_grade_chk', sql`${t.grade} BETWEEN 1 AND 4`),
     check('review_events_response_chk', sql`${t.responseMs} >= 0`),
+  ],
+);
+
+/**
+ * Someone taking part in the league: a row exists only after they chose to. What the others see
+ * of them is here and nowhere else: a name and a look, never an address.
+ */
+export const leagueProfiles = pgTable('league_profiles', {
+  userId: uuid('user_id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull().default(''),
+  look: jsonb('look').$type<PublishedLook>().notNull(),
+  frame: jsonb('frame').$type<AvatarFrame>().notNull(),
+  tier: smallint('tier').notNull().default(0),
+  joinedAt: time('joined_at').notNull().defaultNow(),
+  lastResult: jsonb('last_result').$type<LeagueResult>(),
+});
+
+/** One learner in one week's group; their XP counts up as answers arrive. */
+export const leagueMembers = pgTable(
+  'league_members',
+  {
+    week: date('week', { mode: 'string' }).notNull(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    groupId: uuid('group_id').notNull(),
+    tier: smallint('tier').notNull(),
+    xp: integer('xp').notNull().default(0),
+    xpAt: time('xp_at').notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.week, t.userId] }),
+    index('league_members_group_idx').on(t.week, t.groupId),
+    index('league_members_tier_idx').on(t.week, t.tier),
+    index('league_members_user_idx').on(t.userId, t.week),
   ],
 );

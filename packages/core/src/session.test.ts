@@ -7,6 +7,7 @@ import {
   SESSION_RETURN_MAX_MS,
   startSession,
   type SessionState,
+  showNowUpTo,
 } from './session';
 import type { Grade } from './types';
 
@@ -95,5 +96,31 @@ describe('session', () => {
       token: 'x',
     });
     expect(noop).toBe(s);
+  });
+});
+
+describe('show now', () => {
+  const waiting = (...minutes: number[]) => ({
+    waiting: minutes.map((m) => ({ card: { id: `c${m}` }, returnAt: m * 60_000 })),
+  });
+
+  test('takes every word with about the same time left, not only the next', () => {
+    const s = waiting(10, 11, 14, 40);
+    const upTo = showNowUpTo(s, 0)!;
+    expect(s.waiting.filter((w) => w.returnAt <= upTo).map((w) => w.card.id)).toEqual([
+      'c10',
+      'c11',
+      'c14',
+    ]);
+  });
+
+  test('a word coming back soon still takes those a few minutes after it', () => {
+    const s = waiting(1, 3, 5);
+    const upTo = showNowUpTo(s, 0)!;
+    expect(s.waiting.filter((w) => w.returnAt <= upTo).map((w) => w.card.id)).toEqual(['c1', 'c3']);
+  });
+
+  test('nothing waiting: nothing to bring', () => {
+    expect(showNowUpTo({ waiting: [] }, 0)).toBeNull();
   });
 });

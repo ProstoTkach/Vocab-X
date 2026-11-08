@@ -42,6 +42,14 @@ import {
   type RawData,
 } from './schema';
 import { LocalStore } from './store';
+import {
+  joinDuplicateDecks,
+  mergeDeck,
+  mergeGamification,
+  mergeProfile,
+  sharedSettings,
+} from './sync-merge';
+import { noChanges, SyncJournal, type SentMarks, type SyncChanges } from './sync-journal';
 import { validateData } from './validate';
 
 export interface LocalStorageRepoOptions {
@@ -65,6 +73,8 @@ export class LocalStorageRepo implements Repos, DataPort {
   readonly progress: ProgressRepo;
   readonly reviewLog: ReviewLogRepo;
   readonly gamification: GamificationRepo;
+  /** What the server has not been told yet (nothing while no account is linked). */
+  readonly journal: SyncJournal;
 
   private readonly store: LocalStore;
   private readonly catalog: BuiltinCatalog;
@@ -77,6 +87,7 @@ export class LocalStorageRepo implements Repos, DataPort {
 
   constructor(storage: KeyValueStorage, o: LocalStorageRepoOptions = {}) {
     this.store = new LocalStore(storage);
+    this.journal = new SyncJournal(storage);
     this.catalog = o.catalog ?? { decks: [], words: [] };
     this.builtinDecks = new Map(this.catalog.decks.map((d) => [d.id, d]));
     this.builtinWords = new Map(this.catalog.words.map((w) => [w.id, w]));
@@ -88,13 +99,17 @@ export class LocalStorageRepo implements Repos, DataPort {
 
     this.profile = {
       get: () => Promise.resolve(this.store.read<Profile>(KEYS.profile) ?? null),
-      save: async (p) => this.store.write(KEYS.profile, p),
+      save: async (p) => {
+        this.store.write(KEYS.profile, p);
+        this.journal.mark('state', 'profile');
+      },
     };
     this.settings = {
       get: () => Promise.resolve(this.readSettings()),
       update: async (patch) => {
         const next = mergeSettings(this.readSettings(), patch);
         this.store.write(KEYS.settings, next);
+        this.journal.mark('state', 'settings');
         return next;
       },
     };
@@ -108,7 +123,10 @@ export class LocalStorageRepo implements Repos, DataPort {
           ...INITIAL_GAMIFICATION,
           ...this.store.read<GamificationState>(KEYS.gamification),
         }),
-      save: async (s) => this.store.write(KEYS.gamification, s),
+      save: async (s) => {
+        this.store.write(KEYS.gamification, s);
+        this.journal.mark('state', 'gamification');
+      },
     };
   }
 
@@ -150,13 +168,230 @@ export class LocalStorageRepo implements Repos, DataPort {
       for (const [k, v] of Object.entries(backup)) this.store.write(k, v);
       throw e;
     }
+    this.markAllDirty();
     return Promise.resolve();
   }
 
   reset(): Promise<void> {
     this.clearOwnKeys();
     this.writeMeta();
+    this.journal.clear();
     return Promise.resolve();
+  }
+
+  // ---- sync ----
+
+  /** Everything here is news to the server (a first sign-in, a restored backup). */
+  markAllDirty() {
+    const state = [KEYS.profile, KEYS.settings, KEYS.gamification].filter(
+      (k) => this.store.read(k) !== undefined,
+    );
+    this.journal.markMany('state', state);
+    this.journal.markMany('words', Object.keys(this.readMap<Word>(KEYS.words)));
+    this.journal.markMany('decks', Object.keys(this.readMap<Deck>(KEYS.decks)));
+    this.journal.markMany('cards', Object.keys(this.readCards()));
+    this.journal.markMany(
+      'events',
+      this.readLog().map((p) => p[0]),
+    );
+  }
+
+  /** The waiting changes, up to `maxRows`, and the marks to acknowledge once they arrive. */
+  collectChanges(maxRows: number): { changes: SyncChanges; sent: SentMarks } {
+    const changes = noChanges();
+    const sent: SentMarks = [];
+    const dirty = this.journal.dirty();
+    let left = maxRows;
+    const take = (collection: keyof typeof dirty, each: (id: Id) => void) => {
+      for (const [id, mark] of Object.entries(dirty[collection])) {
+        if (left === 0) return;
+        left -= 1;
+        each(id);
+        sent.push({ collection, id, mark });
+      }
+    };
+
+    take('state', (id) => {
+      const state = (changes.state ??= {});
+      if (id === 'profile') {
+        const profile = this.store.read<Profile>(KEYS.profile);
+        if (profile) state.profile = profile;
+      } else if (id === 'settings') {
+        state.settings = sharedSettings(this.readSettings());
+      } else {
+        const gamification = this.store.read<GamificationState>(KEYS.gamification);
+        if (gamification) state.gamification = { ...INITIAL_GAMIFICATION, ...gamification };
+      }
+    });
+    const words = this.readMap<Word>(KEYS.words);
+    take('words', (id) => {
+      const word = words[id];
+      if (word) changes.words.push(word);
+      else changes.deleted.words.push(id);
+    });
+    const decks = this.readMap<Deck>(KEYS.decks);
+    take('decks', (id) => {
+      const deck = decks[id];
+      if (deck) changes.decks.push(deck);
+      else changes.deleted.decks.push(id);
+    });
+    const cards = this.readCards();
+    take('cards', (id) => {
+      const card = cards[id];
+      if (card) changes.cards.push(card);
+      else changes.deleted.cards.push(id);
+    });
+    const log = new Map(this.readLog().map((p) => [p[0], p]));
+    take('events', (id) => {
+      const packed = log.get(id);
+      if (packed) changes.events.push(unpackEvent(packed));
+      else changes.deleted.events.push(id);
+    });
+    return { changes, sent };
+  }
+
+  /**
+   * Takes in what came from the server, without noting it as a change of this browser's. Returns
+   * whether anything here changed, so the screen knows to catch up.
+   */
+  applyRemote(remote: SyncChanges): boolean {
+    let changed = false;
+    if (remote.state && this.applyRemoteState(remote.state)) changed = true;
+    if (this.applyRemoteWords(remote)) changed = true;
+    if (this.applyRemoteDecks(remote)) changed = true;
+    if (this.applyRemoteCards(remote)) changed = true;
+    if (this.applyRemoteEvents(remote)) changed = true;
+    return changed;
+  }
+
+  private writeIfNew(key: string, value: unknown): boolean {
+    if (JSON.stringify(this.store.read(key) ?? {}) === JSON.stringify(value)) return false;
+    this.store.write(key, value);
+    return true;
+  }
+
+  private applyRemoteState(state: NonNullable<SyncChanges['state']>): boolean {
+    const { journal } = this;
+    let changed = false;
+    if (state.profile) {
+      const local = this.store.read<Profile>(KEYS.profile);
+      const both = local && journal.isDirty('state', 'profile');
+      if (this.writeIfNew(KEYS.profile, both ? mergeProfile(local, state.profile) : state.profile))
+        changed = true;
+    }
+    // Settings changed here too: the last one to choose, this device, wins.
+    if (state.settings && !journal.isDirty('state', 'settings')) {
+      const next = mergeSettings(this.readSettings(), state.settings);
+      if (this.writeIfNew(KEYS.settings, next)) changed = true;
+    }
+    if (state.gamification) {
+      const local = this.store.read<GamificationState>(KEYS.gamification);
+      const both = local && journal.isDirty('state', 'gamification');
+      const next = both
+        ? mergeGamification({ ...INITIAL_GAMIFICATION, ...local }, state.gamification)
+        : state.gamification;
+      if (this.writeIfNew(KEYS.gamification, next)) changed = true;
+    }
+    return changed;
+  }
+
+  private applyRemoteWords(remote: SyncChanges): boolean {
+    const dirty = this.journal.dirty().words;
+    const next = { ...this.readMap<Word>(KEYS.words) };
+    const settled: Id[] = [];
+    for (const word of remote.words) {
+      const local = next[word.id];
+      if (dirty[word.id] !== undefined && local && local.updatedAt > word.updatedAt) continue;
+      next[word.id] = word;
+      settled.push(word.id);
+    }
+    // Deleted there but edited here: the edit brings it back.
+    for (const id of remote.deleted.words)
+      if (dirty[id] === undefined) Reflect.deleteProperty(next, id);
+    this.journal.settle('words', settled);
+    return this.writeIfNew(KEYS.words, next);
+  }
+
+  private applyRemoteDecks(remote: SyncChanges): boolean {
+    const dirty = this.journal.dirty().decks;
+    const next = { ...this.readMap<Deck>(KEYS.decks) };
+    const settled: Id[] = [];
+    for (const deck of remote.decks) {
+      const local = next[deck.id];
+      if (dirty[deck.id] !== undefined && local) {
+        next[deck.id] = mergeDeck(local, deck);
+      } else {
+        next[deck.id] = deck;
+        settled.push(deck.id);
+      }
+    }
+    for (const id of remote.deleted.decks)
+      if (dirty[id] === undefined) Reflect.deleteProperty(next, id);
+    this.journal.settle('decks', settled);
+    const { save, remove } = joinDuplicateDecks(Object.values(next));
+    for (const deck of save) next[deck.id] = deck;
+    for (const id of remove) Reflect.deleteProperty(next, id);
+    this.journal.markMany('decks', [...save.map((d) => d.id), ...remove]);
+    return this.writeIfNew(KEYS.decks, next);
+  }
+
+  /** Answered on both devices: the card of the later answer. Both answers stay in the log. */
+  private applyRemoteCards(remote: SyncChanges): boolean {
+    const dirty = this.journal.dirty().cards;
+    const cards = this.readCards();
+    const settled: Id[] = [];
+    const langs = new Set<LangCode>();
+    const touch = (p: CardProgress) => langs.add(p.lang);
+    for (const p of remote.cards) {
+      const local = cards[p.wordId];
+      if (dirty[p.wordId] !== undefined && local && local.card.lastReviewAt > p.card.lastReviewAt)
+        continue;
+      if (local) touch(local);
+      cards[p.wordId] = p;
+      touch(p);
+      settled.push(p.wordId);
+    }
+    for (const id of remote.deleted.cards) {
+      const local = cards[id];
+      if (dirty[id] !== undefined || !local) continue;
+      touch(local);
+      Reflect.deleteProperty(cards, id);
+    }
+    this.journal.settle('cards', settled);
+    let changed = false;
+    for (const lang of langs) {
+      const own = Object.fromEntries(
+        Object.values(cards)
+          .filter((p) => p.lang === lang)
+          .map((p) => [p.wordId, p]),
+      );
+      const before = JSON.stringify(this.store.read(KEYS.progress(lang)) ?? {});
+      if (before === JSON.stringify(own)) continue;
+      this.writeOrRemove(KEYS.progress(lang), own);
+      changed = true;
+    }
+    return changed;
+  }
+
+  private applyRemoteEvents(remote: SyncChanges): boolean {
+    const log = this.readLog();
+    const known = new Set(log.map((p) => p[0]));
+    // A full log has forgotten what is older than its tail: such an answer is already in the stats.
+    const oldest = log.length >= this.maxLogEvents ? (log[0]?.[2] ?? 0) : 0;
+    const added = remote.events.filter((e) => !known.has(e.id) && e.at >= oldest);
+    const gone = new Set(remote.deleted.events.filter((id) => known.has(id)));
+    this.journal.settle('events', remote.deleted.events);
+    if (added.length === 0 && gone.size === 0) return false;
+
+    let stats = this.readMap<DailyStats>(KEYS.stats);
+    for (const packed of log)
+      if (gone.has(packed[0])) stats = this.statsWith(stats, unpackEvent(packed), -1);
+    for (const e of added) stats = this.statsWith(stats, e, 1);
+    const next = [...log.filter((p) => !gone.has(p[0])), ...added.map(packEvent)];
+    next.sort((a, b) => a[2] - b[2]);
+    this.writeLog(next);
+    this.writeOrRemove(KEYS.stats, stats);
+    return true;
   }
 
   // ---- internals ----
@@ -211,6 +446,53 @@ export class LocalStorageRepo implements Repos, DataPort {
     return this.store.read<Record<Id, T>>(key) ?? {};
   }
 
+  /** The cards of all languages, in a new object. */
+  private readCards(): Record<Id, CardProgress> {
+    const cards: Record<Id, CardProgress> = {};
+    for (const key of this.store.keys())
+      if (key.startsWith('progress:')) Object.assign(cards, this.readMap<CardProgress>(key));
+    return cards;
+  }
+
+  private readLog(): PackedEvent[] {
+    return this.store.read<PackedEvent[]>(KEYS.log) ?? [];
+  }
+
+  private writeLog(log: PackedEvent[]) {
+    let tail = log.length > this.maxLogEvents ? log.slice(-this.maxLogEvents) : log;
+    try {
+      this.writeOrRemove(KEYS.log, tail);
+    } catch (e) {
+      if (!(e instanceof StorageQuotaError) || tail.length < 2) throw e;
+      // Out of space: older events are already folded into stats and card snapshots,
+      // so dropping the older half of the tail loses no learning state.
+      tail = tail.slice(Math.floor(tail.length / 2));
+      this.store.write(KEYS.log, tail);
+    }
+  }
+
+  /** The daily stats with an answer counted (or taken back). */
+  private statsWith(
+    stats: Record<Id, DailyStats>,
+    e: ReviewEvent,
+    sign: 1 | -1,
+  ): Record<Id, DailyStats> {
+    // Placement answers are not study activity and do not count toward today.
+    if (e.kind === 'placement') return stats;
+    const date = this.dateKey(e.at);
+    const s = stats[date] ?? { date, reviews: 0, newCards: 0, correct: 0, xp: 0 };
+    const next = {
+      date,
+      reviews: s.reviews + sign,
+      newCards: s.newCards + (e.wasNew ? sign : 0),
+      correct: s.correct + (e.grade >= 2 ? sign : 0),
+      xp: s.xp + sign * e.xp,
+    };
+    // A day emptied by undo disappears, so undo restores storage exactly.
+    const { [date]: _old, ...others } = stats;
+    return next.reviews === 0 ? others : { ...others, [date]: next };
+  }
+
   private createDeckRepo(): DeckRepo {
     const own = () => this.readMap<Deck>(KEYS.decks);
     return {
@@ -228,10 +510,12 @@ export class LocalStorageRepo implements Repos, DataPort {
         if (deck.origin === 'builtin')
           throw new Error('Built-in decks are read-only; import a copy instead');
         this.store.write(KEYS.decks, { ...own(), [deck.id]: deck });
+        this.journal.mark('decks', deck.id);
       },
       remove: async (id) => {
         const { [id]: _removed, ...rest } = own();
         this.store.write(KEYS.decks, rest);
+        this.journal.mark('decks', id);
       },
     };
   }
@@ -254,10 +538,14 @@ export class LocalStorageRepo implements Repos, DataPort {
         for (const w of Object.values(own())) merged.set(w.id, w);
         return Promise.resolve([...merged.values()].filter((w) => w.lang === lang));
       },
-      save: async (word) => this.store.write(KEYS.words, { ...own(), [word.id]: word }),
+      save: async (word) => {
+        this.store.write(KEYS.words, { ...own(), [word.id]: word });
+        this.journal.mark('words', word.id);
+      },
       remove: async (id) => {
         const { [id]: _removed, ...rest } = own();
         this.store.write(KEYS.words, rest);
+        this.journal.mark('words', id);
       },
     };
   }
@@ -280,53 +568,31 @@ export class LocalStorageRepo implements Repos, DataPort {
       listByLang: (lang) => Promise.resolve(Object.values(read(lang))),
       listDue: (lang, now) =>
         Promise.resolve(Object.values(read(lang)).filter((p) => p.dueAt <= now)),
-      save: async (p) =>
-        this.store.write(KEYS.progress(p.lang), { ...read(p.lang), [p.wordId]: p }),
+      save: async (p) => {
+        this.store.write(KEYS.progress(p.lang), { ...read(p.lang), [p.wordId]: p });
+        this.journal.mark('cards', p.wordId);
+      },
       remove: async (wordId) => {
         for (const lang of langs()) {
           const { [wordId]: removed, ...rest } = read(lang);
           if (removed) this.writeOrRemove(KEYS.progress(lang), rest);
         }
+        this.journal.mark('cards', wordId);
       },
     };
   }
 
   private createReviewLogRepo(): ReviewLogRepo {
-    const readLog = () => this.store.read<PackedEvent[]>(KEYS.log) ?? [];
+    const readLog = () => this.readLog();
     const readStats = () => this.readMap<DailyStats>(KEYS.stats);
-    const writeStats = (e: ReviewEvent, sign: 1 | -1) => {
-      // Placement answers are not study activity and do not count toward today.
-      if (e.kind === 'placement') return;
-      const stats = readStats();
-      const date = this.dateKey(e.at);
-      const s = stats[date] ?? { date, reviews: 0, newCards: 0, correct: 0, xp: 0 };
-      const next = {
-        date,
-        reviews: s.reviews + sign,
-        newCards: s.newCards + (e.wasNew ? sign : 0),
-        correct: s.correct + (e.grade >= 2 ? sign : 0),
-        xp: s.xp + sign * e.xp,
-      };
-      // A day emptied by undo disappears, so undo restores storage exactly.
-      const { [date]: _old, ...others } = stats;
-      this.writeOrRemove(KEYS.stats, next.reviews === 0 ? others : { ...others, [date]: next });
-    };
-    const writeLog = (log: PackedEvent[]) => {
-      let tail = log.length > this.maxLogEvents ? log.slice(-this.maxLogEvents) : log;
-      try {
-        this.writeOrRemove(KEYS.log, tail);
-      } catch (e) {
-        if (!(e instanceof StorageQuotaError) || tail.length < 2) throw e;
-        // Out of space: older events are already folded into stats and card snapshots,
-        // so dropping the older half of the tail loses no learning state.
-        tail = tail.slice(Math.floor(tail.length / 2));
-        this.store.write(KEYS.log, tail);
-      }
-    };
+    const writeStats = (e: ReviewEvent, sign: 1 | -1) =>
+      this.writeOrRemove(KEYS.stats, this.statsWith(readStats(), e, sign));
+    const writeLog = (log: PackedEvent[]) => this.writeLog(log);
     return {
       append: async (e) => {
         writeLog([...readLog(), packEvent(e)]);
         writeStats(e, 1);
+        this.journal.mark('events', e.id);
       },
       remove: async (eventId) => {
         // The log read is shared with the store's cache: build a new one, never splice it.
@@ -335,6 +601,7 @@ export class LocalStorageRepo implements Repos, DataPort {
         if (!packed) return;
         writeLog(log.filter((p) => p !== packed));
         writeStats(unpackEvent(packed), -1);
+        this.journal.mark('events', eventId);
       },
       listForWord: (wordId) =>
         Promise.resolve(

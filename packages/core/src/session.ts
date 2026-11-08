@@ -138,6 +138,24 @@ export function sessionReducer<C extends SessionCard, T>(
 export const sessionDone = <C extends SessionCard>(s: SessionState<C>) =>
   s.total - new Set([...s.queue, ...s.waiting.map((w) => w.card)].map((c) => c.id)).size;
 
+/** "Show now" takes along what comes back this soon after the next card… */
+const SHOW_NOW_MIN_WINDOW_MS = 3 * 60_000;
+/** …or within this share of the time left: at 10 minutes away, those at up to 15. */
+const SHOW_NOW_SHARE = 0.5;
+
+/**
+ * Up to when "show now" brings cards back: not only the next one, but all with about the same
+ * time left. Null when nothing waits.
+ */
+export function showNowUpTo(
+  s: { waiting: readonly { returnAt: number }[] },
+  now: number,
+): number | null {
+  const next = s.waiting[0]?.returnAt;
+  if (next === undefined) return null;
+  return next + Math.max(SHOW_NOW_MIN_WINDOW_MS, (next - now) * SHOW_NOW_SHARE);
+}
+
 /** When the next waiting card is due; null when nothing waits. */
 export const nextReturnAt = <C extends SessionCard>(s: SessionState<C>) =>
   s.waiting[0]?.returnAt ?? null;

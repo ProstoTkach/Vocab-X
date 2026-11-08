@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { onboard, quizRightIndex, setSettings } from './fixtures';
+import { onboard, setSettings } from './fixtures';
 
 const card = (page: Page) => page.getByTestId('review-card');
 const options = (page: Page) => card(page).getByRole('list').getByRole('button');
@@ -210,7 +210,7 @@ test('the lab: any mode and level, nothing saved, the words come round', async (
   await level.selectOption('2');
   await expect(options(page)).toHaveCount(4);
   // Answers go round: the stack never gets smaller, nothing is saved.
-  await expect(page.getByText('15 карток у колоді')).toBeVisible();
+  await expect(page.getByText('15 карток', { exact: true })).toBeVisible();
   for (let i = 0; i < 3; i++) {
     await options(page).first().click();
     await page
@@ -219,7 +219,7 @@ test('the lab: any mode and level, nothing saved, the words come round', async (
       .catch(() => {});
     await expect(options(page).first()).toBeEnabled();
   }
-  await expect(page.getByText('15 карток у колоді')).toBeVisible();
+  await expect(page.getByText('15 карток', { exact: true })).toBeVisible();
   // The last answers can be taken back here too.
   const undo = page.getByRole('button', { name: 'Скасувати останню оцінку' });
   await expect(undo).toBeEnabled();
@@ -228,43 +228,28 @@ test('the lab: any mode and level, nothing saved, the words come round', async (
   expect(await levels(page)).toEqual(before);
 });
 
-test('the mixed mode: first and recommended, explained once, each right answer a step on', async ({
+test('a sentence being said can be skipped: "Next" is there at once, also after a right answer', async ({
   page,
 }) => {
-  // As a learner who has not tried it yet.
-  await setSettings(page, {
-    tipsSeen: ['review-intro', 'review-intro-quiz', 'review-intro-sentences', 'feedback-survey'],
+  const right = page.getByTestId('review-card').getByRole('list').getByRole('button');
+  await expect(right.first()).toBeEnabled();
+  const answer = await page.evaluate(() => {
+    const said = window as unknown as { cancels: number };
+    said.cancels = 0;
+    const cancel = speechSynthesis.cancel.bind(speechSynthesis);
+    speechSynthesis.cancel = () => {
+      said.cancels += 1;
+      cancel();
+    };
+    return true;
   });
-  await page.reload();
-  await page.getByRole('button', { name: 'Змінити' }).click();
-  const first = page.getByRole('menuitemradio').first();
-  await expect(first).toContainText('Змішаний');
-  await expect(first).toContainText('Рекомендований');
-  await first.click();
-  // Chosen for the first time: it explains itself.
-  const intro = page.getByRole('dialog', { name: 'Як проходить змішаний режим' });
-  await expect(intro).toBeVisible();
-  await intro.getByRole('button', { name: 'Зрозуміло, почнімо' }).click();
-  await expect(intro).toHaveCount(0);
-  // The first step of a word: the test, its first level.
-  await expect(page.getByText('Вибір перекладу', { exact: true })).toBeVisible();
-  await options(page)
-    .nth(await quizRightIndex(page))
-    .click();
-  await goOn(page);
-  // The word answered right is at the next step: the sentence, level 1.
-  const steps = await page.evaluate(() => {
-    const out: (number | undefined)[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i)!;
-      if (!k.includes('progress')) continue;
-      const map = JSON.parse(localStorage.getItem(k)!) as Record<
-        string,
-        { card: { mix?: number } }
-      >;
-      out.push(...Object.values(map).map((p) => p.card.mix));
-    }
-    return out;
-  });
-  expect(steps).toContain(1);
+  expect(answer).toBe(true);
+  await right.first().click();
+  const next = page.getByRole('button', { name: 'Далі', disabled: false });
+  await expect(next.filter({ visible: true })).toBeVisible();
+  const before = await page.evaluate(() => (window as unknown as { cancels: number }).cancels);
+  await next.filter({ visible: true }).click();
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { cancels: number }).cancels))
+    .toBeGreaterThan(before);
 });

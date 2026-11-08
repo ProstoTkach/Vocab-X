@@ -19,6 +19,7 @@ import type settings from '../../messages/uk/settings.json';
 import type themes from '../../messages/uk/themes.json';
 import type tours from '../../messages/uk/tours.json';
 import type profile from '../../messages/uk/profile.json';
+import type league from '../../messages/uk/league.json';
 import type words from '../../messages/uk/words.json';
 import type { Locale } from './locales';
 
@@ -46,6 +47,7 @@ declare module 'next-intl' {
       themes: typeof themes;
       tours: typeof tours;
       profile: typeof profile;
+      league: typeof league;
       words: typeof words;
     };
   }

@@ -12,7 +12,6 @@ import {
   nextReturnAt,
   clozeForReview,
   formatForLevel,
-  isQuizFormat,
   isSentenceFormat,
   isTypingFormat,
   quizChoices,
@@ -23,6 +22,7 @@ import {
   seededRng,
   sessionDone,
   sessionReducer,
+  showNowUpTo,
   sessionReturnAt,
   startSession,
   submitReview,
@@ -50,11 +50,6 @@ import { useDevTools } from '@/lib/dev-tools';
 import { track } from '@/lib/analytics';
 import { BackLink } from '@/components/back-link';
 import { useFeedback } from '@/components/feedback/feedback-provider';
-import {
-  QUIZ_INVITE_AFTER,
-  QUIZ_INVITE_TIP,
-  SURVEY_SENT_TIP,
-} from '@/components/feedback/feedback-provider';
 import { useGamification } from '@/lib/gamification';
 import { newId } from '@/lib/ids';
 import { useExampleTopUp } from '@/lib/lexicon/example-top-up';
@@ -64,7 +59,7 @@ import { useSpeech } from '@/lib/speech';
 import { createStopwatch } from '@/lib/stopwatch';
 import { Celebration } from './celebration';
 import { FOUR_GRADES_TIP, FOUR_GRADES_TIP_STREAK, FourGradesTip } from './four-grades-tip';
-import { MIXED_INTRO, QUIZ_INTRO, REVIEW_INTRO, ReviewIntro, SENTENCE_INTRO } from './review-intro';
+import { QUIZ_INTRO, REVIEW_INTRO, ReviewIntro, SENTENCE_INTRO } from './review-intro';
 import { CardStage } from './card-stage';
 import { acceptedAnswers } from './formats/parts';
 import { formatOf, rendererFor } from './formats/registry';
@@ -122,6 +117,8 @@ interface QuizResult {
 const QUIZ_NEXT_MS = { right: 600, wrong: 2000 } as const;
 /** The sentences: time to read and hear the whole sentence with the word in it. */
 const SENTENCE_NEXT_MS = { right: 3000, wrong: 6000 } as const;
+/** The same with speech turned off: only reading, so the next card comes sooner. */
+const SENTENCE_NEXT_SILENT_MS = { right: 1500, wrong: 3500 } as const;
 /** Said longer than that: the next card comes this long after the sentence ends. */
 const AFTER_SPEECH_MS = 600;
 /** The lab keeps this many answers to take back. */
@@ -136,6 +133,7 @@ const REVIEW_TOUR: readonly TourStep[] = [
   { id: 'hello', joy: true, hidden: true },
   { id: 'progress', target: 'review-progress', hidden: true },
   { id: 'undo', target: 'review-undo' },
+  { id: 'speech', target: 'review-speech' },
   { id: 'task', target: 'review-task', hidden: true },
   { id: 'mode', target: 'review-mode' },
   { id: 'card', target: 'review-card', hidden: true },
@@ -214,6 +212,8 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   const speech = useMemo(
     () => ({
       canSpeak: rawSpeech.canSpeak,
+      stop: rawSpeech.stop,
+      warmUp: rawSpeech.warmUp,
       speak: (text: string, lang: string) => {
         statsOf(shownKey.current).audio = true;
         return rawSpeech.speak(text, lang);
@@ -233,8 +233,6 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   /** The test and the sentences taking turns, each word at its own step. */
   const mixed = studyMode === 'mixed';
   const feedback = useFeedback();
-  /** Answers given in the test so far (all sessions), until the survey invitation was made. */
-  const quizAnswered = useRef<number | null>(null);
 
   const [setup, setSetup] = useState<Setup | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -301,16 +299,7 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
         params: DEFAULT_SCHEDULER_PARAMS,
         ...(deck ? { deckIds: [deck.id] } : {}),
       });
-      // Test answers so far, counted from the log, while the survey invitation is still ahead.
-      const inviteAhead = ![QUIZ_INVITE_TIP, SURVEY_SENT_TIP].some((tip) =>
-        settings.tipsSeen.includes(tip),
-      );
-      const answered =
-        inviteAhead && !lab
-          ? (await repos.reviewLog.listSince(0)).filter((e) => isQuizFormat(e.format)).length
-          : null;
       if (ctrl.signal.aborted) return;
-      quizAnswered.current = answered;
       watch.reset();
       setSetup({
         profile,
@@ -397,27 +386,34 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   useEffect(() => {
     if (finished) endReviewRef.current();
   }, [finished]);
-  // Flash cards and the test each explain themselves once.
-  const introTip = mixed
-    ? MIXED_INTRO
-    : sentences
-      ? SENTENCE_INTRO
-      : quiz
-        ? QUIZ_INTRO
-        : REVIEW_INTRO;
+  // Flash cards, the test and the sentences each explain themselves once; the mixed mode does not.
+  const introTip = mixed ? null : sentences ? SENTENCE_INTRO : quiz ? QUIZ_INTRO : REVIEW_INTRO;
   /** The tour of the review screen is over (or was seen before): the task is explained next. */
   const [tourDone, setTourDone] = useState(false);
   const introOpen =
-    !lab && tourDone && !!setup && !introClosed && !setup.tipsSeen.includes(introTip);
+    !lab &&
+    tourDone &&
+    !!setup &&
+    !introClosed &&
+    introTip !== null &&
+    !setup.tipsSeen.includes(introTip);
   const closeIntro = () => {
     setIntroClosed(true);
     log('review_intro_closed');
-    if (!setup) return;
+    if (!setup || !introTip) return;
     const tipsSeen = [...setup.tipsSeen, introTip];
     setSetup((s) => s && { ...s, tipsSeen });
     void repos.settings.update({ tipsSeen });
   };
   const settings = setup?.settings;
+  /** Saying words by itself, on or off, from the top of the screen. */
+  const toggleAutoSpeak = () => {
+    const autoSpeak = !setup?.settings.autoSpeak;
+    if (!autoSpeak) speech.stop();
+    log('auto_speak', { to: autoSpeak ? 'on' : 'off' });
+    setSetup((s) => s && { ...s, settings: { ...s.settings, autoSpeak } });
+    void repos.settings.update({ study: { autoSpeak } });
+  };
   const swipe: SwipeOptions = {
     rtl: localeInfo(locale).dir === 'rtl',
     mirrored: settings?.swipeLayout === 'mirrored',
@@ -484,6 +480,15 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   const renderer = rendererFor(quizFormat ? 'PROD' : format);
   const typing = !!settings?.typing && renderer.supportsTyping;
   const speechLang = card ? (getLanguage(card.word.lang)?.speechLang ?? card.word.lang) : '';
+  // The voice is ready before the first answer; a browser may refuse until the page is touched.
+  const warmFor = settings?.autoSpeak ? speechLang : '';
+  useEffect(() => {
+    if (!warmFor) return;
+    const warm = () => rawSpeech.warmUp(warmFor);
+    warm();
+    window.addEventListener('pointerdown', warm, { once: true });
+    return () => window.removeEventListener('pointerdown', warm);
+  }, [rawSpeech, warmFor]);
   // A listening card plays its word as soon as it shows up: hearing it is the exercise. Other
   // levels of the test speak only when their listen button is pressed.
   const listenTerm =
@@ -576,15 +581,18 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
       responseMs,
       // Typing the word: twice as long to look at what was typed against the answer.
       autoMs: sentenceFormat
-        ? right
-          ? SENTENCE_NEXT_MS.right
-          : SENTENCE_NEXT_MS.wrong
+        ? (setup?.settings.autoSpeak ? SENTENCE_NEXT_MS : SENTENCE_NEXT_SILENT_MS)[
+            right ? 'right' : 'wrong'
+          ]
         : (right ? QUIZ_NEXT_MS.right : QUIZ_NEXT_MS.wrong) * (isTypingFormat(format) ? 2 : 1),
     });
-    // The sentences: the whole sentence, the word in its place, is heard once answered. The
-    // next card waits for it to be said to the end.
-    sentenceSaid.current =
-      cloze && setup?.settings.autoSpeak ? speech.speak(cloze.example.text, speechLang) : null;
+    // Once answered the word is heard (in the sentences, the whole sentence with the word in its
+    // place). Only a sentence holds the next card back until it has been said: a single word is
+    // over in a moment, and the next card does not wait for it.
+    const said = setup?.settings.autoSpeak
+      ? speech.speak(cloze ? cloze.example.text : card.word.term, speechLang)
+      : null;
+    sentenceSaid.current = sentenceFormat ? said : null;
     reveal();
     // Saved once the result is painted and the "Next" bar is filling (an animation the
     // compositor runs on its own), never in the frame of the answer itself.
@@ -705,14 +713,6 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     // Past the daily number of reviews XP starts to shrink.
     if (reviewStats.current.reviewsBefore + session.reviewed + 1 === DEFAULT_XP_PARAMS.dailyDecayN0)
       log('xp_decay_reached', { count: DEFAULT_XP_PARAMS.dailyDecayN0 });
-    // After enough answers in the test, ask once what the learner thinks of it.
-    if ((isQuizFormat(format) || isSentenceFormat(format)) && quizAnswered.current !== null) {
-      quizAnswered.current += 1;
-      if (quizAnswered.current >= QUIZ_INVITE_AFTER) {
-        quizAnswered.current = null;
-        feedback.inviteOnce(QUIZ_INVITE_TIP);
-      }
-    }
     // A card in its learning phase (due again within minutes) comes back in this session.
     const back = sessionReturnAt(now, outcome.progress.dueAt);
     setSession((s) => {
@@ -827,6 +827,8 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   const nextQuiz = (auto = false) => {
     if (!quizResult) return;
     log('quiz_next', { auto, card_level: card?.progress?.card.level ?? 1 });
+    // "Next" pressed during the sentence: it does not go on over the next card.
+    if (!auto) speech.stop();
     const a = quizResult.answer;
     const input: AnswerInput =
       'typed' in a ? 'typed' : 'said' in a ? 'spoken' : a.picked < 0 ? 'skip' : 'option';
@@ -925,8 +927,10 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
         onNext: () => nextQuiz(),
         paused: quizResult.pausedMs !== undefined,
         onPause: canPause ? togglePause : undefined,
-        // A right answer goes on quickly by itself: no arrow (unless it waits: undo, pause).
+        // A right answer goes on quickly by itself: no arrow (unless it waits: undo, pause). A
+        // sentence takes longer to hear, so its arrow is there from the start, to skip it.
         noArrow:
+          !sentenceFormat &&
           quizResult.grade >= 2 &&
           (quizResult.autoMs !== null || quizResult.pausedMs !== undefined),
       }
@@ -962,6 +966,8 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
               deckName={deckName}
               canUndo={(lab ? labHistory.length : session.history.length) > 0 && !busy}
               onUndo={() => void undo()}
+              autoSpeak={!!settings?.autoSpeak}
+              onToggleAutoSpeak={toggleAutoSpeak}
             />
             {!card && returnAt !== null ? (
               <WaitingPanel
@@ -969,7 +975,14 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
                 waiting={session.waiting.length}
                 onShowNow={() => {
                   log('review_show_now', { count: session.waiting.length });
-                  setSession((s) => s && sessionReducer(s, { type: 'release', upTo: returnAt }));
+                  setSession(
+                    (s) =>
+                      s &&
+                      sessionReducer(s, {
+                        type: 'release',
+                        upTo: showNowUpTo(s, clock.now()) ?? returnAt,
+                      }),
+                  );
                 }}
               />
             ) : !card ? (
@@ -1025,13 +1038,15 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
                 ) : (
                   <div
                     data-tour="review-task"
-                    className="flex items-center justify-between gap-2 text-xs font-medium text-fg-muted"
+                    // Equal side columns: the mode button stays in the middle of the card whatever
+                    // the labels beside it say.
+                    className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-xs font-medium text-fg-muted"
                   >
-                    <span className="rounded-full border border-line/70 px-2.5 py-1">
+                    <span className="min-w-0 justify-self-start truncate rounded-full border border-line/70 px-2.5 py-1">
                       {t(`format.${format}`)}
                     </span>
                     <StudyModeMenu mode={studyMode} onChange={changeMode} />
-                    <span>
+                    <span className="min-w-0 justify-self-end truncate">
                       {t('level', {
                         level: Math.min(level, 3),
                         max: 3,

@@ -1,5 +1,6 @@
 'use client';
 
+import { LEAGUE_TIERS } from '@vocabx/core';
 import { Ban, Check, Columns2, Footprints, Lock, Shirt } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -137,6 +138,7 @@ export function WardrobeDialog({ trigger }: { trigger: ReactNode }) {
   const t = useTranslations('character');
   const ti = useTranslations('character.items');
   const ts = useTranslations('settings');
+  const tl = useTranslations('league');
   const { look, setLook, unlocks, animated, fresh, markSeen } = useGamification();
   /** Something was changed: the preview smiles. */
   const [changed, setChanged] = useState(false);
@@ -146,6 +148,9 @@ export function WardrobeDialog({ trigger }: { trigger: ReactNode }) {
   const lockReason = (unlock: Unlock) => {
     const r = parseUnlock(unlock);
     if (r.kind === 'level') return ts('lockedAtLevel', { level: r.level });
+    if (r.kind === 'league') {
+      return t('lockedLeague', { tier: tl(`tiers.${LEAGUE_TIERS[r.tier] ?? LEAGUE_TIERS[0]}`) });
+    }
     if (r.kind === 'achievement') return t('lockedAchievement');
     return t('lockedPurchase');
   };

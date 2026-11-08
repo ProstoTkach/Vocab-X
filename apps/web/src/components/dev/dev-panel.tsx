@@ -1,8 +1,8 @@
 'use client';
 
 import { DAY_MS } from '@vocabx/core';
-import { Clock, Crown, X } from 'lucide-react';
-import { useFormatter, useTranslations } from 'next-intl';
+import { Clock, Crown, Trophy, X } from 'lucide-react';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useClock } from '@/lib/clock';
@@ -21,6 +21,7 @@ import { ReminderTestButtons } from './reminder-test';
 const DEMO_LEVEL = 15;
 
 export function DevPanel() {
+  const locale = useLocale();
   const t = useTranslations('dev');
   const format = useFormatter();
   const { enabled, setEnabled, quiz, sentences, setMode } = useDevTools();
@@ -101,6 +102,15 @@ export function DevPanel() {
       >
         <Crown aria-hidden className="size-4" />
         {t('reachLevel', { level: DEMO_LEVEL })}
+      </Button>
+      <Button
+        size="sm"
+        variant="secondary"
+        className="mt-2 w-full justify-center"
+        onClick={() => window.location.assign(`/${locale}/league?demo=1`)}
+      >
+        <Trophy aria-hidden className="size-4" />
+        {t('leagueDemo')}
       </Button>
       <ReminderTestButtons />
       <p className="mt-3 text-xs text-fg-muted pointer-coarse:hidden">{t('hint')}</p>

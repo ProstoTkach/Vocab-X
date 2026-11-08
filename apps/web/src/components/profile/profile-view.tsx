@@ -9,16 +9,19 @@ import {
   type DailyStats,
   type Profile,
 } from '@vocabx/core';
-import { Check, Pencil } from 'lucide-react';
+import { Check, Palette, Pencil } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useState, type SyntheticEvent } from 'react';
-import { CharacterHead } from '@/components/character/character-view';
-import { AccountCard } from '@/components/profile/account-card';
+import { AvatarBadge } from '@/components/character/avatar-badge';
+import { AccountCard, SignInCard, useAccount } from '@/components/profile/account-card';
+import { FramePicker } from '@/components/profile/frame-picker';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { TextField } from '@/components/ui/field';
 import { Tooltip } from '@/components/ui/tooltip';
+import { toPublished } from '@/character/look';
 import { track } from '@/lib/analytics';
+import { publishLeagueShown } from '@/lib/league-publish';
 import { useClock } from '@/lib/clock';
 import { cx } from '@/lib/cx';
 import { useGamification } from '@/lib/gamification';
@@ -61,7 +64,9 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
   const format = useFormatter();
   const repos = useRepos();
   const { clock, dayOf } = useClock();
-  const { look } = useGamification();
+  const { look, frame } = useGamification();
+  const [framing, setFraming] = useState(false);
+  const account = useAccount(accounts);
   const { level, xpTotal } = usePlayer();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [numbers, setNumbers] = useState<Numbers | null>(null);
@@ -112,7 +117,9 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
     const updated = { ...profile, displayName: next };
     setProfile(updated);
     setEditing(false);
-    void repos.profile.save(updated);
+    void repos.profile
+      .save(updated)
+      .then(() => publishLeagueShown(repos, toPublished(look), frame));
     track('profile_name', { to: next ? 'set' : 'cleared' });
   };
 
@@ -148,7 +155,25 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
   return (
     <div className="flex flex-col gap-6">
       <Card className="relative flex flex-col items-center gap-4 text-center sm:flex-row sm:text-start">
-        <CharacterHead look={look} label={t('character')} className="w-28 shrink-0 sm:w-32" />
+        <div className="relative shrink-0">
+          <AvatarBadge
+            look={look}
+            frame={frame}
+            label={t('character')}
+            sizes="128px"
+            eager
+            className="size-28 sm:size-32"
+          />
+          <Button
+            variant="secondary"
+            size="icon"
+            aria-label={t('frame.title')}
+            className="absolute -end-6 -bottom-1 sm:-end-1"
+            onClick={() => setFraming(true)}
+          >
+            <Palette aria-hidden className="size-4" />
+          </Button>
+        </div>
         <div className="flex w-full min-w-0 flex-1 flex-col gap-2 sm:pe-10">
           {editing ? (
             <form onSubmit={saveName} className="flex items-end gap-2">
@@ -189,6 +214,12 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
         )}
       </Card>
 
+      {account?.email === null && <SignInCard />}
+      {/* Room for that line while the server answers, so the page does not jump. */}
+      {accounts && account === undefined && !repos.journal.active && (
+        <div aria-hidden className="h-20" />
+      )}
+
       <section aria-label={t('numbersTitle')}>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {tiles.map(({ key, value }) => (
@@ -227,7 +258,13 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
               key={i}
               content={t('chartTip', { day: dayLabel(d.date), right: d.right, wrong: d.wrong })}
             >
-              <div className="flex min-w-0 flex-1 flex-col justify-end">
+              <div
+                className={cx(
+                  'flex min-w-0 flex-1 flex-col justify-end rounded-t',
+                  // Today: a faint column behind the bar, so the day is found at a glance.
+                  d.date === today && 'bg-accent/10',
+                )}
+              >
                 <div
                   className={cx(
                     'w-full rounded-t bg-danger transition-[height] motion-normal',
@@ -248,7 +285,13 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
         </div>
         <div aria-hidden className="mt-2 flex gap-1.5 text-xs text-fg-muted sm:gap-3">
           {chart.map((d, i) => (
-            <span key={i} className="min-w-0 flex-1 truncate text-center">
+            <span
+              key={i}
+              className={cx(
+                'min-w-0 flex-1 truncate rounded-full text-center',
+                d.date === today && 'bg-accent font-semibold text-on-accent',
+              )}
+            >
               {dayLabel(d.date)}
             </span>
           ))}
@@ -283,7 +326,8 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
         </div>
       </Card>
 
-      {accounts && <AccountCard />}
+      {account?.email && <AccountCard email={account.email} />}
+      <FramePicker open={framing} onOpenChange={setFraming} />
     </div>
   );
 }

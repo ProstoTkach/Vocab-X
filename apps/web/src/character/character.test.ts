@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, test } from 'vitest';
 import { AVATARS, CANVAS_SIZE, ITEMS, type Sprite } from './config';
 import {
+  isOpen,
   freshUnlocks,
   isWorn,
   itemById,
@@ -22,8 +23,9 @@ const messages = (locale: string) =>
     ),
   ) as { items: Record<string, string> };
 
-const ctx = (level = 1, inventory: string[] = []): UnlockState => ({
+const ctx = (level = 1, inventory: string[] = [], league: number | null = null): UnlockState => ({
   level,
+  league,
   achievements: new Set(),
   purchases: new Set(),
   inventory: new Set(inventory),
@@ -98,12 +100,20 @@ describe('look', () => {
     expect(resolveLook(toEquipped(look), ctx()).worn.upper).toBeUndefined();
   });
 
+  test('the watch is a league reward: worn from the bronze league on, not at any level', () => {
+    const clock = itemById('clock')!;
+    expect(isOpen(clock, ctx(99))).toBe(false);
+    expect(isOpen(clock, ctx(1, [], 0))).toBe(false);
+    expect(isOpen(clock, ctx(1, [], 1))).toBe(true);
+    expect(isOpen(clock, ctx(1, [], 4))).toBe(true);
+  });
+
   test('accessories toggle and several can be worn', () => {
     const clock = itemById('clock')!;
     const glasses = itemById('glasses_black')!;
-    let look = wear(resolveLook({}, ctx(10)), 'accessory', clock);
+    let look = wear(resolveLook({}, ctx(10, [], 1)), 'accessory', clock);
     look = wear(look, 'accessory', glasses);
-    expect(resolveLook(toEquipped(look), ctx(10)).accessories.map((a) => a.id)).toEqual([
+    expect(resolveLook(toEquipped(look), ctx(10, [], 1)).accessories.map((a) => a.id)).toEqual([
       'clock',
       'glasses_black',
     ]);
@@ -124,7 +134,7 @@ describe('look', () => {
   test('head accessories move with the head, others stay with the body', () => {
     const look = resolveLook(
       { avatar: 'dog', 'accessory:clock': 'clock', 'accessory:glasses_black': 'glasses_black' },
-      ctx(10),
+      ctx(10, [], 1),
     );
     const layers = layersOf(look);
     expect(layers.head.map((l) => l.key)).toEqual(['head:dog', 'accessory:glasses_black']);

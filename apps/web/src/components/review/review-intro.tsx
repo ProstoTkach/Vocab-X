@@ -22,7 +22,6 @@ import { cx } from '@/lib/cx';
 export const REVIEW_INTRO = 'review-intro';
 export const QUIZ_INTRO = 'review-intro-quiz';
 export const SENTENCE_INTRO = 'review-intro-sentences';
-export const MIXED_INTRO = 'review-intro-mixed';
 
 interface Step {
   key: 'introRemembered' | 'introForgot' | 'introFlip';
@@ -42,33 +41,22 @@ const LEVELS = {
     { key: 'say', icon: Mic },
     { key: 'type', icon: Keyboard },
   ],
-  // The mixed mode's round (MIXED_STEPS): the test and the sentences taking turns.
-  mixed: [
-    { key: 'q1', icon: Languages },
-    { key: 's1', icon: ListChecks },
-    { key: 'q2', icon: ArrowLeftRight },
-    { key: 'q3', icon: Volume2 },
-    { key: 's2', icon: Mic },
-    { key: 's3', icon: Keyboard },
-  ],
 } as const;
 
 const INTRO_MESSAGES = {
   quiz: 'review.quizIntro',
   sentences: 'review.sentenceIntro',
-  mixed: 'review.mixedIntro',
 } as const;
 
 /**
- * The first visit to the test, the sentences or the mixed mode: how to answer and what the
- * levels (the mixed mode's steps) are.
+ * The first visit to the test or the sentences: how to answer and what the levels are.
  */
 function LevelsIntro({
   mode,
   open,
   onClose,
 }: {
-  mode: 'quiz' | 'sentences' | 'mixed';
+  mode: 'quiz' | 'sentences';
   open: boolean;
   onClose: () => void;
 }) {
@@ -123,6 +111,7 @@ export function ReviewIntro({
   onClose: () => void;
 }) {
   const t = useTranslations('review');
+  if (mode === 'mixed') return null;
   if (mode !== 'cards') return <LevelsIntro mode={mode} open={open} onClose={onClose} />;
   // "Remembered" is toward the inline end in the default layout.
   const rememberedRight = mirrored === rtl;

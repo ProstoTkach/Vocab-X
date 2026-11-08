@@ -150,7 +150,6 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
     const screen = screenOf(pathname);
     if (screen === lastScreen.current) return;
     track('screen_view', { screen, from: lastScreen.current });
-    if (screen === 'league' || screen === 'profile') track('coming_soon_view', { screen });
     lastScreen.current = screen;
   }, [pathname, started]);
 

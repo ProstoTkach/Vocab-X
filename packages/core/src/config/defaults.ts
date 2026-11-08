@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   quizMode: false,
   sentenceMode: false,
   mixedMode: true,
+  leagueJoined: false,
   tipsSeen: [],
   levelSeen: 1,
   xpBonus: 0,

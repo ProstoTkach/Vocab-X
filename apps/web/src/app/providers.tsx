@@ -12,6 +12,7 @@ import { DevToolsProvider } from '@/lib/dev-tools';
 import { GamificationProvider } from '@/lib/gamification';
 import { PlayerProvider } from '@/lib/player';
 import { ReposProvider } from '@/lib/repos';
+import { SyncProvider } from '@/lib/sync';
 import { ThemeProvider } from '@/lib/theme';
 
 export function Providers({ dir, children }: { dir: 'ltr' | 'rtl'; children: ReactNode }) {
@@ -29,8 +30,10 @@ export function Providers({ dir, children }: { dir: 'ltr' | 'rtl'; children: Rea
                   <ToastProvider>
                     <DevToolsProvider>
                       <AnalyticsProvider>
-                        {children}
-                        <DevPanel />
+                        <SyncProvider>
+                          {children}
+                          <DevPanel />
+                        </SyncProvider>
                       </AnalyticsProvider>
                     </DevToolsProvider>
                   </ToastProvider>

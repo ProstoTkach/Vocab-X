@@ -144,19 +144,83 @@ export function CharacterView({
 }
 
 /**
+ * The character standing still, for many on one page: the same pictures, none of the motion, and
+ * of the size they are shown at.
+ */
+export function CharacterStill({
+  look,
+  label,
+  mood = null,
+  phoneWidth,
+  wideWidth,
+  className,
+}: {
+  look: Look;
+  label: string;
+  mood?: Mood | null;
+  /** How wide the whole character shows on a phone and from `md` up, px. */
+  phoneWidth: number;
+  wideWidth: number;
+  className?: string;
+}) {
+  const layers = layersOf(look, mood);
+  // Each picture covers only part of the canvas, so it needs only that share of the width.
+  const sizesOf = (layer: Layer) => {
+    const share = layer.width / CANVAS_SIZE;
+    return `(min-width: 768px) ${Math.ceil(wideWidth * share)}px, ${Math.ceil(phoneWidth * share)}px`;
+  };
+  return (
+    <div
+      role="img"
+      aria-label={label}
+      dir="ltr"
+      className={cx('relative aspect-square', className)}
+    >
+      <div
+        aria-hidden
+        className="absolute rounded-full bg-radial from-fg/30 to-transparent to-70%"
+        style={place(layers.shadow)}
+      />
+      {[...layers.body, ...layers.head, ...layers.front].map((layer) => (
+        <Image
+          key={layer.key}
+          src={layer.src}
+          alt=""
+          width={layer.width}
+          height={layer.height}
+          sizes={sizesOf(layer)}
+          quality={IMAGE_QUALITY}
+          draggable={false}
+          className="absolute select-none"
+          style={{ ...place(layer), ...(layer.filter ? { filter: layer.filter } : {}) }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
  * Only the head, with whatever is worn on it (glasses, a hat): a portrait for the profile. The
  * box takes the shape of the head and its things together.
  */
 export function CharacterHead({
   look,
   label,
+  mood = 'joy',
+  sizes,
+  eager = false,
   className,
 }: {
   look: Look;
   label: string;
+  mood?: Mood | null;
+  /** How wide it shows: without this a small icon loads a picture for a big one. */
+  sizes: string;
+  /** The main picture at the top of a page: loaded at once. */
+  eager?: boolean;
   className?: string;
 }) {
-  const { head } = layersOf(look, 'joy');
+  const { head } = layersOf(look, mood);
   const left = Math.min(...head.map((l) => l.x));
   const top = Math.min(...head.map((l) => l.y));
   const width = Math.max(...head.map((l) => l.x + l.width)) - left;
@@ -167,7 +231,11 @@ export function CharacterHead({
       aria-label={label}
       dir="ltr"
       className={cx('relative', className)}
-      style={{ aspectRatio: `${width} / ${height}` }}
+      // Filling its box by the longer side: the whole head shows, whatever its shape.
+      style={{
+        aspectRatio: `${width} / ${height}`,
+        ...(width >= height ? { width: '100%' } : { height: '100%' }),
+      }}
     >
       {head.map((layer) => (
         <Image
@@ -176,7 +244,9 @@ export function CharacterHead({
           alt=""
           width={layer.width}
           height={layer.height}
+          sizes={sizes}
           quality={IMAGE_QUALITY}
+          {...(eager ? { loading: 'eager' as const } : {})}
           draggable={false}
           className="absolute select-none"
           style={{

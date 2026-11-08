@@ -7,7 +7,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? 'github' : 'list',
+  // Locally only failures and the summary: a line per test is noise in a long run.
+  reporter: process.env.CI ? 'github' : 'line',
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',

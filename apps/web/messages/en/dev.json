@@ -32,5 +32,6 @@
       "no-subscription": "Turn on “Remind me to review” in the settings first.",
       "failed": "Could not send the push (no keys on the server, or more often than every 15 s)."
     }
-  }
+  },
+  "leagueDemo": "League test: 10 participants"
 }

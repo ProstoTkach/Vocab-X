@@ -7,6 +7,10 @@ export interface Speech {
   canSpeak: (speechLang: string) => boolean;
   /** Resolves once the text has been said (or cut off, or could not be said). */
   speak: (text: string, speechLang: string) => Promise<void>;
+  /** Stops whatever is being said. */
+  stop: () => void;
+  /** Wakes the device's voice ahead of the first word, without a sound. */
+  warmUp: (speechLang: string) => void;
 }
 
 /** Some browsers never report the end of a long text: it is taken as said after this long. */
@@ -25,6 +29,9 @@ function pickVoice(voices: SpeechSynthesisVoice[], speechLang: string) {
 
 /** Tests run the app silent: the system voice ignores the browser's mute switch. */
 const SILENT = process.env.NEXT_PUBLIC_SILENT_SPEECH === '1';
+
+/** Voices already woken on this page. */
+const warmed = new Set<string>();
 
 /** Web Speech API text-to-speech; audio is never stored, only spoken on demand. */
 export function useSpeech(): Speech {
@@ -46,6 +53,25 @@ export function useSpeech(): Speech {
   return useMemo<Speech>(
     () => ({
       canSpeak: (lang) => !!pickVoice(voices, lang),
+      stop: () => {
+        if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
+      },
+      // A phone loads its voice on first use, which holds the first words back by a second or two.
+      // A dot says nothing, even where the volume is ignored, but loads the voice all the same.
+      warmUp: (lang) => {
+        const voice = pickVoice(voices, lang);
+        if (SILENT || !voice || warmed.has(voice.voiceURI) || speechSynthesis.speaking) return;
+        warmed.add(voice.voiceURI);
+        const u = new SpeechSynthesisUtterance('.');
+        u.voice = voice;
+        u.lang = voice.lang;
+        u.volume = 0;
+        // Refused before the first touch of the page: it is tried again at that touch.
+        u.onerror = (e) => {
+          if (e.error === 'not-allowed') warmed.delete(voice.voiceURI);
+        };
+        speechSynthesis.speak(u);
+      },
       speak: (text, lang) => {
         const voice = pickVoice(voices, lang);
         if (!voice) return Promise.resolve();

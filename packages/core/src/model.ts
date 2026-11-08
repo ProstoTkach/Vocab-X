@@ -1,4 +1,5 @@
 // Domain entities shared by every storage implementation (localStorage now, IndexedDB/API later).
+import type { AvatarFrame } from './league';
 import type { LangCode } from './language';
 import type { CardState } from './scheduler';
 import type { ExerciseFormat, Grade } from './types';
@@ -159,6 +160,8 @@ export interface AppSettings {
    * it, and with all three off the review uses flash cards.
    */
   mixedMode: boolean;
+  /** Took part in the weekly league: nothing is asked of the server for it before that. */
+  leagueJoined: boolean;
   /** One-time tips already shown (e.g. 'four-grades'). */
   tipsSeen: string[];
   /** The highest player level already congratulated on. */
@@ -216,6 +219,8 @@ export interface GamificationState {
   equipped: Partial<Record<string, Id>>;
   /** Unlockable cosmetics the learner has already seen opened (the rest are shown as new). */
   wardrobeSeen: Id[];
+  /** The circle around the character's head; unset: the default one. */
+  avatarFrame?: AvatarFrame;
 }
 
 /** Read-only content shipped with the app: built-in decks and their words. */

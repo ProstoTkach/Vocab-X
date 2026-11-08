@@ -19,7 +19,7 @@ test('once visited, the app opens and reviews offline; reminders can be turned o
   await page.goto('/uk/review');
   await expect(page.getByTestId('review-card')).toBeVisible();
   await page.keyboard.press('3');
-  await expect(page.getByText('14 карток у колоді')).toBeVisible();
+  await expect(page.getByText('14 карток', { exact: true })).toBeVisible();
   // Another tab, never opened in this visit, opens too.
   await page.goto('/uk/decks/library');
   await expect(page.getByRole('main').getByRole('listitem').first()).toBeVisible();

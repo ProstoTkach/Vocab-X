@@ -1,6 +1,6 @@
 'use client';
 
-import { Layers, Undo2 } from 'lucide-react';
+import { Layers, Undo2, Volume2, VolumeX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -13,6 +13,29 @@ export interface SessionTopBarProps {
   deckName: string | null;
   canUndo: boolean;
   onUndo: () => void;
+  /** Words are said by themselves. */
+  autoSpeak: boolean;
+  onToggleAutoSpeak: () => void;
+}
+
+/** Saying words by itself, on or off: the first thing in the bar. */
+function SpeechToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+  const t = useTranslations('review');
+  const label = t(on ? 'autoSpeakOff' : 'autoSpeakOn');
+  const Icon = on ? Volume2 : VolumeX;
+  return (
+    <Tooltip content={label}>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label={label}
+        data-tour="review-speech"
+        className="glass inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-line/70 text-fg-muted transition-colors motion-fast hover:text-fg"
+      >
+        <Icon aria-hidden className="size-5" />
+      </button>
+    </Tooltip>
+  );
 }
 
 export function SessionTopBar({
@@ -22,10 +45,13 @@ export function SessionTopBar({
   deckName,
   canUndo,
   onUndo,
+  autoSpeak,
+  onToggleAutoSpeak,
 }: SessionTopBarProps) {
   const t = useTranslations('review');
   return (
     <header data-tour="review-progress" className="flex w-full items-center gap-3">
+      <SpeechToggle on={autoSpeak} onToggle={onToggleAutoSpeak} />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex items-center justify-between gap-2 text-sm">
           <span className="inline-flex min-w-0 items-center gap-1.5 font-semibold">

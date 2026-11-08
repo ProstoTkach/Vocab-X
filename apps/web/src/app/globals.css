@@ -51,6 +51,24 @@
    * The character's idle life (gamification "max"). Plain CSS transform/opacity animations run
    * on the compositor, off the main thread, so they never compete with taps and swipes.
    */
+  --animate-spotlight-start: vx-spot-start 7s ease-in-out infinite alternate;
+  --animate-spotlight-end: vx-spot-end 8.5s ease-in-out infinite alternate;
+  @keyframes vx-spot-start {
+    from {
+      transform: translateX(-50%) rotate(-48deg);
+    }
+    to {
+      transform: translateX(-50%) rotate(-14deg);
+    }
+  }
+  @keyframes vx-spot-end {
+    from {
+      transform: translateX(50%) rotate(14deg);
+    }
+    to {
+      transform: translateX(50%) rotate(48deg);
+    }
+  }
   --animate-sway: vx-sway 3.4s ease-in-out infinite;
   @keyframes vx-sway {
     0%,
@@ -149,6 +167,67 @@
       scale: 1;
     }
   }
+}
+
+@theme static {
+  /* The league's colours and the colours of the circle around a character: the same in every theme.
+     Static: pages pick them by name in var(), which Tailwind cannot see, and it drops unused ones.
+     After the palette reset above, which would remove them too. */
+  --color-tier-icon: #ffffff;
+  --color-tier-copper: #a4552f;
+  --color-tier-copper-light: #dd9468;
+  --color-tier-bronze: #8a6a2c;
+  --color-tier-bronze-light: #cfa95c;
+  --color-tier-silver: #7c8794;
+  --color-tier-silver-light: #c6ced8;
+  --color-tier-gold: #c9920e;
+  --color-tier-gold-light: #f6cf52;
+  --color-tier-platinum: #4f8b99;
+  --color-tier-platinum-light: #9ed5df;
+  --color-tier-emerald: #128a62;
+  --color-tier-emerald-light: #58d5a8;
+  --color-tier-diamond: #4a5fd6;
+  --color-tier-diamond-light: #9fb2ff;
+  /* Fills for a light theme. */
+  --color-frame-rose: #f8c9db;
+  --color-frame-coral: #fbcdb9;
+  --color-frame-beige: #f6ebd8;
+  --color-frame-sun: #fbe6a0;
+  --color-frame-mint: #c9f0dc;
+  --color-frame-sky: #c6e7f8;
+  --color-frame-violet: #dacef8;
+  /* Fills for a dark theme; dusk is the dark theme's surface, a little lighter. */
+  --color-frame-wine: #4b2334;
+  --color-frame-rust: #5a3320;
+  --color-frame-moss: #4a4a23;
+  --color-frame-pine: #1f4a39;
+  --color-frame-lake: #1c4651;
+  --color-frame-dusk: #2d3546;
+  --color-frame-plum: #3f2b56;
+  /* Rings, for either theme; dog is the colour of the dog's coat. */
+  --color-frame-red: #d93a3a;
+  --color-frame-dog: #e8792b;
+  --color-frame-gold: #e5ad1d;
+  --color-frame-leaf: #3fa45b;
+  --color-frame-aqua: #1fa3a8;
+  --color-frame-azure: #2f7fdc;
+  --color-frame-iris: #7a55e0;
+  /* No longer offered: frames already chosen keep working. */
+  --color-frame-gray: #5b6068;
+  --color-frame-forest: #2f7d5b;
+  --color-frame-slate: #5d6b7c;
+  --color-frame-cream: #f7efdc;
+  --color-frame-night: #1f2740;
+}
+
+/* Fills of the circle around a character that open together with a theme. */
+:root {
+  --frame-fill-dawn: linear-gradient(145deg, #fde7c8, #f7b7a3);
+  --frame-fill-mist: linear-gradient(145deg, #aab4c4, #4c5564);
+  --frame-fill-ocean: linear-gradient(145deg, #7fd6ea, #1f6fb2);
+  --frame-fill-lagoon: linear-gradient(145deg, #a4f0d4, #1b9a94);
+  --frame-fill-sunset: linear-gradient(145deg, #ffc76b, #e8527a);
+  --frame-fill-ember: linear-gradient(145deg, #f7875a, #6f1f4e);
 }
 
 @theme inline {
@@ -384,4 +463,31 @@
   100% {
     transform: translateX(100%);
   }
+}
+
+/* A faint beam of light from a corner above: soft edges, fading out; only transform moves. */
+/* Beside a sidebar the light has no screen edge to end at: it fades out instead of being cut. */
+@media (min-width: 48rem) {
+  .vx-beams {
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  }
+}
+.vx-beam {
+  position: absolute;
+  top: 0;
+  width: 80%;
+  height: 120%;
+  transform-origin: 50% 0;
+  transform: translateX(-50%) rotate(-30deg);
+  background: conic-gradient(
+    from 164deg at 50% 0,
+    transparent 0deg,
+    color-mix(in srgb, var(--color-tier-gold) 34%, transparent) 16deg,
+    transparent 32deg
+  );
+  mask-image: linear-gradient(to bottom, black, transparent 90%);
+  pointer-events: none;
+}
+.vx-beam-end {
+  transform: translateX(50%) rotate(30deg);
 }

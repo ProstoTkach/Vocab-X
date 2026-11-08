@@ -97,7 +97,7 @@
         "home": "this screen: streak, goal and your deck.",
         "review": "cards with the words that are due.",
         "decks": "all your words and decks: search, edit, import a list.",
-        "league": "compete with other learners. Coming soon.",
+        "league": "compete with other participants in weekly leagues.",
         "profile": "achievements and statistics. Coming soon."
       },
       "extras": {
@@ -128,7 +128,7 @@
   },
   "league": {
     "title": "League",
-    "intro": "A weekly league with demo participants."
+    "intro": "Weekly competition in groups of up to 10 participants."
   },
   "profile": {
     "title": "Profile",

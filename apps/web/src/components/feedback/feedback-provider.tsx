@@ -15,13 +15,12 @@ import { usePlayer } from '@/lib/player';
 import { track } from '@/lib/analytics';
 import { useRepos } from '@/lib/repos';
 import { FeedbackDialog, type FeedbackReason } from './feedback-dialog';
-export { QUIZ_INVITE_AFTER, QUIZ_INVITE_TIP } from '@/lib/feedback';
 
 /**
- * Levels at which the app invites the learner to leave feedback, once each: by then they know
- * the app well enough to judge it. After the survey is sent there are no more invitations.
+ * The level at which the app invites the learner to leave feedback, once and never again: by then
+ * they know the app well enough to judge it.
  */
-export const INVITE_LEVELS: readonly number[] = [5, 10];
+export const INVITE_LEVELS: readonly number[] = [5];
 /** One-time tips (settings.tipsSeen) used here. */
 export const inviteTip = (level: number) => `feedback-invite-${level}`;
 export const SURVEY_SENT_TIP = 'feedback-survey';
@@ -36,8 +35,6 @@ interface FeedbackValue {
   open: (source: FeedbackSource) => void;
   /** Settings changed elsewhere (e.g. a level-up window closed): look for a due invite again. */
   recheck: () => void;
-  /** Invites to the survey about the four-choice test, once per tip (never after the survey was sent). */
-  inviteOnce: (tip: string) => void;
   /** The feedback window is open (keyboard shortcuts behind it should wait). */
   isOpen: boolean;
 }
@@ -115,27 +112,13 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     });
   }, [repos]);
 
-  const inviteOnce = useCallback(
-    (tip: string) => {
-      void repos.settings.get().then((s) => {
-        if (s.tipsSeen.includes(SURVEY_SENT_TIP) || s.tipsSeen.includes(tip)) return;
-        show('quiz', 'invite_quiz');
-        const tipsSeen = [...s.tipsSeen, tip];
-        setSettings({ tipsSeen, levelSeen: s.levelSeen });
-        return repos.settings.update({ tipsSeen });
-      });
-    },
-    [repos, show],
-  );
-
   const value = useMemo<FeedbackValue>(
     () => ({
       open: (source: FeedbackSource) => show('manual', source),
       recheck: () => setNonce((n) => n + 1),
-      inviteOnce,
       isOpen: state.open,
     }),
-    [show, inviteOnce, state.open],
+    [show, state.open],
   );
 
   return (

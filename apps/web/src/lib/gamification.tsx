@@ -1,6 +1,13 @@
 'use client';
 
-import { DEFAULT_SETTINGS, type GamificationMode, type GamificationState } from '@vocabx/core';
+import {
+  DEFAULT_FRAME,
+  DEFAULT_FRAME_DARK,
+  DEFAULT_SETTINGS,
+  type AvatarFrame,
+  type GamificationMode,
+  type GamificationState,
+} from '@vocabx/core';
 import {
   createContext,
   useCallback,
@@ -14,12 +21,17 @@ import {
   freshUnlocks,
   resolveLook,
   toEquipped,
+  toPublished,
   type Look,
   type UnlockState,
 } from '@/character/look';
 import { sinceFirstVisit, track } from './analytics';
 import { usePlayer } from './player';
+import { LEAGUE_CACHE_EVENT, readLeagueCache } from './league-cache';
+import { publishLeagueShown } from './league-publish';
 import { useRepos } from './repos';
+import { useTheme } from './theme';
+import { getTheme } from '@/themes/registry';
 
 interface GamificationValue {
   /** False until settings are read; the character waits so it never flashes. */
@@ -33,6 +45,9 @@ interface GamificationValue {
   animated: boolean;
   look: Look;
   setLook: (look: Look) => void;
+  /** The circle around the character's head. */
+  frame: AvatarFrame;
+  setFrame: (frame: AvatarFrame) => void;
   unlocks: UnlockState;
   /** Cosmetics opened since the wardrobe was last looked at. */
   fresh: ReadonlySet<string>;
@@ -47,10 +62,20 @@ const NONE: ReadonlySet<string> = new Set();
 export function GamificationProvider({ children }: { children: ReactNode }) {
   const repos = useRepos();
   const player = usePlayer();
+  const { resolved } = useTheme();
   const level = player.level;
   const [ready, setReady] = useState(false);
   const [mode, setModeState] = useState<GamificationMode>(DEFAULT_SETTINGS.gamification);
   const [state, setState] = useState<GamificationState | null>(null);
+  /** The league the learner is in now (league rewards open with it); null: not taking part. */
+  const [league, setLeague] = useState<number | null>(null);
+
+  useEffect(() => {
+    const read = () => setLeague(readLeagueCache(repos.journal.owner)?.standing.tier ?? null);
+    read();
+    window.addEventListener(LEAGUE_CACHE_EVENT, read);
+    return () => window.removeEventListener(LEAGUE_CACHE_EVENT, read);
+  }, [repos]);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -66,11 +91,12 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   const unlocks = useMemo<UnlockState>(
     () => ({
       level,
+      league,
       achievements: new Set(Object.keys(state?.achievements ?? {})),
       purchases: NONE,
       inventory: new Set(state?.inventory ?? []),
     }),
-    [level, state],
+    [level, league, state],
   );
   const look = useMemo(() => resolveLook(state?.equipped ?? {}, unlocks), [state, unlocks]);
   const fresh = useMemo(
@@ -115,6 +141,26 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     [repos],
   );
 
+  // Until the learner chooses, the frame goes with the theme.
+  const frame =
+    state?.avatarFrame ??
+    (getTheme(resolved)?.colorScheme === 'dark' ? DEFAULT_FRAME_DARK : DEFAULT_FRAME);
+  const setFrame = useCallback(
+    (avatarFrame: AvatarFrame) => {
+      setState((s) => (s ? { ...s, avatarFrame } : s));
+      void repos.gamification.get().then((g) => repos.gamification.save({ ...g, avatarFrame }));
+    },
+    [repos],
+  );
+
+  // Someone taking part in the league: the others see new clothes or a new frame soon after.
+  const readyToPublish = ready && player.ready;
+  useEffect(() => {
+    if (!readyToPublish) return;
+    const timer = setTimeout(() => void publishLeagueShown(repos, toPublished(look), frame), 2000);
+    return () => clearTimeout(timer);
+  }, [readyToPublish, repos, look, frame]);
+
   const value = useMemo<GamificationValue>(
     () => ({
       ready: ready && player.ready,
@@ -124,11 +170,13 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
       animated: mode === 'max',
       look,
       setLook,
+      frame,
+      setFrame,
       unlocks,
       fresh,
       markSeen,
     }),
-    [ready, player.ready, mode, setMode, look, setLook, unlocks, fresh, markSeen],
+    [ready, player.ready, mode, setMode, look, setLook, frame, setFrame, unlocks, fresh, markSeen],
   );
   return <GamificationContext value={value}>{children}</GamificationContext>;
 }

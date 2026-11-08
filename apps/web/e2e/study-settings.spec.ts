@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { onboard } from './fixtures';
 
 const card = (page: Page) => page.getByTestId('review-card');
-const deckCount = (page: Page) => page.getByText(/^\d+ карт(ка|ки|ок) (в|у) колоді$/);
+const deckCount = (page: Page) => page.getByText(/^\d+ карт(ка|ки|ок)$/);
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -87,7 +87,7 @@ test('mirrored swipe layout swaps Again and Good on arrows', async ({ page }) =>
   await page.getByRole('radio', { name: '← Згадав · → Забув' }).click();
   await openReview(page);
   await page.keyboard.press('ArrowLeft'); // now "Good": the card leaves the deck
-  await expect(deckCount(page)).toHaveText('14 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток');
 });
 
 test('text size of the whole app: at once, and kept from the first paint', async ({ page }) => {
@@ -150,5 +150,5 @@ test('animations off still reviews', async ({ page }) => {
   await openReview(page);
   await page.keyboard.press('Space');
   await page.keyboard.press('3');
-  await expect(deckCount(page)).toHaveText('14 карток у колоді');
+  await expect(deckCount(page)).toHaveText('14 карток');
 });

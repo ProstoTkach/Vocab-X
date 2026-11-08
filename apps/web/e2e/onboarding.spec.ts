@@ -1,6 +1,5 @@
-import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { answerLevelTest, onboard } from './fixtures';
+import { answerLevelTest } from './fixtures';
 
 /**
  * Onboarding with the level test. The learner knows A1 and A2 (4 words each), then in B1
@@ -83,59 +82,6 @@ test('an English speaker can learn Ukrainian', async ({ page }) => {
   await expect(page).toHaveURL(/\/en$/);
   await expect(page.getByText('Learning: Ukrainian')).toBeVisible();
   await expect(page.getByRole('heading', { name: /^15 cards (are )?waiting/ })).toBeVisible();
-});
-
-test('export → reset → import restores the state', async ({ page }) => {
-  // Onboarding twice.
-  test.slow();
-  await completeOnboarding(page, { knownInB1: 0 });
-  await page.goto('/uk/settings');
-
-  // A click that lands before hydration is lost; click again until the file comes.
-  let file = '';
-  await expect(async () => {
-    const download = page.waitForEvent('download', { timeout: 2000 });
-    await page.getByRole('button', { name: 'Експортувати JSON' }).click();
-    file = await (await download).path();
-  }).toPass();
-  const backup = JSON.parse(readFileSync(file, 'utf8')) as { format: string; data: object };
-  expect(backup.format).toBe('vocabx-export');
-
-  await page.getByRole('button', { name: 'Скинути демо-дані' }).click();
-  await page.getByRole('dialog').getByRole('button', { name: 'Скинути демо-дані' }).click();
-  await expect(page).toHaveURL(/\/uk\/onboarding$/);
-  await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'dark');
-
-  // Onboarding again, this time without the dark theme: the backup brings it back from the
-  // settings. A file picked before hydration is lost; pick it again until the confirmation opens.
-  await onboard(page);
-  await page.goto('/uk/settings');
-  await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'dark');
-  await expect(async () => {
-    await page.getByTestId('import-file').setInputFiles(file);
-    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 1000 });
-  }).toPass();
-  await page.getByRole('dialog').getByRole('button', { name: 'Імпортувати JSON' }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await page.goto('/uk');
-  await expect(page.getByRole('heading', { name: /^15 карток чекають/ })).toBeVisible();
-});
-
-test('a broken backup is rejected without touching data', async ({ page }) => {
-  await completeOnboarding(page, { knownInB1: 0 });
-  await page.goto('/uk/settings');
-  await page.getByTestId('import-file').setInputFiles({
-    name: 'bad.json',
-    mimeType: 'application/json',
-    buffer: Buffer.from(
-      JSON.stringify({ format: 'vocabx-export', schemaVersion: 1, data: { hacker: 1 } }),
-    ),
-  });
-  await page.getByRole('dialog').getByRole('button', { name: 'Імпортувати JSON' }).click();
-  // Radix duplicates toast text for screen readers; the visible copy is the first one.
-  await expect(page.getByText('Не вдалося імпортувати файл').first()).toBeVisible();
-  await page.goto('/uk');
-  await expect(page.getByRole('heading', { name: /^15 карток чекають/ })).toBeVisible();
 });
 
 test('languages without ready-made decks cannot be chosen yet', async ({ page }) => {

@@ -9,7 +9,7 @@
 // `src: '/male/uppers/tshirt_green.png'`). New items also need a name in
 // messages/<locale>/character.json under `items`.
 //
-// `unlock` says how an item becomes available: 'free', 'level:N', 'achievement:<id>' or
+// `unlock` says how an item becomes available: 'free', 'level:N', 'league:N', 'achievement:<id>' or
 // 'purchase:<sku>'. Items granted to the learner (gamification inventory) are open regardless.
 // Only the avatar of DEFAULT_LOOK and the base clothes (BASE_CLOTHES) are free; every item
 // opens at a level.
@@ -167,7 +167,8 @@ export const ITEMS: readonly ItemConfig[] = [
   {
     id: 'clock',
     slot: 'accessory',
-    unlock: 'level:7',
+    // A league reward: worn from the bronze league on (LEAGUE_TIERS[1]).
+    unlock: 'league:1',
     src: '/male/accessories/clock.png',
     x: 285,
     y: 479,

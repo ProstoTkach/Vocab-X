@@ -130,7 +130,6 @@ export async function seedOnboarded(page: Page, uiLocale = 'uk') {
             'review-intro',
             'review-intro-quiz',
             'review-intro-sentences',
-            'review-intro-mixed',
             'feedback-survey',
           ],
         }),
@@ -164,13 +163,7 @@ export async function onboard(page: Page, pace: 'Легкий' | 'Звичайн
   // tests of their own and would only get in the way here.
   await setStudySettings(page, { gradeButtonsOnPhone: true, twoGrades: false });
   await setSettings(page, {
-    tipsSeen: [
-      'review-intro',
-      'review-intro-quiz',
-      'review-intro-sentences',
-      'review-intro-mixed',
-      'feedback-survey',
-    ],
+    tipsSeen: ['review-intro', 'review-intro-quiz', 'review-intro-sentences', 'feedback-survey'],
     levelSeen: 99,
   });
 }

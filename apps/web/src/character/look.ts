@@ -1,6 +1,7 @@
 // What the character wears, stored in GamificationState.equipped:
 //   { avatar: 'dog', upper: 'tshirt_green', 'accessory:clock': 'clock', … }
 // Single slots are keyed by slot, accessories by `accessory:<id>` so several can be worn.
+import type { PublishedLook } from '@vocabx/core';
 import { isUnlocked, type UnlockContext } from '@/themes/unlock';
 import {
   AVATARS,
@@ -38,6 +39,30 @@ export function isOpen(item: AvatarConfig | ItemConfig, ctx: UnlockState): boole
 }
 
 const accessoryKey = (id: string) => `accessory:${id}`;
+
+/** What others are shown of a look: ids, drawn by their own devices. */
+export const toPublished = (look: Look): PublishedLook => ({
+  avatar: look.avatar.id,
+  worn: Object.values(look.worn).map((item) => item.id),
+  accessories: look.accessories.map((item) => item.id),
+});
+
+/** Someone else's look. They earned what they wear, so nothing is locked; unknown ids are dropped. */
+export function lookFromPublished(p: PublishedLook): Look {
+  const worn: Look['worn'] = {};
+  for (const id of p.worn) {
+    const item = itemById(id);
+    if (item && (item.slot === 'upper' || item.slot === 'bottom' || item.slot === 'shoes'))
+      worn[item.slot] = item;
+  }
+  return {
+    avatar: avatarById(p.avatar) ?? AVATARS[0]!,
+    worn,
+    accessories: p.accessories
+      .map((id) => itemById(id))
+      .filter((i): i is ItemConfig => i?.slot === 'accessory'),
+  };
+}
 
 /** The stored choice with defaults filled in; unknown or locked items are dropped. */
 export function resolveLook(equipped: Equipped, ctx: UnlockState): Look {

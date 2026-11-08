@@ -7,6 +7,7 @@
   "wardrobeHint": "Pick an avatar, clothes and accessories. Changes are saved right away.",
   "done": "Done",
   "noAccessories": "No accessories",
+  "lockedLeague": "Unlocked in the {tier} league of the ranking",
   "lockedAchievement": "Unlocked by an achievement",
   "lockedPurchase": "Unlocked in the shop",
   "slots": {

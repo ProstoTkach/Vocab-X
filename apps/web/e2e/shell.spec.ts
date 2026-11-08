@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
-import { seedOnboarded } from './fixtures';
+import { seedOnboarded, setSettings, onboard } from './fixtures';
 
 const ROUTES = ['/uk', '/uk/review', '/uk/decks', '/uk/league', '/uk/profile', '/uk/settings'];
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) < 768;
@@ -251,4 +251,26 @@ test('without the developer mode the lab stays closed', async ({ page }) => {
   await page.goto('/uk/review/lab');
   await expect(page.getByRole('link', { name: 'До налаштувань' })).toBeVisible();
   await expect(page.getByRole('combobox', { name: 'Спосіб навчання' })).toHaveCount(0);
+});
+
+test('the survey invitation comes once, at level 5, and never again', async ({ page }) => {
+  await onboard(page);
+  // Level 4: nothing yet.
+  await setSettings(page, { xpBonus: 600, levelSeen: 4 });
+  await page.goto('/uk');
+  await expect(page.getByRole('heading', { name: /Вже \d+ рівень/ })).toHaveCount(0, {
+    timeout: 2500,
+  });
+  await page.waitForTimeout(2000);
+  await expect(page.getByRole('heading', { name: /Вже \d+ рівень/ })).toHaveCount(0);
+  // Level 5.
+  await setSettings(page, { xpBonus: 1000, levelSeen: 5 });
+  await page.goto('/uk');
+  const invite = page.getByRole('heading', { name: 'Вже 5 рівень', exact: false });
+  await expect(invite).toBeVisible({ timeout: 5000 });
+  // Not again, and not at level 10 either.
+  await setSettings(page, { xpBonus: 4500, levelSeen: 10 });
+  await page.goto('/uk');
+  await page.waitForTimeout(2500);
+  await expect(page.getByRole('heading', { name: /Вже \d+ рівень/ })).toHaveCount(0);
 });

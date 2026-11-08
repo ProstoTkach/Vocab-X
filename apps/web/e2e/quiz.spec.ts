@@ -41,7 +41,7 @@ test('the four-choice test replaces flash cards', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Знаю', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Не знаю' })).toHaveCount(0);
 
-  // A right answer with its key: the next card comes by itself. Nothing is spoken.
+  // A right answer with its key: the word is heard, and the next card comes by itself.
   const right = await quizRightIndex(page);
   expect(right).toBeGreaterThanOrEqual(0);
   // A key pressed before the page is ready is lost: press until it counts.
@@ -52,7 +52,27 @@ test('the four-choice test replaces flash cards', async ({ page }) => {
   await expect(options(page).first()).toBeDisabled();
   await expect(verdict(page)).toHaveCount(0, { timeout: 2500 });
   await expect(options(page).first()).toBeEnabled();
-  expect(await page.evaluate(() => (window as unknown as { spoken: number }).spoken)).toBe(0);
+  expect(await page.evaluate(() => (window as unknown as { spoken: number }).spoken)).toBe(1);
+});
+
+test('automatic speech is switched at the top of the screen, and stays so', async ({ page }) => {
+  const spoken = () => page.evaluate(() => (window as unknown as { spoken: number }).spoken);
+  await expect(options(page).first()).toBeEnabled();
+  await page.getByRole('button', { name: 'Вимкнути автоматичне озвучування' }).click();
+  await options(page).first().click();
+  await expect(verdict(page)).toBeVisible();
+  expect(await spoken()).toBe(0);
+  await page.reload();
+  const on = page.getByRole('button', { name: 'Увімкнути автоматичне озвучування' });
+  await expect(on).toBeVisible();
+  await on.click();
+  await expect(
+    page.getByRole('button', { name: 'Вимкнути автоматичне озвучування' }),
+  ).toBeVisible();
+  await expect(options(page).first()).toBeEnabled();
+  await options(page).first().click();
+  await expect(verdict(page)).toBeVisible();
+  expect(await spoken()).toBeGreaterThan(0);
 });
 
 test('a right answer goes on by itself: no arrow on the card', async ({ page }) => {

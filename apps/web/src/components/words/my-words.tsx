@@ -12,32 +12,27 @@ import {
   type Profile,
   type Word,
 } from '@vocabx/core';
-import { Layers, Library, Search, ShieldCheck, X } from 'lucide-react';
+import { Layers, Library, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { WordFormDialog } from '@/components/decks/word-form-dialog';
 import { ActionCardLink } from '@/components/home/action-card';
 import { AddListCard, AddWordCard } from '@/components/home/deck-row';
 import { Button } from '@/components/ui/button';
 import { PageTour, type TourStep } from '@/components/tour/page-tour';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
-import { ExportBackup } from '@/components/settings/export-backup';
 import { inputClass } from '@/components/ui/field';
 import { useToast } from '@/components/ui/toast';
 import { useClock } from '@/lib/clock';
 import { cx } from '@/lib/cx';
 import { newId } from '@/lib/ids';
-import { browserStorage, useRepos } from '@/lib/repos';
+import { useRepos } from '@/lib/repos';
 import { ShowMore, useIncremental } from './show-more';
 import { useWordData } from './use-word-data';
 import { WordRow } from './word-row';
 import { track } from '@/lib/analytics';
 
 type WordSort = 'soonest' | 'latest';
-
-/** Remembers in this browser that the backup reminder was hidden. */
-const BACKUP_HIDDEN_KEY = 'vocabx:backup-reminder-hidden';
-const noSubscription = () => () => {};
 
 /** Every word of the one big deck (active decks of the language being learned). */
 /** The first visit to "My words". */
@@ -46,7 +41,6 @@ const WORDS_TOUR: readonly TourStep[] = [
   { id: 'actions', target: 'words-actions', hidden: true },
   { id: 'find', target: 'words-find', hidden: true },
   { id: 'list', target: 'words-list', hidden: true },
-  { id: 'backup', target: 'words-backup', hidden: true },
 ];
 
 export function MyWords() {
@@ -64,24 +58,6 @@ export function MyWords() {
   const [editing, setEditing] = useState<Word | null>(null);
   const [sort, setSort] = useState<WordSort>('soonest');
   const [removing, setRemoving] = useState<Word | null>(null);
-  // Hidden during SSR, so a reminder the learner hid never flashes on load.
-  const storedHidden = useSyncExternalStore(
-    noSubscription,
-    () => browserStorage().getItem(BACKUP_HIDDEN_KEY) === '1',
-    () => true,
-  );
-  const [hiddenNow, setHiddenNow] = useState(false);
-  const backupHidden = hiddenNow || storedHidden;
-
-  const hideBackup = () => {
-    track('backup_reminder', { to: 'hidden' });
-    setHiddenNow(true);
-    try {
-      browserStorage().setItem(BACKUP_HIDDEN_KEY, '1');
-    } catch {
-      // Storage full or blocked: hidden for this visit only.
-    }
-  };
   const data = useWordData(state?.profile.activeTargetLang ?? null, version);
 
   useEffect(() => {
@@ -171,32 +147,6 @@ export function MyWords() {
   return (
     <div className="flex flex-col gap-5">
       <PageTour tour="words" steps={WORDS_TOUR} ready={!!state && !!data} />
-      {/* Data lives in this browser only: a reminder that a backup is one click away. */}
-      {!backupHidden && (
-        <section
-          aria-labelledby="backup-title"
-          data-tour="words-backup"
-          className="flex flex-col gap-3 rounded-card border border-line/70 bg-surface/60 p-4 sm:flex-row sm:items-center"
-        >
-          <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-2 text-accent max-sm:hidden">
-            <ShieldCheck aria-hidden className="size-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 id="backup-title" className="font-semibold">
-              {t('backupTitle')}
-            </h2>
-            <p className="text-sm text-fg-muted text-pretty">{t('backupText')}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
-            <ExportBackup size="sm" source="reminder" />
-            <Button variant="ghost" size="sm" onClick={hideBackup}>
-              <X aria-hidden className="size-4" />
-              {t('backupHide')}
-            </Button>
-          </div>
-        </section>
-      )}
-
       {/* Adding words first, then where the words come from: the same cards as on Home. */}
       <div data-tour="words-actions" className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-3">
         <AddWordCard layout="row" onClick={() => setAdding(true)} disabled={!state} />
