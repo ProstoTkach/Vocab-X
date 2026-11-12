@@ -23,19 +23,17 @@ async function firstStep(page: Page, url: string) {
   await expect(consent(page)).toBeVisible();
 }
 
-test('the consent window can be neither closed nor declined (testing phase)', async ({ page }) => {
+test('the consent window has "Не надсилати"; nothing goes out before the choice; asked once', async ({
+  page,
+}) => {
   const bodies = await trackRequests(page);
   page.on('dialog', (d) => void d.accept());
   await firstStep(page, '/uk/onboarding');
-  // Nothing goes out before the choice.
+  // Nothing goes out before the choice, however long the page lives.
+  await page.waitForTimeout(1000);
   expect(bodies).toEqual([]);
-  // No "Don't send", no close button; Escape and a click outside leave it open.
-  await expect(consent(page).getByRole('button')).toHaveCount(1);
-  await expect(consent(page).getByRole('button', { name: 'Не надсилати' })).toHaveCount(0);
-  await expect(consent(page).getByRole('button', { name: 'Закрити' })).toHaveCount(0);
-  await page.keyboard.press('Escape');
-  await page.mouse.click(5, 5);
-  await expect(consent(page)).toBeVisible();
+  await expect(consent(page).getByRole('button', { name: 'Не надсилати' })).toBeVisible();
+  await expect(consent(page).getByRole('button', { name: 'Добре, погоджуюся' })).toBeVisible();
   await consent(page).getByRole('button', { name: 'Добре, погоджуюся' }).click();
   await expect(consent(page)).toHaveCount(0);
   await expect.poll(() => bodies.length).toBeGreaterThan(0);
@@ -43,6 +41,39 @@ test('the consent window can be neither closed nor declined (testing phase)', as
   await page.reload();
   await page.waitForTimeout(500);
   await expect(consent(page)).toHaveCount(0);
+});
+
+test('"Не надсилати": no request to /api/track, now or after leaving, and no second question', async ({
+  page,
+}) => {
+  const bodies = await trackRequests(page);
+  page.on('dialog', (d) => void d.accept());
+  await firstStep(page, '/uk/onboarding');
+  await consent(page).getByRole('button', { name: 'Не надсилати' }).click();
+  await expect(consent(page)).toHaveCount(0);
+  await page.getByRole('button', { name: 'Далі' }).click();
+  await page.goto('about:blank');
+  await page.goto('/uk/onboarding');
+  await page.waitForTimeout(1000);
+  await expect(consent(page)).toHaveCount(0);
+  expect(bodies).toEqual([]);
+  expect(await page.evaluate(() => localStorage.getItem('vocabx:analytics:consent'))).toBe(
+    'denied',
+  );
+  expect(await page.evaluate(() => localStorage.getItem('vocabx:analytics:outbox'))).toBeNull();
+});
+
+test('closing the window (Escape) counts as a refusal: nothing is sent, no second question', async ({
+  page,
+}) => {
+  const bodies = await trackRequests(page);
+  await firstStep(page, '/uk/onboarding');
+  await page.keyboard.press('Escape');
+  await expect(consent(page)).toHaveCount(0);
+  await page.reload();
+  await page.waitForTimeout(1000);
+  await expect(consent(page)).toHaveCount(0);
+  expect(bodies).toEqual([]);
 });
 
 test('agreeing sends the events (in this test build); on localhost a warning says nothing is sent', async ({
@@ -130,6 +161,15 @@ test('the statistics can be switched in Settings → Data', async ({ page }) => 
   await expect
     .poll(() => bodies.flatMap((b) => b.events).map((e) => e.type))
     .toContain('consent_accepted');
+  // And back: switched off, nothing more goes out and the choice is remembered.
+  await toggle.click();
+  await expect(toggle).not.toBeChecked();
+  const count = bodies.length;
+  await page.goto('about:blank');
+  await page.goto('/uk/settings');
+  await expect(toggle).not.toBeChecked();
+  await page.waitForTimeout(500);
+  expect(bodies.length).toBe(count);
 });
 
 test('leaving the page sends the last events and the session summary', async ({ page }) => {

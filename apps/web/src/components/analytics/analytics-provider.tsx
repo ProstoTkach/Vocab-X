@@ -302,35 +302,18 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   return (
     <AnalyticsContext value={value}>
       {children}
-      {/*
-        Testing phase: every visitor from a link is counted, so the window cannot be closed or
-        declined; the statistics can still be switched off in Settings → Data. The earlier,
-        optional version (kept for later) closed on the cross, a click outside or Escape and had
-        a "Don't send" button:
-
-        <Dialog open={asking} onOpenChange={(open) => !open && setAsking(false)}>
-          <DialogContent
-            title={t('title')}
-            description={t('text')}
-            footer={
-              <>
-                <Button variant="secondary" onClick={() => setConsent(false)}>
-                  {t('decline')}
-                </Button>
-                <Button onClick={() => setConsent(true)}>{t('accept')}</Button>
-              </>
-            }
-          >
-      */}
-      <Dialog open={asking}>
+      {/* Closing the window (cross, click outside, Escape) counts as "Don't send": no repeat. */}
+      <Dialog open={asking} onOpenChange={(open) => !open && setConsent(false)}>
         <DialogContent
           title={t('title')}
           description={t('text')}
-          dismissible={false}
           footer={
-            <Button className="justify-center" onClick={() => setConsent(true)}>
-              {t('accept')}
-            </Button>
+            <>
+              <Button variant="secondary" onClick={() => setConsent(false)}>
+                {t('decline')}
+              </Button>
+              <Button onClick={() => setConsent(true)}>{t('accept')}</Button>
+            </>
           }
         >
           <p className="flex items-start gap-2 text-sm text-fg-muted">

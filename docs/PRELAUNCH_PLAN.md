@@ -7,9 +7,9 @@ rows of "Additions to existing steps" that name them.
 
 ## Progress and handoff
 
-Next: **session 2** (model S); before any deploy the owner applies migration `0004` to the main
+Next: **session 3** (model O); before any deploy the owner applies migration `0004` to the main
 database (`pnpm db:migrate`). Update this line and the "Done" line at the end of every session.
-Done: 0.1 (`docs/AUDIT.md`, 2026-11-12); 1.0 + 5.3a (session 1, 2026-11-12, not committed yet);
+Done: 0.1 (`docs/AUDIT.md`, 2026-11-12); 1.0 + 5.3a (session 1, 2026-11-12, commit b076026); 1.1 + 1.2 (session 2, 2026-11-12);
 owner: 6.8 (two-step sign-in everywhere), Neon test branch created.
 
 Owner decisions that later sessions must respect (2026-11-12):
