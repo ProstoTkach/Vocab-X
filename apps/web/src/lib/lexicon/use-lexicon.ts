@@ -8,11 +8,11 @@ import {
   type TranslationProvider,
 } from '@vocabx/core';
 import { createLookupCache } from '@vocabx/data';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { browserStorage } from '../repos';
 import { cachedLexicon, cachedTranslations } from './cached';
 import { createFreeDictionaryProvider } from './free-dictionary';
-import { createGoogleTranslateProvider } from './google-translate';
+import { createGoogleTranslateProvider, type TranslateLimited } from './google-translate';
 import { proxiedFetch } from './proxy';
 import { mergedLexicon, mergedTranslations } from './suggest';
 import { createTatoebaProvider } from './tatoeba';
@@ -22,11 +22,13 @@ import { createWiktionaryTranslations } from './wiktionary-translations';
 export interface Lexicon {
   translations: TranslationProvider;
   dictionary: LexiconProvider;
+  /** Google's suggestions are used up for today (the free dictionaries still answer). */
+  limited?: TranslateLimited | null;
 }
 
 const CACHE = { maxEntries: 400, ttlMs: 30 * DAY_MS, now: () => systemClock.now() };
 
-function createLexicon(): Lexicon {
+function createLexicon(onLimited: (who: TranslateLimited) => void): Lexicon {
   const storage = browserStorage();
   const fetchJson = proxiedFetch((url, init) => fetch(url, init));
   return {
@@ -34,7 +36,7 @@ function createLexicon(): Lexicon {
     // English Wiktionary add the other senses (several variants to choose from).
     translations: mergedTranslations([
       cachedTranslations(
-        createGoogleTranslateProvider({ fetch: (url, init) => fetch(url, init) }),
+        createGoogleTranslateProvider({ fetch: (url, init) => fetch(url, init), onLimited }),
         createLookupCache<string[]>(storage, 'google-translations', CACHE),
       ),
       cachedTranslations(
@@ -64,6 +66,7 @@ function createLexicon(): Lexicon {
 
 /** Free online dictionaries (suggestions only; the learner confirms everything). */
 export function useLexicon(): Lexicon {
-  const [lexicon] = useState(createLexicon);
-  return lexicon;
+  const [limited, setLimited] = useState<TranslateLimited | null>(null);
+  const [lexicon] = useState(() => createLexicon(setLimited));
+  return useMemo(() => ({ ...lexicon, limited }), [lexicon, limited]);
 }

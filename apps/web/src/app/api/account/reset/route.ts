@@ -1,8 +1,10 @@
 import { after, NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
+import { letterRules } from '@/lib/account-limits';
 import { crossSite, fail, NO_STORE } from '@/lib/api-user';
 import { dbFromEnv } from '@/lib/db/client';
 import { requestReset, resetPassword } from '@/lib/email-accounts';
+import { count, senderKey, tooMany, verdictOf } from '@/lib/rate-limit';
 import { setSessionCookie } from '@/lib/session-cookie';
 
 const askSchema = z.object({ email: z.email().max(254), locale: z.string().max(5) });
@@ -26,6 +28,12 @@ export async function POST(request: NextRequest): Promise<Response> {
   const now = new Date().getTime();
   const ask = askSchema.safeParse(body);
   if (ask.success) {
+    // Counted whether the address has an account or not: the answer still tells nothing.
+    const [mine, everyone] = letterRules('reset', senderKey(request));
+    const counts = await count(db, [mine, everyone], now);
+    const limit = verdictOf(counts, [mine], now);
+    if (!limit.ok) return tooMany(limit);
+    if (!verdictOf(counts, [everyone], now).ok) return fail(503);
     after(() =>
       requestReset(db, ask.data, now).catch((e: unknown) =>
         console.error('reset letter failed', e instanceof Error ? e.message : 'unknown'),

@@ -50,6 +50,28 @@ describe('Google Translate', () => {
     expect(await odd.translate({ text: 'a', from: 'en', to: 'uk' })).toEqual([]);
   });
 
+  test("past the day's limit: says who, and asks nothing more until the wait is over", async () => {
+    let now = 0;
+    const fetch = vi.fn<FetchLike>(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ translations: [], limited: 'account' }), {
+          status: 429,
+          headers: { 'Retry-After': '60' },
+        }),
+      ),
+    );
+    const onLimited = vi.fn();
+    const p = createGoogleTranslateProvider({ fetch, onLimited, now: () => now });
+    expect(await p.translate({ text: 'a', from: 'en', to: 'uk' })).toEqual([]);
+    expect(onLimited).toHaveBeenCalledWith('account');
+    now = 59_000;
+    expect(await p.translate({ text: 'b', from: 'en', to: 'uk' })).toEqual([]);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    now = 60_000;
+    await p.translate({ text: 'c', from: 'en', to: 'uk' });
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
   test('times out', async () => {
     const hang: FetchLike = (_url, init) =>
       new Promise((_, reject) =>

@@ -281,9 +281,7 @@ test('signing in with email: a wrong password is told; signing up checks the for
   await dialog.getByRole('button', { name: 'Показати пароль' }).click();
   await expect(dialog.getByLabel('Пароль', { exact: true })).toHaveAttribute('type', 'text');
   await dialog.getByRole('button', { name: 'Увійти', exact: true }).click();
-  await expect(dialog.getByRole('alert')).toHaveText(
-    'Неправильний email або пароль. Після кількох невдалих спроб вхід закривається на 15 хвилин.',
-  );
+  await expect(dialog.getByRole('alert')).toHaveText('Неправильний email або пароль.');
 
   await dialog.getByRole('button', { name: 'Зареєструйтеся' }).click();
   await dialog.getByLabel('Пароль', { exact: true }).fill('long-enough');

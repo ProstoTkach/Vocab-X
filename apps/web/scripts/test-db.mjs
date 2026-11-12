@@ -54,9 +54,14 @@ const {
 env.NEXTAUTH_SECRET = 'vocabx-db-test-secret';
 env.NEXTAUTH_URL = 'http://localhost:3000';
 
-const result = spawnSync('pnpm', ['exec', 'vitest', 'run', '--config', 'vitest.db.config.ts'], {
-  stdio: 'inherit',
-  env,
-  shell: process.platform === 'win32',
-});
+const result = spawnSync(
+  'pnpm',
+  // Anything after `pnpm test:db` goes to vitest (a file, --silent=false).
+  ['exec', 'vitest', 'run', '--config', 'vitest.db.config.ts', ...process.argv.slice(2)],
+  {
+    stdio: 'inherit',
+    env,
+    shell: process.platform === 'win32',
+  },
+);
 process.exit(result.status ?? 1);

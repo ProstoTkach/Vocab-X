@@ -67,6 +67,9 @@
     "exampleSuggestions": "Examples — pick one",
     "suggestHint": "Finds translations and examples for the word you typed",
     "noTranslations": "No translation found in the dictionaries — type it in yourself.",
+    "limitedAnonymous": "Free translation suggestions are used up for today. Sign in to get more: 100 a day.",
+    "limitedAccount": "Translation suggestions are used up for today. The dictionaries still help; suggestions return tomorrow.",
+    "limitedSignIn": "Sign in",
     "noExamples": "No example found in the dictionaries — add your own or leave it empty.",
     "hideSuggestions": "Hide suggestions"
   },

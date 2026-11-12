@@ -6,9 +6,11 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
+import { SignInDialog } from '@/components/account/sign-in-dialog';
 import { HighlightedText } from '@/components/words/highlighted-text';
 import { cx } from '@/lib/cx';
 import { suggestWord, type WordSuggestions } from '@/lib/lexicon/suggest';
+import type { TranslateLimited } from '@/lib/lexicon/google-translate';
 import type { Lexicon } from '@/lib/lexicon/use-lexicon';
 import { track } from '@/lib/analytics';
 
@@ -135,54 +137,85 @@ function NotFound({ text }: { text: string }) {
   );
 }
 
+/**
+ * Google's suggestions are used up for today. Without an account the form asks to sign in (the
+ * server gives an account ten times as many); with one, tomorrow they come back.
+ */
+function LimitNotice({ who }: { who: TranslateLimited }) {
+  const t = useTranslations('decks.form');
+  const [signingIn, setSigningIn] = useState(false);
+  return (
+    <div aria-live="polite" className="-mt-2 flex flex-wrap items-center gap-2">
+      <p className="text-sm text-fg-muted">
+        {t(who === 'anonymous' ? 'limitedAnonymous' : 'limitedAccount')}
+      </p>
+      {who === 'anonymous' && (
+        <>
+          <Button size="sm" variant="secondary" onClick={() => setSigningIn(true)}>
+            {t('limitedSignIn')}
+          </Button>
+          <SignInDialog open={signingIn} onOpenChange={setSigningIn} google />
+        </>
+      )}
+    </div>
+  );
+}
+
 /** Translation variants as chips; a tap adds one to the field, a second tap takes it out. */
 export function TranslationSuggestions({
   found,
   value,
   lang,
+  limited,
   onChange,
 }: {
   found: WordSuggestions | null;
   value: string;
   lang: LangCode;
+  /** Google's suggestions are used up for today: said under whatever the dictionaries found. */
+  limited?: TranslateLimited | null | undefined;
   /** The field with the variant added or taken out. */
   onChange: (field: string) => void;
 }) {
   const t = useTranslations('decks.form');
   if (!found) return null;
-  if (!found.translations.length) return <NotFound text={t('noTranslations')} />;
+  const notice = limited ? <LimitNotice who={limited} /> : null;
+  if (!found.translations.length) return notice ?? <NotFound text={t('noTranslations')} />;
   const used = new Set(splitTranslations(value).map((s) => s.toLocaleLowerCase()));
   return (
-    <div aria-live="polite" className="-mt-2 flex flex-col gap-2">
-      <p className="text-sm text-fg-muted">{t('translationSuggestions')}</p>
-      <div className="flex flex-wrap gap-2">
-        {found.translations.map((s) => {
-          const on = used.has(s.toLocaleLowerCase());
-          return (
-            <button
-              key={s}
-              type="button"
-              lang={lang}
-              aria-pressed={on}
-              onClick={() => onChange(toggleTranslation(value, s))}
-              className={cx(
-                'inline-flex min-h-9 items-center gap-1 rounded-full border bg-surface px-3 text-sm transition-colors motion-fast',
-                on
-                  ? 'border-accent text-fg hover:border-danger hover:text-danger'
-                  : 'border-line hover:border-accent',
-              )}
-            >
-              {on ? (
-                <Check aria-hidden className="size-3.5 text-accent" />
-              ) : (
-                <Plus aria-hidden className="size-3.5" />
-              )}
-              {s}
-            </button>
-          );
-        })}
+    <>
+      <div aria-live="polite" className="-mt-2 flex flex-col gap-2">
+        <p className="text-sm text-fg-muted">{t('translationSuggestions')}</p>
+        <div className="flex flex-wrap gap-2">
+          {found.translations.map((s) => {
+            const on = used.has(s.toLocaleLowerCase());
+            return (
+              <button
+                key={s}
+                type="button"
+                lang={lang}
+                aria-pressed={on}
+                onClick={() => onChange(toggleTranslation(value, s))}
+                className={cx(
+                  'inline-flex min-h-9 items-center gap-1 rounded-full border bg-surface px-3 text-sm transition-colors motion-fast',
+                  on
+                    ? 'border-accent text-fg hover:border-danger hover:text-danger'
+                    : 'border-line hover:border-accent',
+                )}
+              >
+                {on ? (
+                  <Check aria-hidden className="size-3.5 text-accent" />
+                ) : (
+                  <Plus aria-hidden className="size-3.5" />
+                )}
+                {s}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+      {notice}
+    </>
   );
 }
 

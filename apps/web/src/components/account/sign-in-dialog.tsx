@@ -15,6 +15,9 @@ const MIN_PASSWORD = 8;
 
 type Mode = 'signIn' | 'register' | 'sent';
 
+const sendError = (status: number) =>
+  status === 400 ? 'errorEmail' : status === 429 ? 'errorTooMany' : 'errorSend';
+
 /**
  * Signing in with an email and a password, or signing up: the form, then a letter whose link
  * confirms the address. `extraParam`: also comes back in the address after signing in.
@@ -69,8 +72,16 @@ export function SignInDialog({
       return;
     }
     setUnverified(res?.error === 'unverified');
-    // A locked account answers like a wrong password: the server never says which addresses exist.
-    setError(t(res?.error === 'unverified' ? 'errorUnverified' : 'errorInvalid'));
+    // Too many tries are counted for every address alike: the server never says which exist.
+    setError(
+      t(
+        res?.error === 'unverified'
+          ? 'errorUnverified'
+          : res?.error === 'limited'
+            ? 'errorTooMany'
+            : 'errorInvalid',
+      ),
+    );
   };
 
   const submitRegister = async () => {
@@ -81,7 +92,7 @@ export function SignInDialog({
       track('account', { to: 'registered' });
       setResent(false);
       setMode('sent');
-    } else setError(t(res.status === 400 ? 'errorEmail' : 'errorSend'));
+    } else setError(t(sendError(res.status)));
   };
 
   const submit = async (e: SyntheticEvent) => {
@@ -104,7 +115,7 @@ export function SignInDialog({
       if (res.status === 202) {
         setResent(true);
         setMode('sent');
-      } else setError(t('errorSend'));
+      } else setError(t(sendError(res.status)));
     } catch {
       setError(t('errorSend'));
     } finally {

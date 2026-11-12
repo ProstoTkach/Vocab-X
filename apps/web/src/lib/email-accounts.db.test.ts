@@ -1,7 +1,9 @@
+import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { users } from './db/schema';
 import { removeTestUsers, testDb, testEmail } from './db/testing';
+import { hashed, spendQuery } from './rate-limit';
 
 const mail = vi.hoisted(() => ({ sent: [] as { to: string; link: string }[] }));
 vi.mock('./email', () => ({
@@ -13,7 +15,7 @@ vi.mock('./email', () => ({
 }));
 
 const {
-  checkLogin,
+  checkLogin: checkLoginFrom,
   confirmEmail,
   provesRegistration,
   register,
@@ -22,6 +24,7 @@ const {
   requestReset,
   resendConfirmation,
   resetPassword,
+  normalizeEmail,
 } = await import('./email-accounts');
 
 const db = testDb();
@@ -32,11 +35,17 @@ let now = new Date('2026-11-12T10:00:00Z').getTime();
 
 beforeAll(() => removeTestUsers(db));
 afterAll(() => removeTestUsers(db));
+/** Where the tries come from: a sender of each test's own, so their counts never meet. */
+const newSender = () => `db-test-${randomUUID()}`;
+let sender = newSender();
 beforeEach(() => {
   mail.sent.length = 0;
+  sender = newSender();
   // Every test starts past the wait between letters of the one before.
   now += 10 * MINUTE;
 });
+const checkLogin = (email: string, password: string, at = now, from = sender) =>
+  checkLoginFrom(db, email, password, at, from);
 
 /** The token of the last letter to this address. */
 function lastToken(email: string): string {
@@ -48,13 +57,20 @@ function lastToken(email: string): string {
 const letters = (email: string) => mail.sent.filter((l) => l.to === email).length;
 const row = async (email: string) =>
   (await db.select().from(users).where(eq(users.email, email)))[0]!;
-const lock = (email: string) =>
-  db
-    .update(users)
-    .set({ lockedUntil: new Date(now + 600_000) })
-    .where(eq(users.email, email));
-const signsIn = async (email: string, password: string) =>
-  (await checkLogin(db, email, password, now)).ok;
+/** Ten wrong passwords at once from this sender: the address is closed to it. */
+const lock = (email: string, from = sender) =>
+  Promise.all(Array.from({ length: 10 }, () => checkLogin(email, 'wrong-pass', now, from)));
+const signsIn = async (email: string, password: string, from = sender) =>
+  (await checkLogin(email, password, now, from)).ok;
+
+/** An account whose address is confirmed, with the password `old-pass`. */
+async function confirmed(name: string) {
+  const email = testEmail(name);
+  await signUp(email, 'old-pass');
+  await confirmEmail(db, lastToken(email), now);
+  now += MINUTE;
+  return email;
+}
 
 /** Registers as one browser would: the key its proof cookie is made from comes back. */
 const signUp = (email: string, password: string) => register(db, { email, password, locale }, now);
@@ -68,7 +84,7 @@ describe('registration and its letter', () => {
     const key = await signUp(email, 'password-1');
     expect(letters(email)).toBe(1);
     // Before the link: only the owner of the password learns that it waits.
-    expect(await checkLogin(db, email, 'password-1', now)).toEqual({
+    expect(await checkLogin(email, 'password-1')).toEqual({
       ok: false,
       code: 'unverified',
     });
@@ -203,14 +219,6 @@ describe('two registrations of one address', () => {
 
 // AUDIT A8.
 describe('a new password by letter', () => {
-  async function confirmed(name: string) {
-    const email = testEmail(name);
-    await signUp(email, 'old-pass');
-    await confirmEmail(db, lastToken(email), now);
-    now += MINUTE;
-    return email;
-  }
-
   test('sets the password once, and the old one stops working', async () => {
     const email = await confirmed('reset');
     await requestReset(db, { email, locale: 'en' }, now);
@@ -263,6 +271,7 @@ describe('a new password by letter', () => {
   test('lifts a lock', async () => {
     const email = await confirmed('reset-locked');
     await lock(email);
+    expect(await signsIn(email, 'old-pass')).toBe(false);
     await requestReset(db, { email, locale }, now);
     await reset(email, 'new-pass');
     expect(await signsIn(email, 'new-pass')).toBe(true);
@@ -270,27 +279,43 @@ describe('a new password by letter', () => {
 });
 
 describe('signing in says nothing about which addresses exist', () => {
-  test('an unknown address, a wrong password and a locked account answer alike', async () => {
-    const email = testEmail('login');
-    await signUp(email, 'correct-pass');
-    await confirmEmail(db, lastToken(email), now);
-    const invalid = { ok: false, code: 'invalid' };
-    expect(await checkLogin(db, testEmail('nobody'), 'correct-pass', now)).toEqual(invalid);
-    expect(await checkLogin(db, email, 'wrong-pass', now)).toEqual(invalid);
-    expect((await row(email)).loginFailures).toBe(1);
-    await lock(email);
-    // Not even the right password learns about the lock.
-    expect(await checkLogin(db, email, 'correct-pass', now)).toEqual(invalid);
-    expect((await checkLogin(db, email, 'correct-pass', now + 601_000)).ok).toBe(true);
-    expect((await row(email)).loginFailures).toBe(0);
+  const invalid = { ok: false, code: 'invalid' };
+  const limited = { ok: false, code: 'limited' };
+
+  test('an unknown address and a wrong password answer alike', async () => {
+    const email = await confirmed('login');
+    expect(await checkLogin(testEmail('nobody'), 'old-pass')).toEqual(invalid);
+    expect(await checkLogin(email, 'wrong-pass')).toEqual(invalid);
+    expect(await signsIn(email, 'old-pass')).toBe(true);
   });
 
-  test('ten wrong passwords lock the account', async () => {
-    const email = testEmail('lock');
-    await signUp(email, 'correct-pass');
-    await confirmEmail(db, lastToken(email), now);
-    await db.update(users).set({ loginFailures: 9 }).where(eq(users.email, email));
-    await checkLogin(db, email, 'wrong-pass', now);
-    expect((await row(email)).lockedUntil?.getTime()).toBe(now + 15 * 60_000);
+  test('ten wrong passwords close an address to that sender only, known or not', async () => {
+    const email = await confirmed('lock');
+    const unknown = testEmail('nobody');
+    await Promise.all([lock(email), lock(unknown)]);
+    // Not even the right password gets in, and an unknown address is closed just the same.
+    expect(await checkLogin(email, 'old-pass')).toEqual(limited);
+    expect(await checkLogin(unknown, 'old-pass')).toEqual(limited);
+    // The owner, from elsewhere, is not kept out; their way in opens it again for everyone.
+    expect(await signsIn(email, 'old-pass', newSender())).toBe(true);
+    expect(await signsIn(email, 'old-pass')).toBe(true);
+    // A quarter of an hour later the unknown one is open again too.
+    expect(await checkLogin(unknown, 'old-pass', now + 16 * 60_000)).toEqual(invalid);
+  });
+
+  test('a hundred wrong passwords from everywhere close an address for all', async () => {
+    const email = await confirmed('everywhere');
+    const key = `login-wrong:${hashed(normalizeEmail(email))}`;
+    await spendQuery(db, [{ key, max: 100, windowMs: 3_600_000, cost: 100 }], now);
+    expect(await checkLogin(email, 'old-pass')).toEqual(limited);
+    expect(await checkLogin(email, 'old-pass', now, newSender())).toEqual(limited);
+    expect(await signsIn(email, 'old-pass', newSender())).toBe(false);
+  });
+
+  test('thirty tries from one sender close every address to it', async () => {
+    const email = await confirmed('tries');
+    await spendQuery(db, [{ key: `login:${sender}`, max: 30, windowMs: 900_000, cost: 30 }], now);
+    expect(await checkLogin(email, 'old-pass')).toEqual(limited);
+    expect(await signsIn(email, 'old-pass', newSender())).toBe(true);
   });
 });

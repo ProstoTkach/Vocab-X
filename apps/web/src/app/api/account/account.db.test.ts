@@ -1,4 +1,5 @@
 // The account routes as the browser meets them: cookies, redirects and status codes.
+import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { encode } from 'next-auth/jwt';
 import { NextRequest } from 'next/server';
@@ -21,7 +22,12 @@ const resetRoute = await import('./reset/route');
 const account = await import('./route');
 const league = await import('../league/route');
 
+// The day's letters for everyone are tried on their own below; here they never run out.
+process.env.EMAIL_DAILY_LIMIT = '100000000';
+
 const db = testDb();
+/** This run's own sender, so the per-sender counts of earlier runs never meet it. */
+let sender = `db-test-${randomUUID()}`;
 const SITE = 'http://localhost:3000';
 const SESSION = 'next-auth.session-token';
 const PROOF = 'vocabx-email-proof';
@@ -33,7 +39,7 @@ function request(
   path: string,
   init: { method?: string; body?: unknown; cookies?: Record<string, string>; origin?: string } = {},
 ) {
-  const headers: Record<string, string> = { host: 'localhost:3000' };
+  const headers: Record<string, string> = { host: 'localhost:3000', 'x-real-ip': sender };
   if (init.method && init.method !== 'GET') headers.origin = init.origin ?? SITE;
   if (init.body !== undefined) headers['content-type'] = 'application/json';
   const cookies = Object.entries(init.cookies ?? {});
@@ -156,5 +162,58 @@ describe('a deleted account with a live cookie', () => {
       request('/api/league', { method: 'POST', body: leagueBody, cookies }),
     );
     expect(after.status).toBe(401);
+  });
+});
+
+// AUDIT A3: one sender cannot send letters without end, nor everyone past the day's letters.
+describe('limits of the letter routes', () => {
+  const signUp = (email: string) =>
+    register.POST(
+      request('/api/account/register', {
+        method: 'POST',
+        body: { email, password: 'password-1', locale: 'uk' },
+      }),
+    );
+
+  test('ten sign-ups an hour from one sender, then 429 before any letter', async () => {
+    sender = `db-test-${randomUUID()}`;
+    for (let i = 0; i < 10; i += 1) expect((await signUp(testEmail('many'))).status).toBe(202);
+    const sent = mail.sent.length;
+    const res = await signUp(testEmail('many'));
+    expect(res.status).toBe(429);
+    expect(Number(res.headers.get('retry-after'))).toBeGreaterThan(3000);
+    expect(mail.sent.length).toBe(sent);
+  });
+
+  test('asking for a new password is limited by the same rule, on a count of its own', async () => {
+    sender = `db-test-${randomUUID()}`;
+    const { hashed, spendQuery } = await import('@/lib/rate-limit');
+    // Ten asks already made from this sender (a successful one sends its letter after the answer).
+    await spendQuery(
+      db,
+      [{ key: `reset:${hashed(sender)}`, max: 10, windowMs: 3_600_000, cost: 10 }],
+      new Date().getTime(),
+    );
+    const reset = await resetRoute.POST(
+      request('/api/account/reset', {
+        method: 'POST',
+        body: { email: testEmail('many'), locale: 'uk' },
+      }),
+    );
+    expect(reset.status).toBe(429);
+    // Signing up from it still works: another count.
+    expect((await signUp(testEmail('many'))).status).toBe(202);
+  });
+
+  test("past the day's letters for everyone, no letter goes out", async () => {
+    sender = `db-test-${randomUUID()}`;
+    process.env.EMAIL_DAILY_LIMIT = '0';
+    try {
+      const sent = mail.sent.length;
+      expect((await signUp(testEmail('cap'))).status).toBe(503);
+      expect(mail.sent.length).toBe(sent);
+    } finally {
+      process.env.EMAIL_DAILY_LIMIT = '100000000';
+    }
   });
 });

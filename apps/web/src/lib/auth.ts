@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider, { type GoogleProfile } from 'next-auth/providers/google';
 import { checkLogin, rememberGoogleUser } from './email-accounts';
 import { dbFromEnv } from './db/client';
+import { hashed, senderNetwork } from './rate-limit';
 
 /** Signing in is offered only where its keys are set: not on a server without them. */
 export function signInConfigured(env: Record<string, string | undefined> = process.env): boolean {
@@ -29,10 +30,13 @@ export const authOptions: NextAuthOptions = {
         }),
         CredentialsProvider({
           credentials: { email: {}, password: {} },
-          authorize: async (input) => {
+          authorize: async (input, req) => {
             const db = dbFromEnv();
             if (!db || !input?.email || !input.password) return null;
-            const result = await checkLogin(db, input.email, input.password, new Date().getTime());
+            const headers = (req.headers ?? {}) as Record<string, string | undefined>;
+            const sender = hashed(senderNetwork((name) => headers[name]));
+            const now = new Date().getTime();
+            const result = await checkLogin(db, input.email, input.password, now, sender);
             if (result.ok) return { id: result.id, email: result.email };
             // The dialog tells these apart; a wrong email or password stays one and the same.
             if (result.code === 'invalid') return null;

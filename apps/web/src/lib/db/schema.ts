@@ -50,7 +50,9 @@ export const users = pgTable(
     verifyTokenHash: text('verify_token_hash'),
     verifyExpiresAt: time('verify_expires_at'),
     verifySentAt: time('verify_sent_at'),
+    /** Unused since step 2.1a (wrong passwords count in `rate_limits`); to be dropped later. */
     loginFailures: smallint('login_failures').notNull().default(0),
+    /** Unused since step 2.1a, like `loginFailures`. */
     lockedUntil: time('locked_until'),
     createdAt: time('created_at').notNull().defaultNow(),
     deletedAt: time('deleted_at'),
@@ -210,4 +212,33 @@ export const leagueMembers = pgTable(
     index('league_members_tier_idx').on(t.week, t.tier),
     index('league_members_user_idx').on(t.userId, t.week),
   ],
+);
+
+/**
+ * Counts for the limits of the rare and costly routes (`lib/rate-limit.ts`), shared by every
+ * server instance. A key names a rule and whom it counts: a hashed sender address, account or
+ * email, never a plain one. A row lives until its window ends and is swept soon after.
+ */
+export const rateLimits = pgTable(
+  'rate_limits',
+  {
+    key: text('key').primaryKey(),
+    count: integer('count').notNull(),
+    resetAt: time('reset_at').notNull(),
+  },
+  (t) => [index('rate_limits_reset_idx').on(t.resetAt)],
+);
+
+/**
+ * Google's answers for words already asked (`api/translate`), the same for everyone: a word asked
+ * again costs nothing. Key: `from|to|word`. Kept for a limited time (see the route).
+ */
+export const translationCache = pgTable(
+  'translation_cache',
+  {
+    key: text('key').primaryKey(),
+    translations: jsonb('translations').$type<string[]>().notNull(),
+    createdAt: time('created_at').notNull().defaultNow(),
+  },
+  (t) => [index('translation_cache_created_idx').on(t.createdAt)],
 );

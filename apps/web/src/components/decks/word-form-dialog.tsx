@@ -193,6 +193,7 @@ export function WordFormDialog({
             found={found}
             value={draft.translations}
             lang={nativeLang}
+            limited={lexicon.limited}
             onChange={pickTranslations}
           />
 

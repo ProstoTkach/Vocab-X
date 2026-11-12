@@ -98,6 +98,7 @@ export function ImportRow({
               found={found}
               value={row.translation}
               lang={nativeLang}
+              limited={lexicon.limited}
               onChange={(translation) => onChange({ translation })}
             />
           </div>

@@ -18,14 +18,35 @@ import {
   renderVerifyEmail,
 } from './email-templates';
 import { hashPassword, newToken, tokenHash, verifyPassword } from './password';
+import {
+  forgetQuery,
+  hashed,
+  isFull,
+  MINUTE_MS,
+  HOUR_MS,
+  peekQuery,
+  spendQuery,
+  sweepQuery,
+  verdictOf,
+  type Rule,
+} from './rate-limit';
 
 const LINK_LIFETIME_MS = 24 * 3_600_000;
 /** A link for a new password is worth more to whoever finds it, so it lives shorter. */
 const RESET_LIFETIME_MS = 3_600_000;
 /** One letter a minute to one address, however often someone asks. */
 const LETTER_GAP_MS = 60_000;
-const MAX_FAILURES = 10;
-const LOCK_MS = 15 * 60_000;
+/**
+ * Sign-in limits (AUDIT A4). Tries from one sender, right or wrong, whatever the address: trying
+ * many accounts from one place is slow. Wrong passwords for one address from one sender close it
+ * to that sender only, so nobody can keep its owner out from elsewhere; from everyone together,
+ * a much higher count closes it for all (guessing from many places at once).
+ */
+const TRIES: Omit<Rule, 'key'> = { max: 30, windowMs: 15 * MINUTE_MS };
+const WRONG_HERE: Omit<Rule, 'key'> = { max: 10, windowMs: 15 * MINUTE_MS };
+const WRONG_ANYWHERE: Omit<Rule, 'key'> = { max: 100, windowMs: HOUR_MS };
+/** Keyed by the address, known or not, so a closed address says nothing about an account. */
+const wrongKey = (email: string) => `login-wrong:${hashed(normalizeEmail(email))}`;
 /** A wrong password waits this long: guessing by trying many is slow. */
 const WRONG_DELAY_MS = 800;
 
@@ -220,8 +241,6 @@ export async function resetPassword(
       emailVerifiedAt: sql`coalesce(${users.emailVerifiedAt}, now())`,
       verifyTokenHash: null,
       verifyExpiresAt: null,
-      loginFailures: 0,
-      lockedUntil: null,
     })
     .where(
       and(
@@ -231,7 +250,10 @@ export async function resetPassword(
       ),
     )
     .returning({ id: users.id, email: users.email });
-  return rows[0] ?? null;
+  const user = rows[0] ?? null;
+  // The owner of the address has proved it: the wrong passwords of others no longer count.
+  if (user) await forgetQuery(db, wrongKey(user.email));
+  return user;
 }
 
 /**
@@ -298,7 +320,8 @@ export function provesRegistration(
 }
 
 export type LoginResult =
-  { ok: true; id: string; email: string } | { ok: false; code: 'invalid' | 'unverified' };
+  | { ok: true; id: string; email: string }
+  | { ok: false; code: 'invalid' | 'unverified' | 'limited' };
 
 const pause = () => new Promise((resolve) => setTimeout(resolve, WRONG_DELAY_MS));
 
@@ -307,44 +330,50 @@ let stand: Promise<string> | null = null;
 const standIn = () => (stand ??= hashPassword(newToken().token));
 
 /**
- * Checks an email and a password. Too many wrong ones lock the account for a while. Every answer
- * but a right one is the same `invalid`, after the same work: an unknown address, a locked
- * account (even with the right password) and a wrong password cannot be told apart, so trying
- * says nothing about which addresses have an account. A new password by letter lifts the lock.
+ * Checks an email and a password, for a sender (`senderKey`). Too many tries, or too many wrong
+ * passwords for the address, answer `limited` before any password is looked at (see the limits
+ * above); an address without an account is counted and closed just the same. Any other answer
+ * but a right one is the same `invalid`, after the same work: an unknown address and a wrong
+ * password cannot be told apart, so trying says nothing about which addresses have an account.
+ * A new password by letter lifts the closing.
  */
 export async function checkLogin(
   db: Db,
   email: string,
   password: string,
   now: number,
+  sender: string,
 ): Promise<LoginResult> {
-  const row = await findByEmail(db, email);
+  const tries: Rule = { key: `login:${sender}`, ...TRIES };
+  const wrongHere: Rule = { key: `${wrongKey(email)}:${sender}`, ...WRONG_HERE };
+  const wrongAnywhere: Rule = { key: wrongKey(email), ...WRONG_ANYWHERE };
+  // One request to the database: this try counted, the account, its wrong passwords so far.
+  const [counted, found, wrong] = await db.batch([
+    spendQuery(db, [tries], now),
+    db.select().from(users).where(byEmail(email)),
+    peekQuery(db, [wrongHere.key, wrongAnywhere.key]),
+    sweepQuery(db, now),
+  ]);
+  if (
+    !verdictOf(counted, [tries], now).ok ||
+    isFull(wrong, wrongHere, now) ||
+    isFull(wrong, wrongAnywhere, now)
+  ) {
+    await pause();
+    return { ok: false, code: 'limited' };
+  }
+  const row = found[0] ?? null;
   // Not yet confirmed: the password the latest registration chose (or one set before it kept them).
   const stored = row?.emailVerifiedAt
     ? row.passwordHash
     : (row?.pendingPasswordHash ?? row?.passwordHash);
   const right = await verifyPassword(password, stored ?? (await standIn()));
-  const locked = !!row?.lockedUntil && row.lockedUntil.getTime() > now;
-  if (!row || !stored || locked) {
-    await pause();
-    return { ok: false, code: 'invalid' };
-  }
-  if (!right) {
-    const failures = row.loginFailures + 1;
-    await db
-      .update(users)
-      .set(
-        failures >= MAX_FAILURES
-          ? { loginFailures: 0, lockedUntil: new Date(now + LOCK_MS) }
-          : { loginFailures: failures },
-      )
-      .where(eq(users.id, row.id));
-    await pause();
+  if (!row || !stored || !right) {
+    await Promise.all([spendQuery(db, [wrongHere, wrongAnywhere], now), pause()]);
     return { ok: false, code: 'invalid' };
   }
   // Only the owner of the password learns that the address is still to be confirmed.
   if (!row.emailVerifiedAt) return { ok: false, code: 'unverified' };
-  if (row.loginFailures > 0 || row.lockedUntil)
-    await db.update(users).set({ loginFailures: 0, lockedUntil: null }).where(eq(users.id, row.id));
+  if (wrong.length) await forgetQuery(db, wrongKey(email));
   return { ok: true, id: row.id, email: row.email };
 }

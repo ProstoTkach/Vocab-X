@@ -106,6 +106,29 @@ test('add a word from my words goes to "My words"', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Мої слова' }).last()).toBeVisible();
 });
 
+/** The server's answer past the day's free suggestions of a learner who is not signed in. */
+const LIMITED = {
+  status: 429,
+  headers: { 'Retry-After': '3600' },
+  json: { translations: [], limited: 'anonymous' },
+};
+
+test("past the day's free suggestions the word form asks to sign in", async ({ page }) => {
+  await page.route('**/api/translate?**', (route) => route.fulfill(LIMITED));
+  await page.goto('/uk/decks');
+  await page.getByRole('button', { name: /^Додати нове слово/ }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Слово або вираз').fill('revenue');
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
+  await expect(
+    dialog.getByText('Безкоштовні підказки перекладу на сьогодні закінчилися', { exact: false }),
+  ).toBeVisible();
+  // The dictionaries still answer: their example is there to take.
+  await expect(dialog.getByRole('button', { name: 'Revenue grew by 10%.' })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Увійти', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Вхід через email' })).toBeVisible();
+});
+
 test('"I have learned it" moves a word to the learned words, out of the reviews', async ({
   page,
 }) => {
