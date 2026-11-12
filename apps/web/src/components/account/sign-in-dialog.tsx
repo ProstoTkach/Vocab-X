@@ -16,7 +16,13 @@ const MIN_PASSWORD = 8;
 type Mode = 'signIn' | 'register' | 'sent' | 'forgot' | 'forgotSent' | 'newPassword';
 
 const sendError = (status: number) =>
-  status === 400 ? 'errorEmail' : status === 429 ? 'errorTooMany' : 'errorSend';
+  status === 400
+    ? 'errorEmail'
+    : status === 429
+      ? 'errorTooMany'
+      : status === 503
+        ? 'errorUnavailable'
+        : 'errorSend';
 
 /** Asks for a letter with a link to choose a new password; always 202 for a real address. */
 export const askReset = (email: string, locale: string) =>

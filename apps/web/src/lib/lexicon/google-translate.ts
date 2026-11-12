@@ -3,8 +3,14 @@
 import { systemClock, type TranslationProvider } from '@vocabx/core';
 import { getJson, type FetchLike } from './http';
 
-/** Who reached the day's limit: the form asks to sign in, or to come back tomorrow. */
-export type TranslateLimited = 'anonymous' | 'account';
+/**
+ * Why Google's suggestions are not there: the day's limit of an anonymous sender (the form asks to
+ * sign in) or of an account (come back tomorrow), or the service is switched off (`KILL_TRANSLATE`).
+ */
+export type TranslateLimited = 'anonymous' | 'account' | 'unavailable';
+
+/** The server is not asked again for this long after it said it is switched off. */
+const UNAVAILABLE_PAUSE_MS = 5 * 60_000;
 
 export interface GoogleTranslateOptions {
   fetch: FetchLike;
@@ -50,6 +56,17 @@ export function createGoogleTranslateProvider(o: GoogleTranslateOptions): Transl
   let blockedUntil = 0;
   const fetchFn: FetchLike = async (url, init) => {
     const res = await o.fetch(url, init);
+    if (res.status === 503) {
+      const body = (await res
+        .clone()
+        .json()
+        .catch(() => null)) as { unavailable?: unknown } | null;
+      if (body?.unavailable === true) {
+        blockedUntil = now() + UNAVAILABLE_PAUSE_MS;
+        o.onLimited?.('unavailable');
+      }
+      return res;
+    }
     const limit = await limitOf(res);
     if (limit) {
       blockedUntil = now() + limit.waitMs;

@@ -138,7 +138,7 @@ function NotFound({ text }: { text: string }) {
 }
 
 /**
- * Google's suggestions are used up for today. Without an account the form asks to sign in (the
+ * Google's suggestions are used up for today (or switched off). Without an account the form asks to sign in (the
  * server gives an account ten times as many); with one, tomorrow they come back.
  */
 function LimitNotice({ who }: { who: TranslateLimited }) {
@@ -147,7 +147,13 @@ function LimitNotice({ who }: { who: TranslateLimited }) {
   return (
     <div aria-live="polite" className="-mt-2 flex flex-wrap items-center gap-2">
       <p className="text-sm text-fg-muted">
-        {t(who === 'anonymous' ? 'limitedAnonymous' : 'limitedAccount')}
+        {t(
+          who === 'anonymous'
+            ? 'limitedAnonymous'
+            : who === 'account'
+              ? 'limitedAccount'
+              : 'suggestionsPaused',
+        )}
       </p>
       {who === 'anonymous' && (
         <>

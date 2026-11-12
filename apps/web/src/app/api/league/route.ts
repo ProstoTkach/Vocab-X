@@ -12,6 +12,7 @@ import { crossSite, fail, NO_STORE, readJson, requestUserId } from '@/lib/api-us
 import { dbFromEnv, inTransaction } from '@/lib/db/client';
 import { leagueProfiles, users } from '@/lib/db/schema';
 import { ensureMember, leaveLeague, readScores, readStanding } from '@/lib/league-server';
+import { switchedOff } from '@/lib/kill-switch';
 import { MINUTE_MS, hashed, spend, tooMany } from '@/lib/rate-limit';
 
 /** The biggest body is a name, a look and a frame: well under this. */
@@ -53,6 +54,8 @@ const earnedRing = (ring: AvatarFrame['ring'], tier: number): AvatarFrame['ring'
  */
 export async function POST(request: NextRequest): Promise<Response> {
   if (crossSite(request)) return fail(403);
+  // `KILL_LEAGUE`: before the account or the database is looked at. Leaving (DELETE) stays open.
+  if (switchedOff('league')) return fail(503);
   const url = process.env.DATABASE_URL;
   if (!url) return fail(503);
   const userId = await requestUserId(request);

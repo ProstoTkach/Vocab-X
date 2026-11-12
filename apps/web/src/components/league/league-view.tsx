@@ -28,7 +28,7 @@ import { Standing } from './standings';
 const JOIN_PARAM = 'joinLeague';
 const DEMO_PARAM = 'demo';
 
-type Phase = 'closed' | 'loading' | 'ready' | 'waiting' | 'signedOut' | 'failed';
+type Phase = 'closed' | 'loading' | 'ready' | 'waiting' | 'signedOut' | 'failed' | 'unavailable';
 
 const MINUTE = 60_000;
 /** Places are asked for at most this often when opening the page… */
@@ -120,6 +120,7 @@ export function LeagueView({ accounts }: { accounts: boolean }) {
         });
       let res = await send(known?.week ?? null);
       if (res.status === 401) return 'signedOut';
+      if (res.status === 503) return 'unavailable';
       if (!res.ok) return 'failed';
       let answer = (await res.json()) as LeagueAnswer;
       if (!answer.joined) {
@@ -179,7 +180,7 @@ export function LeagueView({ accounts }: { accounts: boolean }) {
       setRefreshing(true);
       try {
         const next = await ask(false, full);
-        if (next !== 'ready' && next !== 'failed') setPhase(next);
+        if (next !== 'ready' && next !== 'failed' && next !== 'unavailable') setPhase(next);
       } catch {
         // Offline: what the browser keeps stays on screen.
       } finally {
@@ -291,6 +292,16 @@ export function LeagueView({ accounts }: { accounts: boolean }) {
         onRefresh={() => void refresh(false)}
         onLeave={() => void leave()}
       />
+    );
+
+  if (phase === 'unavailable')
+    return (
+      <Card className="flex flex-col items-center gap-3 text-center">
+        <p className="text-fg-muted">{t('paused')}</p>
+        <Button variant="secondary" onClick={() => void load(false)}>
+          {t('retry')}
+        </Button>
+      </Card>
     );
 
   if (phase === 'failed')

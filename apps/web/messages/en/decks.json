@@ -71,6 +71,7 @@
     "limitedAnonymous": "Free translation suggestions are used up for today. Sign in to get more: 100 a day.",
     "limitedAccount": "Translation suggestions are used up for today. The dictionaries still help; suggestions return tomorrow.",
     "limitedSignIn": "Sign in",
+    "suggestionsPaused": "Translation suggestions are taking a short break. The dictionaries still help — or type the translation in yourself.",
     "noExamples": "No example found in the dictionaries — add your own or leave it empty.",
     "hideSuggestions": "Hide suggestions"
   },

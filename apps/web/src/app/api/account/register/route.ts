@@ -10,6 +10,7 @@ import {
   registrationProof,
   resendConfirmation,
 } from '@/lib/email-accounts';
+import { switchedOff } from '@/lib/kill-switch';
 import { count, senderKey, tooMany, verdictOf } from '@/lib/rate-limit';
 import { PROOF_COOKIE, PROOF_COOKIE_OPTIONS } from '@/lib/session-cookie';
 
@@ -28,6 +29,8 @@ const bodySchema = z.object({
  */
 export async function POST(request: NextRequest): Promise<Response> {
   if (crossSite(request)) return fail(403);
+  // `KILL_REGISTRATION`: before the database is opened or a letter counted.
+  if (switchedOff('registration')) return fail(503);
   const db = dbFromEnv();
   if (!db) return fail(503);
   const now = new Date().getTime();

@@ -11,6 +11,9 @@
   "notFoundTitle": "Page not found",
   "notFoundText": "The link may be outdated or the page has moved.",
   "goHome": "Go home",
+  "errorTitle": "Something went wrong",
+  "errorText": "The page could not be shown. Your words are safe on this device. Try again, or go back to the start.",
+  "errorRetry": "Try again",
   "links": {
     "label": "Policies and credits",
     "privacy": "Privacy policy",

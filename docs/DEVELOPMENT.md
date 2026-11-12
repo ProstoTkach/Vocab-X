@@ -10,23 +10,24 @@
 
 Змінні середовища (локально — `apps/web/.env`, на Vercel — у налаштуваннях проєкту):
 
-| Змінна                                                           | Для чого                                                                                        |
-| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_PROJECT_ID` | сервісний акаунт Google (Sheets API, Cloud Translation API)                                     |
-| `GOOGLE_SPREADSHEET_POLLS_ID`                                    | таблиця «Vocab-X polls»: відгуки, рядок на відгук                                               |
-| `GOOGLE_SPREADSHEET_ANALYTICS_ID`                                | таблиця «Vocab-X analytics»: листи «Події», «Сесії», «Відгуки», «Словник»                       |
-| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`                         | запасний канал відгуків, коли таблиця недоступна                                                |
-| `DATABASE_URL`, `DATABASE_URL_DIRECT`                            | Neon: застосунок (через пул) і міграції (напряму)                                               |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                       | OAuth-клієнт Google: вхід у профілі                                                             |
-| `NEXTAUTH_URL`, `NEXTAUTH_SECRET`                                | адреса сайту (листи, sitemap, відправник push) і ключ підпису сесії (`openssl rand -base64 32`) |
-| `EMAIL_SERVER_USER`, `EMAIL_SERVER_PASSWORD`                     | SMTP для листів (Gmail: пароль застосунку); без них локально посилання в консолі                |
-| `EMAIL_FROM`, `EMAIL_SERVER_HOST`, `EMAIL_SERVER_PORT`           | необовʼязково: відправник і інший SMTP-сервер                                                   |
-| `DEVELOPER_CODE`                                                 | код, що відкриває режим розробника в налаштуваннях                                              |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`              | ключі Web Push для нагадувань (публічний іде в браузер)                                         |
-| `VAPID_SUBJECT`                                                  | необовʼязково: mailto: чи https: відправника (типово адреса сайту)                              |
-| `CRON_SECRET`                                                    | Vercel Cron надсилає його до `/api/push/cron` і `/api/cleanup`                                  |
-| `TRANSLATE_DAILY_CHARS`                                          | необовʼязково: символів до Google Translate на добу для всіх (типово 15 000; 0 — вимкнено)      |
-| `EMAIL_DAILY_LIMIT`                                              | необовʼязково: листів на добу для всіх (типово 300, під лімітом Gmail 500)                      |
+| Змінна                                                                 | Для чого                                                                                        |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_PROJECT_ID`       | сервісний акаунт Google (Sheets API, Cloud Translation API)                                     |
+| `GOOGLE_SPREADSHEET_POLLS_ID`                                          | таблиця «Vocab-X polls»: відгуки, рядок на відгук                                               |
+| `GOOGLE_SPREADSHEET_ANALYTICS_ID`                                      | таблиця «Vocab-X analytics»: листи «Події», «Сесії», «Відгуки», «Словник»                       |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`                               | запасний канал відгуків, коли таблиця недоступна                                                |
+| `DATABASE_URL`, `DATABASE_URL_DIRECT`                                  | Neon: застосунок (через пул) і міграції (напряму)                                               |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                             | OAuth-клієнт Google: вхід у профілі                                                             |
+| `NEXTAUTH_URL`, `NEXTAUTH_SECRET`                                      | адреса сайту (листи, sitemap, відправник push) і ключ підпису сесії (`openssl rand -base64 32`) |
+| `EMAIL_SERVER_USER`, `EMAIL_SERVER_PASSWORD`                           | SMTP для листів (Gmail: пароль застосунку); без них локально посилання в консолі                |
+| `EMAIL_FROM`, `EMAIL_SERVER_HOST`, `EMAIL_SERVER_PORT`                 | необовʼязково: відправник і інший SMTP-сервер                                                   |
+| `DEVELOPER_CODE`                                                       | код, що відкриває режим розробника в налаштуваннях                                              |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`                    | ключі Web Push для нагадувань (публічний іде в браузер)                                         |
+| `VAPID_SUBJECT`                                                        | необовʼязково: mailto: чи https: відправника (типово адреса сайту)                              |
+| `CRON_SECRET`                                                          | Vercel Cron надсилає його до `/api/push/cron` і `/api/cleanup`                                  |
+| `TRANSLATE_DAILY_CHARS`                                                | необовʼязково: символів до Google Translate на добу для всіх (типово 15 000; 0 — вимкнено)      |
+| `KILL_TRANSLATE`, `KILL_REGISTRATION`, `KILL_LEAGUE`, `KILL_ANALYTICS` | необовʼязково: `1`/`true`/`on` вимикає функцію без зміни коду (див. «Вимикачі»)                 |
+| `EMAIL_DAILY_LIMIT`                                                    | необовʼязково: листів на добу для всіх (типово 300, під лімітом Gmail 500)                      |
 
 Повний список з поясненнями — `apps/web/.env.example`. Заголовки безпеки (CSP, HSTS, `nosniff`, `Referrer-Policy`, `Permissions-Policy`) задає `apps/web/next.config.ts`: CSP без nonce (інакше всі сторінки стали б динамічними), тож `script-src`/`style-src` мають `unsafe-inline`; браузер ходить напряму лише до Tatoeba, Free Dictionary і Wiktionary — новий зовнішній домен у `connect-src` додавати там. CI (`.github/workflows/ci.yml`): `pnpm audit --prod --audit-level=high` і gitleaks; Dependabot — `.github/dependabot.yml`. Ліміт Gmail — 500 листів/добу, наш `EMAIL_DAILY_LIMIT` — 300; без власного домену SPF/DKIM/DMARC не налаштувати (рішення 6.3).
 
@@ -180,6 +181,26 @@ Wiktionary та Free Dictionary (частина мови, приклади) — 
 лежать у `translation_cache` 30 днів (стільки ж, скільки раніше в CDN; умови Google щодо зберігання
 перевіряє крок 6.7). Стеля для всіх — `TRANSLATE_DAILY_CHARS` символів на добу, рахуються лише
 слова, що пішли до Google; понад неї й без бази — 503, до Google нічого не йде.
+
+## Вимикачі (kill switches)
+
+Найшвидша відповідь на зловживання чи несподіваний рахунок, поки робиться справжнє виправлення:
+змінна середовища (Vercel → Settings → Environment Variables), потім redeploy. Читаються
+`lib/kill-switch.ts` на кожному запиті, **до** лімітера й бази: вимкнений маршрут нічого не
+рахує й Neon не будить. Значення `1`, `true`, `on` (будь-який регістр) — вимкнено; порожньо чи
+будь-що інше — працює.
+
+| Змінна              | Маршрут                      | Що бачить сервер/клієнт                                                                                                                                                                                                                                                                                                                        |
+| ------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `KILL_TRANSLATE`    | `GET /api/translate`         | 503 `{ translations: [], unavailable: true }`; форма слова пише «підказки на паузі» (`decks.form.suggestionsPaused`) і 5 хвилин не питає сервер. Слова, що вже лежать у CDN, віддаються далі (вони нічого не коштують). Словники (`/api/dictionary`) **не** гасяться: безкоштовні, мають свій ліміт на відправника, а рахунок дає лише Google. |
+| `KILL_REGISTRATION` | `POST /api/account/register` | 503; діалог входу пише «реєстрація тимчасово недоступна» (`profile.account.errorUnavailable`). Вхід наявних акаунтів, скидання пароля й вхід через Google працюють (реєстрацію через Google цей прапор не зупиняє).                                                                                                                            |
+| `KILL_LEAGUE`       | `POST /api/league`           | 503; сторінка рейтингу показує «ненадовго на паузі» (`league.paused`) з кнопкою «Повторити»; що вже на екрані з кешу, лишається. Вийти з рейтингу (`DELETE`) можна завжди.                                                                                                                                                                     |
+| `KILL_ANALYTICS`    | `POST /api/track`            | 204 без запису в таблицю: застосунок нічого не помічає й не повторює. Окремого стану в UI немає (аналітики користувач не бачить).                                                                                                                                                                                                              |
+
+Окремо від прапорів лишаються добові стелі (`TRANSLATE_DAILY_CHARS`, `EMAIL_DAILY_LIMIT`): вони
+спрацьовують самі, прапор — рішення людини. Екрани помилок маршрутів: `app/[locale]/error.tsx`
+(переклад і стилі як у решти застосунку) і `app/global-error.tsx` (лише коли зламався кореневий
+layout: без провайдерів, мова за адресою `/en/…`, тексти з тих самих `messages/*/common.json`).
 
 ## Режим «Речення» і приклади
 

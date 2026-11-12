@@ -22,6 +22,7 @@ import {
   upsertRows,
 } from '@/lib/google-sheets';
 import { crossSite, fail, readJson } from '@/lib/api-user';
+import { switchedOff } from '@/lib/kill-switch';
 import { MINUTE_MS, memoryLimiter, senderKey, tooMany } from '@/lib/rate-limit';
 
 /** Sheet names of the analytics spreadsheet. */
@@ -72,6 +73,8 @@ let dictionaryWritten = false;
  */
 export async function POST(request: Request): Promise<Response> {
   if (crossSite(request)) return fail(403);
+  // `KILL_ANALYTICS`: dropped quietly (204), so browsers do not retry or log errors.
+  if (switchedOff('analytics')) return new Response(null, { status: 204 });
   const sheets = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
   if (!sheets) return new Response(null, { status: 204 });
 

@@ -79,6 +79,7 @@
     "errorRepeat": "The passwords do not match.",
     "errorEmail": "Check your email address and password.",
     "errorSend": "Could not send the letter. Please try again later.",
+    "errorUnavailable": "Signing up is temporarily unavailable. Please try again later.",
     "verified": "Your email is confirmed! You can sign in now.",
     "verifiedSignedIn": "Your email is confirmed and you are signed in!",
     "verifyFailed": "This link has expired or is not valid. Sign up again to get a new letter.",

@@ -21,6 +21,7 @@ import {
   type Verdict,
 } from '@/lib/rate-limit';
 import { RETENTION } from '@/lib/retention';
+import { switchedOff } from '@/lib/kill-switch';
 
 const API = 'https://translation.googleapis.com/language/translate/v2';
 const SCOPE = 'https://www.googleapis.com/auth/cloud-translation';
@@ -74,6 +75,10 @@ const answer = (translations: string[]) =>
     },
   );
 
+/** Switched off (`KILL_TRANSLATE`): the form says so; never kept by a CDN. */
+const unavailable = () =>
+  Response.json({ translations: [], unavailable: true }, { status: 503, headers: NO_STORE });
+
 const nothing = (status: number) =>
   Response.json({ translations: [] }, { status, headers: NO_STORE });
 
@@ -81,7 +86,7 @@ const nothing = (status: number) =>
  * Translates a word with Google Translate as the service account (the key stays here). Answers
  * `{ translations: string[] }`, empty when the service is not set up or fails; the learner then
  * types the translation in. 429 `{ limited }` past the day's limit of this sender (not signed in)
- * or account; 503 when the day's ceiling for everyone is reached or the database is not there.
+ * or account; 503 `{ unavailable }` when switched off (`KILL_TRANSLATE`); 503 when the day's ceiling for everyone is reached or the database is not there.
  */
 export async function GET(request: NextRequest): Promise<Response> {
   const params = new URL(request.url).searchParams;
@@ -90,6 +95,9 @@ export async function GET(request: NextRequest): Promise<Response> {
   const to = params.get('to') ?? '';
   if (!q || q.length > MAX_LENGTH || !LANG.test(from) || !LANG.test(to) || from === to)
     return nothing(400);
+  // Before the sender is counted or the database opened: a flag costs nothing. (A word the CDN
+  // already holds is still served from it.)
+  if (switchedOff('translate')) return unavailable();
   const account = serviceAccountFromEnv();
   if (!account) return answer([]);
 

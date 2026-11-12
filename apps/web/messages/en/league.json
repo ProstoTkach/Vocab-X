@@ -5,6 +5,7 @@
   "join": "Try the race for the cup",
   "signInAgain": "Sign in to return to the league",
   "unavailable": "The league is not available here yet.",
+  "paused": "The league is taking a short break. Your points are safe — try again a little later.",
   "failed": "Could not load the league. Check your connection.",
   "retry": "Try again",
   "tierTitle": "{tier} league",

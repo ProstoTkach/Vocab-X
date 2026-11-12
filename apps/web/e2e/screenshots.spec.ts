@@ -88,6 +88,25 @@ for (const vp of VIEWPORTS) {
       await page.screenshot({ path: `screenshots/word-limit-${vp.name}.png` });
     });
 
+    test('word form with suggestions switched off', async ({ page }) => {
+      test.skip(vp.name !== '390x844' && vp.name !== '1280x800');
+      await page.route('**/api/translate?**', (route) =>
+        route.fulfill({ status: 503, json: { translations: [], unavailable: true } }),
+      );
+      await page.route('**/api/dictionary?**', (route) => route.fulfill({ json: null }));
+      await page.route('https://api.tatoeba.org/**', (route) =>
+        route.fulfill({ json: { data: [] } }),
+      );
+      await onboard(page);
+      await page.goto('/uk/decks');
+      await page.getByRole('button', { name: /^Додати нове слово/ }).click();
+      const dialog = page.getByRole('dialog');
+      await dialog.getByLabel('Слово або вираз').fill('revenue');
+      await dialog.getByRole('button', { name: 'Знайти' }).click();
+      await expect(dialog.getByText(/ненадовго на паузі/)).toBeVisible();
+      await page.screenshot({ path: `screenshots/word-paused-${vp.name}.png` });
+    });
+
     test('onboarding', async ({ page }) => {
       await page.goto('/uk/onboarding');
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
