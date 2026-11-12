@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { crossSite, fail, NO_STORE, readJson, requestUserId } from '@/lib/api-user';
 import { dbFromEnv, inTransaction } from '@/lib/db/client';
 import { HOUR_MS, MINUTE_MS, hashed, spend, tooMany } from '@/lib/rate-limit';
-import { exchange, parseSyncRequest } from '@/lib/sync-server';
+import { exchange, parseSyncRequest, protocolFit } from '@/lib/sync-server';
 
 /**
  * The biggest request: 1000 rows in each of the four lists (the most one sends), the words with all
@@ -24,8 +24,9 @@ const rules = (userId: string) => [
 /**
  * Exchanges changes with a signed-in device (see lib/sync-server.ts). 401: not signed in, or the
  * account is gone; 409: this browser's data belongs to another account; 400: not a sync request;
- * 413: too big, or the account already holds all the rows it may keep; 429: too many requests;
- * 503: no database here.
+ * 413: too big, or the account already holds all the rows it may keep; 426: the device's sync
+ * protocol is older than this server serves (the app must update); 429: too many requests;
+ * 503: no database here, or a device newer than this server (it tries again later).
  */
 export async function POST(request: NextRequest): Promise<Response> {
   if (crossSite(request)) return fail(403);
@@ -38,6 +39,9 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   const read = await readJson(request, BODY_MAX_BYTES);
   if (!read.ok) return fail(read.status);
+  const fit = protocolFit(read.value);
+  if (fit === 'old') return fail(426);
+  if (fit === 'new') return fail(503);
   const body = parseSyncRequest(read.value);
   if (!body) return fail(400);
   if (body.owner !== userId) return fail(409);

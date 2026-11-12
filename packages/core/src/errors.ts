@@ -21,3 +21,17 @@ export class ImportError extends Error {
     super(message);
   }
 }
+
+/**
+ * The browser's data was written by a newer version of the app. This one must not touch it: it
+ * would write the old shape over the new one. The page has to load the newer app.
+ */
+export class NewerDataError extends Error {
+  override readonly name = 'NewerDataError';
+  constructor(
+    readonly stored: number,
+    readonly supported: number,
+  ) {
+    super(`Stored schema v${stored} is newer than supported v${supported}`);
+  }
+}

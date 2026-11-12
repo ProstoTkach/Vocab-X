@@ -1,7 +1,7 @@
 // What a device may send: the checks before anything reaches the database (step 2.2).
 import { describe, expect, test } from 'vitest';
-import { noChanges } from '@vocabx/data';
-import { MAX_RESPONSE_MS, parseSyncRequest } from './sync-server';
+import { noChanges, SYNC_PROTOCOL } from '@vocabx/data';
+import { MAX_RESPONSE_MS, parseSyncRequest, protocolFit } from './sync-server';
 
 const answer = (o: Record<string, unknown> = {}) => ({
   id: 'e1',
@@ -46,5 +46,26 @@ describe('a sync request', () => {
   test('not a request at all', () => {
     expect(parseSyncRequest(null)).toBeNull();
     expect(parseSyncRequest({ owner: 'u1' })).toBeNull();
+  });
+});
+
+describe('the sync protocol (version skew)', () => {
+  test('today’s devices and those from before the protocol had a number are served', () => {
+    expect(protocolFit({ ...request([]), protocol: SYNC_PROTOCOL })).toBe('ok');
+    expect(protocolFit(request([]))).toBe('ok');
+    expect(parseSyncRequest({ ...request([]), protocol: SYNC_PROTOCOL })).not.toBeNull();
+  });
+
+  test('a device older than the server serves is told to update; a newer one waits', () => {
+    expect(protocolFit({ ...request([]), protocol: 1 }, 2, 2)).toBe('old');
+    expect(protocolFit(request([]), 2, 2)).toBe('old');
+    expect(protocolFit({ ...request([]), protocol: 3 }, 1, 2)).toBe('new');
+  });
+
+  test('a protocol that is not a number is left to the request check, which refuses it', () => {
+    const odd = { ...request([]), protocol: 'x' };
+    expect(protocolFit(odd)).toBe('ok');
+    expect(parseSyncRequest(odd)).toBeNull();
+    expect(parseSyncRequest({ ...request([]), protocol: 1.5 })).toBeNull();
   });
 });

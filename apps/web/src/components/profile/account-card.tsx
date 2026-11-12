@@ -125,8 +125,14 @@ export function AccountCard({ email }: { email: string }) {
       <p aria-live="polite" className="text-sm text-fg-muted">
         {status === 'syncing'
           ? t('syncing')
-          : status === 'failed' || status === 'full'
-            ? t(status === 'full' ? 'syncFull' : 'syncFailed')
+          : status === 'failed' || status === 'full' || status === 'outdated'
+            ? t(
+                status === 'full'
+                  ? 'syncFull'
+                  : status === 'outdated'
+                    ? 'syncOutdated'
+                    : 'syncFailed',
+              )
             : syncedAt > 0
               ? t('syncedAt', {
                   time: format.dateTime(syncedAt, { dateStyle: 'medium', timeStyle: 'short' }),
@@ -138,10 +144,21 @@ export function AccountCard({ email }: { email: string }) {
         <ChangeEmail email={email} />
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button variant="secondary" disabled={status === 'syncing'} onClick={() => void syncNow()}>
-          <RefreshCw aria-hidden className="size-4" />
-          {t('syncNow')}
-        </Button>
+        {status === 'outdated' ? (
+          <Button onClick={() => window.location.reload()}>
+            <RefreshCw aria-hidden className="size-4" />
+            {t('updateApp')}
+          </Button>
+        ) : (
+          <Button
+            variant="secondary"
+            disabled={status === 'syncing'}
+            onClick={() => void syncNow()}
+          >
+            <RefreshCw aria-hidden className="size-4" />
+            {t('syncNow')}
+          </Button>
+        )}
         <Button
           variant="ghost"
           onClick={() => {

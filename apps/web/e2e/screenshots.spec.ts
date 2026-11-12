@@ -162,6 +162,44 @@ for (const vp of VIEWPORTS) {
       await page.screenshot({ path: `screenshots/account/change-password-${vp.name}.png` });
     });
 
+    // Step 6.6: the "update the app" screen, and the account card when the server asks for it.
+    test('update the app', async ({ page }) => {
+      test.skip(vp.name !== '360x740' && vp.name !== '1280x800');
+      await onboard(page);
+      await page.route('**/api/auth/session', (route) =>
+        route.fulfill({ json: { user: { email: 'olena@example.com', id: 'u1' } } }),
+      );
+      await page.route('**/api/account', (route) =>
+        route.fulfill({ json: { password: true, google: false } }),
+      );
+      await page.route('**/api/sync', (route) => route.fulfill({ status: 426 }));
+      await page.evaluate(() =>
+        localStorage.setItem(
+          'vocabx:sync',
+          JSON.stringify({
+            owner: 'u1',
+            active: true,
+            cursor: 0,
+            syncedAt: 0,
+            tick: 0,
+            dirty: { state: {}, words: {}, decks: {}, cards: {}, events: {} },
+          }),
+        ),
+      );
+      await page.goto('/uk/profile');
+      const card = page.locator('section[aria-labelledby="profile-account"]');
+      await expect(card.getByRole('button', { name: 'Оновити застосунок' })).toBeVisible();
+      await card.scrollIntoViewIfNeeded();
+      await card.screenshot({ path: `screenshots/update/card-${vp.name}.png` });
+
+      await page.evaluate(() =>
+        localStorage.setItem('vocabx:v1:meta', JSON.stringify({ schemaVersion: 99 })),
+      );
+      await page.goto('/uk');
+      await expect(page.getByRole('heading', { name: 'Оновіть VocabX' })).toBeVisible();
+      await page.screenshot({ path: `screenshots/update/screen-${vp.name}.png` });
+    });
+
     test('legal pages', async ({ page }) => {
       await seedOnboarded(page);
       for (const name of ['privacy', 'credits']) {

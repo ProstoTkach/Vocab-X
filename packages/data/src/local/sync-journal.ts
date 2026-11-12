@@ -37,7 +37,17 @@ export const noChanges = (): SyncChanges => ({
   deleted: { words: [], decks: [], cards: [], events: [] },
 });
 
+/**
+ * What a sync request and its answer mean. Raised by a change a device of the previous version
+ * would get wrong (a field it must send, a meaning that changed); a new field an older device may
+ * leave out does not need it. The server serves versions from its `MIN_SYNC_PROTOCOL` up to this
+ * one (`apps/web/src/lib/sync-server.ts`); an older device is told to update the app (426).
+ */
+export const SYNC_PROTOCOL = 1;
+
 export interface SyncRequest {
+  /** `SYNC_PROTOCOL` of the device; none: a device from before there was one (version 1). */
+  protocol?: number;
   /** The account this browser's data belongs to: the server refuses it for any other. */
   owner: string;
   /** The last server number this browser has seen. */

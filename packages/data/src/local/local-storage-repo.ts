@@ -3,6 +3,7 @@
 import {
   DEFAULT_SETTINGS,
   INITIAL_GAMIFICATION,
+  NewerDataError,
   ImportError,
   StorageQuotaError,
   localDateKey,
@@ -42,7 +43,7 @@ import {
   type Migration,
   type RawData,
 } from './schema';
-import { LocalStore } from './store';
+import { KEY_PREFIX, LocalStore } from './store';
 import {
   joinDuplicateDecks,
   mergeDeck,
@@ -394,10 +395,15 @@ export class LocalStorageRepo implements Repos, DataPort {
     const settled: Id[] = [];
     const langs = new Set<LangCode>();
     const touch = (p: CardProgress) => langs.add(p.lang);
+    const takenBack = this.takenBackHere();
     for (const p of remote.cards) {
       const local = cards[p.wordId];
-      if (dirty[p.wordId] !== undefined && local && local.card.lastReviewAt > p.card.lastReviewAt)
-        continue;
+      if (dirty[p.wordId] !== undefined) {
+        // The card of an answer taken back here (it reached the server, the reply did not reach
+        // this browser): what the undo left stays, and goes to the server.
+        if (takenBack(p.lastEventId)) continue;
+        if (local && local.card.lastReviewAt > p.card.lastReviewAt) continue;
+      }
       if (local) touch(local);
       cards[p.wordId] = p;
       touch(p);
@@ -430,7 +436,12 @@ export class LocalStorageRepo implements Repos, DataPort {
     const known = new Set(log.map((p) => p[0]));
     // A full log has forgotten what is older than its tail: such an answer is already in the stats.
     const oldest = log.length >= this.maxLogEvents ? (log[0]?.[2] ?? 0) : 0;
-    const added = remote.events.filter((e) => !known.has(e.id) && e.at >= oldest);
+    // An answer taken back here and not yet reported comes back from a request whose reply was
+    // lost: it stays taken back.
+    const takenBack = this.takenBackHere();
+    const added = remote.events.filter(
+      (e) => !known.has(e.id) && !takenBack(e.id) && e.at >= oldest,
+    );
     const gone = new Set(remote.deleted.events.filter((id) => known.has(id)));
     this.journal.settle('events', remote.deleted.events);
     if (added.length === 0 && gone.size === 0) return false;
@@ -446,6 +457,17 @@ export class LocalStorageRepo implements Repos, DataPort {
     return true;
   }
 
+  /** Answers removed here whose removal the server has not heard of yet. */
+  private takenBackHere(): (id: Id) => boolean {
+    const dirty = this.journal.dirty().events;
+    let log: Set<Id> | null = null;
+    return (id) => {
+      if (dirty[id] === undefined) return false;
+      log ??= new Set(this.readLog().map((p) => p[0]));
+      return !log.has(id);
+    };
+  }
+
   // ---- internals ----
 
   private upgradeStoredData() {
@@ -454,9 +476,7 @@ export class LocalStorageRepo implements Repos, DataPort {
     if (meta.schemaVersion === this.schemaVersion) return;
     if (meta.schemaVersion > this.schemaVersion) {
       // Data written by a newer app version: leave it untouched rather than corrupt it.
-      throw new Error(
-        `Stored schema v${meta.schemaVersion} is newer than supported v${this.schemaVersion}`,
-      );
+      throw new NewerDataError(meta.schemaVersion, this.schemaVersion);
     }
     const before = this.snapshot();
     const migrated = migrate(before, meta.schemaVersion, this.migrations, this.schemaVersion);
@@ -779,4 +799,22 @@ function parseExport(input: unknown, currentVersion: number): VocabXExport {
     throw new ImportError('invalid_data', 'Missing data section');
   }
   return v as VocabXExport;
+}
+
+/**
+ * A change another tab made (a `storage` event's key and new value) that shows the data is now in
+ * the shape of a newer app: a newer tab upgraded it, and this one must stop writing.
+ */
+export function writtenByNewerApp(
+  key: string | null,
+  value: string | null,
+  supported = SCHEMA_VERSION,
+): boolean {
+  if (key !== KEY_PREFIX + KEYS.meta || !value) return false;
+  try {
+    const meta = JSON.parse(value) as Partial<Meta> | null;
+    return typeof meta?.schemaVersion === 'number' && meta.schemaVersion > supported;
+  } catch {
+    return false;
+  }
 }

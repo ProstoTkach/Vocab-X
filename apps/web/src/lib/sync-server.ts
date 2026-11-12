@@ -20,7 +20,13 @@ import {
   type ReviewEvent,
   type Word,
 } from '@vocabx/core';
-import { noChanges, type SyncChanges, type SyncRequest, type SyncResponse } from '@vocabx/data';
+import {
+  noChanges,
+  SYNC_PROTOCOL,
+  type SyncChanges,
+  type SyncRequest,
+  type SyncResponse,
+} from '@vocabx/data';
 import { leagueWeek, leagueWeekStart } from '@vocabx/core';
 import { and, eq, gt, inArray, isNull, sql } from 'drizzle-orm';
 import type { PgColumn } from 'drizzle-orm/pg-core';
@@ -56,6 +62,7 @@ const eventSchema = z.object({
   kind: z.enum(['placement', 'mixed']).optional(),
 });
 const requestSchema = z.object({
+  protocol: z.number().int().positive().optional(),
   owner: id,
   cursor: z.number().int().nonnegative(),
   changes: z.object({
@@ -102,6 +109,30 @@ export async function overQuota(tx: Tx, userId: string, c: SyncChanges): Promise
     if ((row?.n ?? 0) >= SYNC_QUOTA[t]) full.push(t);
   }
   return full;
+}
+
+/**
+ * The oldest sync protocol this server still serves. Raised together with `SYNC_PROTOCOL` when a
+ * change breaks what older devices send or expect; those are then told to update the app.
+ */
+export const MIN_SYNC_PROTOCOL = 1;
+
+/**
+ * Whether this server speaks the device's protocol, read before the request is checked (an older
+ * device's request may not pass today's checks). `old`: the device must update the app; `new`: a
+ * device ahead of the server (a rolled-back deploy) waits and tries later.
+ */
+export function protocolFit(
+  body: unknown,
+  min = MIN_SYNC_PROTOCOL,
+  current = SYNC_PROTOCOL,
+): 'ok' | 'old' | 'new' {
+  const v =
+    typeof body === 'object' && body !== null ? (body as { protocol?: unknown }).protocol : null;
+  // Devices from before the protocol had a number send none: version 1.
+  const version = v === undefined ? 1 : typeof v === 'number' && Number.isInteger(v) ? v : null;
+  if (version === null) return 'ok'; // Not a number at all: the request check refuses it.
+  return version < min ? 'old' : version > current ? 'new' : 'ok';
 }
 
 /** The request, once checked: it comes from outside. Null when it is not one. */

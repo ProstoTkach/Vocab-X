@@ -1,6 +1,6 @@
 'use client';
 
-import type { SyncResponse } from '@vocabx/data';
+import { SYNC_PROTOCOL, type SyncResponse } from '@vocabx/data';
 import { useTranslations } from 'next-intl';
 import {
   createContext,
@@ -17,6 +17,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
 import { usePathname } from '@/i18n/navigation';
 import { track } from './analytics';
+import { isReview, updateWaits } from './app-update';
 import { useClock } from './clock';
 import { useRepos } from './repos';
 
@@ -41,8 +42,12 @@ const MAX_ROUNDS = 50;
 const SIGNED_IN_PARAM = 'signedIn';
 const EMAIL_VERIFIED_PARAM = 'emailVerified';
 
-/** `full`: the server holds all the rows an account may keep, so more are not sent. */
-export type SyncStatus = 'idle' | 'syncing' | 'failed' | 'full';
+/**
+ * `full`: the server holds all the rows an account may keep, so more are not sent. `outdated`:
+ * the server no longer speaks this version's sync protocol; nothing is sent until the page has
+ * loaded the newer app (it reloads at a quiet moment by itself, see lib/app-update.tsx).
+ */
+export type SyncStatus = 'idle' | 'syncing' | 'failed' | 'full' | 'outdated';
 
 interface SyncValue {
   status: SyncStatus;
@@ -76,8 +81,6 @@ async function aloneAmongTabs(work: () => Promise<void>) {
   else await work();
 }
 
-const isReview = (path: string) => path === '/review' || path.startsWith('/review/');
-
 /**
  * Keeps this browser and the account's copy in step. Nothing here runs for a learner who never
  * signed in. The app itself never waits for it: it works on the browser's copy, and whatever is
@@ -95,6 +98,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
   /** Another account signed in on this browser's data: the learner decides. */
   const [otherAccount, setOtherAccount] = useState<string | null>(null);
   const running = useRef(false);
+  const outdated = useRef(false);
   const reloadWaits = useRef(false);
   const signingOut = useRef(false);
   const path = useRef(pathname);
@@ -117,7 +121,12 @@ export function SyncProvider({ children }: { children: ReactNode }) {
         if (!hidden) repos.beginSync(clock.now());
         for (let round = 0; round < MAX_ROUNDS; round++) {
           const { changes, sent } = repos.collectChanges(hidden ? HIDDEN_ROWS : PUSH_ROWS);
-          const body = JSON.stringify({ owner, cursor: journal.cursor, changes });
+          const body = JSON.stringify({
+            protocol: SYNC_PROTOCOL,
+            owner,
+            cursor: journal.cursor,
+            changes,
+          });
           const res = await fetch('/api/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -127,6 +136,13 @@ export function SyncProvider({ children }: { children: ReactNode }) {
           if (res.status === 401 || res.status === 409) {
             journal.setActive(false);
             setStatus('idle');
+            return;
+          }
+          if (res.status === 426) {
+            outdated.current = true;
+            setStatus('outdated');
+            track('sync', { to: 'outdated' });
+            updateWaits();
             return;
           }
           if (!res.ok) {
@@ -152,7 +168,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
 
   const run = useCallback(
     async (hidden = false) => {
-      if (running.current || !journal.owner || !journal.active) return;
+      if (running.current || outdated.current || !journal.owner || !journal.active) return;
       running.current = true;
       try {
         await aloneAmongTabs(() => exchange(hidden));

@@ -28,6 +28,17 @@ const CSP = [
   "frame-ancestors 'none'",
 ].join('; ');
 
+/**
+ * Which build this is, for the service worker (lib/offline.ts registers `/sw.js?v=<build>`, so
+ * each deploy installs a worker of its own and open tabs of the older one learn of it). The
+ * commit on Vercel; elsewhere the moment of the build.
+ */
+const BUILD_ID = (
+  process.env.VERCEL_GIT_COMMIT_SHA ??
+  process.env.VERCEL_DEPLOYMENT_ID ??
+  `local-${new Date().getTime().toString(36)}`
+).slice(0, 16);
+
 const SECURITY_HEADERS = [
   { key: 'Content-Security-Policy', value: CSP },
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
@@ -45,6 +56,7 @@ const config: NextConfig = {
   transpilePackages: ['@vocabx/core', '@vocabx/content', '@vocabx/data'],
   reactStrictMode: true,
   poweredByHeader: false,
+  env: { NEXT_PUBLIC_BUILD_ID: BUILD_ID },
   async headers() {
     return [{ source: '/:path*', headers: SECURITY_HEADERS }];
   },

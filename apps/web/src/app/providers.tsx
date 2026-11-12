@@ -7,6 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { restoreRootAttributes } from '@/lib/boot-script';
 import { AnalyticsProvider } from '@/components/analytics/analytics-provider';
 import { DevPanel } from '@/components/dev/dev-panel';
+import { AppUpdate } from '@/components/shell/app-update';
 import { ClockProvider } from '@/lib/clock';
 import { DevToolsProvider } from '@/lib/dev-tools';
 import { GamificationProvider } from '@/lib/gamification';
@@ -33,6 +34,7 @@ export function Providers({ dir, children }: { dir: 'ltr' | 'rtl'; children: Rea
                         <SyncProvider>
                           {children}
                           <DevPanel />
+                          <AppUpdate />
                         </SyncProvider>
                       </AnalyticsProvider>
                     </DevToolsProvider>

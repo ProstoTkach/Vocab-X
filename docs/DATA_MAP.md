@@ -85,12 +85,12 @@ is a legal question for the owner's review (session 5).
 
 ### 2.5 Other browser storage
 
-| Store                       | Name                                   | Holds                                                                                                                    | Lifetime                                               |
-| --------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
-| IndexedDB                   | `vocabx-sw`, store `kv`, key `summary` | Reminder text and how many words wait / when others come due (no word texts)                                             | Overwritten                                            |
-| Push subscription (browser) | —                                      | The push address of this browser at its push service                                                                     | Until reminders are turned off or the browser drops it |
-| Cache Storage               | `vocabx-v2`                            | App pages and files for offline use; `/__vocabx/meta` (home page and time of the last warm-up). `/api/*` is never cached | Replaced on each app update                            |
-| Web Locks                   | `vocabx-sync`, `vocabx-export`         | Nothing stored: only stops two tabs syncing / exporting at once                                                          | —                                                      |
+| Store                       | Name                                   | Holds                                                                                                                                                                                 | Lifetime                                               |
+| --------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| IndexedDB                   | `vocabx-sw`, store `kv`, key `summary` | Reminder text and how many words wait / when others come due (no word texts)                                                                                                          | Overwritten                                            |
+| Push subscription (browser) | —                                      | The push address of this browser at its push service                                                                                                                                  | Until reminders are turned off or the browser drops it |
+| Cache Storage               | `vocabx-<build>`                       | App pages and files for offline use, one store per build of the app (the older ones are dropped); `/__vocabx/meta` (home page and time of the last warm-up). `/api/*` is never cached | Replaced on each app update                            |
+| Web Locks                   | `vocabx-sync`, `vocabx-export`         | Nothing stored: only stops two tabs syncing / exporting at once                                                                                                                       | —                                                      |
 
 ### 2.6 Local data durability (step 6.4, measured 2026-11-12)
 
