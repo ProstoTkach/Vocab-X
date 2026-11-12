@@ -57,12 +57,13 @@ const ALL = '*';
  * matching rule wins for a path; "*" runs everything.
  */
 const RULES = [
-  // The test setup itself, dependencies and the build: everything.
+  // The test setup, dependencies and the build: only the quick look at every page (smoke).
+  // The whole suite stays `pnpm e2e`, run before pushing.
   [
     /^apps\/web\/(e2e\/(fixtures\.ts|storage-state\.json)|playwright\.config\.ts|next\.config\.ts|package\.json)$/,
-    [ALL],
+    ['smoke'],
   ],
-  [/^(pnpm-lock\.yaml|package\.json)$/, [ALL]],
+  [/^(pnpm-lock\.yaml|package\.json)$/, ['smoke']],
   [/^apps\/web\/e2e\/(.+)\.spec\.ts$/, (m) => [`${m[1]}.spec.ts`]],
   // Logic shared by the review, the decks and onboarding (unit tests check it in detail).
   [/^packages\/core\/src\/placement/, ['onboarding']],
@@ -86,7 +87,17 @@ const RULES = [
   [/^apps\/web\/src\/components\/character\//, ['review', 'tour']],
   [/^apps\/web\/src\/components\/feedback\//, ['quiz', 'sentences', 'shell']],
   [/^apps\/web\/src\/components\/dev\//, ['quiz', 'sentences']],
+  [/^apps\/web\/src\/components\/league\//, ['league']],
+  [/^apps\/web\/src\/components\/(profile|account)\//, ['profile']],
   [/^apps\/web\/src\/components\/ui\//, ['shell', 'review', 'decks']],
+  // Server only: the test server has no database, so no end-to-end test reaches this code.
+  [
+    /^apps\/web\/src\/lib\/(db\/|sync-server|league-server|email|password|session-cookie|api-user|google-|push\.ts|reminder-store)/,
+    [],
+  ],
+  [/^apps\/web\/src\/lib\/league/, ['league']],
+  [/^apps\/web\/src\/lib\/(sync|auth)/, ['profile', 'league']],
+  [/^apps\/web\/src\/lib\/(reminder|offline|push)/, ['offline', 'profile']],
   [/^apps\/web\/src\/lib\/analytics\/|^apps\/web\/src\/app\/api\/track\//, ['analytics']],
   [/^apps\/web\/src\/lib\/(home-tour|gamification|player)/, ['tour', 'review']],
   [/^apps\/web\/src\/lib\/speech/, ['review', 'study-settings']],
@@ -98,6 +109,8 @@ const RULES = [
   [/^apps\/web\/src\/app\/\[locale\]\/\(app\)\/review\//, ['review', 'quiz', 'sentences']],
   [/^apps\/web\/src\/app\/\[locale\]\/\(app\)\/decks\//, ['decks']],
   [/^apps\/web\/src\/app\/\[locale\]\/\(app\)\/settings\//, ['study-settings', 'shell']],
+  [/^apps\/web\/src\/app\/\[locale\]\/\(app\)\/league\//, ['league']],
+  [/^apps\/web\/src\/app\/\[locale\]\/\(app\)\/profile\//, ['profile']],
   [/^apps\/web\/src\/app\/\[locale\]\/\(app\)\/page\.tsx$/, ['tour', 'shell']],
   [/^apps\/web\/src\/app\/api\//, []],
   [/^apps\/web\/src\//, ['shell']],
@@ -107,6 +120,9 @@ const RULES = [
   [/^apps\/web\/messages\/[^/]+\/(decks|words|library)\.json$/, ['decks']],
   [/^apps\/web\/messages\/[^/]+\/settings\.json$/, ['study-settings', 'shell']],
   [/^apps\/web\/messages\/[^/]+\/analytics\.json$/, ['analytics']],
+  [/^apps\/web\/messages\/[^/]+\/league\.json$/, ['league']],
+  [/^apps\/web\/messages\/[^/]+\/(profile|email)\.json$/, ['profile']],
+  [/^apps\/web\/public\/sw\.js$/, ['offline', 'install']],
   [/^apps\/web\/messages\//, ['shell']],
   [/^apps\/web\/public\//, ['shell', 'install']],
 ];
@@ -128,9 +144,11 @@ for (const path of changed) {
 }
 
 const runAll = specs.has(ALL);
-const files = [...specs]
-  .filter((s) => s !== ALL)
-  .map((s) => (s.endsWith('.spec.ts') ? s : `${s}.spec.ts`))
+const files = [
+  ...new Set(
+    [...specs].filter((s) => s !== ALL).map((s) => (s.endsWith('.spec.ts') ? s : `${s}.spec.ts`)),
+  ),
+]
   .filter((f) => existsSync(join(web, 'e2e', f)) && f !== 'screenshots.spec.ts')
   .sort();
 
