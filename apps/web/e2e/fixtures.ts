@@ -141,7 +141,94 @@ export async function seedOnboarded(page: Page, uiLocale = 'uk') {
  * Goes through onboarding with the given pace and the level test: knows A1 (3 words) and A2 (4),
  * then misses two B1 words, so the English B1 deck (30 words) is added.
  */
-export async function onboard(page: Page, pace: 'Легкий' | 'Звичайний' | 'Інтенсивний' = 'Легкий') {
+type Pace = 'Легкий' | 'Звичайний' | 'Інтенсивний';
+type Snapshot = {
+  local: Record<string, string>;
+  idb: { db: string; stores: { name: string; rows: [IDBValidKey, unknown][] }[] }[];
+};
+/** What a real onboarding leaves in the browser, kept once per worker and pace. */
+const snapshots = new Map<Pace, Snapshot>();
+
+/**
+ * Starts a learner who has gone through onboarding. The first call in a worker goes through the
+ * screens for real (onboarding.spec.ts checks them in detail); the next ones put the saved
+ * result straight into the browser, which saves about ten seconds per test.
+ */
+export async function onboard(page: Page, pace: Pace = 'Легкий') {
+  const saved = snapshots.get(pace);
+  if (!saved) {
+    await onboardViaScreens(page, pace);
+    snapshots.set(pace, await takeSnapshot(page));
+    return;
+  }
+  await pinAnalytics(page);
+  await page.goto('/uk');
+  await restoreSnapshot(page, saved);
+  await page.reload();
+  await page.waitForURL(/\/uk$/);
+}
+
+async function takeSnapshot(page: Page): Promise<Snapshot> {
+  return page.evaluate(async () => {
+    const local: Record<string, string> = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)!;
+      local[k] = localStorage.getItem(k)!;
+    }
+    const req = <T>(r: IDBRequest<T>) =>
+      new Promise<T>((ok, fail) => {
+        r.onsuccess = () => ok(r.result);
+        r.onerror = () => fail(r.error ?? new Error('IndexedDB request failed'));
+      });
+    const idb: Snapshot['idb'] = [];
+    for (const info of await indexedDB.databases()) {
+      if (!info.name) continue;
+      const db = await req(indexedDB.open(info.name));
+      const stores: Snapshot['idb'][number]['stores'] = [];
+      for (const name of Array.from(db.objectStoreNames)) {
+        const store = db.transaction(name).objectStore(name);
+        const keys = await req(store.getAllKeys());
+        const values = await req(store.getAll());
+        stores.push({ name, rows: keys.map((k, i) => [k, values[i]]) });
+      }
+      db.close();
+      idb.push({ db: info.name, stores });
+    }
+    return { local, idb };
+  });
+}
+
+async function restoreSnapshot(page: Page, snap: Snapshot) {
+  await page.evaluate(async (json) => {
+    const snap = JSON.parse(json) as Snapshot;
+    for (const [k, v] of Object.entries(snap.local)) localStorage.setItem(k, v);
+    for (const { db: name, stores } of snap.idb) {
+      // The app has made the empty database by now; it is opened as it is.
+      const db = await new Promise<IDBDatabase>((ok, fail) => {
+        const r = indexedDB.open(name);
+        r.onsuccess = () => ok(r.result);
+        r.onerror = () => fail(r.error ?? new Error('IndexedDB request failed'));
+      });
+      for (const { name: store, rows } of stores) {
+        if (!db.objectStoreNames.contains(store)) continue;
+        await new Promise<void>((ok, fail) => {
+          const tx = db.transaction(store, 'readwrite');
+          const os = tx.objectStore(store);
+          os.clear();
+          for (const [key, value] of rows) {
+            if (os.keyPath !== null) os.put(value);
+            else os.put(value, key);
+          }
+          tx.oncomplete = () => ok();
+          tx.onerror = () => fail(tx.error ?? new Error('IndexedDB transaction failed'));
+        });
+      }
+      db.close();
+    }
+  }, JSON.stringify(snap));
+}
+
+export async function onboardViaScreens(page: Page, pace: Pace) {
   await pinAnalytics(page);
   await page.goto('/uk/onboarding');
   // A click that lands before hydration is lost; retry until the next step shows.

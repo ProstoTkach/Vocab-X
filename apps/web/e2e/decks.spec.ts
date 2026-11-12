@@ -49,7 +49,7 @@ test.beforeEach(async ({ page }) => {
   await onboard(page);
 });
 
-test('my words: list with learning bars and details', async ({ page }) => {
+test('my words: list with learning bars and details @smoke', async ({ page }) => {
   // Answer the first card so it has history.
   await page.goto('/uk/review');
   await expect(page.getByTestId('review-card')).toBeVisible();
@@ -124,6 +124,8 @@ test('"I have learned it" moves a word to the learned words, out of the reviews'
 });
 
 test('library: pick single words by swiping, then add the rest', async ({ page }) => {
+  // A long walk through the library; the default time is tight when tests run side by side.
+  test.slow();
   await page.goto('/uk/decks/library');
   // B1 from onboarding: its first 15 words, the rest still to pick.
   await expect(
@@ -271,7 +273,7 @@ test('library: filters by level and progress; unfinished decks come first', asyn
   expect(await decks.count()).toBeGreaterThan(15);
 });
 
-test('my decks: create a deck, add a word, review only that deck', async ({ page }) => {
+test('my decks: create a deck, add a word, review only that deck @smoke', async ({ page }) => {
   await page.goto('/uk/decks/mine');
   await expect(page.getByRole('heading', { name: 'Уся колода' })).toBeVisible();
   await page.getByRole('button', { name: 'Нова колода' }).click();

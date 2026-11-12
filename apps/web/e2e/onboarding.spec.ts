@@ -43,7 +43,7 @@ async function completeOnboarding(page: Page, { knownInB1 }: { knownInB1: number
   await expect(page).toHaveURL(/\/uk$/);
 }
 
-test('new learner goes through onboarding and lands on a ready stack', async ({ page }) => {
+test('new learner goes through onboarding and lands on a ready stack @smoke', async ({ page }) => {
   await completeOnboarding(page, { knownInB1: 2 });
   await expect(page.getByText('Вивчаєте: Англійська')).toBeVisible();
   // No daily caps: the whole B1 deck except the two known words.

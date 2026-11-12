@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { onboard } from './fixtures';
+import { onboardViaScreens } from './fixtures';
 
 // The consent as usual, but the home-screen window not seen yet.
 test.use({
@@ -20,7 +20,8 @@ const prompt = (page: Page) =>
 test('phones: right after onboarding, an invitation to add a home-screen shortcut', async ({
   page,
 }, info) => {
-  await onboard(page);
+  // The invitation comes at the end of the real onboarding, so it is gone through for real.
+  await onboardViaScreens(page, 'Легкий');
   if (info.project.name !== 'mobile') {
     // Computers do not get it.
     await page.waitForTimeout(1500);

@@ -143,7 +143,7 @@ test('flips back and forth; the word is spoken only on the first flip', async ({
   expect(await spoken()).toBe(voice ? 1 : 0);
 });
 
-test('desktop: keyboard grades, undo, and the whole deck to the end', async ({
+test('desktop: keyboard grades, undo, and the whole deck to the end @smoke', async ({
   page,
   isMobile,
 }) => {
@@ -229,7 +229,7 @@ test('keys grade without flipping', async ({ page, isMobile }) => {
   await expect(deckCount(page)).toHaveText('14 карток');
 });
 
-test('a review can be left halfway and continued later', async ({ page }) => {
+test('a review can be left halfway and continued later @smoke', async ({ page }) => {
   for (let i = 0; i < 3; i++) {
     await card(page).click();
     await page.getByRole('button', { name: /^Згадав/ }).click();

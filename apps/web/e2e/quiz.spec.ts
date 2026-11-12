@@ -31,7 +31,7 @@ async function answerAny(page: Page) {
   await expect(verdict(page)).toHaveCount(0);
 }
 
-test('the four-choice test replaces flash cards', async ({ page }) => {
+test('the four-choice test replaces flash cards @smoke', async ({ page }) => {
   await expect(page.getByText('Вибір перекладу', { exact: true })).toBeVisible();
   await expect(page.getByText('Рівень 1 з 3')).toBeVisible();
   // No line saying what to do: the card speaks for itself.
@@ -106,6 +106,7 @@ test('a wrong answer taken back at once still counts on the way forward', async 
 });
 
 test('a mistake stays longer; an undo brings the card back with its result', async ({ page }) => {
+  await page.clock.install();
   const right = await quizRightIndex(page);
   await options(page)
     .nth(right === 0 ? 1 : 0)
@@ -113,7 +114,7 @@ test('a mistake stays longer; an undo brings the card back with its result', asy
   await expect(card(page).getByText('Неправильно')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Далі' })).toBeFocused();
   // Still there after more than the "right" delay (1 s; a mistake stays 4 s).
-  await page.waitForTimeout(1200);
+  await page.clock.fastForward(1200);
   await expect(card(page).getByText('Неправильно')).toBeVisible({ timeout: 500 });
   await page.keyboard.press('Enter');
   await expect(verdict(page)).toHaveCount(0);
@@ -122,7 +123,7 @@ test('a mistake stays longer; an undo brings the card back with its result', asy
   await page.keyboard.press('z');
   await expect(card(page).getByText('Неправильно')).toBeVisible();
   await expect(options(page).first()).toBeDisabled();
-  await page.waitForTimeout(4500);
+  await page.clock.fastForward(4500);
   await expect(card(page).getByText('Неправильно')).toBeVisible();
   await page.getByRole('button', { name: 'Далі' }).click();
   await expect(verdict(page)).toHaveCount(0);

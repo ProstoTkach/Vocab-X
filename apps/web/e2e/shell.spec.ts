@@ -18,7 +18,7 @@ async function chooseTheme(page: Page, name: string, id: string) {
   }).toPass();
 }
 
-test('shows the layout for the viewport', async ({ page }) => {
+test('shows the layout for the viewport @smoke', async ({ page }) => {
   await page.goto('/uk');
   await expect(page.getByRole('heading', { level: 1, name: 'Головна' })).toBeVisible();
   await expect(mainNav(page)).toHaveCount(1);
@@ -28,7 +28,7 @@ test('shows the layout for the viewport', async ({ page }) => {
   await expect(page.getByRole('list', { name: 'Календар серії' })).toBeVisible();
 });
 
-test('navigates between sections and marks the current one', async ({ page }) => {
+test('navigates between sections and marks the current one @smoke', async ({ page }) => {
   await page.goto('/uk');
   await mainNav(page).getByRole('link', { name: 'Мої слова' }).click();
   await expect(page).toHaveURL(/\/uk\/decks$/);

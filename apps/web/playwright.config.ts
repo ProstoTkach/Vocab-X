@@ -23,7 +23,9 @@ export default defineConfig({
   projects: [
     {
       name: 'mobile',
-      testIgnore: /screenshots\.spec\.ts/,
+      // The phone runs only what depends on the screen: layout and touch. The logic (quiz,
+      // sentences, settings, profile, analytics, offline) does not care about the width.
+      testMatch: /(shell|smoke|review|league|decks|install|tour|onboarding)\.spec\.ts/,
       use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } },
     },
     {
