@@ -4,7 +4,16 @@ import { eq } from 'drizzle-orm';
 import { encode } from 'next-auth/jwt';
 import { NextRequest } from 'next/server';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { users } from '@/lib/db/schema';
+import {
+  cardProgress,
+  decks,
+  leagueMembers,
+  leagueProfiles,
+  reviewEvents,
+  userState,
+  users,
+  words,
+} from '@/lib/db/schema';
 import { removeTestUsers, testDb, testEmail } from '@/lib/db/testing';
 
 const mail = vi.hoisted(() => ({ sent: [] as { to: string; link: string }[] }));
@@ -20,6 +29,7 @@ const register = await import('./register/route');
 const verify = await import('./verify/route');
 const resetRoute = await import('./reset/route');
 const account = await import('./route');
+const exportRoute = await import('./export/route');
 const league = await import('../league/route');
 
 // The day's letters for everyone are tried on their own below; here they never run out.
@@ -162,6 +172,114 @@ describe('a deleted account with a live cookie', () => {
       request('/api/league', { method: 'POST', body: leagueBody, cookies }),
     );
     expect(after.status).toBe(401);
+  });
+});
+
+// Step 1.5: "Download my data" and "Delete account" cover every table that holds a learner.
+describe('my data: export and deletion', () => {
+  const tables = [
+    userState,
+    words,
+    decks,
+    cardProgress,
+    reviewEvents,
+    leagueProfiles,
+    leagueMembers,
+  ];
+
+  async function learner() {
+    const email = testEmail('mydata');
+    const [user] = await db
+      .insert(users)
+      .values({
+        email,
+        emailVerifiedAt: new Date(),
+        passwordHash: 'secret-hash',
+        verifyTokenHash: 'secret-token',
+      })
+      .returning({ id: users.id });
+    const userId = user!.id;
+    await db.insert(userState).values({ userId, profile: { name: 'Me' }, settings: {} });
+    await db
+      .insert(words)
+      .values({ userId, id: 'w1', lang: 'en', term: 'achieve', data: { id: 'w1' } as never });
+    await db.insert(words).values({
+      userId,
+      id: 'w2',
+      lang: 'en',
+      term: 'gone',
+      data: { id: 'w2' } as never,
+      deletedAt: new Date(),
+    });
+    await db.insert(decks).values({ userId, id: 'd1', lang: 'en', data: { id: 'd1' } as never });
+    await db.insert(cardProgress).values({
+      userId,
+      wordId: 'w1',
+      lang: 'en',
+      card: { reps: 1 } as never,
+      dueAt: new Date(),
+      lastEventId: 'e1',
+    });
+    await db.insert(reviewEvents).values({
+      userId,
+      id: 'e1',
+      wordId: 'w1',
+      at: new Date(),
+      grade: 3,
+      format: 'flip',
+      responseMs: 900,
+      wasNew: true,
+      retention: 0.9,
+      xp: 5,
+    });
+    await db
+      .insert(leagueProfiles)
+      .values({ userId, name: 'Me', look: {} as never, frame: {} as never });
+    await db
+      .insert(leagueMembers)
+      .values({ week: '2026-11-09', userId, groupId: randomUUID(), tier: 0, xp: 5 });
+    return { email, userId, cookies: { [SESSION]: await session(userId, email) } };
+  }
+
+  const rowsOf = (userId: string) =>
+    Promise.all(tables.map((t) => db.select().from(t).where(eq(t.userId, userId))));
+
+  test('the file holds the learner’s data and none of the secrets', async () => {
+    const { email, cookies } = await learner();
+    const res = await exportRoute.GET(request('/api/account/export', { cookies }));
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    expect(text).not.toContain('secret-hash');
+    expect(text).not.toContain('secret-token');
+    const file = JSON.parse(text) as {
+      account: { email: string; signInWithPassword: boolean };
+      words: unknown[];
+      decks: unknown[];
+      cards: unknown[];
+      answers: unknown[];
+      league: { profile: { name: string }; weeks: unknown[] };
+    };
+    expect(file.account.email).toBe(email);
+    expect(file.account.signInWithPassword).toBe(true);
+    expect(file.words).toHaveLength(1);
+    expect(file.decks).toHaveLength(1);
+    expect(file.cards).toHaveLength(1);
+    expect(file.answers).toHaveLength(1);
+    expect(file.league.profile.name).toBe('Me');
+    expect(file.league.weeks).toHaveLength(1);
+  });
+
+  test('without signing in there is no file', async () => {
+    expect((await exportRoute.GET(request('/api/account/export'))).status).toBe(401);
+  });
+
+  test('deleting leaves no row of the learner in any table', async () => {
+    const { userId, cookies } = await learner();
+    expect((await rowsOf(userId)).every((r) => r.length > 0)).toBe(true);
+    const res = await account.DELETE(request('/api/account', { method: 'DELETE', cookies }));
+    expect(res.status).toBe(204);
+    expect(await db.select().from(users).where(eq(users.id, userId))).toEqual([]);
+    expect((await rowsOf(userId)).map((r) => r.length)).toEqual(tables.map(() => 0));
   });
 });
 

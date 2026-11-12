@@ -283,6 +283,24 @@ export async function upsertRows(
   await appendRows(c, title, fresh);
 }
 
+/**
+ * Empties the row whose key column holds `key` (the header and the other rows stay; an empty
+ * row is skipped by readers and reused by nothing). Nothing is done if the key is not there.
+ */
+export async function clearRowByKey(
+  c: SheetsConfig,
+  title: string,
+  keyColumn: number,
+  key: string,
+): Promise<boolean> {
+  const col = columnName(keyColumn);
+  const keys = await call<{ values?: string[][] }>(c, `/values/${range(title, `${col}:${col}`)}`);
+  const rows = (keys.values ?? []).flatMap((v, i) => (i > 0 && v[0] === key ? [i + 1] : []));
+  for (const n of rows)
+    await call(c, `/values/${range(title, `A${n}:Z${n}`)}:clear`, { method: 'POST', body: '{}' });
+  return rows.length > 0;
+}
+
 /** The rows of a tab under its header, as stored (numbers, booleans and text, not formatted). */
 export async function readRows(c: SheetsConfig, title: string): Promise<unknown[][]> {
   const res = await call<{ values?: unknown[][] }>(

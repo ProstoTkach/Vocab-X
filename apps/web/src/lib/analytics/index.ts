@@ -124,6 +124,22 @@ export function analyticsIds(): { anonId: string } {
   return { anonId: getTracker()?.identity.anonId ?? '' };
 }
 
+/**
+ * What analytics keeps in this browser, for "My data": the random id, the first visit (ms) and
+ * the stored choice ("granted", "denied" or none). Null id: none created yet.
+ */
+export function storedAnalytics(): {
+  id: string | null;
+  firstVisit: number | null;
+  choice: string | null;
+} {
+  return {
+    id: readKey(KEYS.anonId),
+    firstVisit: Number(readKey(KEYS.firstVisit)) || null,
+    choice: readKey(KEYS.consent),
+  };
+}
+
 /** "dd" days and the session count since the first visit, for settings changes. */
 export function sinceFirstVisit(): { days: number; sessions: number } {
   const t = getTracker();

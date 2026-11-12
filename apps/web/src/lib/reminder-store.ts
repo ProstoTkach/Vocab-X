@@ -2,7 +2,7 @@
 // spreadsheet (server only). Only the push address, the interface language, whether it is on
 // and when the next reminder is due (the phone works that out itself); nothing about the
 // learner or the words.
-import { ensureSheet, readRows, upsertRows, type SheetsConfig } from './google-sheets';
+import { clearRowByKey, ensureSheet, readRows, upsertRows, type SheetsConfig } from './google-sheets';
 
 export const REMINDER_SHEET = 'Нагадування';
 const COLUMNS = [
@@ -65,4 +65,10 @@ export async function updateReminders(c: SheetsConfig, list: Reminder[], now: nu
     0,
     list.map((r) => row(r, now)),
   );
+}
+
+/** Forgets a subscription altogether (its row is emptied): the learner deleted their account. */
+export async function removeReminder(c: SheetsConfig, endpoint: string): Promise<boolean> {
+  await ensureSheet(c, REMINDER_SHEET, COLUMNS, DATE_COLUMNS);
+  return clearRowByKey(c, REMINDER_SHEET, 0, endpoint);
 }

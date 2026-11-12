@@ -97,6 +97,11 @@ is a legal question for the owner's review (session 5).
 
 Every learner table refers to `users` with `ON DELETE CASCADE`: "Delete account" (`DELETE
 /api/account`) removes the user row and with it every row below except the two shared tables.
+The same learner tables are what "Download my data" (`GET /api/account/export`, `lib/account-export.ts`)
+lists, without the password hash, the pending password and the link-token hashes. The reminder
+row in Google Sheets is not tied to an account: the browser that deletes the account sends its own
+push address, and that row is emptied (`removeReminder`); other browsers' rows stay until their own
+retention ends. Tested on the test database (`account.db.test.ts`).
 
 | Table               | Fields (personal ones in bold)                                                                                                                                                                                             | Written by                                                            | Purpose                                                   | Retention now                                                                                       | Approved (1.6)                                                                                                                                                  |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |

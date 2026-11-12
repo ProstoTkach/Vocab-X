@@ -2,6 +2,7 @@ import { generateKeyPairSync } from 'node:crypto';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import {
   appendRow,
+  clearRowByKey,
   columnName,
   kyivSerial,
   rowsOf,
@@ -105,5 +106,36 @@ describe('one row per session', () => {
     expect(columnName(0)).toBe('A');
     expect(columnName(25)).toBe('Z');
     expect(columnName(26)).toBe('AA');
+  });
+});
+
+describe('forgetting one row', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  test('only the rows holding the key are emptied; a missing key does nothing', async () => {
+    const calls: { url: string; method?: string }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init: RequestInit = {}) => {
+        calls.push({ url, ...(init.method ? { method: init.method } : {}) });
+        if (url.startsWith('https://oauth2'))
+          return Response.json({ access_token: 'token', expires_in: 3600 });
+        if (url.includes(encodeURIComponent("'Т'!A:A")))
+          return Response.json({ values: [['header'], ['keep'], ['mine'], ['x'], ['mine']] });
+        return Response.json({});
+      }),
+    );
+    const c = { clientEmail: 'bot@x', privateKey: pem, spreadsheetId: 'clear' };
+    expect(await clearRowByKey(c, 'Т', 0, 'mine')).toBe(true);
+    const cleared = calls
+      .filter((x) => x.url.endsWith(':clear'))
+      .map((x) => decodeURIComponent(x.url));
+    expect(cleared.map((u) => u.split('/values/')[1])).toEqual([
+      "'Т'!A3:Z3:clear",
+      "'Т'!A5:Z5:clear",
+    ]);
+    expect(await clearRowByKey(c, 'Т', 0, 'header')).toBe(false);
+    expect(await clearRowByKey(c, 'Т', 0, 'nobody')).toBe(false);
+    expect(calls.filter((x) => x.url.endsWith(':clear'))).toHaveLength(2);
   });
 });

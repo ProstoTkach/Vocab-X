@@ -1,18 +1,17 @@
 'use client';
 
-import { LogOut, Mail, RefreshCw, Trash2 } from 'lucide-react';
+import { LogOut, Mail, RefreshCw } from 'lucide-react';
 import { signIn, signOut } from 'next-auth/react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { DeleteAccount } from '@/components/account/delete-account';
 import { SignInDialog } from '@/components/account/sign-in-dialog';
 import { LegalLinks } from '@/components/legal/legal-links';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { GoogleIcon } from '@/components/ui/google-icon';
 import { useToast } from '@/components/ui/toast';
 import { track } from '@/lib/analytics';
-import { useRepos } from '@/lib/repos';
 import { signedInReturn, useSync } from '@/lib/sync';
 
 /**
@@ -108,28 +107,8 @@ export function SignInCard() {
 /** Signed in: the address, how syncing goes, signing out and deleting the account. */
 export function AccountCard({ email }: { email: string }) {
   const t = useTranslations('profile.account');
-  const common = useTranslations('common');
   const format = useFormatter();
-  const toast = useToast();
-  const repos = useRepos();
   const { status, syncedAt, syncNow, disconnect } = useSync();
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
-  const deleteAccount = async () => {
-    setConfirmDelete(false);
-    try {
-      const res = await fetch('/api/account', { method: 'DELETE' });
-      if (!res.ok) throw new Error('delete');
-    } catch {
-      toast({ title: t('deleteFailed'), tone: 'danger' });
-      return;
-    }
-    track('account', { to: 'deleted' });
-    // The browser's copy stays, and is no longer tied to anything.
-    repos.journal.clear();
-    await repos.settings.update({ leagueJoined: false });
-    void signOut({ callbackUrl: window.location.pathname });
-  };
 
   return (
     <Card aria-labelledby="profile-account" className="flex flex-col gap-3">
@@ -164,28 +143,9 @@ export function AccountCard({ email }: { email: string }) {
           <LogOut aria-hidden className="size-4" />
           {t('signOut')}
         </Button>
-        <Button variant="ghost" className="text-danger" onClick={() => setConfirmDelete(true)}>
-          <Trash2 aria-hidden className="size-4" />
-          {t('delete')}
-        </Button>
+        <DeleteAccount />
       </div>
       <LegalLinks only={['privacy', 'terms']} />
-      <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
-        <DialogContent
-          title={t('deleteTitle')}
-          description={t('deleteText')}
-          footer={
-            <>
-              <DialogClose asChild>
-                <Button variant="secondary">{common('cancel')}</Button>
-              </DialogClose>
-              <Button variant="danger" onClick={() => void deleteAccount()}>
-                {t('deleteConfirm')}
-              </Button>
-            </>
-          }
-        />
-      </Dialog>
     </Card>
   );
 }

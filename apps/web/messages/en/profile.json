@@ -47,7 +47,7 @@
     "otherFresh": "Only this account’s data",
     "delete": "Delete account",
     "deleteTitle": "Delete your account?",
-    "deleteText": "Your words, progress, settings and league place will be permanently deleted from the server. This cannot be undone. The copy in this browser stays, but syncing stops on your other devices.",
+    "deleteText": "Your words, progress, settings and league place will be permanently deleted from the server, and reminders in this browser will be turned off. This cannot be undone. The copy in this browser stays, but syncing stops on your other devices.",
     "deleteConfirm": "Delete forever",
     "deleteFailed": "Could not delete the account. Please try again.",
     "emailTitle": "Sign in with email",

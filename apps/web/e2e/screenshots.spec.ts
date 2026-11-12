@@ -94,6 +94,35 @@ for (const vp of VIEWPORTS) {
       await page.screenshot({ path: `screenshots/onboarding-${vp.name}.png`, fullPage: true });
     });
 
+    // Step 1.5: the trust screens (consent window, policy, "My data"), light and dark.
+    test('data trust', async ({ page }) => {
+      test.skip(vp.name !== '390x844' && vp.name !== '1280x800');
+      for (const theme of ['light', 'dark']) {
+        await seedOnboarded(page);
+        await page.addInitScript((themeId) => {
+          const settings = JSON.parse(localStorage.getItem('vocabx:v1:settings') ?? '{}') as object;
+          localStorage.setItem('vocabx:v1:settings', JSON.stringify({ ...settings, themeId }));
+        }, theme);
+        await page.goto('/uk/settings');
+        const card = page.locator('section[aria-labelledby="settings-data"]');
+        await expect(card.getByRole('button', { name: 'Завантажити мої дані' })).toBeVisible();
+        await expect(card.getByText('Слова з прогресом')).toBeVisible();
+        await page.waitForTimeout(400);
+        await card.screenshot({ path: `screenshots/data-trust/my-data-${theme}-${vp.name}.png` });
+      }
+    });
+
+    test('consent window', async ({ page }) => {
+      test.skip(vp.name !== '390x844' && vp.name !== '1280x800');
+      await seedOnboarded(page);
+      await page.addInitScript(() => localStorage.removeItem('vocabx:analytics:consent'));
+      await page.goto('/uk/settings');
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible();
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `screenshots/data-trust/consent-${vp.name}.png` });
+    });
+
     test('legal pages', async ({ page }) => {
       await seedOnboarded(page);
       for (const name of ['privacy', 'credits']) {
