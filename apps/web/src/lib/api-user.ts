@@ -11,3 +11,21 @@ export async function requestUserId(request: NextRequest): Promise<string | null
 
 export const NO_STORE = { 'Cache-Control': 'no-store' };
 export const fail = (status: number) => new Response(null, { status, headers: NO_STORE });
+
+/**
+ * A change asked for by a page of another site, which the browser would send with the learner's
+ * cookie. The cookie's SameSite=Lax keeps it out of most of them already; this is the second
+ * guard, for every route that changes something (next-auth checks its own). A request without
+ * Origin does not come from a page, so it carries no learner's cookie either.
+ */
+export function crossSite(request: Request): boolean {
+  if (request.headers.get('sec-fetch-site') === 'cross-site') return true;
+  const origin = request.headers.get('origin');
+  if (origin === null) return false;
+  try {
+    return new URL(origin).host !== request.headers.get('host');
+  } catch {
+    // "null" and anything else that is not an address.
+    return true;
+  }
+}

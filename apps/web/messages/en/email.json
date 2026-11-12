@@ -13,5 +13,12 @@
     "body": "Someone tried to sign up with this email, but it already has an account. If that was you, simply sign in.",
     "button": "Sign in to VocabX",
     "footer": "If it was not you, there is nothing to do: your account is safe."
+  },
+  "reset": {
+    "subject": "A new password for VocabX",
+    "title": "A new password",
+    "body": "Someone asked for a new password for the account with this email. If that was you, press the button and choose a new password.",
+    "button": "Choose a new password",
+    "footer": "The link works for an hour and only once. If you did not ask for anything, simply ignore this letter: your password stays the same."
   }
 }

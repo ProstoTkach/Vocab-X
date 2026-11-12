@@ -2,6 +2,7 @@ import { systemClock } from '@vocabx/core';
 import { sheetsConfigFromEnv } from '@/lib/google-sheets';
 import { pushEndpoint, vapidFromEnv } from '@/lib/push';
 import { saveReminder } from '@/lib/reminder-store';
+import { crossSite, fail } from '@/lib/api-user';
 
 const BODY_MAX = 2000;
 
@@ -11,6 +12,7 @@ const BODY_MAX = 2000;
  * of the browsers' push services is accepted, and nothing else is kept.
  */
 export async function POST(request: Request): Promise<Response> {
+  if (crossSite(request)) return fail(403);
   const sheets = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
   if (!sheets || !vapidFromEnv()) return new Response(null, { status: 503 });
   let body: { endpoint?: unknown; on?: unknown; locale?: unknown; at?: unknown };

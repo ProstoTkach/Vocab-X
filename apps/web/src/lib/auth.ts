@@ -1,50 +1,18 @@
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider, { type GoogleProfile } from 'next-auth/providers/google';
-import { and, eq, isNull, sql } from 'drizzle-orm';
-import { checkLogin, normalizeEmail } from './email-accounts';
+import { checkLogin, rememberGoogleUser } from './email-accounts';
 import { dbFromEnv } from './db/client';
-import { users } from './db/schema';
 
 /** Signing in is offered only where its keys are set: not on a server without them. */
 export function signInConfigured(env: Record<string, string | undefined> = process.env): boolean {
   return !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET && env.NEXTAUTH_SECRET);
 }
 
-/**
- * The learner's id, by the account Google says is theirs; the address follows Google's. An account
- * made earlier with a password joins it. If that address was never confirmed, the password goes:
- * whoever set it did not prove the address was theirs, and Google has just said whose it is.
- */
 async function rememberUser(googleSub: string, email: string): Promise<string> {
   const db = dbFromEnv();
   if (!db) throw new Error('DATABASE_URL is not set');
-  const [known] = await db
-    .update(users)
-    .set({ email })
-    .where(eq(users.googleSub, googleSub))
-    .returning({ id: users.id });
-  if (known) return known.id;
-  const [sameEmail] = await db
-    .select()
-    .from(users)
-    .where(and(sql`lower(${users.email}) = ${normalizeEmail(email)}`, isNull(users.deletedAt)));
-  if (sameEmail) {
-    await db
-      .update(users)
-      .set({
-        googleSub,
-        emailVerifiedAt: sameEmail.emailVerifiedAt ?? new Date(),
-        ...(sameEmail.emailVerifiedAt ? {} : { passwordHash: null }),
-      })
-      .where(eq(users.id, sameEmail.id));
-    return sameEmail.id;
-  }
-  const [row] = await db
-    .insert(users)
-    .values({ googleSub, email, emailVerifiedAt: new Date() })
-    .returning({ id: users.id });
-  return row!.id;
+  return rememberGoogleUser(db, googleSub, email);
 }
 
 /**

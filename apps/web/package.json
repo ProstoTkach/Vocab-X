@@ -15,7 +15,8 @@
     "db:check": "node scripts/db-check.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/db-migrate.mjs",
-    "db:seed-test": "node scripts/db-seed-test-users.mjs"
+    "db:seed-test": "node scripts/db-seed-test-users.mjs",
+    "test:db": "node scripts/test-db.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

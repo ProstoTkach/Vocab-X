@@ -1,5 +1,6 @@
 import { systemClock } from '@vocabx/core';
 import { pushEndpoint, sendPush, vapidFromEnv } from '@/lib/push';
+import { crossSite, fail } from '@/lib/api-user';
 
 /** One test push per subscription in this window (kept in memory, per server instance). */
 const WINDOW_MS = 15_000;
@@ -10,6 +11,7 @@ const recent = new Map<string, number>();
  * the daily one. Only to the browsers' push services, and not more often than every 15 s.
  */
 export async function POST(request: Request): Promise<Response> {
+  if (crossSite(request)) return fail(403);
   const vapid = vapidFromEnv();
   if (!vapid) return new Response(null, { status: 503 });
   let endpoint: string | null;

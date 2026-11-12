@@ -21,6 +21,7 @@ import {
   sheetsConfigFromEnv,
   upsertRows,
 } from '@/lib/google-sheets';
+import { crossSite, fail } from '@/lib/api-user';
 
 /** Sheet names of the analytics spreadsheet. */
 const SHEETS = { events: 'Події', sessions: 'Сесії', dictionary: 'Словник' } as const;
@@ -75,6 +76,7 @@ let dictionaryWritten = false;
  * header of the request is logged or stored; the body is checked item by item.
  */
 export async function POST(request: Request): Promise<Response> {
+  if (crossSite(request)) return fail(403);
   const sheets = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
   if (!sheets) return new Response(null, { status: 204 });
 

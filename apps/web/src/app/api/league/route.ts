@@ -5,12 +5,12 @@ import {
   ringLeague,
   type AvatarFrame,
 } from '@vocabx/core';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { fail, NO_STORE, requestUserId } from '@/lib/api-user';
+import { crossSite, fail, NO_STORE, requestUserId } from '@/lib/api-user';
 import { inTransaction } from '@/lib/db/client';
-import { leagueProfiles } from '@/lib/db/schema';
+import { leagueProfiles, users } from '@/lib/db/schema';
 import { ensureMember, leaveLeague, readScores, readStanding } from '@/lib/league-server';
 
 const itemId = z.string().min(1).max(64);
@@ -39,9 +39,10 @@ const earnedRing = (ring: AvatarFrame['ring'], tier: number): AvatarFrame['ring'
 /**
  * The learner's group this week: only the places when the device knows the group and the week has
  * not changed, otherwise all of it. Answers `{ joined: false }` to someone not taking part, and
- * `startsAt` to someone waiting for their first race.
+ * `startsAt` to someone waiting for their first race. 401: not signed in, or the account is gone.
  */
 export async function POST(request: NextRequest): Promise<Response> {
+  if (crossSite(request)) return fail(403);
   const url = process.env.DATABASE_URL;
   if (!url) return fail(503);
   const userId = await requestUserId(request);
@@ -53,6 +54,12 @@ export async function POST(request: NextRequest): Promise<Response> {
   try {
     const result = await inTransaction(url, async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`);
+      // The account was deleted on another device, but this cookie lives on.
+      const [user] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(and(eq(users.id, userId), isNull(users.deletedAt)));
+      if (!user) return null;
       const [profile] = await tx
         .select({ tier: leagueProfiles.tier })
         .from(leagueProfiles)
@@ -87,6 +94,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         ? { joined: true, scores: await readScores(tx, member) }
         : { joined: true, standing: await readStanding(tx, member, userId) };
     });
+    if (!result) return fail(401);
     return Response.json(result, { headers: NO_STORE });
   } catch (e) {
     console.error('league failed', e instanceof Error ? e.message : 'unknown');
@@ -96,6 +104,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
 /** Leaving the league: the rows are gone, and the others no longer see this learner. */
 export async function DELETE(request: NextRequest): Promise<Response> {
+  if (crossSite(request)) return fail(403);
   const url = process.env.DATABASE_URL;
   if (!url) return fail(503);
   const userId = await requestUserId(request);

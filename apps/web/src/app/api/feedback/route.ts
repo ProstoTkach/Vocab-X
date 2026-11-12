@@ -12,6 +12,7 @@ import {
   forgetSheets,
   sheetsConfigFromEnv,
 } from '@/lib/google-sheets';
+import { crossSite, fail } from '@/lib/api-user';
 
 /** The feedback sheet of the analytics spreadsheet, next to the usage statistics. */
 const ANALYTICS_SHEET = 'Відгуки';
@@ -54,6 +55,7 @@ function tooMany(key: string): boolean {
  * forwarded or stored, so the feedback stays anonymous.
  */
 export async function POST(request: Request): Promise<Response> {
+  if (crossSite(request)) return fail(403);
   const sheets = sheetsConfigFromEnv();
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;

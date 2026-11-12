@@ -7,9 +7,10 @@ rows of "Additions to existing steps" that name them.
 
 ## Progress and handoff
 
-Next: **session 1** (model O); owner in parallel: **6.8**, **6.1**, **6.9**. Update this line and
-the "Done" line at the end of every session.
-Done: 0.1 (`docs/AUDIT.md`, 2026-11-12); owner: 6.8 (two-step sign-in everywhere), Neon test branch created.
+Next: **session 2** (model S); before any deploy the owner applies migration `0004` to the main
+database (`pnpm db:migrate`). Update this line and the "Done" line at the end of every session.
+Done: 0.1 (`docs/AUDIT.md`, 2026-11-12); 1.0 + 5.3a (session 1, 2026-11-12, not committed yet);
+owner: 6.8 (two-step sign-in everywhere), Neon test branch created.
 
 Owner decisions that later sessions must respect (2026-11-12):
 
@@ -30,7 +31,8 @@ Owner decisions that later sessions must respect (2026-11-12):
 **Handoff rule (assistant):** when a session is finished, end the report with a block the owner
 can use without thinking (the next row of "Sessions" not done, or the one the owner chose):
 
-1. **Модель:** the model's name in full (Opus or Sonnet) and one line on why that model.
+1. **Модель:** the model's name in full (Opus or Sonnet), the effort level (see "Effort" under
+   "Sessions") and one line on why.
 2. **Промпт для нового чата:** a ready prompt in a code block, in Russian, to paste as it is. It
    names the session and its steps, and carries what the new chat cannot learn from the plan:
    decisions made in this chat, what was left unfinished ("part 2"), files that changed and
@@ -283,6 +285,14 @@ Rules:
   screenshots is needed), finish the current step, write the work log, and hand off the rest of
   the row as "session N, part 2" — do not push on.
 - A step that proves harder than its model (S stuck on a design decision) stops and hands off to O.
+
+Effort (a judgment, not measured; raise one level if a session got stuck, never start at the top):
+
+- **Opus, high:** sessions 1, 3, 11, 12, 15, 22 — logic and design where a mistake is costly.
+- **Opus, medium:** sessions 4, 5, 21 — inventories, texts and conclusions from ready material.
+- **Sonnet, high:** sessions 9, 23 — validation on many routes, data migration script.
+- **Sonnet, medium:** every other Sonnet session.
+- **Sonnet, low:** chats that only format, run tests and commit.
 
 | #   | Model | Steps                                                                                    | Why together                                                                                              | Start from                                                                                                      | Gate                                                                      |
 | --- | ----- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |

@@ -4,11 +4,12 @@ import { dbFromEnv } from '@/lib/db/client';
 import { siteUrl } from '@/lib/email';
 import { confirmEmail, provesRegistration } from '@/lib/email-accounts';
 import { emailLocale } from '@/lib/email-templates';
-import { PROOF_COOKIE, setSessionCookie } from '@/lib/session-cookie';
+import { PROOF_COOKIE, PROOF_COOKIE_PATH, setSessionCookie } from '@/lib/session-cookie';
 
 /**
  * The link in the letter: confirms the address and goes to the profile, which says how it went.
- * In the browser that asked for the letter it also signs in, so the form need not be filled again.
+ * In the browser that made this very registration it also signs in, so the form need not be
+ * filled again.
  */
 export async function GET(request: NextRequest): Promise<Response> {
   const db = dbFromEnv();
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   const signIn =
     !!user &&
     !!secret &&
-    provesRegistration(user.email, request.cookies.get(PROOF_COOKIE)?.value, secret);
+    provesRegistration(user.email, user.key, request.cookies.get(PROOF_COOKIE)?.value, secret);
   // 1: confirmed; 2: confirmed and signed in, the sync takes it from there; 0: did not work.
   const verified = signIn ? '2&signedIn=1' : user ? '1' : '0';
   const lang = emailLocale(searchParams.get('lang'));
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   if (signIn) {
     await setSessionCookie(response, user, secret);
     // Once: after signing out, the same link does not sign in again.
-    response.cookies.set(PROOF_COOKIE, '', { path: '/api/account/verify', maxAge: 0 });
+    response.cookies.set(PROOF_COOKIE, '', { path: PROOF_COOKIE_PATH, maxAge: 0 });
   }
   return response;
 }

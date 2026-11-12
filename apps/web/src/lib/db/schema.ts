@@ -36,9 +36,17 @@ export const users = pgTable(
     /** Set once they sign in with Google; empty for an account with a password only. */
     googleSub: text('google_sub').unique(),
     passwordHash: text('password_hash'),
+    /**
+     * The password a registration chose, waiting for its link: only that link makes it the
+     * account's password. A newer registration replaces both, so an older letter cannot confirm it.
+     */
+    pendingPasswordHash: text('pending_password_hash'),
     /** Until then, an account with a password cannot sign in. */
     emailVerifiedAt: time('email_verified_at'),
-    /** Hash of the token in the letter; only the letter holds the token itself. */
+    /**
+     * Hash of the token in the latest letter (confirm or reset); only the letter holds the token
+     * itself. A new letter replaces it, so earlier links stop working.
+     */
     verifyTokenHash: text('verify_token_hash'),
     verifyExpiresAt: time('verify_expires_at'),
     verifySentAt: time('verify_sent_at'),

@@ -1,14 +1,19 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
-import { fail, NO_STORE } from '@/lib/api-user';
+import { crossSite, fail, NO_STORE } from '@/lib/api-user';
 import { dbFromEnv } from '@/lib/db/client';
 import { EmailNotSent } from '@/lib/email';
-import { register, registrationProof, resendConfirmation } from '@/lib/email-accounts';
+import {
+  provesRegistration,
+  register,
+  registrationProof,
+  resendConfirmation,
+} from '@/lib/email-accounts';
 import { PROOF_COOKIE, PROOF_COOKIE_OPTIONS } from '@/lib/session-cookie';
 
 const bodySchema = z.object({
   email: z.email().max(254),
-  /** Missing: only another letter for an address still waiting. */
+  /** Missing: another letter for an address still waiting, to the browser that registered it. */
   password: z.string().min(8).max(200).optional(),
   locale: z.string().max(5),
 });
@@ -19,19 +24,26 @@ const bodySchema = z.object({
  * 502/503: the letter could not go out.
  */
 export async function POST(request: NextRequest): Promise<Response> {
+  if (crossSite(request)) return fail(403);
   const db = dbFromEnv();
   if (!db) return fail(503);
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return fail(400);
   const { email, password, locale } = parsed.data;
   const now = new Date().getTime();
+  const secret = process.env.NEXTAUTH_SECRET;
   try {
-    if (password) await register(db, { email, password, locale }, now);
-    else await resendConfirmation(db, email, locale, now);
-    const secret = process.env.NEXTAUTH_SECRET;
+    if (!password) {
+      // Only for the browser that registered: see resendConfirmation.
+      const proof = request.cookies.get(PROOF_COOKIE)?.value;
+      const proves = (key: string) => !!secret && provesRegistration(email, key, proof, secret);
+      await resendConfirmation(db, { email, locale, proves }, now);
+      return fail(202);
+    }
+    const key = await register(db, { email, password, locale }, now);
     if (!secret) return fail(202);
     const response = new NextResponse(null, { status: 202, headers: NO_STORE });
-    response.cookies.set(PROOF_COOKIE, registrationProof(email, secret), PROOF_COOKIE_OPTIONS);
+    response.cookies.set(PROOF_COOKIE, registrationProof(email, key, secret), PROOF_COOKIE_OPTIONS);
     return response;
   } catch (e) {
     if (e instanceof EmailNotSent) {

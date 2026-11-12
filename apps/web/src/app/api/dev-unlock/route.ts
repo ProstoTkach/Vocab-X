@@ -1,4 +1,5 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { crossSite, fail } from '@/lib/api-user';
 
 /** A wrong code waits this long: guessing it by trying many is slow. */
 const WRONG_DELAY_MS = 800;
@@ -10,6 +11,7 @@ const digest = (s: string) => createHash('sha256').update(s).digest();
  * Answers `{ ok }`; without the variable set nothing unlocks.
  */
 export async function POST(request: Request): Promise<Response> {
+  if (crossSite(request)) return fail(403);
   const expected = process.env.DEVELOPER_CODE ?? '';
   let code = '';
   try {

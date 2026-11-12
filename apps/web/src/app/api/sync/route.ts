@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { fail, NO_STORE, requestUserId } from '@/lib/api-user';
+import { crossSite, fail, NO_STORE, requestUserId } from '@/lib/api-user';
 import { inTransaction } from '@/lib/db/client';
 import { exchange, parseSyncRequest } from '@/lib/sync-server';
 
@@ -9,6 +9,7 @@ import { exchange, parseSyncRequest } from '@/lib/sync-server';
  * 503: no database here.
  */
 export async function POST(request: NextRequest): Promise<Response> {
+  if (crossSite(request)) return fail(403);
   const url = process.env.DATABASE_URL;
   if (!url) return fail(503);
   const userId = await requestUserId(request);

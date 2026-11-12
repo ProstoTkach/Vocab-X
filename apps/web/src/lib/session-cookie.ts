@@ -2,8 +2,12 @@
 import { encode } from 'next-auth/jwt';
 import type { NextResponse } from 'next/server';
 
-/** Set when a letter is asked for, read by the link in that letter: nothing else sees it. */
+/**
+ * Set when registering, read by the link in the letter and by a request for another letter:
+ * nothing outside /api/account sees it.
+ */
 export const PROOF_COOKIE = 'vocabx-email-proof';
+export const PROOF_COOKIE_PATH = '/api/account';
 /** How next-auth decides it too. */
 const SECURE = (process.env.NEXTAUTH_URL ?? '').startsWith('https://');
 
@@ -12,7 +16,7 @@ export const PROOF_COOKIE_OPTIONS = {
   // Sent along when the link in a letter is opened.
   sameSite: 'lax',
   secure: SECURE,
-  path: '/api/account/verify',
+  path: PROOF_COOKIE_PATH,
   maxAge: 24 * 3600,
 } as const;
 

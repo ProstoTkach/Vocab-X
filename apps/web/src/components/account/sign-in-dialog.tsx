@@ -69,15 +69,8 @@ export function SignInDialog({
       return;
     }
     setUnverified(res?.error === 'unverified');
-    setError(
-      t(
-        res?.error === 'unverified'
-          ? 'errorUnverified'
-          : res?.error === 'locked'
-            ? 'errorLocked'
-            : 'errorInvalid',
-      ),
-    );
+    // A locked account answers like a wrong password: the server never says which addresses exist.
+    setError(t(res?.error === 'unverified' ? 'errorUnverified' : 'errorInvalid'));
   };
 
   const submitRegister = async () => {

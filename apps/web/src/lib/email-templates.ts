@@ -97,3 +97,12 @@ export function renderAlreadyEmail(
 ): RenderedEmail {
   return layout({ ...TEXTS[locale].already, fallback: TEXTS[locale].fallback, link }, wolf);
 }
+
+/** Someone asked for a new password: the link leads to the form that sets it. */
+export function renderResetEmail(
+  locale: EmailLocale,
+  link: string,
+  wolf: string | null,
+): RenderedEmail {
+  return layout({ ...TEXTS[locale].reset, fallback: TEXTS[locale].fallback, link }, wolf);
+}
