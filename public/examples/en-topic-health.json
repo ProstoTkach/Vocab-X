@@ -1,0 +1,269 @@
+{
+  "v": 1,
+  "words": {
+    "en:symptom": [
+      {
+        "text": "He often ignores symptoms of illness.",
+        "credit": { "id": 13204673, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He experiences allergy symptoms with peanuts.",
+        "credit": { "id": 13006526, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Feelings can lead to physical symptoms.",
+        "credit": { "id": 12991887, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "If symptoms persist, consult your doctor.",
+        "credit": { "id": 12486274, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:headache": [
+      {
+        "text": "Drinking water might relieve my headache.",
+        "credit": { "id": 13193922, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Jonas got a really bad headache.",
+        "credit": { "id": 11634019, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Jayjay is giving Jessica a headache.",
+        "credit": { "id": 11542731, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom went home with a headache.",
+        "credit": { "id": 11523211, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:prescription": [
+      {
+        "text": "Rodrigo tried to read the prescription.",
+        "credit": { "id": 11776374, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Antonio discovered the prescription was fake.",
+        "credit": { "id": 11775897, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The doctor writes prescriptions for medicine.",
+        "credit": { "id": 10921807, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom is a prescription drug wholesaler.",
+        "credit": { "id": 7135454, "by": "shekitten", "license": "CC0 1.0" }
+      }
+    ],
+    "en:pharmacy": [
+      {
+        "text": "Drugstores are commonly known as pharmacies.",
+        "credit": { "id": 13532115, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The pharmacy is near the library.",
+        "credit": { "id": 13883887, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "There's a pharmacy under us.",
+        "credit": { "id": 13572682, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You guys went to the pharmacy.",
+        "credit": { "id": 12788499, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:injury": [
+      {
+        "text": "She got injuried while ice skating.",
+        "credit": { "id": 13851248, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom has become clumsy after injuries.",
+        "credit": { "id": 13754618, "by": "GemMonkey", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom and Mary both have injuries.",
+        "credit": { "id": 12286943, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The accident victim suffered head injuries.",
+        "credit": { "id": 12204444, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:recover": [
+      {
+        "text": "The body needs sleep to recover.",
+        "credit": { "id": 14019743, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Everyone wished that Tom recovered soon.",
+        "credit": { "id": 13355859, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom is recovering from a surgery.",
+        "credit": { "id": 13734369, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Give me a moment to recover.",
+        "credit": { "id": 13558785, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:treatment": [
+      {
+        "text": "They afforded that customer special treatment.",
+        "credit": { "id": 13858846, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "His illness worsened despite the treatment.",
+        "credit": { "id": 12764896, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Tom gave me the silent treatment.",
+        "credit": { "id": 12062308, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Everyone complained about the unfair treatment.",
+        "credit": { "id": 11922390, "by": "JimBreen", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:cough": [
+      {
+        "text": "I saw Tom cough up blood.",
+        "credit": { "id": 12250726, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My baby keeps coughing and sneezing.",
+        "credit": { "id": 10702105, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You're coughing because you smoke.",
+        "credit": { "id": 12964526, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Have you been coughing a lot?",
+        "credit": { "id": 12447613, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:fever": [
+      {
+        "text": "I need medicine for infantile fever.",
+        "credit": { "id": 12867864, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Pyrexia is another word for fever.",
+        "credit": { "id": 11970767, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I am running a slight fever.",
+        "credit": { "id": 13087200, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I have a low-grade fever.",
+        "credit": { "id": 13087198, "by": "anzart", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:allergy": [
+      {
+        "text": "He experiences allergy symptoms with peanuts.",
+        "credit": { "id": 13006526, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do you have a peanut allergy?",
+        "credit": { "id": 13844101, "by": "dust_bunny", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He suffers from a peanut allergy.",
+        "credit": { "id": 13006573, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Does your wife have any allergies?",
+        "credit": { "id": 12340148, "by": "Miktsoanit", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:painful": [
+      {
+        "text": "Her silence hid a painful truth.",
+        "credit": { "id": 13280750, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:surgery": [
+      {
+        "text": "The doctor said surgery was necessary.",
+        "credit": { "id": 13992382, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Dr. Jackson is doing the surgery.",
+        "credit": { "id": 12227037, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom needed money for the surgery.",
+        "credit": { "id": 12222200, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Dr. Jackson is stuck in surgery.",
+        "credit": { "id": 12092042, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:vaccine": [
+      {
+        "text": "Ziri got his Covid-19 vaccine.",
+        "credit": { "id": 10861960, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:diet": [
+      {
+        "text": "Diet affects health, notably the heart.",
+        "credit": { "id": 13751645, "by": "IMer", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Fitness results are influenced by diet.",
+        "credit": { "id": 13227644, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "A healthy diet helps you live.",
+        "credit": { "id": 12378113, "by": "Miktsoanit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Are you maintaining a balanced diet?",
+        "credit": { "id": 13230356, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:exhausted": [
+      {
+        "text": "Exhausted, she sunk into the cushion.",
+        "credit": { "id": 13117908, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My body's strength is exhausted.",
+        "credit": { "id": 13045108, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I’m exhausted from everyday obligations.",
+        "credit": { "id": 13033777, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They will get exhausted from running.",
+        "credit": { "id": 12972720, "by": "anzart", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:patient": [
+      {
+        "text": "Give good tidings to the patient.",
+        "credit": { "id": 13272546, "by": "kiryopi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The patient reported a tingling sensation.",
+        "credit": { "id": 12851803, "by": "Teangloir", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The patient reported a dull ache.",
+        "credit": { "id": 12851802, "by": "Teangloir", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom was very patient with them.",
+        "credit": { "id": 13304896, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

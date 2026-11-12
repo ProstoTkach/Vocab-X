@@ -1,0 +1,293 @@
+{
+  "v": 1,
+  "words": {
+    "en:lecture": [
+      {
+        "text": "The monthly lecture starts in October.",
+        "credit": { "id": 11985620, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The lecture was sleep-inducingly boring.",
+        "credit": { "id": 11455279, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri lectures at the Algiers University.",
+        "credit": { "id": 10930311, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri became a lecturer in Algeria.",
+        "credit": { "id": 10798697, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:exam": [
+      {
+        "text": "The phone rang during the exam.",
+        "credit": { "id": 13433121, "by": "ecorralest101", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I managed to pass the exam.",
+        "credit": { "id": 14087496, "by": "yessoos", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We will pass an exam tomorrow.",
+        "credit": { "id": 13656618, "by": "dnswrsrx", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He has to resit his exam.",
+        "credit": { "id": 13442687, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:grade": [
+      {
+        "text": "He gets good grades in science.",
+        "credit": { "id": 12839206, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Study harder to improve your grades.",
+        "credit": { "id": 11889525, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I have a low-grade fever.",
+        "credit": { "id": 13087198, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom's grades have been slipping.",
+        "credit": { "id": 12994696, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:degree": [
+      {
+        "text": "The thermometer registers 37 degrees Celsius.",
+        "credit": { "id": 13487000, "by": "mraz", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Minus twenty degrees? That's nothing.",
+        "credit": { "id": 13452358, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It's ten degrees above zero.",
+        "credit": { "id": 12847946, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This looks like third-degree frostbite.",
+        "credit": { "id": 12110078, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:homework": [
+      {
+        "text": "Tom turned his homework in late.",
+        "credit": { "id": 13747960, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom turned in his homework late.",
+        "credit": { "id": 13385843, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He leaves his homework half-done.",
+        "credit": { "id": 13248899, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I've finished my maths homework.",
+        "credit": { "id": 14093873, "by": "Myrano_", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:scholarship": [
+      {
+        "text": "Fyodor applied for a scholarship program.",
+        "credit": { "id": 11819882, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "David can kiss that scholarship goodbye.",
+        "credit": { "id": 11503181, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Of course, David wants the scholarship.",
+        "credit": { "id": 11503150, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom will probably win the scholarship.",
+        "credit": { "id": 6528622, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:revise": [
+      {
+        "text": "I revised everything before the exam.",
+        "credit": { "id": 9617699, "by": "issadouba", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'll start revising next week.",
+        "credit": { "id": 3273133, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She spent the whole weekend revising.",
+        "credit": { "id": 3272604, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Have you revised for the exam?",
+        "credit": { "id": 11994665, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:essay": [
+      {
+        "text": "I finally finished writing this essay.",
+        "credit": { "id": 12703131, "by": "kleberlucas", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The student's essay lacked rigour.",
+        "credit": { "id": 12336337, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Leon helped Rima write the essay.",
+        "credit": { "id": 11639260, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "John hasn't written the essay.",
+        "credit": { "id": 11531272, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:library": [
+      {
+        "text": "The library closes in five minutes.",
+        "credit": { "id": 13606710, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This library is 80 years old.",
+        "credit": { "id": 14098563, "by": "Tartar", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The pharmacy is near the library.",
+        "credit": { "id": 13883887, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I went to the library yesterday.",
+        "credit": { "id": 13713670, "by": "Babelball", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:semester": [
+      {
+        "text": "That French course lasts one semester.",
+        "credit": { "id": 10369337, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The German course lasts a semester.",
+        "credit": { "id": 9770422, "by": "DJ_Saidez", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom took French for three semesters.",
+        "credit": { "id": 9770418, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The new school semester has started.",
+        "credit": { "id": 7822980, "by": "basilhan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:graduate": [
+      {
+        "text": "Tom just graduated a week ago.",
+        "credit": { "id": 13139695, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He graduated college within two years.",
+        "credit": { "id": 12904579, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He graduated high school last year.",
+        "credit": { "id": 12744134, "by": "Abra", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I want to see Tom graduate.",
+        "credit": { "id": 12111515, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:tutor": [
+      {
+        "text": "He needs more after-school tutoring.",
+        "credit": { "id": 12924082, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Michael gave Linda some tutoring lessons.",
+        "credit": { "id": 11592399, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri paid Rima to tutor him.",
+        "credit": { "id": 11276359, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri tried to tutor his daughter.",
+        "credit": { "id": 10819387, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:research": [
+      {
+        "text": "She started doing some research online.",
+        "credit": { "id": 12850604, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Research before making an important purchase.",
+        "credit": { "id": 11889726, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Rodrigo began researching Rima’s profile.",
+        "credit": { "id": 11785241, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Benedito's research involves interdisciplinary collaboration.",
+        "credit": { "id": 11737947, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:cheat": [
+      {
+        "text": "The teacher caught him while cheating.",
+        "credit": { "id": 13911517, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The student cheated with his phone.",
+        "credit": { "id": 13907871, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She'd never cheat on me.",
+        "credit": { "id": 13148831, "by": "menaud", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She would never cheat on me.",
+        "credit": { "id": 13148830, "by": "menaud", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:subject": [
+      {
+        "text": "He tried to avoid sensitive subjects.",
+        "credit": { "id": 13712967, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Another necessary subject is a dictionary.",
+        "credit": { "id": 13287902, "by": "TATAR1", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He tried to avoid touchy subjects.",
+        "credit": { "id": 13047198, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Different perspectives exist on various subjects.",
+        "credit": { "id": 13028996, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:curious": [
+      {
+        "text": "Are you cultivating a curious mindset?",
+        "credit": { "id": 12776810, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "He encourages others to be curious.",
+        "credit": { "id": 12776190, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "The future belongs to the curious.",
+        "credit": { "id": 12766695, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Tom was very curious about that.",
+        "credit": { "id": 12090316, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

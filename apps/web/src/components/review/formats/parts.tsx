@@ -1,6 +1,7 @@
 'use client';
 
 // Building blocks shared by format renderers.
+import { ExampleCredit } from '@/components/ui/example-credit';
 import type { Example, LangCode, StudyCard, Word } from '@vocabx/core';
 import { Volume2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -144,6 +145,7 @@ export function ExampleBlock({
       <p lang={wordLang} className="mt-1">
         <HighlightedText text={example.text} term={term} lang={wordLang} />
       </p>
+      <ExampleCredit credit={example.credit} />
     </figure>
   );
 }

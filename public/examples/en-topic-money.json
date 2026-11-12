@@ -1,0 +1,293 @@
+{
+  "v": 1,
+  "words": {
+    "en:discount": [
+      {
+        "text": "I always give Tom a discount.",
+        "credit": { "id": 12182713, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I always gave Tom a discount.",
+        "credit": { "id": 12072778, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Claudio will give Isabella a discount.",
+        "credit": { "id": 11688942, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mark gave Jessica a discount coupon.",
+        "credit": { "id": 11543002, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:refund": [
+      {
+        "text": "The clerk gave Tom a refund.",
+        "credit": { "id": 10736282, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri can give Rima a refund.",
+        "credit": { "id": 10229046, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You should offer them a refund.",
+        "credit": { "id": 10597039, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm expecting a full refund.",
+        "credit": { "id": 7076213, "by": "Eccles17", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:cash": [
+      {
+        "text": "He secretly sent cash to Mom.",
+        "credit": { "id": 12745933, "by": "Abra", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Does that vending machine take cash?",
+        "credit": { "id": 12248989, "by": "Miktsoanit", "license": "CC0 1.0" }
+      },
+      {
+        "text": "That bank has a cash machine.",
+        "credit": { "id": 13003095, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He got away with the cash.",
+        "credit": { "id": 12951767, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:loan": [
+      {
+        "text": "Tom has already repaid his loan.",
+        "credit": { "id": 13744143, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Student loan repayment begins next month.",
+        "credit": { "id": 12080752, "by": "joan_LanguageProcess", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri asked someone for a loan.",
+        "credit": { "id": 10533128, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Does Tom still need a loan?",
+        "credit": { "id": 8838165, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:debt": [
+      {
+        "text": "Tom consolidated his credit card debt.",
+        "credit": { "id": 13797270, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She paid off Mom's debt.",
+        "credit": { "id": 12847190, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Who will pay Tom's debts?",
+        "credit": { "id": 13888296, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You're accumulating debt after debt.",
+        "credit": { "id": 13864361, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:budget": [
+      {
+        "text": "They want to stay under budget.",
+        "credit": { "id": 12890928, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She manages the office budget carefully.",
+        "credit": { "id": 12776923, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Gabor traveled on a tight budget.",
+        "credit": { "id": 11968416, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria has a high infrastructure budget.",
+        "credit": { "id": 10107554, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:save": [
+      {
+        "text": "The brave dog saved the children.",
+        "credit": { "id": 13910494, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We'll save time that way.",
+        "credit": { "id": 13837585, "by": "JK_Summerlin", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom saved my life last year.",
+        "credit": { "id": 13573025, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "A pack of wolves saved Tom.",
+        "credit": { "id": 13511504, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:spend": [
+      {
+        "text": "He tries to spend less money.",
+        "credit": { "id": 14097380, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Keeping track of spending is important.",
+        "credit": { "id": 13460836, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I enjoy spending time on Tatoeba.",
+        "credit": { "id": 13257931, "by": "LdjuherTaqvaylit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They spend their time chasing women.",
+        "credit": { "id": 13161938, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:bargain": [
+      {
+        "text": "Ziri began to bargain with Rima.",
+        "credit": { "id": 11223077, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You should consider a plea bargain.",
+        "credit": { "id": 12752265, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Bargaining does not force the purchase.",
+        "credit": { "id": 10885915, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Are you good at finding bargains?",
+        "credit": { "id": 10853893, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:price": [
+      {
+        "text": "The commodity market sets grain prices.",
+        "credit": { "id": 13406281, "by": "Igider", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Worth and price are different things.",
+        "credit": { "id": 12975375, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom wants to know the price.",
+        "credit": { "id": 12872856, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The price should fit my budget.",
+        "credit": { "id": 13190397, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:invoice": [
+      {
+        "text": "Sami came across some unpaid invoices.",
+        "credit": { "id": 6384348, "by": "OsoHombre", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary hasn't paid the invoice yet.",
+        "credit": { "id": 1742822, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This whole thing is the invoice.",
+        "credit": { "id": 13045706, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They have not approved my invoice.",
+        "credit": { "id": 9721183, "by": "6dDcHYgMAg", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:tax": [
+      {
+        "text": "He'll pay less in tax.",
+        "credit": { "id": 12930539, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "James was involved in tax fraud.",
+        "credit": { "id": 11511069, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Income tax rates will likely rise.",
+        "credit": { "id": 11471295, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Death and taxes are both unavoidable.",
+        "credit": { "id": 10960210, "by": "CM", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:income": [
+      {
+        "text": "My daily income is ten dollars.",
+        "credit": { "id": 13618177, "by": "Tigre", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "David wanted to increase his income.",
+        "credit": { "id": 11484089, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Income tax rates will likely rise.",
+        "credit": { "id": 11471295, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Is Algeria a middle-income economy?",
+        "credit": { "id": 10118583, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:withdraw": [
+      {
+        "text": "Turkey must withdraw its troops from Cyprus.",
+        "credit": { "id": 11491909, "by": "janTuki", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Many Algerians are withdrawing their foreign savings.",
+        "credit": { "id": 10088150, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "How much money do you withdraw?",
+        "credit": { "id": 13408329, "by": "kiryopi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "France will be withdrawing from Mali.",
+        "credit": { "id": 10987454, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:subscription": [
+      {
+        "text": "We renewed our subscription last week.",
+        "credit": { "id": 14091003, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri never used his Netflix subscription.",
+        "credit": { "id": 11050262, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I want to cancel a subscription.",
+        "credit": { "id": 12867792, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My subscription is ending in September.",
+        "credit": { "id": 12300812, "by": "Miktsoanit", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:wallet": [
+      {
+        "text": "Flavio saw Isabella drop her wallet.",
+        "credit": { "id": 11696131, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Paul lost his wallet and keys.",
+        "credit": { "id": 11653595, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Robert loved Sandra, not her wallet.",
+        "credit": { "id": 11599708, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He didn't steal the wallet.",
+        "credit": { "id": 12826822, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "v": 1,
+  "words": {
+    "en:charger": [
+      {
+        "text": "I forgot to bring my charger.",
+        "credit": { "id": 13247234, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Can you bring my charger, please?",
+        "credit": { "id": 12964124, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The phone charger doesn't work.",
+        "credit": { "id": 12888885, "by": "Josephlingo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do you have a phone charger?",
+        "credit": { "id": 11887753, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:battery": [
+      {
+        "text": "The battery ran out quite quickly.",
+        "credit": { "id": 12415052, "by": "nana2capriccio", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Your TV remote needs new batteries.",
+        "credit": { "id": 11886097, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Flavio charged the rover’s batteries.",
+        "credit": { "id": 11696977, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My laptop's battery is low.",
+        "credit": { "id": 13328968, "by": "Nicat", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:screen": [
+      {
+        "text": "John looks great on the screen.",
+        "credit": { "id": 11513566, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I shared my screen with Tom.",
+        "credit": { "id": 13658214, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He was glued to the screen.",
+        "credit": { "id": 12926419, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Be mindful of your screen time.",
+        "credit": { "id": 11889749, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:update": [
+      {
+        "text": "The system requires a new update.",
+        "credit": { "id": 13696537, "by": "Rafik", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri updated the garage security system.",
+        "credit": { "id": 12648579, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Check your email for important updates.",
+        "credit": { "id": 11889674, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Paul will send Amelia an update.",
+        "credit": { "id": 11653220, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:download": [
+      {
+        "text": "He downloaded the E-scooter app.",
+        "credit": { "id": 13586353, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Antonio downloaded Rima’s brain scans.",
+        "credit": { "id": 11774808, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I downloaded an electronic multilingual dictionary.",
+        "credit": { "id": 10314915, "by": "DJ_Saidez", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "But how to download the video?",
+        "credit": { "id": 13214431, "by": "EugeneGS", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:password": [
+      {
+        "text": "Please enter your password once again.",
+        "credit": { "id": 14066979, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Please request a new password reset.",
+        "credit": { "id": 13346056, "by": "Nicat", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Never let anyone know your password.",
+        "credit": { "id": 12856232, "by": "Teangloir", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I don't know his password.",
+        "credit": { "id": 13921994, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:wireless": [
+      {
+        "text": "Yanni had an unprotected wireless connection.",
+        "credit": { "id": 9104738, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I forgot to charge my wireless headset last night.",
+        "credit": { "id": 13230437, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Gabriel was a senior wireless operator on the Titanic.",
+        "credit": { "id": 11757075, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The wireless joypad made it easier to play from the couch.",
+        "credit": { "id": 13974570, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:storage": [
+      {
+        "text": "Ziri dried berries for winter storage.",
+        "credit": { "id": 12650401, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Pietro went to the storage unit.",
+        "credit": { "id": 11717826, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Martino used the basement for storage.",
+        "credit": { "id": 11713725, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The corridor leads to storage rooms.",
+        "credit": { "id": 11675778, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:keyboard": [
+      {
+        "text": "Tom fell asleep at the keyboard.",
+        "credit": { "id": 13952404, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I compose using the Amazigh keyboard.",
+        "credit": { "id": 12565445, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I write using the Amazigh keyboard.",
+        "credit": { "id": 12565444, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I think Tom plays the keyboards.",
+        "credit": { "id": 12212634, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:software": [
+      {
+        "text": "Ubuntu is an open-source software.",
+        "credit": { "id": 13965185, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The software requires an internet connection.",
+        "credit": { "id": 13848809, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Gabriel is an Algerian software designer.",
+        "credit": { "id": 11757426, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This software isn't very intuitive.",
+        "credit": { "id": 13823777, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:install": [
+      {
+        "text": "They are installing face recognition cameras.",
+        "credit": { "id": 13427907, "by": "Ooneykcall", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I want to install solar panels.",
+        "credit": { "id": 12978113, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Will you finally install linux now?",
+        "credit": { "id": 12703115, "by": "kleberlucas", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom installed a new light fixture.",
+        "credit": { "id": 12380802, "by": "ddnktr", "license": "CC0 1.0" }
+      }
+    ],
+    "en:backup": [
+      {
+        "text": "Bruno tried to call for backup.",
+        "credit": { "id": 11679266, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You have 1 backup token remaining.",
+        "credit": { "id": 13345050, "by": "Nicat", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You have 2 backup tokens remaining.",
+        "credit": { "id": 13345045, "by": "Nicat", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You should've called for backup.",
+        "credit": { "id": 12262085, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:crash": [
+      {
+        "text": "The waves crashed against the shoreline.",
+        "credit": { "id": 12851214, "by": "Teangloir", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom watched the waves crashing down.",
+        "credit": { "id": 12768434, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "The plane crashed into the mountains.",
+        "credit": { "id": 13917436, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The plane crashed into the sea.",
+        "credit": { "id": 13889739, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:laptop": [
+      {
+        "text": "I bought myself a new laptop.",
+        "credit": { "id": 13247643, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She chose a sleek black laptop.",
+        "credit": { "id": 12079636, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Diego's laptop was really old.",
+        "credit": { "id": 11748829, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Bruno watched movies on his laptop.",
+        "credit": { "id": 11681043, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:user": [
+      {
+        "text": "Janos is an experienced computer user.",
+        "credit": { "id": 13622164, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom is a non-magic-user.",
+        "credit": { "id": 13574019, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom's a recreational marijuana user.",
+        "credit": { "id": 11841114, "by": "Adelpa", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom is an intravenous drug user.",
+        "credit": { "id": 10322431, "by": "shekitten", "license": "CC0 1.0" }
+      }
+    ]
+  }
+}

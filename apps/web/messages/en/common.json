@@ -25,5 +25,9 @@
     "text": "Your words were saved by a newer version of the app, and this page opened an older one. So as not to spoil them, it leaves them alone: reload the page and everything will be there.",
     "reload": "Reload",
     "offline": "No connection? Get online and reload the page."
+  },
+  "exampleCredit": {
+    "label": "Tatoeba · {author}",
+    "title": "Sentence {id} on Tatoeba, by {author} ({license})"
   }
 }

@@ -16,6 +16,8 @@ export default defineConfig(
       '**/.next/**',
       '**/coverage/**',
       '**/.tmp-*/**',
+      // Run by hand with tsx, outside the app's tsconfig.
+      'apps/web/scripts/fetch-examples.ts',
       '**/next-env.d.ts',
       '**/playwright-report/**',
       '**/test-results/**',

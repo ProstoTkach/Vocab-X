@@ -1,22 +1,37 @@
 'use client';
 
-import { clozesOf, mergeExamples, MAX_EXAMPLES, systemClock, type Word } from '@vocabx/core';
+import {
+  clozesOf,
+  mergeExamples,
+  MAX_EXAMPLES,
+  systemClock,
+  type Example,
+  type Word,
+} from '@vocabx/core';
 import { useEffect } from 'react';
 import { useRepos } from '../repos';
+import { builtinExamplesOf } from './builtin-examples';
 import { contextWords, isSentence } from './suggest';
-import { useLexicon } from './use-lexicon';
+import { topUpGuard, useLexicon } from './use-lexicon';
 
-/** Words looked up at most this many per review, one after another. */
+/** Words of one review whose sentences are looked up on the network, one after another. */
 const PER_SESSION = 10;
-/** Words already looked up since the page opened (an empty answer is not asked again). */
+/** Words already handled since the page opened. */
 const tried = new Set<string>();
 
+const usable = (w: Word, found: readonly Example[]) =>
+  found.filter(
+    (e) => e.text.length <= 200 && isSentence(e.text) && contextWords(e.text, w.term, w.lang) >= 1,
+  );
+
 /**
- * The sentence tasks need several examples per word, but the built-in decks ship one each:
- * writing four more for every word of every deck would make the app heavier for everyone, for
- * words most learners never reach. Instead, the words of the current review that have fewer
- * than five are looked up in the background (the same free dictionaries as "Suggest", cached),
- * and what is found is kept with the word. The next time the word comes, it has more.
+ * The sentence tasks need several examples per word, but the built-in decks ship one each. The
+ * words of the current review that have fewer than five get more, and what is found is kept with
+ * the word (the next time it comes, it has more):
+ *  - built-in words: from the static files collected in advance (builtin-examples.ts), no
+ *    third party is asked;
+ *  - the learner's own words: from the free dictionaries and Tatoeba (cached), within the limits
+ *    of top-up-guard.ts.
  */
 export function useExampleTopUp(words: readonly Word[] | null, enabled: boolean) {
   const repos = useRepos();
@@ -25,24 +40,31 @@ export function useExampleTopUp(words: readonly Word[] | null, enabled: boolean)
     if (!enabled || !words) return;
     const ctrl = new AbortController();
     const stopped = () => ctrl.signal.aborted;
-    const todo = words
-      .filter((w) => !tried.has(w.id) && clozesOf(w).length < MAX_EXAMPLES)
-      .slice(0, PER_SESSION);
+    const guard = topUpGuard();
+    const needing = words.filter((w) => !tried.has(w.id) && clozesOf(w).length < MAX_EXAMPLES);
+    const own = needing.filter((w) => w.source !== 'builtin');
+    const todo = [
+      ...needing.filter((w) => w.source === 'builtin'),
+      ...guard.allowed(own).slice(0, PER_SESSION),
+    ];
     void (async () => {
       for (const w of todo) {
         if (stopped()) return;
         tried.add(w.id);
-        const entries = await lexicon.dictionary
-          .lookup(w.term, w.lang, ctrl.signal)
-          .catch(() => []);
-        const found = entries
-          .flatMap((e) => e.examples)
-          .filter(
-            (e) =>
-              e.text.length <= 200 &&
-              isSentence(e.text) &&
-              contextWords(e.text, w.term, w.lang) >= 1,
+        let found: Example[];
+        if (w.source === 'builtin') {
+          found = await builtinExamplesOf(w, ctrl.signal);
+        } else {
+          if (!guard.spend()) return;
+          const entries = await lexicon.dictionary
+            .lookup(w.term, w.lang, ctrl.signal)
+            .catch(() => []);
+          found = usable(
+            w,
+            entries.flatMap((e) => e.examples),
           );
+          if (!found.length && !stopped()) guard.markEmpty(w.id);
+        }
         const examples = mergeExamples(w, w.examples, found);
         if (examples.length === w.examples.length || stopped()) continue;
         // Read again: the word may have changed meanwhile (an edit, a new translation).

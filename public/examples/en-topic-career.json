@@ -1,0 +1,281 @@
+{
+  "v": 1,
+  "words": {
+    "en:interview": [
+      {
+        "text": "He wanted to interview Tom Hanks.",
+        "credit": { "id": 12846288, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He scheduled interviews with two candidates.",
+        "credit": { "id": 12828145, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Are you interviewing Tom Jackson today?",
+        "credit": { "id": 12149862, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I had three job interviews today.",
+        "credit": { "id": 12078254, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:candidate": [
+      {
+        "text": "He scheduled interviews with two candidates.",
+        "credit": { "id": 12828145, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Yuri was still among the candidates.",
+        "credit": { "id": 11941965, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Elections, shmelections; the candidates are fags.",
+        "credit": { "id": 10729664, "by": "Ooneykcall", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Neither candidate is very well known.",
+        "credit": { "id": 10612380, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:skill": [
+      {
+        "text": "Tom has very good organizational skills.",
+        "credit": { "id": 13691931, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I really respect his teaching skills.",
+        "credit": { "id": 13690473, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The students admire her leadership skills.",
+        "credit": { "id": 13535368, "by": "LeviHighway", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Your guitar skills were always impressive.",
+        "credit": { "id": 13253163, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:qualification": [
+      {
+        "text": "We agreed to the plan without qualification.",
+        "credit": { "id": 322794, "by": "shekitten", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I support his proposal with certain qualifications.",
+        "credit": { "id": 253045, "by": "ddnktr", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Proper qualifications are required for the position.",
+        "credit": { "id": 46153, "by": "CM", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They left school aged 16 with no qualifications.",
+        "credit": { "id": 10861623, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:apply": [
+      {
+        "text": "Tom has applied for Canadian citizenship.",
+        "credit": { "id": 11875976, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Fyodor applied for a scholarship program.",
+        "credit": { "id": 11819882, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The driver cautiously applied the brakes.",
+        "credit": { "id": 11700240, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm applying to the university.",
+        "credit": { "id": 13738200, "by": "apzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:hire": [
+      {
+        "text": "She hired a good defence lawyer.",
+        "credit": { "id": 13882771, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We hired an off-road vehicle.",
+        "credit": { "id": 13166926, "by": "maaster", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He'll hire a private chef.",
+        "credit": { "id": 12937477, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Are you going to hire Tom?",
+        "credit": { "id": 13919591, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:strength": [
+      {
+        "text": "Others admire my resilience and strength.",
+        "credit": { "id": 13675511, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The old mans hands lost strength.",
+        "credit": { "id": 13255841, "by": "OsmanOmera", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Choosing silence shows strength of character.",
+        "credit": { "id": 13207072, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Does your roommate do strength training?",
+        "credit": { "id": 13962276, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:weakness": [
+      {
+        "text": "It's seen as a weakness.",
+        "credit": { "id": 13874486, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Authoritarianism is the result of weakness.",
+        "credit": { "id": 13497765, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Your strength is also your weakness.",
+        "credit": { "id": 12576382, "by": "elithyia", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:goal": [
+      {
+        "text": "We can all achieve our goals.",
+        "credit": { "id": 14098537, "by": "Tartar", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Our goal is to cross over.",
+        "credit": { "id": 14055829, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Our goal was to prevent bloodshed.",
+        "credit": { "id": 13985217, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We hope to reach our goal.",
+        "credit": { "id": 13926576, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:internship": [
+      {
+        "text": "I'm doing an internship right now.",
+        "credit": { "id": 13879224, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The internship has reached its final week.",
+        "credit": { "id": 10127987, "by": "shekitten", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My internship is about to end.",
+        "credit": { "id": 12317785, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It was the most interesting internship.",
+        "credit": { "id": 10127983, "by": "shekitten", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:reference": [
+      {
+        "text": "The report primarily references opinion articles.",
+        "credit": { "id": 13193646, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He made reference to that book.",
+        "credit": { "id": 12915802, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:ambitious": [
+      {
+        "text": "She sets ambitious goals for herself.",
+        "credit": { "id": 12775184, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Lajos was determined and super ambitious.",
+        "credit": { "id": 12082366, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tebboune has an ambitious economic agenda.",
+        "credit": { "id": 11409881, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria initiated an ambitious economic program.",
+        "credit": { "id": 10111964, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:benefit": [
+      {
+        "text": "Open data benefits the whole society.",
+        "credit": { "id": 13964313, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Improved conditions benefit all of humanity.",
+        "credit": { "id": 12766982, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Improvement benefits both self and society.",
+        "credit": { "id": 12766896, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "I am benefiting from that land.",
+        "credit": { "id": 13963609, "by": "IdiomHunter", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:contract": [
+      {
+        "text": "He contracted a sexually transmitted infection.",
+        "credit": { "id": 13867564, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This contract is made in duplicate.",
+        "credit": { "id": 14059843, "by": "jan_OkulaJu", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It's an open-ended contract.",
+        "credit": { "id": 13088585, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He has contracted a severe disease.",
+        "credit": { "id": 13087294, "by": "anzart", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:position": [
+      {
+        "text": "Our organization rarely takes political positions.",
+        "credit": { "id": 13985313, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I guess Tom envies my position.",
+        "credit": { "id": 13660014, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Be prepared to justify your position.",
+        "credit": { "id": 14030476, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do you want a management position?",
+        "credit": { "id": 13693329, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:freelance": [
+      {
+        "text": "Tom works as a freelance illustrator.",
+        "credit": { "id": 8987238, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom works mainly as a freelancer.",
+        "credit": { "id": 8884188, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom is a freelance computer programmer.",
+        "credit": { "id": 1093506, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He works as a freelance graphic designer.",
+        "credit": { "id": 12777333, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ]
+  }
+}

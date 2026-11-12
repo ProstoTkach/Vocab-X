@@ -1,0 +1,269 @@
+{
+  "v": 1,
+  "words": {
+    "en:angry": [
+      {
+        "text": "Why are you making me angry?",
+        "credit": { "id": 13933446, "by": "ninefi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I don't get angry easily.",
+        "credit": { "id": 13891647, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary said, \"I'm not angry.\"",
+        "credit": { "id": 13804643, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary really is angry at me.",
+        "credit": { "id": 13709904, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:proud": [
+      {
+        "text": "Dad is proud of his car.",
+        "credit": { "id": 14007817, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Those rich people are so proud.",
+        "credit": { "id": 13819916, "by": "LeeSooHa", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's proud to be French.",
+        "credit": { "id": 13810701, "by": "mervert1", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They will be proud of themselves.",
+        "credit": { "id": 13301054, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:nervous": [
+      {
+        "text": "Ziri was nervous to look back.",
+        "credit": { "id": 12652776, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I think he was just nervous.",
+        "credit": { "id": 13886985, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Believe me, I was really nervous.",
+        "credit": { "id": 13577363, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I get nervous trying to communicate.",
+        "credit": { "id": 13240472, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:lonely": [
+      {
+        "text": "I feel lonely without you around.",
+        "credit": { "id": 13014996, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She was a very lonely person.",
+        "credit": { "id": 13396936, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I think she's feeling lonely.",
+        "credit": { "id": 13351400, "by": "deniko", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm lonely without my dog.",
+        "credit": { "id": 13249563, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:excited": [
+      {
+        "text": "I'm excited to read it.",
+        "credit": { "id": 13815832, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:bored": [
+      {
+        "text": "Tom is very bored right now.",
+        "credit": { "id": 13897376, "by": "kylewii", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:jealous": [
+      {
+        "text": "I think Tom was probably jealous.",
+        "credit": { "id": 12711620, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Unfortunately, I'm the jealous type.",
+        "credit": { "id": 13702123, "by": "Babelball", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They were jealous of each other.",
+        "credit": { "id": 12673014, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They are jealous of one another.",
+        "credit": { "id": 12668097, "by": "anzart", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:grateful": [
+      {
+        "text": "When do you feel most grateful?",
+        "credit": { "id": 13270785, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I was grateful for the opportunity.",
+        "credit": { "id": 13258116, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They're grateful for the support.",
+        "credit": { "id": 12964657, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He is grateful for every lesson.",
+        "credit": { "id": 12775197, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:embarrassed": [
+      {
+        "text": "He feels embarrassed about his body.",
+        "credit": { "id": 13037031, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom was embarrassed by the river.",
+        "credit": { "id": 12894421, "by": "rdgscratch", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I would've been really embarrassed.",
+        "credit": { "id": 12438911, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm embarrassed to say that.",
+        "credit": { "id": 12391927, "by": "InfinitusPrimus", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:upset": [
+      {
+        "text": "I came home from work upset.",
+        "credit": { "id": 12911296, "by": "Asif", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This guy gets upset a lot.",
+        "credit": { "id": 12587079, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm sorry you're upset.",
+        "credit": { "id": 14080191, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I don't want upset him.",
+        "credit": { "id": 13812971, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:relaxed": [
+      {
+        "text": "Massages help me to feel relaxed.",
+        "credit": { "id": 14036777, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "On the balcony, Ziri relaxed alone.",
+        "credit": { "id": 12636598, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri relaxed with tea after work.",
+        "credit": { "id": 12636538, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "When do you feel most relaxed?",
+        "credit": { "id": 13270783, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:scared": [
+      {
+        "text": "She's scared to return home.",
+        "credit": { "id": 14043191, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "That cat's scared of mice.",
+        "credit": { "id": 14026324, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "What he told me scared me.",
+        "credit": { "id": 13858346, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's scared of facing reality.",
+        "credit": { "id": 13604288, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:surprised": [
+      {
+        "text": "I was surprised by the news.",
+        "credit": { "id": 13855892, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I am surprised by what happened.",
+        "credit": { "id": 13408573, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I was surprised by their stupidity.",
+        "credit": { "id": 13283808, "by": "Ooneykcall", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I was surprised by her stupidity.",
+        "credit": { "id": 13283807, "by": "Ooneykcall", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:calm": [
+      {
+        "text": "Little by little, she calmed down.",
+        "credit": { "id": 13727145, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Time passed, and she calmed down.",
+        "credit": { "id": 13645744, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Polite words calm a mad man.",
+        "credit": { "id": 12977823, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You need to calm way down.",
+        "credit": { "id": 12963947, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:disappointed": [
+      {
+        "text": "Till now, all men disappointed me.",
+        "credit": { "id": 13093930, "by": "maaster", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "A lot of us are disappointed.",
+        "credit": { "id": 13813066, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm not mad, just disappointed.",
+        "credit": { "id": 13523993, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm not angry, just disappointed.",
+        "credit": { "id": 13523991, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:shy": [
+      {
+        "text": "I like shy boys like him.",
+        "credit": { "id": 14083319, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The shy pupil whispered his answer.",
+        "credit": { "id": 13825264, "by": "TATAR1", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You often shy away in fear.",
+        "credit": { "id": 13675535, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I shy away from new adventures.",
+        "credit": { "id": 12994027, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

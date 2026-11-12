@@ -1,0 +1,533 @@
+{
+  "v": 1,
+  "words": {
+    "en:weather": [
+      {
+        "text": "The weather in England changes often.",
+        "credit": { "id": 14005265, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom complained about the hot weather.",
+        "credit": { "id": 13955505, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The weather in Copenhagen was freezing.",
+        "credit": { "id": 14045172, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The weather here is very bad.",
+        "credit": { "id": 13892579, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:ticket": [
+      {
+        "text": "The plane ticket costs 727 dollars.",
+        "credit": { "id": 13840137, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I need two tickets to Boston.",
+        "credit": { "id": 13622320, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Please give me a transfer ticket.",
+        "credit": { "id": 13565224, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Wait, let me buy his ticket.",
+        "credit": { "id": 13432039, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:neighbour": [
+      {
+        "text": "Our neighbour repaired our oven yesterday.",
+        "credit": { "id": 14032721, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We greet our neighbours every morning.",
+        "credit": { "id": 13864305, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We look after our elderly neighbours.",
+        "credit": { "id": 13792025, "by": "Just_Balls", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The rotten apple injures its neighbour.",
+        "credit": { "id": 13677550, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:recipe": [
+      {
+        "text": "He enjoys experimenting with new recipes.",
+        "credit": { "id": 12944928, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I like to try new recipes.",
+        "credit": { "id": 12768005, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri used cream in the recipe.",
+        "credit": { "id": 12636731, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom stole this recipe from Mary.",
+        "credit": { "id": 12120189, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:luggage": [
+      {
+        "text": "He offered to carry the luggage.",
+        "credit": { "id": 12915849, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Place your luggage on the ground.",
+        "credit": { "id": 12646602, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It's in the luggage compartment.",
+        "credit": { "id": 12536298, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "When can I collect my luggage?",
+        "credit": { "id": 12259790, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:healthy": [
+      {
+        "text": "Sleep is necessary to stay healthy.",
+        "credit": { "id": 13839854, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Apple juice is a healthy drink.",
+        "credit": { "id": 13313965, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Healthy discussions can demystify many topics.",
+        "credit": { "id": 13131159, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Respect is important for healthy relationships.",
+        "credit": { "id": 13028380, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:expensive": [
+      {
+        "text": "Cat food has gotten more expensive.",
+        "credit": { "id": 14006206, "by": "kitler", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Copenhagen is beautiful, but very expensive.",
+        "credit": { "id": 14045153, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "That bag is pretty and expensive.",
+        "credit": { "id": 13868984, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The car is pretty, but expensive.",
+        "credit": { "id": 13572786, "by": "araneo", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:crowded": [
+      {
+        "text": "The school corridors are always crowded.",
+        "credit": { "id": 14075219, "by": "CuteGirlLeia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The bar is getting really crowded.",
+        "credit": { "id": 13631059, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The market is crowded with people.",
+        "credit": { "id": 13681929, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:lazy": [
+      {
+        "text": "James was lazy and acted spoilt.",
+        "credit": { "id": 11506571, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I really am kind of lazy.",
+        "credit": { "id": 13803737, "by": "haohao", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The lazy will not find anything.",
+        "credit": { "id": 13090461, "by": "monsen_sanang_ai", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I hate when people are lazy.",
+        "credit": { "id": 12884317, "by": "Josephlingo", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:borrow": [
+      {
+        "text": "Governments borrow money by issuing bonds.",
+        "credit": { "id": 12947343, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Can I borrow three hundred dollars?",
+        "credit": { "id": 12345381, "by": "Miktsoanit", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Let me borrow your fly swatter.",
+        "credit": { "id": 12242474, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I borrowed an onion from Tom.",
+        "credit": { "id": 13589117, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:invite": [
+      {
+        "text": "I regret inviting Tom for dinner.",
+        "credit": { "id": 13623041, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They invited everyone and their mother.",
+        "credit": { "id": 13855907, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "May I invite you to lunch?",
+        "credit": { "id": 13802374, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Come! I'm inviting you home.",
+        "credit": { "id": 13715693, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:forget": [
+      {
+        "text": "You never forget your first love.",
+        "credit": { "id": 13835395, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Technology makes us forget our past.",
+        "credit": { "id": 13824583, "by": "Just_Balls", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Forget it, I'm ordering takeout.",
+        "credit": { "id": 14067736, "by": "jan_OkulaJu", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "How did he forget his appointment?",
+        "credit": { "id": 14018137, "by": "haomakk", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:return": [
+      {
+        "text": "My wife will return home soon.",
+        "credit": { "id": 13718834, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I will return home soon, today.",
+        "credit": { "id": 13698679, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I have just returned the magazines.",
+        "credit": { "id": 14068835, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She's scared to return home.",
+        "credit": { "id": 14043191, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:already": [
+      {
+        "text": "They'd already promptly gone away.",
+        "credit": { "id": 14047833, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary already read today's paper.",
+        "credit": { "id": 13886470, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They're already at the door.",
+        "credit": { "id": 14051842, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They're already on our doorstep.",
+        "credit": { "id": 14051841, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:nearly": [
+      {
+        "text": "The wine has nearly run out.",
+        "credit": { "id": 13894356, "by": "glossboss", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "That's nearly impossible to read.",
+        "credit": { "id": 13818988, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It's nearly time to go.",
+        "credit": { "id": 13493672, "by": "Ooneykcall", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:arrive": [
+      {
+        "text": "They'll arrive at Logan, Boston.",
+        "credit": { "id": 14050906, "by": "maaster", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'll arrive in a bit",
+        "credit": { "id": 14087488, "by": "yessoos", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I will arrive on Monday morning.",
+        "credit": { "id": 14070836, "by": "humed_adam", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Lock the door! They're arriving!",
+        "credit": { "id": 14040603, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:decide": [
+      {
+        "text": "He decided to eat off-peak.",
+        "credit": { "id": 14080775, "by": "jan_OkulaJu", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom decided to become a politician.",
+        "credit": { "id": 13979163, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Who decided that that would happen?",
+        "credit": { "id": 14012334, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do you know what she decided?",
+        "credit": { "id": 13956480, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:explain": [
+      {
+        "text": "This video explained Japanese grammar comprehensively.",
+        "credit": { "id": 14043756, "by": "Dexterity121", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Dependency theory explains global economic inequalities.",
+        "credit": { "id": 13711978, "by": "menaud", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "That wouldn't explain everything, though.",
+        "credit": { "id": 13630437, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Explain it in very simple terms.",
+        "credit": { "id": 13855340, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:hurry": [
+      {
+        "text": "I need it now. Hurry, please!",
+        "credit": { "id": 13433437, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Hurry up and take a bath.",
+        "credit": { "id": 14017730, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They're clearly in no hurry.",
+        "credit": { "id": 13941105, "by": "glossboss", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He does things in a hurry.",
+        "credit": { "id": 13901853, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:careful": [
+      {
+        "text": "Careful, slippery conditions on the road!",
+        "credit": { "id": 13783415, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Be careful when writing in Polish.",
+        "credit": { "id": 14015034, "by": "haomakk", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Be careful, this virus is airborne.",
+        "credit": { "id": 13909145, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Be careful on the way down.",
+        "credit": { "id": 13817136, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:comfortable": [
+      {
+        "text": "I enjoy situations that feel comfortable.",
+        "credit": { "id": 12994245, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I felt comfortable with you today.",
+        "credit": { "id": 13812670, "by": "Just_Balls", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "When do you feel most comfortable?",
+        "credit": { "id": 13270791, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:dangerous": [
+      {
+        "text": "They use dangerous chemicals on fruits.",
+        "credit": { "id": 14070874, "by": "humed_adam", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He often drives at dangerous speeds.",
+        "credit": { "id": 14070866, "by": "humed_adam", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Wounded bears are generally very dangerous.",
+        "credit": { "id": 13648889, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Little knowledge is a dangerous thing.",
+        "credit": { "id": 13388039, "by": "Roomba_Unit", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:empty": [
+      {
+        "text": "The blue bottle was empty yesterday.",
+        "credit": { "id": 13971591, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She arrived empty-handed, without food.",
+        "credit": { "id": 13632823, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Went to sleep with empty stomach.",
+        "credit": { "id": 13255718, "by": "OsmanOmera", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Your words feel empty and insincere.",
+        "credit": { "id": 13245386, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:quiet": [
+      {
+        "text": "Please be quiet. Meeting in progress.",
+        "credit": { "id": 13867527, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary lives on a quiet street.",
+        "credit": { "id": 13388511, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Be quiet! The children are sleeping!",
+        "credit": { "id": 14016079, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They live in a quiet neighbourhood.",
+        "credit": { "id": 14016074, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:holiday": [
+      {
+        "text": "He sings this song every holiday.",
+        "credit": { "id": 12953022, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Have you uploaded the holiday photos?",
+        "credit": { "id": 13974269, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I plan to go on holiday.",
+        "credit": { "id": 13734394, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "How quickly the holidays went by!",
+        "credit": { "id": 13408280, "by": "kiryopi", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:bill": [
+      {
+        "text": "Bill's Hebrew name was Avraham.",
+        "credit": { "id": 13057335, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The bill was being debated throughly.",
+        "credit": { "id": 13752705, "by": "qwertydiy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He only ever has large bills.",
+        "credit": { "id": 13517785, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Bill and I are good friends.",
+        "credit": { "id": 13371790, "by": "Nicat", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:message": [
+      {
+        "text": "Look, he sent you four messages!",
+        "credit": { "id": 13864314, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He delivered messages around the city.",
+        "credit": { "id": 12949620, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He didn't understand my message.",
+        "credit": { "id": 13863823, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "How dare you read my messages?",
+        "credit": { "id": 13815949, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:gift": [
+      {
+        "text": "Where's my Christmas gift now?",
+        "credit": { "id": 14021077, "by": "stoopeedhooman", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's generous when making gifts.",
+        "credit": { "id": 14018948, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm gifting you my heart!",
+        "credit": { "id": 14010988, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She didn't accept my gift.",
+        "credit": { "id": 14001315, "by": "maaster", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:receipt": [
+      {
+        "text": "Could you show me your receipt?",
+        "credit": { "id": 11886927, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do you need these old receipts?",
+        "credit": { "id": 10153043, "by": "ddnktr", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Do you still have the receipts?",
+        "credit": { "id": 10123851, "by": "DJ_Saidez", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I can't find the receipt.",
+        "credit": { "id": 10110906, "by": "ddnktr", "license": "CC0 1.0" }
+      }
+    ],
+    "en:suddenly": [
+      {
+        "text": "Suddenly all the lights went off.",
+        "credit": { "id": 13872858, "by": "LeeSooHa", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Suddenly, a flute began to play.",
+        "credit": { "id": 13856686, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The princess suddenly started to cry.",
+        "credit": { "id": 13813278, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Before daybreak, I was suddenly awoken.",
+        "credit": { "id": 13802740, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

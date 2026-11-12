@@ -1,0 +1,261 @@
+{
+  "v": 1,
+  "words": {
+    "en:colleague": [
+      {
+        "text": "Lunch breaks were enjoyable with colleagues.",
+        "credit": { "id": 13155426, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "None of my colleagues like Tom.",
+        "credit": { "id": 12433851, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Neither of my colleagues likes Tom.",
+        "credit": { "id": 12433841, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My colleague knows the technical data.",
+        "credit": { "id": 12283857, "by": "Lebensfreude", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:deadline": [
+      {
+        "text": "He needs to set clear deadlines.",
+        "credit": { "id": 12828183, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They set deadlines for each task.",
+        "credit": { "id": 12776919, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "You consistently struggle to meet deadlines.",
+        "credit": { "id": 12125426, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom has never met a deadline.",
+        "credit": { "id": 12078735, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:meeting": [
+      {
+        "text": "I wish you a productive meeting.",
+        "credit": { "id": 14071432, "by": "humed_adam", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:salary": [
+      {
+        "text": "Tom has an above-average salary.",
+        "credit": { "id": 13349740, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Lajos never discusses salary at work.",
+        "credit": { "id": 12099510, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Dad gave mum all his salary.",
+        "credit": { "id": 9788575, "by": "helloroto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Everyone aims for a salary increase.",
+        "credit": { "id": 9681441, "by": "Nylez", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:manager": [
+      {
+        "text": "The new manager is very professional.",
+        "credit": { "id": 14019154, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Appoint me as the project manager.",
+        "credit": { "id": 13994308, "by": "menaud", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I can't stand our manager.",
+        "credit": { "id": 13843502, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:task": [
+      {
+        "text": "Finishing tasks is his strong suit.",
+        "credit": { "id": 13244450, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This kind of task requires dedication.",
+        "credit": { "id": 13014956, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They set deadlines for each task.",
+        "credit": { "id": 12776919, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "You have successfully completed this task.",
+        "credit": { "id": 13583556, "by": "Native77", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:schedule": [
+      {
+        "text": "The hours suited his schedule perfectly.",
+        "credit": { "id": 13155381, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My schedule is often quite full.",
+        "credit": { "id": 13012982, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You have a tight schedule today.",
+        "credit": { "id": 14087500, "by": "yessoos", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I need to schedule a ride.",
+        "credit": { "id": 13542410, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:employee": [
+      {
+        "text": "Who's the new employee again?",
+        "credit": { "id": 14018092, "by": "haomakk", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "New employees have joined the company.",
+        "credit": { "id": 13904020, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The new employee is dead weight.",
+        "credit": { "id": 12892705, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She works on employee retention strategies.",
+        "credit": { "id": 12777177, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:remote": [
+      {
+        "text": "Hold the remote with clean hands.",
+        "credit": { "id": 11887378, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Keep the remote away from liquids.",
+        "credit": { "id": 11886295, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Your TV remote needs new batteries.",
+        "credit": { "id": 11886097, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Oleg worked in a remote place.",
+        "credit": { "id": 11850842, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:promotion": [
+      {
+        "text": "I congratulate you on your promotion.",
+        "credit": { "id": 13858834, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Dad, I got a promotion today!",
+        "credit": { "id": 13843431, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:overtime": [
+      {
+        "text": "It's not worth working overtime.",
+        "credit": { "id": 13957260, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Did you have to work overtime?",
+        "credit": { "id": 12160216, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Are you willing to work overtime?",
+        "credit": { "id": 11887271, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We were forced to work overtime.",
+        "credit": { "id": 11618407, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:report": [
+      {
+        "text": "False reports can affect social decisions.",
+        "credit": { "id": 13960528, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "No one's reported Tom missing.",
+        "credit": { "id": 13588429, "by": "Adelpa", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "No one has reported Tom missing.",
+        "credit": { "id": 13588428, "by": "Adelpa", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Report suspicious individuals to the police.",
+        "credit": { "id": 13403715, "by": "ddnktr", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:shift": [
+      {
+        "text": "We worked the night shift yesterday.",
+        "credit": { "id": 13339180, "by": "artemlyubchenko", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Changes are shifting outside the word.",
+        "credit": { "id": 12946152, "by": "sacredceltic", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom has been working extra shifts.",
+        "credit": { "id": 12927652, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Elevation requires a shift in perspective.",
+        "credit": { "id": 12766893, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:department": [
+      {
+        "text": "Tom is in the casualty department.",
+        "credit": { "id": 12397876, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's in the casualty department.",
+        "credit": { "id": 12397851, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:resign": [
+      {
+        "text": "They demanded that the mayor resign.",
+        "credit": { "id": 13405356, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They must all resign in disgrace.",
+        "credit": { "id": 12203669, "by": "Adelpa", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm going to publicly resign.",
+        "credit": { "id": 12194526, "by": "Miktsoanit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He is said to have resigned.",
+        "credit": { "id": 12089871, "by": "ceviri_atolyesi", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:workload": [
+      {
+        "text": "Tom didn't mind the added workload.",
+        "credit": { "id": 7131272, "by": "CM", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom doesn't mind the added workload.",
+        "credit": { "id": 7131039, "by": "CM", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It's good to lighten the workload of others.",
+        "credit": { "id": 12508105, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom is barely coping with his workload at the moment.",
+        "credit": { "id": 9246683, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

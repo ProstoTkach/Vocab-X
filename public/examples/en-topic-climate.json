@@ -1,0 +1,257 @@
+{
+  "v": 1,
+  "words": {
+    "en:pollution": [
+      {
+        "text": "Pollution had devastated the coastal areas.",
+        "credit": { "id": 12765037, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Pollution was slowly killing the environment.",
+        "credit": { "id": 12765030, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Pollution clouded the skies for weeks.",
+        "credit": { "id": 12765000, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Pollution was turning the water toxic.",
+        "credit": { "id": 12764969, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:emission": [
+      {
+        "text": "Saving energy can reduce greenhouse gas emissions.",
+        "credit": { "id": 12715623, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Cars are equipped with emission-control filters.",
+        "credit": { "id": 10480640, "by": "traeton", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria needs to decrease its emission levels.",
+        "credit": { "id": 10078315, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Can Algiers become a zero-emissions metropolis?",
+        "credit": { "id": 8592925, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:renewable": [
+      {
+        "text": "Algeria is rich in renewable energies.",
+        "credit": { "id": 10101169, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Renewable energies are unstoppable in Algeria.",
+        "credit": { "id": 8610655, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Can Algeria rely on renewable energy?",
+        "credit": { "id": 8610567, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:recycle": [
+      {
+        "text": "She crafts jewelry from recycled materials.",
+        "credit": { "id": 12777317, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Yanni recycles his car engine oil.",
+        "credit": { "id": 10011414, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We've started to recycle newspapers.",
+        "credit": { "id": 7791863, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's an Algerian glass recycler.",
+        "credit": { "id": 8592838, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:drought": [
+      {
+        "text": "Benedito's plant is drought-tolerant.",
+        "credit": { "id": 11736430, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Drought could displace millions of Algerians.",
+        "credit": { "id": 11409780, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The giraffe herd survived the drought.",
+        "credit": { "id": 8558937, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "These giraffes died during the drought.",
+        "credit": { "id": 8557152, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:flood": [
+      {
+        "text": "Tom lost everything in the flood.",
+        "credit": { "id": 13109092, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The flood hurt the whole region.",
+        "credit": { "id": 12185949, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The rainwater flooded Benedito's garden.",
+        "credit": { "id": 11736318, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The area will experience great floods.",
+        "credit": { "id": 11711465, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:species": [
+      {
+        "text": "This animal species is nearing extinction.",
+        "credit": { "id": 13855359, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sperm size can vary across species.",
+        "credit": { "id": 13266958, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri discovered a new bird species.",
+        "credit": { "id": 12636643, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Humans will become an interplanetary species.",
+        "credit": { "id": 11711701, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:carbon": [
+      {
+        "text": "Carbon dioxide is also called CO₂.",
+        "credit": { "id": 12503207, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Carbon dioxide is indispensable for plants.",
+        "credit": { "id": 12500509, "by": "maaster", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Paper is white, carbon is black.",
+        "credit": { "id": 10113846, "by": "DJ_Saidez", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria needs a smaller carbon footprint.",
+        "credit": { "id": 10078335, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:waste": [
+      {
+        "text": "Let's start without wasting time.",
+        "credit": { "id": 14068791, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Intelligent systems help reduce energy waste.",
+        "credit": { "id": 13960510, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He wasted money on useless things.",
+        "credit": { "id": 12920026, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You wasted two seconds reading this.",
+        "credit": { "id": 12823044, "by": "GustaBR", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:conservation": [
+      {
+        "text": "The organization focuses on wildlife conservation.",
+        "credit": { "id": 13748434, "by": "IMer", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:deforestation": [
+      {
+        "text": "Deforestation is a major concern for Algeria.",
+        "credit": { "id": 10136663, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom and Mary planted trees to help combat deforestation.",
+        "credit": { "id": 12767988, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Deforestation is destroying ecosystems and causing the loss of biodiversity.",
+        "credit": { "id": 11567733, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Deforestation and poor irrigation practices can lead to irreversible desertification.",
+        "credit": { "id": 10259697, "by": "bekindtoall", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:extinction": [
+      {
+        "text": "This animal species is nearing extinction.",
+        "credit": { "id": 13855359, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:footprint": [
+      {
+        "text": "The rain washed away the footprints.",
+        "credit": { "id": 12768459, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "The tracks looked like bloody footprints.",
+        "credit": { "id": 11667456, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Lukas noticed footprints on the carpet.",
+        "credit": { "id": 11650367, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Felix saw footprints in the snow.",
+        "credit": { "id": 11628288, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:habitat": [
+      {
+        "text": "He observed pandas in their natural habitat.",
+        "credit": { "id": 8392736, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The habitat of seals is typically coastal areas.",
+        "credit": { "id": 13906913, "by": "opalandwoof", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Vegans drink water destroying the habitat of fish.",
+        "credit": { "id": 11411310, "by": "maaster", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Not all zoos offer good habitats for their animals.",
+        "credit": { "id": 10553087, "by": "catimini", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:disposable": [
+      {
+        "text": "Disposable cups are banned at school.",
+        "credit": { "id": 10608616, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Discarded disposable facemasks littered the pavement.",
+        "credit": { "id": 10558954, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:heatwave": [
+      {
+        "text": "An intense heatwave is hitting Europe.",
+        "credit": { "id": 13880955, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Everyone will be relieved when the heatwave has ended.",
+        "credit": { "id": 11934926, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Summer heatwaves are becoming the new normal across Europe.",
+        "credit": { "id": 8958888, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We're in the second week of an unrelenting heatwave.",
+        "credit": { "id": 11060229, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

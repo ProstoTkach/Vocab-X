@@ -1,0 +1,511 @@
+{
+  "v": 1,
+  "words": {
+    "en:achieve": [
+      {
+        "text": "They worked hard to achieve success.",
+        "credit": { "id": 13831405, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He wants to achieve true godhood.",
+        "credit": { "id": 13548928, "by": "Myrano_", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I found everything simple to achieve.",
+        "credit": { "id": 13044403, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Set personal goals and achieve them.",
+        "credit": { "id": 13019857, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:advice": [
+      {
+        "text": "Don't ask anyone for advice.",
+        "credit": { "id": 13814015, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I've given you some advice.",
+        "credit": { "id": 13780699, "by": "ninefi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The advice is wasted on Tom.",
+        "credit": { "id": 13630938, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He disregarded his father's advice.",
+        "credit": { "id": 13559135, "by": "LeviHighway", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:device": [
+      {
+        "text": "Smart devices communicate through digital networks.",
+        "credit": { "id": 13960508, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Authenticate using a WebAuthn-compatible device.",
+        "credit": { "id": 13344870, "by": "Nicat", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Paul explained the device to Rima.",
+        "credit": { "id": 11656959, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Leon uses the device too often.",
+        "credit": { "id": 11639338, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:afford": [
+      {
+        "text": "They afforded that customer special treatment.",
+        "credit": { "id": 13858846, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He couldn't afford fancy lunches.",
+        "credit": { "id": 12937149, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He couldn't afford the treatment.",
+        "credit": { "id": 12974016, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He can't afford a dishwasher.",
+        "credit": { "id": 12956332, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:appointment": [
+      {
+        "text": "Do you have an appointment, madam?",
+        "credit": { "id": 14074492, "by": "Adelpa", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Why are you cancelling the appointment?",
+        "credit": { "id": 14027980, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "How did he forget his appointment?",
+        "credit": { "id": 14018137, "by": "haomakk", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I delayed my appointments for her.",
+        "credit": { "id": 13827636, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:attempt": [
+      {
+        "text": "Every attempt to remember feels futile.",
+        "credit": { "id": 13219650, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The farmer attempts to churn milk.",
+        "credit": { "id": 12523383, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Did Dr. Jackson attempt a diagnosis?",
+        "credit": { "id": 12135977, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Igor attempted to tackle the man.",
+        "credit": { "id": 11821938, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:available": [
+      {
+        "text": "Is the full track available anywhere?",
+        "credit": { "id": 13597616, "by": "Ooneykcall", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My pay slip is available online.",
+        "credit": { "id": 13406287, "by": "Igider", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "There aren't any beds available.",
+        "credit": { "id": 14012341, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Excuse me, is this spot available?",
+        "credit": { "id": 14007275, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:avoid": [
+      {
+        "text": "He tried to avoid sensitive topics.",
+        "credit": { "id": 13712968, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He tried to avoid sensitive subjects.",
+        "credit": { "id": 13712967, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He tried to avoid eye contact.",
+        "credit": { "id": 13320322, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Stinky situations can be easily avoided.",
+        "credit": { "id": 13229078, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:behaviour": [
+      {
+        "text": "Tom's bad behaviour discouraged everyone.",
+        "credit": { "id": 13892820, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Manners are part of good behaviour.",
+        "credit": { "id": 13086063, "by": "robert1991", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Nothing can excuse his rude behaviour.",
+        "credit": { "id": 12377117, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "People are talking about your behaviour.",
+        "credit": { "id": 12647952, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:complain": [
+      {
+        "text": "Tom complained about the hot weather.",
+        "credit": { "id": 13955505, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary complained for the entire meal.",
+        "credit": { "id": 13807575, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I have complained to the waitress.",
+        "credit": { "id": 13853570, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Don't cry, don't complain!",
+        "credit": { "id": 13787042, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:confident": [
+      {
+        "text": "You're a self-confident fellow.",
+        "credit": { "id": 13955207, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "When do you feel most confident?",
+        "credit": { "id": 13502142, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:decision": [
+      {
+        "text": "False reports can affect social decisions.",
+        "credit": { "id": 13960528, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Consider your decision carefully before proceeding.",
+        "credit": { "id": 13941106, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I analyze situations before making decisions.",
+        "credit": { "id": 13675588, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do you agree with our decision?",
+        "credit": { "id": 14063739, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:deliver": [
+      {
+        "text": "He delivered messages around the city.",
+        "credit": { "id": 12949620, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He delivered food to sick people.",
+        "credit": { "id": 12937119, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We deliver food to sick people.",
+        "credit": { "id": 12882634, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The anchorwoman delivered the news stoically.",
+        "credit": { "id": 12850350, "by": "Teangloir", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:environment": [
+      {
+        "text": "Children need a happy family environment.",
+        "credit": { "id": 14005338, "by": "LeviHighway", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sustainable technologies help protect the environment.",
+        "credit": { "id": 13960516, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "A positive environment promotes lifelong learning.",
+        "credit": { "id": 13236542, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "A loving environment nurtures personal growth.",
+        "credit": { "id": 13228067, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:especially": [
+      {
+        "text": "I like Asian food, especially Thai.",
+        "credit": { "id": 13436363, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The moon is especially beautiful today.",
+        "credit": { "id": 12069363, "by": "Winter", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Stay hydrated, especially during intense workouts.",
+        "credit": { "id": 11889917, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The moon tonight is especially beautiful.",
+        "credit": { "id": 10942504, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:experience": [
+      {
+        "text": "With experience, you'll get wiser.",
+        "credit": { "id": 13815963, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "His life is rich with experiences.",
+        "credit": { "id": 13648871, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Pessimists are optimists with more experience.",
+        "credit": { "id": 13587595, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She's a woman of experience.",
+        "credit": { "id": 13505693, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:improve": [
+      {
+        "text": "One always has to improve themself.",
+        "credit": { "id": 14081157, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "People often change and rarely improve.",
+        "credit": { "id": 14061426, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary can still improve her German.",
+        "credit": { "id": 13705991, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Your English level has greatly improved.",
+        "credit": { "id": 13365738, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:journey": [
+      {
+        "text": "Every journey begins with one step.",
+        "credit": { "id": 13806125, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Each person’s journey is unique.",
+        "credit": { "id": 13482852, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Life’s journey is beautifully unpredictable.",
+        "credit": { "id": 13184478, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He journeyed throughout the entire world.",
+        "credit": { "id": 13087932, "by": "anzart", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:knowledge": [
+      {
+        "text": "Little knowledge is a dangerous thing.",
+        "credit": { "id": 13388039, "by": "Roomba_Unit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Books provide valuable knowledge and insights.",
+        "credit": { "id": 12999043, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We gain knowledge through our failures.",
+        "credit": { "id": 12991006, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Knowledge is good; action is power.",
+        "credit": { "id": 12960096, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:manage": [
+      {
+        "text": "Manage your fixed-rate plan yourself.",
+        "credit": { "id": 14045842, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I managed to pass the exam.",
+        "credit": { "id": 14087496, "by": "yessoos", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The new manager is very professional.",
+        "credit": { "id": 14019154, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Appoint me as the project manager.",
+        "credit": { "id": 13994308, "by": "menaud", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:opportunity": [
+      {
+        "text": "Finding the right opportunity requires patience.",
+        "credit": { "id": 13667451, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He sees challenges as creative opportunities.",
+        "credit": { "id": 12776844, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "I was grateful for the opportunity.",
+        "credit": { "id": 13258116, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This is your chance – your opportunity.",
+        "credit": { "id": 13086217, "by": "robert1991", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:prefer": [
+      {
+        "text": "I prefer my coffee boiling hot.",
+        "credit": { "id": 13886012, "by": "mervert1", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I prefer white wine to red.",
+        "credit": { "id": 13864978, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I prefer to travel via bus.",
+        "credit": { "id": 13816786, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She prefers reading to attending parties.",
+        "credit": { "id": 13646391, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:reduce": [
+      {
+        "text": "Intelligent systems help reduce energy waste.",
+        "credit": { "id": 13960510, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Reducing travel stress was a priority.",
+        "credit": { "id": 13244525, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Government subsidies will also be reduced.",
+        "credit": { "id": 14032049, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm slowly reducing my dose.",
+        "credit": { "id": 13471330, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:reliable": [
+      {
+        "text": "A reliable source provides accurate information.",
+        "credit": { "id": 13960522, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom says Mary is quite reliable.",
+        "credit": { "id": 12453479, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The community's book is reliable.",
+        "credit": { "id": 13955158, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom used to be more reliable.",
+        "credit": { "id": 12930182, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:require": [
+      {
+        "text": "I require a few clothes hangers.",
+        "credit": { "id": 13940843, "by": "Zucker_t", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Learning Japanese requires thousands of hours.",
+        "credit": { "id": 13895217, "by": "kylewii", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The pursuit of success requires sacrifices.",
+        "credit": { "id": 13886005, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The software requires an internet connection.",
+        "credit": { "id": 13848809, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:suggest": [
+      {
+        "text": "I remember suggesting something similar before.",
+        "credit": { "id": 13459056, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I suggested the idea to Maria.",
+        "credit": { "id": 13588721, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I suggest you abandon that notion.",
+        "credit": { "id": 13272071, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I’m great at suggesting activities.",
+        "credit": { "id": 12982798, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:affect": [
+      {
+        "text": "False reports can affect social decisions.",
+        "credit": { "id": 13960528, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Years of confinement affected his health.",
+        "credit": { "id": 13753345, "by": "IMer", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Diet affects health, notably the heart.",
+        "credit": { "id": 13751645, "by": "IMer", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Certain medications can affect sperm viability.",
+        "credit": { "id": 13267007, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:effect": [
+      {
+        "text": "Their kindness creates a ripple effect.",
+        "credit": { "id": 13211031, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Don't confuse cause and effect.",
+        "credit": { "id": 14003679, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The disease is losing its effect.",
+        "credit": { "id": 13376067, "by": "Nicat", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You're confusing cause and effect.",
+        "credit": { "id": 12883696, "by": "clm333", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:worried": [
+      {
+        "text": "My mother's eyes looked worried.",
+        "credit": { "id": 13595654, "by": "supermarinete", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm worried about the result.",
+        "credit": { "id": 13989767, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

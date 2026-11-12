@@ -6,6 +6,9 @@ export const DICTIONARY_UPSTREAMS = [
   'https://en.wiktionary.org/api/rest_v1/page/definition/',
 ] as const;
 
+/** Header of an answer from /api/dictionary when the dictionary itself was throttling or down. */
+export const UPSTREAM_FAILED = 'x-upstream-failed';
+
 /**
  * Sends lookups of those dictionaries through the route, which turns "not found" and outages
  * into a quiet `null` (no red network errors in the console). Other addresses go out as they are.

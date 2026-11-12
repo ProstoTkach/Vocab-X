@@ -382,4 +382,20 @@ describe('cleaning up what the sources give', () => {
     expect(url.searchParams.get('word_count')).toBe('6-16');
     expect(await p.lookup('reliable', 'xx')).toEqual([]);
   });
+
+  test('Tatoeba: the sentence number, author and licence are kept for the credit', async () => {
+    const fetch = vi.fn<FetchLike>(() =>
+      json({
+        data: [
+          { id: 42, text: 'Tom is reliable.', owner: 'rul', license: 'CC BY 2.0 FR' },
+          { id: 43, text: 'Nobody knows the author.', owner: null, license: 'CC0 1.0' },
+        ],
+      }),
+    );
+    const [entry] = await createTatoebaProvider({ fetch }).lookup('reliable', 'en');
+    expect(entry?.examples).toEqual([
+      { text: 'Tom is reliable.', credit: { id: 42, by: 'rul', license: 'CC BY 2.0 FR' } },
+      { text: 'Nobody knows the author.' },
+    ]);
+  });
 });

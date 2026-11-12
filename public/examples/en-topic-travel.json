@@ -1,0 +1,263 @@
+{
+  "v": 1,
+  "words": {
+    "en:passport": [
+      {
+        "text": "Tom has stolen Mary’s passport.",
+        "credit": { "id": 12396613, "by": "mhr", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I've left my passport somewhere.",
+        "credit": { "id": 13791854, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My passport is in the hotel.",
+        "credit": { "id": 13718127, "by": "pcmill", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My passport is at the hotel.",
+        "credit": { "id": 13709342, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:flight": [
+      {
+        "text": "He went to book another flight.",
+        "credit": { "id": 12931333, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The March 30th flight is complete.",
+        "credit": { "id": 12772055, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri admired the eagles' graceful flight.",
+        "credit": { "id": 12648034, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Vladimir climbed forty flights of stairs.",
+        "credit": { "id": 11934063, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:departure": [
+      {
+        "text": "The departure is delayed one hour.",
+        "credit": { "id": 14043060, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I paid my departure fee online.",
+        "credit": { "id": 13333521, "by": "ninefi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Get ready! Departure in five minutes!",
+        "credit": { "id": 10945901, "by": "Sprakify", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Gate closes 20 minutes before departure.",
+        "credit": { "id": 3724705, "by": "corvard", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:delay": [
+      {
+        "text": "The departure is delayed one hour.",
+        "credit": { "id": 14043060, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Supplies of raw materials are delayed.",
+        "credit": { "id": 13406201, "by": "Igider", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The bad weather delayed the harvest.",
+        "credit": { "id": 13125223, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We're only delaying the inevitable.",
+        "credit": { "id": 13973492, "by": "Waldelfe", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:destination": [
+      {
+        "text": "Gustavo was driving towards his destination.",
+        "credit": { "id": 11768834, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algiers is a popular tourist destination.",
+        "credit": { "id": 11409592, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri has finally found his destination.",
+        "credit": { "id": 10803742, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Kalman was close to his destination.",
+        "credit": { "id": 12053271, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:suitcase": [
+      {
+        "text": "Tom packed his suitcase and left.",
+        "credit": { "id": 12508958, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom doesn't have a suitcase.",
+        "credit": { "id": 14016215, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'll buy Tom a suitcase.",
+        "credit": { "id": 13919584, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm weighing down my suitcases.",
+        "credit": { "id": 13825781, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:reservation": [
+      {
+        "text": "Janos lived on the Navajo reservation.",
+        "credit": { "id": 12033599, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We're on the Tuscarora reservation.",
+        "credit": { "id": 13280901, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "What time is our dinner reservation?",
+        "credit": { "id": 12964251, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I want to confirm my reservation.",
+        "credit": { "id": 11895298, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:passenger": [
+      {
+        "text": "This minibus holds twenty-five passengers.",
+        "credit": { "id": 12463793, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "None of the passengers said anything.",
+        "credit": { "id": 12177459, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Panic broke out among the passengers.",
+        "credit": { "id": 12070028, "by": "ddnktr", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Three passengers died in the crash.",
+        "credit": { "id": 11885654, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:abroad": [
+      {
+        "text": "Her son longs to study abroad.",
+        "credit": { "id": 12623964, "by": "LeeSooHa", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom and Mary both live abroad.",
+        "credit": { "id": 12320722, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'd like to study abroad.",
+        "credit": { "id": 13979170, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My daughter's also studying abroad.",
+        "credit": { "id": 13873806, "by": "araneo", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:sightseeing": [
+      {
+        "text": "Australia is a great place for sightseeing.",
+        "credit": { "id": 11103045, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Canada is a great place for sightseeing.",
+        "credit": { "id": 63634, "by": "CN", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Dirigibles are sometimes used for advertising and sightseeing.",
+        "credit": { "id": 13661482, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mennad did a lot of sightseeing.",
+        "credit": { "id": 8127570, "by": "OsoHombre", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:customs": [
+      {
+        "text": "I'm confused by your customs.",
+        "credit": { "id": 13344091, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:currency": [
+      {
+        "text": "A weaker currency can boost exports.",
+        "credit": { "id": 11727953, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria decided to devalue its currency.",
+        "credit": { "id": 10987477, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria needs more foreign currency reserves.",
+        "credit": { "id": 10987466, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria has enough foreign currency reserves.",
+        "credit": { "id": 10987461, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:guide": [
+      {
+        "text": "Her integrity was her guiding principle.",
+        "credit": { "id": 13652779, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Can I hire a tour guide?",
+        "credit": { "id": 13482213, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'll serve as your guide.",
+        "credit": { "id": 13076004, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I serve as a guiding light.",
+        "credit": { "id": 13038400, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:souvenir": [
+      {
+        "text": "He bought a two-bit souvenir.",
+        "credit": { "id": 14044591, "by": "Myrano_", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom bought a lot of souvenirs.",
+        "credit": { "id": 7520431, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom wanted to buy some souvenirs.",
+        "credit": { "id": 2015267, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It's a souvenir onsen egg.",
+        "credit": { "id": 13693662, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:hostel": [
+      {
+        "text": "Tom and Mary stayed at a hostel.",
+        "credit": { "id": 7872102, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This building is not a hostel.",
+        "credit": { "id": 8373415, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Is there a youth hostel here?",
+        "credit": { "id": 5707200, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I just arrived at the hostel.",
+        "credit": { "id": 1824777, "by": "CM", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

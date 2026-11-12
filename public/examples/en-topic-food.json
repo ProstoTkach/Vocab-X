@@ -1,0 +1,293 @@
+{
+  "v": 1,
+  "words": {
+    "en:vegetable": [
+      {
+        "text": "I bought vegetables, meat and butter.",
+        "credit": { "id": 13846351, "by": "ninefi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri tasted the vegetables for freshness.",
+        "credit": { "id": 12647763, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri planted vegetables in neat rows.",
+        "credit": { "id": 12647761, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The potato is a delicious vegetable.",
+        "credit": { "id": 13447388, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:meal": [
+      {
+        "text": "I only ate one meal today.",
+        "credit": { "id": 13905866, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary complained for the entire meal.",
+        "credit": { "id": 13807575, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The meal is still piping hot.",
+        "credit": { "id": 13726268, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Wait until the meal gets cold.",
+        "credit": { "id": 13305256, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:boil": [
+      {
+        "text": "I prefer my coffee boiling hot.",
+        "credit": { "id": 13886012, "by": "mervert1", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He poured away the boiling water.",
+        "credit": { "id": 13882579, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Are those eggs boiled or raw?",
+        "credit": { "id": 13890925, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "His boil is about to burst.",
+        "credit": { "id": 13859949, "by": "LeeSooHa", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:fry": [
+      {
+        "text": "The beef stir-fry was aromatic.",
+        "credit": { "id": 12106555, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom dipped a fry in ketchup.",
+        "credit": { "id": 8671642, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom dipped his fry in ketchup.",
+        "credit": { "id": 8659395, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom has bigger fish to fry.",
+        "credit": { "id": 3730157, "by": "CM", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:bake": [
+      {
+        "text": "I'm taking a baking class.",
+        "credit": { "id": 13630497, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom baked some cupcakes this afternoon.",
+        "credit": { "id": 12996261, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He baked a pumpkin spice cake.",
+        "credit": { "id": 12915586, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's pretty bad at baking.",
+        "credit": { "id": 12915555, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:ingredient": [
+      {
+        "text": "Ziri selected ingredients for the salad.",
+        "credit": { "id": 12647731, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The baker mixed the bun ingredients.",
+        "credit": { "id": 11880515, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Benedito's restaurant sources local ingredients.",
+        "credit": { "id": 11732284, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Combine all ingredients and mix well.",
+        "credit": { "id": 11600582, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:spicy": [
+      {
+        "text": "This spicy sauce tastes so good!",
+        "credit": { "id": 13866328, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Spicy food makes my stomach ache.",
+        "credit": { "id": 13333527, "by": "ninefi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sarah doesn't like spicy food.",
+        "credit": { "id": 13247859, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They threw the spicy sandwiches away.",
+        "credit": { "id": 12889471, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:sweet": [
+      {
+        "text": "Food coloring is added to sweets.",
+        "credit": { "id": 13775046, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Strong scents can evoke sweet memories.",
+        "credit": { "id": 13208416, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He'll never eat sweets again.",
+        "credit": { "id": 12944638, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sweet autumn air penetrates the bedroom.",
+        "credit": { "id": 12728064, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:sour": [
+      {
+        "text": "I accidentally drank soured milk today.",
+        "credit": { "id": 13532731, "by": "Babelball", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Relations between Algeria and Morocco soured.",
+        "credit": { "id": 11694313, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The milk tastes a little sour.",
+        "credit": { "id": 10849939, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Pretty apples can be sour, too.",
+        "credit": { "id": 13623540, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:flour": [
+      {
+        "text": "Tom is making bread without flour.",
+        "credit": { "id": 13899548, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri carefully measured out the flour.",
+        "credit": { "id": 12649516, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Gabor ground the corn into flour.",
+        "credit": { "id": 11968241, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Add flour, baking powder, and milk.",
+        "credit": { "id": 11883551, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:knife": [
+      {
+        "text": "The knife accidentally gashes her hand.",
+        "credit": { "id": 13855428, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The knife accidentally gashes his hand.",
+        "credit": { "id": 13855427, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom's got a big knife.",
+        "credit": { "id": 13472910, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I scared him with a knife.",
+        "credit": { "id": 13171749, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:menu": [
+      {
+        "text": "Ziri planned the restaurant’s menu.",
+        "credit": { "id": 12648245, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do you have a kids' menu?",
+        "credit": { "id": 13625737, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "May I have a menu, please?",
+        "credit": { "id": 13481884, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Can you pass me the menu?",
+        "credit": { "id": 13247815, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:waiter": [
+      {
+        "text": "Miroslav found work as a waiter.",
+        "credit": { "id": 11847103, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Waiter, please give us the menu.",
+        "credit": { "id": 11837292, "by": "Lemmih", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Donald noticed the waiter getting insulted.",
+        "credit": { "id": 11487342, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom threw up on the waiter.",
+        "credit": { "id": 13944483, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:tasty": [
+      {
+        "text": "It's now tasty Ayu season.",
+        "credit": { "id": 12597726, "by": "urro", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She makes a tasty avocado salsa.",
+        "credit": { "id": 12106623, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Roasted chickpeas are a tasty snack.",
+        "credit": { "id": 12106327, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The bletted medlars got really tasty.",
+        "credit": { "id": 11477579, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:dessert": [
+      {
+        "text": "Ziri's favorite dessert is cake.",
+        "credit": { "id": 12636761, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I would like fruit for dessert.",
+        "credit": { "id": 13891178, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You have to try this dessert.",
+        "credit": { "id": 13556250, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He made some cookies for dessert.",
+        "credit": { "id": 12920626, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:vegetarian": [
+      {
+        "text": "Ziri's entire family is vegetarian.",
+        "credit": { "id": 10805737, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do you like eating vegetarian pizza?",
+        "credit": { "id": 10468046, "by": "Objectivesea", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Does this pension have vegetarian food?",
+        "credit": { "id": 14094977, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Would you like a vegetarian pizza?",
+        "credit": { "id": 13025773, "by": "araneo", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

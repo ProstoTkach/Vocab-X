@@ -1,0 +1,263 @@
+{
+  "v": 1,
+  "words": {
+    "en:post": [
+      {
+        "text": "The dog pissed against a post.",
+        "credit": { "id": 13852169, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We'll keep the students posted.",
+        "credit": { "id": 12882534, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They chained themselves to lamp posts.",
+        "credit": { "id": 12635952, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He’s dumb as a post.",
+        "credit": { "id": 14093374, "by": "Myrano_", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:share": [
+      {
+        "text": "Tom lives in a shared flat.",
+        "credit": { "id": 13988540, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They often share stories at dinner.",
+        "credit": { "id": 13250590, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom didn't get his share.",
+        "credit": { "id": 13698669, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I shared my screen with Tom.",
+        "credit": { "id": 13658214, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:comment": [
+      {
+        "text": "Ziri posted the comments in Hebrew.",
+        "credit": { "id": 12625743, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Don't reply to negative comments!",
+        "credit": { "id": 13894995, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "His comment was a low blow.",
+        "credit": { "id": 13858424, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "His comment made me feel small.",
+        "credit": { "id": 13855909, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:profile": [
+      {
+        "text": "Ivan was keeping a low profile.",
+        "credit": { "id": 11830419, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Rodrigo began researching Rima’s profile.",
+        "credit": { "id": 11785241, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Claudio was running that Instagram profile.",
+        "credit": { "id": 11686174, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Martha went through men's profiles.",
+        "credit": { "id": 11501140, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:trend": [
+      {
+        "text": "The graph showed an upwards trend.",
+        "credit": { "id": 9358209, "by": "megamanenm", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Trends often feel like pressure to conform.",
+        "credit": { "id": 13202865, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I don't care about trends.",
+        "credit": { "id": 11518254, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We expect this trend to continue.",
+        "credit": { "id": 10685459, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:viral": [
+      {
+        "text": "Some TikTok-based memes go viral.",
+        "credit": { "id": 8599413, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sami's sex tape went viral.",
+        "credit": { "id": 7198804, "by": "OsoHombre", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This clip runs viral in Twitter.",
+        "credit": { "id": 3455087, "by": "fekundulo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sami's video went viral on YouTube.",
+        "credit": { "id": 7992316, "by": "OsoHombre", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:subscribe": [
+      {
+        "text": "Subscribe to help the channel grow.",
+        "credit": { "id": 11201166, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Smash that like button and subscribe.",
+        "credit": { "id": 10875704, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Press the like button and subscribe.",
+        "credit": { "id": 10873393, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Click the like button and subscribe.",
+        "credit": { "id": 10873392, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:privacy": [
+      {
+        "text": "Privacy is a fundamental human right.",
+        "credit": { "id": 12767841, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Privacy protects the individual from exploitation.",
+        "credit": { "id": 12767827, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Privacy ensures autonomy in decision-making.",
+        "credit": { "id": 12767820, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Protecting privacy is a human right.",
+        "credit": { "id": 12766996, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:account": [
+      {
+        "text": "The audit revealed several accounting irregularities.",
+        "credit": { "id": 13406223, "by": "Igider", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom has an offshore bank account.",
+        "credit": { "id": 13077348, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom's account has been deleted.",
+        "credit": { "id": 13999716, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They can even delete your account.",
+        "credit": { "id": 13928562, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:notification": [
+      {
+        "text": "Ivan turned on his YouTube notifications.",
+        "credit": { "id": 11830356, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Diego received a notification from Snapchat.",
+        "credit": { "id": 11750982, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Yanni clicked on the notification bell.",
+        "credit": { "id": 9800899, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He blocked out his social media notifications.",
+        "credit": { "id": 12828199, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:stream": [
+      {
+        "text": "Ford the stream without soaking yourself.",
+        "credit": { "id": 12580153, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tears streamed down Yuri's face.",
+        "credit": { "id": 11953954, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Be careful crossing streams or rivers.",
+        "credit": { "id": 11887339, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The stream flows through the garden.",
+        "credit": { "id": 11848752, "by": "ddnktr", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:influencer": [
+      {
+        "text": "Tom and Mary are political influencers.",
+        "credit": { "id": 13164485, "by": "maaster", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:block": [
+      {
+        "text": "A chip off the old block.",
+        "credit": { "id": 13048554, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He parked a couple blocks away.",
+        "credit": { "id": 12915469, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He blocked those people ages ago.",
+        "credit": { "id": 12904922, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Snow has blocked the western roads.",
+        "credit": { "id": 12675255, "by": "anzart", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:fake": [
+      {
+        "text": "He started printing the fake money.",
+        "credit": { "id": 12956271, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He was fake lifting heavy weights.",
+        "credit": { "id": 12920624, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom's entire image is fake.",
+        "credit": { "id": 12884684, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Walid was fake-lifting heavy weights.",
+        "credit": { "id": 12672315, "by": "Wassnen", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:hashtag": [
+      {
+        "text": "Yanni tweeting tweets with the hashtag \"Pray for Skura.\"",
+        "credit": { "id": 9956142, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They asked the social media platforms to take down the hashtag.",
+        "credit": { "id": 12113591, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Since 2019, the hashtag #okboomer has been used 3.7 billion times on TikTok.",
+        "credit": { "id": 9989093, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "To comment on a sentence, press the hashtag button, then go to the comment section.",
+        "credit": { "id": 10028677, "by": "espamatics", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

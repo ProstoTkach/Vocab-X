@@ -18,8 +18,20 @@ export type PartOfSpeech =
   | 'phrase'
   | 'other';
 
+/** Where a sentence comes from, when it is somebody else's work (Tatoeba, CC BY 2.0 FR). */
+export interface ExampleCredit {
+  /** Tatoeba's sentence number: https://tatoeba.org/sentences/show/<id>. */
+  id: number;
+  /** The author's name on Tatoeba. */
+  by: string;
+  /** The licence as Tatoeba names it ("CC BY 2.0 FR", "CC0 1.0"). */
+  license: string;
+}
+
 export interface Example {
   text: string;
+  /** Set for sentences taken from Tatoeba: shown next to the sentence. */
+  credit?: ExampleCredit | undefined;
   /** Translations of the sentence keyed by language. */
   translations?: Partial<Record<LangCode, string>>;
 }

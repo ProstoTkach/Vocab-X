@@ -13,7 +13,9 @@ import { browserStorage } from '../repos';
 import { cachedLexicon, cachedTranslations } from './cached';
 import { createFreeDictionaryProvider } from './free-dictionary';
 import { createGoogleTranslateProvider, type TranslateLimited } from './google-translate';
-import { proxiedFetch } from './proxy';
+import { proxiedFetch, UPSTREAM_FAILED } from './proxy';
+import { createTopUpGuard, type TopUpGuard } from './top-up-guard';
+import type { FetchLike } from './http';
 import { mergedLexicon, mergedTranslations } from './suggest';
 import { createTatoebaProvider } from './tatoeba';
 import { createWiktionaryProvider } from './wiktionary';
@@ -28,9 +30,25 @@ export interface Lexicon {
 
 const CACHE = { maxEntries: 400, ttlMs: 30 * DAY_MS, now: () => systemClock.now() };
 
+let shared: TopUpGuard | undefined;
+/** The guard of this device (one per page: the lookups that trip it are made anywhere). */
+export function topUpGuard(): TopUpGuard {
+  return (shared ??= createTopUpGuard(browserStorage(), () => systemClock.now()));
+}
+
+/** A 429 or a server error (ours, or the dictionary's behind it) stops background lookups for an hour. */
+function watched(fetchFn: FetchLike): FetchLike {
+  return async (url, init) => {
+    const res = await fetchFn(url, init);
+    if (res.status === 429 || res.status >= 500 || res.headers.has(UPSTREAM_FAILED))
+      topUpGuard().pause();
+    return res;
+  };
+}
+
 function createLexicon(onLimited: (who: TranslateLimited) => void): Lexicon {
   const storage = browserStorage();
-  const fetchJson = proxiedFetch((url, init) => fetch(url, init));
+  const fetchJson = proxiedFetch(watched((url, init) => fetch(url, init)));
   return {
     // Google Translate gives the main translation of a word; the translation tables of the
     // English Wiktionary add the other senses (several variants to choose from).

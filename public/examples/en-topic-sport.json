@@ -1,0 +1,293 @@
+{
+  "v": 1,
+  "words": {
+    "en:exercise": [
+      {
+        "text": "Cookie ran on his exercise wheel.",
+        "credit": { "id": 13147692, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They exercise daily to stay fit.",
+        "credit": { "id": 12634285, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Include stretching exercises for injury prevention.",
+        "credit": { "id": 11889928, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Incorporate functional exercises for everyday movements.",
+        "credit": { "id": 11889922, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:team": [
+      {
+        "text": "My grandma followed every Cleveland team.",
+        "credit": { "id": 14061109, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Media organizations use fact-checking teams.",
+        "credit": { "id": 13960529, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My team is playing tomorrow, Thursday.",
+        "credit": { "id": 13727503, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My team will play tomorrow, Thursday.",
+        "credit": { "id": 13727502, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:match": [
+      {
+        "text": "We use matches to light fires.",
+        "credit": { "id": 13895345, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He'll probably win the match.",
+        "credit": { "id": 13803728, "by": "haohao", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The job matched his interests perfectly.",
+        "credit": { "id": 13155465, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom only ever wrestled exhibition matches.",
+        "credit": { "id": 13076879, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:coach": [
+      {
+        "text": "My coach plays tennis every Sunday.",
+        "credit": { "id": 13898253, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Coach Jackson threw Tom the ball.",
+        "credit": { "id": 12697101, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom Jackson was a tough coach.",
+        "credit": { "id": 12073997, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The coach gave him batting tips.",
+        "credit": { "id": 11880847, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:win": [
+      {
+        "text": "You win one point per round.",
+        "credit": { "id": 13907820, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He'll probably win the match.",
+        "credit": { "id": 13803728, "by": "haohao", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Whoever scores the most points, wins.",
+        "credit": { "id": 13719630, "by": "doemaar14", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Reality always wins, sooner or later.",
+        "credit": { "id": 13719490, "by": "Adelpa", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:lose": [
+      {
+        "text": "He's sad about losing money.",
+        "credit": { "id": 13842280, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ken was making Tom lose hope.",
+        "credit": { "id": 13816795, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom needs to learn to lose.",
+        "credit": { "id": 13729881, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The plane started to lose speed.",
+        "credit": { "id": 13503502, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:score": [
+      {
+        "text": "Whoever scores the most points, wins.",
+        "credit": { "id": 13719630, "by": "doemaar14", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He writes scores for independent films.",
+        "credit": { "id": 12777292, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "The judges' scores were mostly positive.",
+        "credit": { "id": 12587002, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Marcello scored a last-minute equaliser.",
+        "credit": { "id": 11858625, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:gym": [
+      {
+        "text": "Boldi took Martha to the gym.",
+        "credit": { "id": 12027747, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The gym became a hurricane shelter.",
+        "credit": { "id": 11801763, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Stefan went back to the gym.",
+        "credit": { "id": 11663250, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He couldn't participate in gym.",
+        "credit": { "id": 12844771, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:muscle": [
+      {
+        "text": "Muscle tissue consists of countless cells.",
+        "credit": { "id": 12277889, "by": "Miktsoanit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom's muscles are like pudding.",
+        "credit": { "id": 12206234, "by": "Miktsoanit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Kalman wanted to gain muscle mass.",
+        "credit": { "id": 12050152, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Get enough sleep for muscle recovery.",
+        "credit": { "id": 11889851, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:stretch": [
+      {
+        "text": "I feel like stretching my legs.",
+        "credit": { "id": 12296787, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Include stretching exercises for injury prevention.",
+        "credit": { "id": 11889928, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Stretch your muscles to prevent injuries.",
+        "credit": { "id": 11889828, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Each minute stretched into an eternity.",
+        "credit": { "id": 11819061, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:marathon": [
+      {
+        "text": "Tom ran a marathon last month.",
+        "credit": { "id": 12981333, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Fifty marathon participants sought medical help.",
+        "credit": { "id": 12293429, "by": "Miktsoanit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom competed in the Boston marathon.",
+        "credit": { "id": 6840484, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Yuki Kawauchi won the Boston marathon.",
+        "credit": { "id": 6840480, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:champion": [
+      {
+        "text": "Germany is the world export champion.",
+        "credit": { "id": 12808163, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary is the world chess champion.",
+        "credit": { "id": 11650589, "by": "deniko", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Vladimir Putin is a judo champion.",
+        "credit": { "id": 11162086, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Yanni is our water balloon champion.",
+        "credit": { "id": 9958608, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:tired": [
+      {
+        "text": "\"You look tired.\" \"I slept poorly.\"",
+        "credit": { "id": 13809986, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm tired of this life.",
+        "credit": { "id": 14089923, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I'm tired of that game.",
+        "credit": { "id": 13933193, "by": "maaster", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Being tired, I went to bed.",
+        "credit": { "id": 13802115, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:fit": [
+      {
+        "text": "I am slowly getting fit again.",
+        "credit": { "id": 12948389, "by": "LoverofEnglish", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They exercise daily to stay fit.",
+        "credit": { "id": 12634285, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The price should fit my budget.",
+        "credit": { "id": 13190397, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "These trousers don't fit properly.",
+        "credit": { "id": 13102497, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:referee": [
+      {
+        "text": "The referee sent the player off.",
+        "credit": { "id": 11456667, "by": "see", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The referee awarded a corner kick.",
+        "credit": { "id": 10196936, "by": "DJ_Saidez", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The referee showed the red card.",
+        "credit": { "id": 10068570, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Marcus called the referee a numpty.",
+        "credit": { "id": 9476283, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:racket": [
+      {
+        "text": "Ziri bought a new tennis racket.",
+        "credit": { "id": 10222899, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom is holding a tennis racket.",
+        "credit": { "id": 7543840, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom bought a new tennis racket.",
+        "credit": { "id": 3264738, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Someone has stolen my tennis racket.",
+        "credit": { "id": 1124162, "by": "danepo", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

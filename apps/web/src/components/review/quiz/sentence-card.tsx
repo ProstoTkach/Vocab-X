@@ -5,6 +5,7 @@ import { Keyboard, Lightbulb, Mic } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { ExampleCredit } from '@/components/ui/example-credit';
 import { cx } from '@/lib/cx';
 import type { Speech } from '@/lib/speech';
 import { useSpeechRecognition, type ListenError } from '@/lib/speech-recognition';
@@ -110,6 +111,8 @@ export function SentenceCard(p: SentenceCardProps) {
           <>
             {/* Above the verdict (the top grows upwards): the sentence does not move. */}
             <SpeakButton text={cloze.example.text} speechLang={p.speechLang} speech={p.speech} />
+            {/* Shown once answered, so the credit does not move the unanswered card. */}
+            <ExampleCredit credit={cloze.example.credit} />
             {'typed' in answer ? (
               <TypedFeedback typed={answer.typed} />
             ) : (

@@ -26,6 +26,13 @@ export const posSchema = z.enum([
 
 export const exampleSchema = z.object({
   text: z.string().max(1000),
+  credit: z
+    .object({
+      id: z.number().int().nonnegative(),
+      by: z.string().max(100),
+      license: z.string().max(40),
+    })
+    .optional(),
   translations: langMap(z.string().max(1000)).optional(),
 });
 

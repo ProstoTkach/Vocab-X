@@ -1,0 +1,281 @@
+{
+  "v": 1,
+  "words": {
+    "en:rent": [
+      {
+        "text": "Rents are rising in major cities.",
+        "credit": { "id": 13696545, "by": "Rafik", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I have to pay the rent.",
+        "credit": { "id": 13279247, "by": "LdjuherTaqvaylit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "At least the rent is cheap.",
+        "credit": { "id": 13270436, "by": "menaud", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I would like to rent it.",
+        "credit": { "id": 13193588, "by": "Everybody", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:landlord": [
+      {
+        "text": "Tom always complains about his landlord.",
+        "credit": { "id": 12655120, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Our landlord's name is Tom.",
+        "credit": { "id": 12210187, "by": "Miktsoanit", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Kalman's inlaws are his landlords.",
+        "credit": { "id": 12036150, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri got his landlord a gift.",
+        "credit": { "id": 10225654, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:flat": [
+      {
+        "text": "Tom lives in a shared flat.",
+        "credit": { "id": 13988540, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She entered my flat without knocking.",
+        "credit": { "id": 12593936, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He sprinted down the flat road.",
+        "credit": { "id": 12566416, "by": "Asif", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She fell flat on the floor.",
+        "credit": { "id": 13843589, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:furniture": [
+      {
+        "text": "Ziri auctioned his old furniture online.",
+        "credit": { "id": 12649756, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We unloaded furniture for three hours.",
+        "credit": { "id": 10704192, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Why did you rearrange the furniture?",
+        "credit": { "id": 12579128, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Your new furniture is very beautiful.",
+        "credit": { "id": 12059781, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:kitchen": [
+      {
+        "text": "Put the glasses in the kitchen.",
+        "credit": { "id": 13892131, "by": "LeeSooHa", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He gets by in the kitchen.",
+        "credit": { "id": 13886145, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I want to renovate my kitchen.",
+        "credit": { "id": 13866717, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Take this away to the kitchen.",
+        "credit": { "id": 13486827, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:bedroom": [
+      {
+        "text": "My new house has four bedrooms.",
+        "credit": { "id": 13232669, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sweet autumn air penetrates the bedroom.",
+        "credit": { "id": 12728064, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "That hallway leads to the bedrooms.",
+        "credit": { "id": 13505488, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Don't look in my bedroom.",
+        "credit": { "id": 12995695, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:balcony": [
+      {
+        "text": "Ziri leaned on the balcony railing.",
+        "credit": { "id": 12650305, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri touched the cold balcony railing.",
+        "credit": { "id": 12650304, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri tightened the loose balcony railing.",
+        "credit": { "id": 12650284, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri painted the balcony railing blue.",
+        "credit": { "id": 12648787, "by": "always", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:heating": [
+      {
+        "text": "What food are you heating up?",
+        "credit": { "id": 14059939, "by": "Babelball", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:tidy": [
+      {
+        "text": "We've tidied our room up.",
+        "credit": { "id": 12463824, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We've tidied up our room.",
+        "credit": { "id": 12463823, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sit down while I tidy up.",
+        "credit": { "id": 12207523, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You should tidy up your room.",
+        "credit": { "id": 13823537, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:repair": [
+      {
+        "text": "Our neighbour repaired our oven yesterday.",
+        "credit": { "id": 14032721, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri repaired broken toys with glue.",
+        "credit": { "id": 12649252, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I repaired my brother's house.",
+        "credit": { "id": 13639776, "by": "Babelball", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I had someone repair my bicycle.",
+        "credit": { "id": 13548063, "by": "LeviHighway", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:move": [
+      {
+        "text": "Tom moved into a psychiatric hospital.",
+        "credit": { "id": 14093516, "by": "Myrano_", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He moved away after a year.",
+        "credit": { "id": 13949842, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He thought he saw something move.",
+        "credit": { "id": 13905809, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Where is our society moving towards?",
+        "credit": { "id": 13843212, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:key": [
+      {
+        "text": "I lost my keys last night.",
+        "credit": { "id": 14053545, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I gave my friend his keys.",
+        "credit": { "id": 13982347, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I gave my friend her keys.",
+        "credit": { "id": 13971639, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Drop the key in the mailbox.",
+        "credit": { "id": 13787987, "by": "Just_Balls", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:laundry": [
+      {
+        "text": "Who does the laundry at home?",
+        "credit": { "id": 13892148, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He picked up the laundry basket.",
+        "credit": { "id": 13208376, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Has the laundry been washed yet?",
+        "credit": { "id": 13082579, "by": "Arkylie", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's doing laundry this afternoon.",
+        "credit": { "id": 12952741, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:carpet": [
+      {
+        "text": "Lukas noticed footprints on the carpet.",
+        "credit": { "id": 11650367, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Leon was hiding under a carpet.",
+        "credit": { "id": 11645987, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They spilled coffee on the carpet.",
+        "credit": { "id": 12634883, "by": "always", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "What's your favourite carpet colour?",
+        "credit": { "id": 12008609, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:shelf": [
+      {
+        "text": "The falling shelf broke his leg.",
+        "credit": { "id": 12817767, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Boris never uses the top shelf.",
+        "credit": { "id": 11793771, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Help! I accidentally built a shelf!",
+        "credit": { "id": 10157953, "by": "espamatics", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The books fell off the shelf.",
+        "credit": { "id": 8888146, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:deposit": [
+      {
+        "text": "Elias deposited fifty percent in advance.",
+        "credit": { "id": 11611558, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Does Western Sahara have oil deposits?",
+        "credit": { "id": 10963077, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Western Sahara has crude oil deposits.",
+        "credit": { "id": 10896741, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Western Sahara has rich phosphate deposits.",
+        "credit": { "id": 10896725, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

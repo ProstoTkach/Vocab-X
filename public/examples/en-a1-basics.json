@@ -1,0 +1,275 @@
+{
+  "v": 1,
+  "words": {
+    "en:family": [
+      {
+        "text": "Children need a happy family environment.",
+        "credit": { "id": 14005338, "by": "LeviHighway", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My family members always have ideas.",
+        "credit": { "id": 13868171, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Vladimir celebrated Christmas with his family.",
+        "credit": { "id": 13667374, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mark was visiting family in Perth.",
+        "credit": { "id": 13651513, "by": "lingomaxim", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:house": [
+      {
+        "text": "Maria lives alone in her house.",
+        "credit": { "id": 14024642, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I saw lightning strike the house.",
+        "credit": { "id": 14022708, "by": "Tom9358", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "After housing, the priority is education.",
+        "credit": { "id": 13978005, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It's not a new house.",
+        "credit": { "id": 14061128, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:water": [
+      {
+        "text": "Soap dissolves well in hot water.",
+        "credit": { "id": 13963360, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Fresh water is a good thing.",
+        "credit": { "id": 13955190, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Is this clear water poisoned, perhaps?",
+        "credit": { "id": 13898215, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Pour water on the pancake mix.",
+        "credit": { "id": 13892718, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:friend": [
+      {
+        "text": "My friend's girlfriend studies medicine.",
+        "credit": { "id": 14062887, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "His best friend became his girlfriend.",
+        "credit": { "id": 13990730, "by": "mervert1", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He went shopping with his friend.",
+        "credit": { "id": 14088976, "by": "deyta", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He is loved by his friends.",
+        "credit": { "id": 14073774, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:morning": [
+      {
+        "text": "We greet our neighbours every morning.",
+        "credit": { "id": 13864305, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Every morning, Charles eats two croissants.",
+        "credit": { "id": 13855345, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I run four miles every morning.",
+        "credit": { "id": 13814984, "by": "Just_Balls", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He gets up early every morning.",
+        "credit": { "id": 13806259, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:happy": [
+      {
+        "text": "Children need a happy family environment.",
+        "credit": { "id": 14005338, "by": "LeviHighway", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Has Tom ever been really happy?",
+        "credit": { "id": 13791794, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We're happy about your success.",
+        "credit": { "id": 14096171, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "If you're not happy, leave.",
+        "credit": { "id": 14019208, "by": "menaud", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:big": [
+      {
+        "text": "These birds have big red eggs.",
+        "credit": { "id": 13973560, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He proudly showed his big biceps.",
+        "credit": { "id": 13681928, "by": "mervert1", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "One hundred is a big number.",
+        "credit": { "id": 13591296, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It's not a big place.",
+        "credit": { "id": 14096183, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:cold": [
+      {
+        "text": "The roast pork is already cold!",
+        "credit": { "id": 13866253, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Please give me a cold one.",
+        "credit": { "id": 13565218, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "It suddenly got really cold, right?",
+        "credit": { "id": 13388208, "by": "Roomba_Unit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The water isn't very cold.",
+        "credit": { "id": 13915883, "by": "araneo", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:cheap": [
+      {
+        "text": "Even a cheap thing is adequate.",
+        "credit": { "id": 13721470, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I hear Poland has cheap shopping.",
+        "credit": { "id": 13093064, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Leon's Santa costume seemed cheap.",
+        "credit": { "id": 11641685, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This market sells very cheap clothes.",
+        "credit": { "id": 11291330, "by": "chaule3", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:eat": [
+      {
+        "text": "He decided to eat off-peak.",
+        "credit": { "id": 14080775, "by": "jan_OkulaJu", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Let's eat rice every day.",
+        "credit": { "id": 14060970, "by": "mervert1", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I am not eating a fish.",
+        "credit": { "id": 14076134, "by": "Thadh", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Don't eat the peach pit!",
+        "credit": { "id": 14054245, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:drink": [
+      {
+        "text": "He gave Mary something to drink.",
+        "credit": { "id": 14040315, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Yesterday evening we had drinks downtown.",
+        "credit": { "id": 13918550, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My parents drink beer every day.",
+        "credit": { "id": 13907060, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My dad drinks beer every day.",
+        "credit": { "id": 13907035, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:read": [
+      {
+        "text": "He meditates while reading the Bible.",
+        "credit": { "id": 14070512, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Mary is reading an exciting book.",
+        "credit": { "id": 14057172, "by": "Babelball", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Every student read a different book.",
+        "credit": { "id": 13971640, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Jean has not read my book.",
+        "credit": { "id": 14052176, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:speak": [
+      {
+        "text": "The frightened girl could barely speak.",
+        "credit": { "id": 14071625, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Thor speaks to me at night.",
+        "credit": { "id": 14058718, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Hello? Who am I speaking with?",
+        "credit": { "id": 14048694, "by": "menaud", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Hello? Who am I speaking to?",
+        "credit": { "id": 14048693, "by": "menaud", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:always": [
+      {
+        "text": "One always has to improve themself.",
+        "credit": { "id": 14081157, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The school corridors are always crowded.",
+        "credit": { "id": 14075219, "by": "CuteGirlLeia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Trains in Japan are always punctual.",
+        "credit": { "id": 14045204, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "One is always sad without money.",
+        "credit": { "id": 14026849, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:today": [
+      {
+        "text": "Maria is dressed in white today.",
+        "credit": { "id": 14038206, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Today my son rode a pony.",
+        "credit": { "id": 14021286, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I learnt a new word today.",
+        "credit": { "id": 14020760, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You have a tight schedule today.",
+        "credit": { "id": 14087500, "by": "yessoos", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

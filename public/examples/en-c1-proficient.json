@@ -1,0 +1,521 @@
+{
+  "v": 1,
+  "words": {
+    "en:elaborate": [
+      {
+        "text": "He liked to tell elaborate stories.",
+        "credit": { "id": 12835819, "by": "Ussis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The princess wore an elaborate dress.",
+        "credit": { "id": 7371395, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom refused to elaborate any further.",
+        "credit": { "id": 7241139, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom wouldn't elaborate any further.",
+        "credit": { "id": 7205614, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:coherent": [
+      {
+        "text": "The two sentences are both coherent.",
+        "credit": { "id": 5057632, "by": "konkorde", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Our tax system is still without coherent philosophy.",
+        "credit": { "id": 29182, "by": "al_ex_an_der", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The argument is rigorous and coherent but ultimately unconvincing.",
+        "credit": { "id": 713036, "by": "darinmex", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Don't expect a coherent answer.",
+        "credit": { "id": 5731069, "by": "CM", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:mitigate": [
+      {
+        "text": "Kind words will mitigate their fury.",
+        "credit": { "id": 12344984, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri needs to mitigate this problem.",
+        "credit": { "id": 10822831, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria needs to mitigate its vulnerabilities.",
+        "credit": { "id": 10134221, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Friendly words will mitigate their fury.",
+        "credit": { "id": 6907604, "by": "swolesuki", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:prevalent": [
+      {
+        "text": "Is sociopathy disproportionally prevalent in females?",
+        "credit": { "id": 10856829, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Dry weather with tropical temperatures is prevalent.",
+        "credit": { "id": 11912198, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This superstition is still prevalent among them.",
+        "credit": { "id": 9713479, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Berber is prevalent in many regions of Algeria.",
+        "credit": { "id": 7811214, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:deteriorate": [
+      {
+        "text": "Yanni's performance at school deteriorated.",
+        "credit": { "id": 8802033, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Chopin's health continued to deteriorate.",
+        "credit": { "id": 8329377, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sami and Layla's relationship deteriorated.",
+        "credit": { "id": 6691003, "by": "OsoHombre", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom's condition is deteriorating rapidly.",
+        "credit": { "id": 3039959, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:substantial": [
+      {
+        "text": "Ziri asked for a substantial raise.",
+        "credit": { "id": 10822406, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Food designers should make food substantial.",
+        "credit": { "id": 10667321, "by": "nonong", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom is facing substantial prison time.",
+        "credit": { "id": 6222832, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Human vices provide substantial government income.",
+        "credit": { "id": 813308, "by": "papabear", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:undermine": [
+      {
+        "text": "Hate speech undermines respect and tolerance.",
+        "credit": { "id": 12115494, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Old age has undermined her memory.",
+        "credit": { "id": 282177, "by": "Dejo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This undermined my trust in state institutions.",
+        "credit": { "id": 10715075, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He wanted to undermine our language.",
+        "credit": { "id": 13062138, "by": "Aghanim", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:feasible": [
+      {
+        "text": "It's easy, maybe even feasible.",
+        "credit": { "id": 969620, "by": "riccioberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I definitely think it's feasible.",
+        "credit": { "id": 10305440, "by": "shekitten", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I don't think it's feasible.",
+        "credit": { "id": 11520837, "by": "shekitten", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Being friends with him isn't feasible.",
+        "credit": { "id": 11499886, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:advocate": [
+      {
+        "text": "Muslims advocate for peace, not violence.",
+        "credit": { "id": 13023676, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Stop playing devil's advocate, Tom.",
+        "credit": { "id": 9505179, "by": "shekitten", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Mennad is a mental health advocate.",
+        "credit": { "id": 8010027, "by": "OsoHombre", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She's an advocate for herself.",
+        "credit": { "id": 13223116, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:notion": [
+      {
+        "text": "It blew away all my preconceived notions.",
+        "credit": { "id": 11594990, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He dislikes notions that are extremely intellectual.",
+        "credit": { "id": 11519559, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "His notion of welfare is pretty abstract.",
+        "credit": { "id": 287474, "by": "shekitten", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "His notion was neither concrete nor abstract.",
+        "credit": { "id": 286223, "by": "shekitten", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:compelling": [
+      {
+        "text": "That's a very compelling story.",
+        "credit": { "id": 5132654, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:discrepancy": [
+      {
+        "text": "Tom has found some interesting discrepancies.",
+        "credit": { "id": 5726340, "by": "CM", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "There is a discrepancy of 145 dollars in my June credit card statement.",
+        "credit": { "id": 3353687, "by": "DostKaplan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "A smart news consumer is always aware of this discrepancy between traditional media and social media.",
+        "credit": { "id": 6993452, "by": "Hybrid", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I can't think of an explanation for the discrepancy.",
+        "credit": { "id": 13260640, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:endorse": [
+      {
+        "text": "Would Jesus, peace be upon him, endorse this?",
+        "credit": { "id": 11390956, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The local newspaper is endorsing the conservative candidate.",
+        "credit": { "id": 706764, "by": "darinmex", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I fully endorse their plan to tie the knot.",
+        "credit": { "id": 13211127, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We certainly don't endorse that.",
+        "credit": { "id": 5728835, "by": "CM", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:versatile": [
+      {
+        "text": "Swiss Army knives are versatile tools.",
+        "credit": { "id": 12175541, "by": "ddnktr", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Ivies are very versatile vining plants.",
+        "credit": { "id": 10860330, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The human hand is astonishingly versatile.",
+        "credit": { "id": 5622706, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Black-eyed beans are a versatile ingredient.",
+        "credit": { "id": 12106313, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:consensus": [
+      {
+        "text": "We practice consensus-based decision-making.",
+        "credit": { "id": 11499524, "by": "shekitten", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Algeria needs to reach a political consensus.",
+        "credit": { "id": 7861134, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The co-op practices consensus-based decision making.",
+        "credit": { "id": 12025251, "by": "shekitten", "license": "CC0 1.0" }
+      },
+      {
+        "text": "At first I thought we could find a consensus.",
+        "credit": { "id": 10608554, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:alleviate": [
+      {
+        "text": "Sami took medication to alleviate pain.",
+        "credit": { "id": 6694544, "by": "OsoHombre", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Companionship can help alleviate feelings of loneliness.",
+        "credit": { "id": 13210145, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This cream may help alleviate your symptoms.",
+        "credit": { "id": 10619405, "by": "sangelo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "What's Algeria doing to alleviate poverty?",
+        "credit": { "id": 10105361, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:arbitrary": [
+      {
+        "text": "Memory is a capricious and arbitrary creature.",
+        "credit": { "id": 10652986, "by": "remline", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Latin word order is free, but not arbitrary.",
+        "credit": { "id": 5052251, "by": "Jesse", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Lemma 5 cannot be generalized to arbitrary artinian rings.",
+        "credit": { "id": 387014, "by": "MUIRIEL", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Our decision to go to Portugal was quite arbitrary.",
+        "credit": { "id": 247210, "by": "shekitten", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:comprise": [
+      {
+        "text": "Uyghurs comprise the majority in Kashgar.",
+        "credit": { "id": 474252, "by": "FeuDRenais", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Turkey is comprised of eighty-one provinces.",
+        "credit": { "id": 14067290, "by": "Babelball", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The genus Giraffe comprises five main species.",
+        "credit": { "id": 13879981, "by": "BilalBouy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This sentence comprises exactly forty-four letters.",
+        "credit": { "id": 12289199, "by": "Adelpa", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:contemplate": [
+      {
+        "text": "Those who contemplate move forward prudently.",
+        "credit": { "id": 12971585, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Yuri paused and contemplated his wording.",
+        "credit": { "id": 11881778, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Igor was contemplating his next moves.",
+        "credit": { "id": 11829042, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom said he had contemplated suicide.",
+        "credit": { "id": 5726660, "by": "CM", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:convey": [
+      {
+        "text": "His smile conveyed warmth and friendliness.",
+        "credit": { "id": 13480601, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Your apology needs to convey warmth.",
+        "credit": { "id": 11472136, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Please convey my apologies to Tom.",
+        "credit": { "id": 3534158, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Wires are used to convey electricity.",
+        "credit": { "id": 269865, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:deem": [
+      {
+        "text": "My sister deems your efforts futile.",
+        "credit": { "id": 11802465, "by": "Fenrir", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The doctor deemed Damiano a psychopath.",
+        "credit": { "id": 11693683, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sami's car was deemed undrivable.",
+        "credit": { "id": 7989747, "by": "OsoHombre", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Boris deemed Melissa unworthy of such a responsibility.",
+        "credit": { "id": 11797736, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:discern": [
+      {
+        "text": "You need to discern nonsense from truth.",
+        "credit": { "id": 11744228, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Carlos needs to discern reality from fiction.",
+        "credit": { "id": 11744225, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Every evening I discern the glow over there.",
+        "credit": { "id": 12679458, "by": "anzart", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Every evening we discern the glow over there.",
+        "credit": { "id": 12679452, "by": "anzart", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:explicit": [
+      {
+        "text": "Most drag shows are not sexually explicit.",
+        "credit": { "id": 12029263, "by": "shekitten", "license": "CC0 1.0" }
+      },
+      {
+        "text": "The following scene contains language of explicit nature.",
+        "credit": { "id": 10798937, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He was explicit on the point.",
+        "credit": { "id": 291183, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Some implicit elements can be made explicit.",
+        "credit": { "id": 3214480, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:inherent": [
+      {
+        "text": "Love is inherent in every living being.",
+        "credit": { "id": 13333283, "by": "Nicat", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Inertia is inherent in any material object.",
+        "credit": { "id": 10725706, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:intricate": [
+      {
+        "text": "They marveled at the intricate cake topper.",
+        "credit": { "id": 11880700, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Benedito admired the plant's intricate leaves.",
+        "credit": { "id": 11736416, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Great thoughts are created through intricate details.",
+        "credit": { "id": 11290400, "by": "Aphima", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom shaped the copper wire into intricate filigree.",
+        "credit": { "id": 13944000, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:plausible": [
+      {
+        "text": "I told Tom it sounded plausible.",
+        "credit": { "id": 6849263, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The trick is to maintain plausible deniability.",
+        "credit": { "id": 12061522, "by": "shekitten", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Yanni thinks Skura's suspicions are plausible.",
+        "credit": { "id": 9354578, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Two theories occur to me; both seem plausible.",
+        "credit": { "id": 8988461, "by": "shekitten", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:scrutiny": [
+      {
+        "text": "Yanni will be under intense scrutiny.",
+        "credit": { "id": 10026762, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The downside of fame is public scrutiny.",
+        "credit": { "id": 10493371, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Corporate political donations are coming under heavy scrutiny.",
+        "credit": { "id": 20736, "by": "fishda", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The statement seems to make sense, but under further scrutiny, it falls apart.",
+        "credit": { "id": 8657757, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:tentative": [
+      {
+        "text": "Tom's French is correct but tentative.",
+        "credit": { "id": 11732918, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The parties have reached a tentative agreement.",
+        "credit": { "id": 6865881, "by": "bigfellow68", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I've made a tentative deal with Tom.",
+        "credit": { "id": 3043999, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:unprecedented": [
+      {
+        "text": "TikTok's growth rate is unprecedented.",
+        "credit": { "id": 11628518, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We're going through an unprecedented health crisis.",
+        "credit": { "id": 13871118, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "There are unprecedented protests everywhere in the West.",
+        "credit": { "id": 12113503, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The Tokyo stock market recorded an unprecedented loss.",
+        "credit": { "id": 279829, "by": "CM", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:viable": [
+      {
+        "text": "Algiers needs to become a viable city.",
+        "credit": { "id": 9076223, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Solar power is becoming more viable every year.",
+        "credit": { "id": 6015021, "by": "mailohilohi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "A seed can remain viable for centuries, even millennia.",
+        "credit": { "id": 9969616, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The Soviet Union became economically non-viable in the 1980s.",
+        "credit": { "id": 8530304, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

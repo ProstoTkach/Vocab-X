@@ -1,0 +1,293 @@
+{
+  "v": 1,
+  "words": {
+    "en:election": [
+      {
+        "text": "The election took place without incident.",
+        "credit": { "id": 13848690, "by": "JK_Summerlin", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The democrats will probably lose elections.",
+        "credit": { "id": 13297071, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We were elected in the elections.",
+        "credit": { "id": 14056101, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "When do the elections take place?",
+        "credit": { "id": 13155912, "by": "atitarev", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:government": [
+      {
+        "text": "Let the government hear our voice.",
+        "credit": { "id": 14031997, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This government is racist against Kabyles.",
+        "credit": { "id": 13084253, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Governments borrow money by issuing bonds.",
+        "credit": { "id": 12947343, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He stole a secret government weapon.",
+        "credit": { "id": 12926646, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:vote": [
+      {
+        "text": "Tom would vote for Biden again.",
+        "credit": { "id": 14001418, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He chose to abstain from voting.",
+        "credit": { "id": 13748333, "by": "IMer", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do the undead have voting rights?",
+        "credit": { "id": 13560092, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We're going to vote soon.",
+        "credit": { "id": 13705943, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:law": [
+      {
+        "text": "Her brother's wife studied law.",
+        "credit": { "id": 13962171, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Divorce is contrary to divine law.",
+        "credit": { "id": 13954136, "by": "Ioan_Cristian", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Estrellia is my sister-in-law.",
+        "credit": { "id": 14025509, "by": "stoopeedhooman", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My mother-in-law was hospitalized.",
+        "credit": { "id": 13935001, "by": "zogwarg", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:citizen": [
+      {
+        "text": "Senior citizens fall in love, too.",
+        "credit": { "id": 12063242, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Congratulations to our newest Algerian citizens.",
+        "credit": { "id": 10702123, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri is becoming an Algerian citizen.",
+        "credit": { "id": 10702032, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Rima is a citizen of Lebanon.",
+        "credit": { "id": 13101748, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:protest": [
+      {
+        "text": "The woman protested for appearances' sake.",
+        "credit": { "id": 13226129, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Yuri protested the teacher's decision.",
+        "credit": { "id": 11956087, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The government actively ignored the protests.",
+        "credit": { "id": 11886667, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Orban organized protests against the government.",
+        "credit": { "id": 11383104, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:policy": [
+      {
+        "text": "He debates policy issues on stage.",
+        "credit": { "id": 12776985, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Pinochet's economic policies were neoliberal.",
+        "credit": { "id": 12048501, "by": "shekitten", "license": "CC0 1.0" }
+      },
+      {
+        "text": "When is honesty the best policy?",
+        "credit": { "id": 13270794, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They review the company's policies.",
+        "credit": { "id": 12777031, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:headline": [
+      {
+        "text": "Sami's story dominated the headlines.",
+        "credit": { "id": 6114623, "by": "OsoHombre", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Who's headlining Glastonbury this year?",
+        "credit": { "id": 1486820, "by": "voxbubnya", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom usually only reads the headlines.",
+        "credit": { "id": 1092591, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I read the headline: \"Israel fears isolation.\"",
+        "credit": { "id": 13872185, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:journalist": [
+      {
+        "text": "Journalists compare different sources before publishing.",
+        "credit": { "id": 13960530, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Journalists can't ignore credible sources.",
+        "credit": { "id": 11514141, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ziri is an Algerian sports journalist.",
+        "credit": { "id": 10870856, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I've already met that journalist.",
+        "credit": { "id": 13807479, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:refugee": [
+      {
+        "text": "Will the refugees find safety soon?",
+        "credit": { "id": 12765499, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "The organisation provided refugees with food.",
+        "credit": { "id": 12084228, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Antonio helps refugees cross the border.",
+        "credit": { "id": 11775843, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom has applied for refugee status.",
+        "credit": { "id": 11554698, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:volunteer": [
+      {
+        "text": "Did Mary volunteer for another mission?",
+        "credit": { "id": 12765572, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Has Mary volunteered for another mission?",
+        "credit": { "id": 12765494, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Tom volunteers at a horse sanctuary.",
+        "credit": { "id": 12655125, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She enjoys volunteering in the community.",
+        "credit": { "id": 13131199, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:crisis": [
+      {
+        "text": "Again with that damn financial crisis?",
+        "credit": { "id": 13864360, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Crisis response requires teamwork and leadership.",
+        "credit": { "id": 12767970, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Crisis response needs preparation and communication.",
+        "credit": { "id": 12767894, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Fascism is capitalism in crisis mode.",
+        "credit": { "id": 11854801, "by": "shekitten", "license": "CC0 1.0" }
+      }
+    ],
+    "en:corruption": [
+      {
+        "text": "Algeria is trying to eradicate corruption.",
+        "credit": { "id": 11409930, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria needs to deal with corruption.",
+        "credit": { "id": 11409802, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Government corruption is rife in Ukraine.",
+        "credit": { "id": 10821803, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Corruption is Algeria's main obstacle.",
+        "credit": { "id": 10814694, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:inequality": [
+      {
+        "text": "Dependency theory explains global economic inequalities.",
+        "credit": { "id": 13711978, "by": "menaud", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Are global leaders addressing economic inequality?",
+        "credit": { "id": 12766185, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Health care inequality is a problem.",
+        "credit": { "id": 11471300, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Inequality is decreasing all around the world.",
+        "credit": { "id": 14063818, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:freedom": [
+      {
+        "text": "Servile people are dams of freedom.",
+        "credit": { "id": 13416221, "by": "maaster", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Can we ever achieve true freedom?",
+        "credit": { "id": 12777582, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "He promised the slaves their freedom.",
+        "credit": { "id": 13815817, "by": "tieguy", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He denied them freedom and dignity.",
+        "credit": { "id": 13668696, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:misinformation": [
+      {
+        "text": "Social media is filled with misinformation.",
+        "credit": { "id": 13247853, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Social networks can accelerate the spread of misinformation.",
+        "credit": { "id": 13960521, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Don't let the misinformation spreading jerk speak.",
+        "credit": { "id": 13821320, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The Community Notes feature on X helps curb misinformation.",
+        "credit": { "id": 13247843, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}

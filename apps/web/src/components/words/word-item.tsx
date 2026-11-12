@@ -10,6 +10,7 @@ import {
 } from '@vocabx/core';
 import { ChevronDown, CircleCheck, CircleX, Flame, GraduationCap, RotateCcw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { ExampleCredit } from '@/components/ui/example-credit';
 import { useId, useState, type ReactNode } from 'react';
 import { Badge, BadgeDot, type BadgeTone } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -84,9 +85,12 @@ function WordDetails({
         <div>
           <p className="text-xs font-semibold text-fg-muted uppercase">{t('example')}</p>
           {example ? (
-            <p lang={word.lang} className="mt-1">
-              <HighlightedText text={example.text} term={word.term} lang={word.lang} />
-            </p>
+            <>
+              <p lang={word.lang} className="mt-1">
+                <HighlightedText text={example.text} term={word.term} lang={word.lang} />
+              </p>
+              <ExampleCredit credit={example.credit} />
+            </>
           ) : (
             <p className="text-sm text-fg-muted">{t('noExample')}</p>
           )}

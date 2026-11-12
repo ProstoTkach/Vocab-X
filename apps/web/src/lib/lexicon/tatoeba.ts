@@ -5,7 +5,13 @@ import type { LexiconProvider } from '@vocabx/core';
 import { getJson, type FetchLike } from './http';
 
 interface TatoebaResponse {
-  data?: { text?: string; is_unapproved?: boolean }[];
+  data?: {
+    id?: number;
+    text?: string;
+    license?: string;
+    owner?: string | null;
+    is_unapproved?: boolean;
+  }[];
 }
 
 /** Tatoeba names languages by ISO 639-3 codes. */
@@ -57,11 +63,16 @@ export function createTatoebaProvider(o: TatoebaOptions): LexiconProvider {
         o.timeoutMs ?? 8000,
         signal,
       )) as TatoebaResponse | null;
+      // The author and the sentence number are kept: CC BY asks for the credit to be shown.
       const examples = (data?.data ?? [])
         .filter((s) => !s.is_unapproved)
-        .map((s) => (s.text ?? '').replace(/\s+/g, ' ').trim())
-        .filter(Boolean)
-        .map((text) => ({ text }));
+        .map((s) => ({ s, text: (s.text ?? '').replace(/\s+/g, ' ').trim() }))
+        .filter(({ text }) => text)
+        .map(({ s, text }) =>
+          typeof s.id === 'number' && s.owner && s.license
+            ? { text, credit: { id: s.id, by: s.owner.slice(0, 100), license: s.license } }
+            : { text },
+        );
       return examples.length ? [{ lemma: term, definitions: [], examples }] : [];
     },
   };

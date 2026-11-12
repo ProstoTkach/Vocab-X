@@ -53,12 +53,17 @@ not re-read this session (confirm during the owner's legal review, session 5).
 
 - Sentences: CC BY 2.0 FR (most), some CC0. CC BY needs credit to the author, a link to the
   licence and an indication of changes.
-- **Missing today:** `lib/lexicon/tatoeba.ts` keeps only the text; the author and the sentence id
-  are dropped, and the sentence is stored in the learner's word (local and Neon). So no proper
-  credit is possible for sentences already stored.
-- Fix (session 13, step 6.15): keep the sentence id and author with the example, show "Tatoeba ·
-  author" (link to the sentence) where the example is shown or in the word's details; Credits names
-  Tatoeba and the licence. The API used is marked `unstable` by Tatoeba itself.
+- **Done (session 13, step 6.15):** `lib/lexicon/tatoeba.ts` keeps the sentence id, the author and
+  the licence with the example (`Example.credit`, also in the sync schema). The credit "Tatoeba ·
+  author" (link to the sentence) is shown under the example in the word's details, in the review
+  card and after an answer in the sentence tasks (`components/ui/example-credit.tsx`). Credits
+  names Tatoeba and the licence. Sentences stored before session 13 have no credit; they are the
+  learner's own copies from before and are not touched. Only sentences with an author are kept.
+- **Built-in words:** their extra sentences come from one run of `apps/web/scripts/fetch-examples.ts`
+  (Tatoeba only, so every one has an author and a licence) and ship as `/public/examples/<deck>.json`
+  with the credit inside. The licence stays in each sentence, so a later sentence under another
+  licence needs no change in code. The API used is marked `unstable` by Tatoeba itself.
+- Translations of Tatoeba sentences are not taken (they would need their own authors' credit).
 
 ### 2.3 Wiktionary (definitions via `/api/dictionary`; translations from the browser) — known
 
@@ -117,10 +122,10 @@ Versions from `node_modules/*/package.json` on 2026-11-12.
 
 ## 6. Open items
 
-| Item                                                          | Who       | Where                    |
-| ------------------------------------------------------------- | --------- | ------------------------ |
-| "powered by Google Translate" next to suggestions             | assistant | session 6 (with Credits) |
-| Keep Tatoeba id + author; Wiktionary / Free Dictionary source | assistant | session 13 (6.15)        |
-| `User-Agent` with the site address for Wikimedia              | assistant | session 10 or 13         |
-| `CACHE_MS` 15 days (and `s-maxage`, browser cache), approved  | assistant | session 8 with 1.6       |
-| Vercel Hobby = non-commercial                                 | owner     | before any paid feature  |
+| Item                                                                                                     | Who       | Where                     |
+| -------------------------------------------------------------------------------------------------------- | --------- | ------------------------- |
+| "powered by Google Translate" next to suggestions                                                        | assistant | session 6 (with Credits)  |
+| Tatoeba id + author kept and shown (Wiktionary / Free Dictionary examples are not credited per sentence) | assistant | done in session 13 (6.15) |
+| `User-Agent` with the site address for Wikimedia                                                         | assistant | session 10 or 13          |
+| `CACHE_MS` 15 days (and `s-maxage`, browser cache), approved                                             | assistant | session 8 with 1.6        |
+| Vercel Hobby = non-commercial                                                                            | owner     | before any paid feature   |

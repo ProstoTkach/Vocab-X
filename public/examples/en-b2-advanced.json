@@ -1,0 +1,537 @@
+{
+  "v": 1,
+  "words": {
+    "en:negotiate": [
+      {
+        "text": "Gustavo suggested negotiating with the aliens.",
+        "credit": { "id": 11772065, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Learn how to negotiate with people.",
+        "credit": { "id": 13595948, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She's very good at negotiating.",
+        "credit": { "id": 13447728, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The diplomats are meeting to negotiate.",
+        "credit": { "id": 12659352, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:consequence": [
+      {
+        "text": "Immoderate drinking can have negative consequences.",
+        "credit": { "id": 12380879, "by": "Miktsoanit", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Oleg took responsibility for the consequences.",
+        "credit": { "id": 11849797, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Leon warned Rima of the consequences.",
+        "credit": { "id": 11639518, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Michael will face the consequences himself.",
+        "credit": { "id": 11594282, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:reluctant": [
+      {
+        "text": "James was reluctant to contact Amanda.",
+        "credit": { "id": 11504226, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom was reluctant to press charges.",
+        "credit": { "id": 10656512, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's reluctant to deepen friendships.",
+        "credit": { "id": 12108665, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "She's reluctant to marry him.",
+        "credit": { "id": 11129754, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:significant": [
+      {
+        "text": "I bring attention to significant topics.",
+        "credit": { "id": 13039312, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Love holds significant importance for me.",
+        "credit": { "id": 12960598, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Flavio didn’t accomplish anything significant.",
+        "credit": { "id": 11696852, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Neither ship suffered any significant damage.",
+        "credit": { "id": 10944566, "by": "CM", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:approach": [
+      {
+        "text": "The officials approached the issue formally.",
+        "credit": { "id": 13732699, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Communication is now my preferred approach.",
+        "credit": { "id": 13236480, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They approached the abandoned town cautiously.",
+        "credit": { "id": 12775353, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "They silently approached the sleeping dog.",
+        "credit": { "id": 12634194, "by": "always", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:assume": [
+      {
+        "text": "Tom assumed I had bad intentions.",
+        "credit": { "id": 13744094, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Everything changed after Tom assumed office.",
+        "credit": { "id": 12303958, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I assume you told Tom already.",
+        "credit": { "id": 12161577, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Always assume a gun is loaded.",
+        "credit": { "id": 11883923, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:sustainable": [
+      {
+        "text": "Sustainable technologies help protect the environment.",
+        "credit": { "id": 13960516, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "A smart city promotes sustainable mobility.",
+        "credit": { "id": 13960511, "by": "Naityahia", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We all want sustainable world peace.",
+        "credit": { "id": 12206817, "by": "Miktsoanit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Is Algeria's economic diversification sustainable?",
+        "credit": { "id": 10107423, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:emphasize": [
+      {
+        "text": "Judaism and Buddhism both emphasize moderation.",
+        "credit": { "id": 13048484, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Their teachings emphasize love and respect.",
+        "credit": { "id": 13023623, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Boldi wanted to emphasize his individuality.",
+        "credit": { "id": 11961339, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He emphasized the importance of this.",
+        "credit": { "id": 10623642, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:inevitable": [
+      {
+        "text": "Without context, ambiguity is often inevitable.",
+        "credit": { "id": 11114795, "by": "DJ_Saidez", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "We're only delaying the inevitable.",
+        "credit": { "id": 13973492, "by": "Waldelfe", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Changes seem inevitable to many people.",
+        "credit": { "id": 13339028, "by": "artemlyubchenko", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "They knew the showdown was inevitable.",
+        "credit": { "id": 12775317, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:thorough": [
+      {
+        "text": "Tom underwent a thorough medical examination.",
+        "credit": { "id": 13477993, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's undergone thorough health screenings.",
+        "credit": { "id": 13270043, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He's very thorough about everything.",
+        "credit": { "id": 12947157, "by": "Conjuice", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:comprehensive": [
+      {
+        "text": "I gave you a comprehensive answer.",
+        "credit": { "id": 10600060, "by": "AlanF_US", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This is the most comprehensive monolingual dictionary.",
+        "credit": { "id": 13095365, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "What's needed is a comprehensive plan.",
+        "credit": { "id": 8348638, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:acknowledge": [
+      {
+        "text": "Grant refused to acknowledge his defeat.",
+        "credit": { "id": 12720953, "by": "jacoblaguerre", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Lajos didn't even acknowledge Olivia.",
+        "credit": { "id": 12099385, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom acknowledged he needed more help.",
+        "credit": { "id": 11162451, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I acknowledge my mistakes with humility.",
+        "credit": { "id": 13227271, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:fluctuate": [
+      {
+        "text": "The price of vegetables fluctuates daily.",
+        "credit": { "id": 12042957, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The price fluctuates according to demand.",
+        "credit": { "id": 11205403, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He fluctuated between hope and despair.",
+        "credit": { "id": 295058, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The price of gold fluctuates daily.",
+        "credit": { "id": 18609, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:ambiguous": [
+      {
+        "text": "Without context, that expression is ambiguous.",
+        "credit": { "id": 12353828, "by": "Miktsoanit", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Ambiguous phrases often beget funny interpretations.",
+        "credit": { "id": 2910816, "by": "astyng", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He might say something ambiguous again.",
+        "credit": { "id": 1316460, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The Spanish sentence isn't ambiguous.",
+        "credit": { "id": 13811018, "by": "maaster", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:persuade": [
+      {
+        "text": "Don't try to persuade Tom.",
+        "credit": { "id": 13534323, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You just have to persuade Tom.",
+        "credit": { "id": 13457775, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He wasn't easy to persuade.",
+        "credit": { "id": 13226146, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Were you able to persuade Tom?",
+        "credit": { "id": 12315795, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:abandon": [
+      {
+        "text": "Yesterday, I rescued an abandoned dog.",
+        "credit": { "id": 13892164, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom adopted an abandoned wolf puppy.",
+        "credit": { "id": 13272440, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom lives in an abandoned boxcar.",
+        "credit": { "id": 12916730, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "True friends never abandon each other.",
+        "credit": { "id": 12777390, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:adequate": [
+      {
+        "text": "Even a cheap thing is adequate.",
+        "credit": { "id": 13721470, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Even a cheap thing is sufficiently adequate.",
+        "credit": { "id": 13721468, "by": "terrywallwork", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I don't consider that adequate.",
+        "credit": { "id": 2275975, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He is adequate for the post.",
+        "credit": { "id": 290542, "by": "jdonnarumma", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:anticipate": [
+      {
+        "text": "I think Tom anticipated that question.",
+        "credit": { "id": 12187769, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Could we have anticipated this earlier?",
+        "credit": { "id": 12773993, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "More difficult than anyone had anticipated.",
+        "credit": { "id": 12773302, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "More challenging than anticipated, it was.",
+        "credit": { "id": 12773210, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:controversial": [
+      {
+        "text": "Brutalism is a controversial architectural style.",
+        "credit": { "id": 12905419, "by": "araneo", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He began playing more controversial roles.",
+        "credit": { "id": 9049997, "by": "rafaeldejesus8199", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom has written another controversial book.",
+        "credit": { "id": 7541216, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom has published another controversial book.",
+        "credit": { "id": 7540752, "by": "CK", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:deny": [
+      {
+        "text": "Tom denied stealing the invisible ring.",
+        "credit": { "id": 13952482, "by": "rul", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He denied them freedom and dignity.",
+        "credit": { "id": 13668696, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The boy denied stealing the bicycle.",
+        "credit": { "id": 13548048, "by": "LeviHighway", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Tom denied having been in debt.",
+        "credit": { "id": 13298865, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:diverse": [
+      {
+        "text": "China is a linguistically diverse country.",
+        "credit": { "id": 13247715, "by": "Lumi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Representation ensures diverse voices are heard.",
+        "credit": { "id": 12766775, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "The world is a diverse place.",
+        "credit": { "id": 13755361, "by": "TanukiKun", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The causes can be very diverse.",
+        "credit": { "id": 11160274, "by": "DJ_Saidez", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:enhance": [
+      {
+        "text": "Different opinions can enhance our understanding.",
+        "credit": { "id": 13031321, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Reading enhances our creativity and imagination.",
+        "credit": { "id": 12999050, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "A balanced lifestyle enhances natural beauty.",
+        "credit": { "id": 12768289, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Improved conditions enhance quality of life.",
+        "credit": { "id": 12766952, "by": "Igider", "license": "CC0 1.0" }
+      }
+    ],
+    "en:evidence": [
+      {
+        "text": "They are still looking for evidence.",
+        "credit": { "id": 13895179, "by": "kylewii", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "You need to bring the evidence.",
+        "credit": { "id": 13819704, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Do you have evidence against him?",
+        "credit": { "id": 13738322, "by": "apzzd", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I think there's enough evidence.",
+        "credit": { "id": 13395158, "by": "rul", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:genuine": [
+      {
+        "text": "Genuine friendships enrich our lives profoundly.",
+        "credit": { "id": 13215741, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "This is genuine sterling silver dinnerware.",
+        "credit": { "id": 12463251, "by": "CK", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "He asked this with genuine interest.",
+        "credit": { "id": 12247572, "by": "ddnktr", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My feelings for him are genuine.",
+        "credit": { "id": 11867163, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:implement": [
+      {
+        "text": "The UN resolution was never implemented.",
+        "credit": { "id": 10817004, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria needs to implement these reforms.",
+        "credit": { "id": 10132235, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Algeria needs to implement radical reforms.",
+        "credit": { "id": 10132184, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Yanni needs to implement those tips.",
+        "credit": { "id": 10052636, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:justify": [
+      {
+        "text": "Oleg tried to justify his actions.",
+        "credit": { "id": 11851046, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "My results justify taking drastic action.",
+        "credit": { "id": 9054000, "by": "hackerman", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Sometimes the end justifies the means.",
+        "credit": { "id": 8771231, "by": "deniko", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Be prepared to justify your position.",
+        "credit": { "id": 14030476, "by": "frpzzd", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:priority": [
+      {
+        "text": "After housing, the priority is education.",
+        "credit": { "id": 13978005, "by": "carlosalberto", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Reducing travel stress was a priority.",
+        "credit": { "id": 13244525, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Has cybersecurity become a national priority?",
+        "credit": { "id": 12766153, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Our priorities have changed over time.",
+        "credit": { "id": 13110466, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:relevant": [
+      {
+        "text": "Is the fight for decolonization still relevant?",
+        "credit": { "id": 12765631, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "We scanned the book for relevant information.",
+        "credit": { "id": 11880267, "by": "Amastan", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Could you summarise the relevant points, please?",
+        "credit": { "id": 10744190, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "The relevant components should be installed.",
+        "credit": { "id": 13363002, "by": "Igider", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:resolve": [
+      {
+        "text": "Muslims work towards resolving issues peacefully.",
+        "credit": { "id": 13023662, "by": "Nuel", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "I stand firm in quiet resolve.",
+        "credit": { "id": 12769344, "by": "Igider", "license": "CC0 1.0" }
+      },
+      {
+        "text": "Mary resolved to give up smoking.",
+        "credit": { "id": 12459449, "by": "sundown", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Only Tom can resolve that problem.",
+        "credit": { "id": 13597617, "by": "Ergulis", "license": "CC BY 2.0 FR" }
+      }
+    ],
+    "en:widespread": [
+      {
+        "text": "Nepotism is widespread in Eastern countries.",
+        "credit": { "id": 5961951, "by": "mailohilohi", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Snow-caused incidents continue to happen widespread.",
+        "credit": { "id": 13008469, "by": "urro", "license": "CC BY 2.0 FR" }
+      },
+      {
+        "text": "Celtic languages used to be more widespread.",
+        "credit": { "id": 12401791, "by": "Miktsoanit", "license": "CC0 1.0" }
+      },
+      {
+        "text": "There'll be a widespread frost tonight.",
+        "credit": { "id": 11115111, "by": "sundown", "license": "CC BY 2.0 FR" }
+      }
+    ]
+  }
+}
