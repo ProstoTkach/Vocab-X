@@ -4,6 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vit
 import { users } from './db/schema';
 import { removeTestUsers, testDb, testEmail } from './db/testing';
 import { hashed, spendQuery } from './rate-limit';
+import type { Caller } from './sessions';
 
 const mail = vi.hoisted(() => ({ sent: [] as { to: string; link: string }[] }));
 vi.mock('./email', () => ({
@@ -272,6 +273,22 @@ describe('a new password by letter', () => {
     expect(await signsIn(email, 'attacker-pass')).toBe(false);
   });
 
+  test('only the reset letter’s link sets a password, not the confirmation’s', async () => {
+    const email = testEmail('reset-confirm-link');
+    await signUp(email, 'old-pass');
+    const confirmation = lastToken(email);
+    expect(await confirmEmail(db, confirmation, now)).not.toBeNull();
+    expect(
+      await resetPassword(db, { token: confirmation, password: 'x-pass-123' }, now),
+    ).toBeNull();
+    expect(await signsIn(email, 'old-pass')).toBe(true);
+    // Nor does a reset link confirm through the confirmation's route.
+    now += MINUTE;
+    await requestReset(db, { email, locale }, now);
+    expect(await confirmEmail(db, lastToken(email), now)).toBeNull();
+    expect(await reset(email, 'new-pass')).not.toBeNull();
+  });
+
   test('lifts a lock', async () => {
     const email = await confirmed('reset-locked');
     await lock(email);
@@ -325,6 +342,8 @@ describe('signing in says nothing about which addresses exist', () => {
 });
 
 describe('changes while signed in', () => {
+  /** A session of this account that signed in at `at`. */
+  const me = (id: string, at = now): Caller => ({ id, email: null, authAt: at });
   /** The token and the address of the last address-change letter to `email`. */
   const changeLink = (email: string) => {
     const link = mail.sent.findLast((l) => l.to === email)!.link;
@@ -335,12 +354,12 @@ describe('changes while signed in', () => {
   test('a new password needs the current one; old reset links die', async () => {
     const email = await confirmed('change-pass');
     const { id } = await row(email);
-    expect(await signInMethods(db, id)).toEqual({ password: true, google: false });
+    expect(await signInMethods(db, me(id))).toEqual({ password: true, google: false });
     await requestReset(db, { email, locale }, now);
     const resetToken = lastToken(email);
     const input = (current: string) => ({ current, password: 'new-pass-1' });
-    expect(await changePassword(db, id, input('wrong-pass'), now)).toBe('wrong');
-    expect(await changePassword(db, id, input('old-pass'), now)).toBe('ok');
+    expect(await changePassword(db, me(id), input('wrong-pass'), now)).toBe('wrong');
+    expect(await changePassword(db, me(id), input('old-pass'), now)).toBe('ok');
     expect(await signsIn(email, 'new-pass-1')).toBe(true);
     expect(await signsIn(email, 'old-pass')).toBe(false);
     expect(await resetPassword(db, { token: resetToken, password: 'x-pass-123' }, now)).toBeNull();
@@ -351,20 +370,20 @@ describe('changes while signed in', () => {
     const { id } = await row(email);
     const input = (current: string) => ({ current, password: 'new-pass-1' });
     await Promise.all(
-      Array.from({ length: 10 }, () => changePassword(db, id, input('wrong-pass'), now)),
+      Array.from({ length: 10 }, () => changePassword(db, me(id), input('wrong-pass'), now)),
     );
-    expect(await changePassword(db, id, input('old-pass'), now)).toBe('limited');
+    expect(await changePassword(db, me(id), input('old-pass'), now)).toBe('limited');
   });
 
   test('an account with Google only has no password to change', async () => {
     const email = testEmail('change-google');
     const id = await rememberGoogleUser(db, `sub-${randomUUID()}`, email);
-    expect(await signInMethods(db, id)).toEqual({ password: false, google: true });
-    expect(await changePassword(db, id, { current: 'x', password: 'new-pass-1' }, now)).toBe(
+    expect(await signInMethods(db, me(id))).toEqual({ password: false, google: true });
+    expect(await changePassword(db, me(id), { current: 'x', password: 'new-pass-1' }, now)).toBe(
       'none',
     );
     const ask = { email: testEmail('elsewhere'), password: '', locale };
-    expect(await requestEmailChange(db, id, ask, now)).toBe('google');
+    expect(await requestEmailChange(db, me(id), ask, now)).toBe('google');
   });
 
   test('a new address counts only through the link sent to it', async () => {
@@ -372,11 +391,11 @@ describe('changes while signed in', () => {
     const { id } = await row(email);
     const next = testEmail('change-mail-new');
     const ask = (password: string, to = next) => ({ email: to, password, locale: 'en' });
-    expect(await requestEmailChange(db, id, ask('wrong-pass'), now)).toBe('wrong');
-    expect(await requestEmailChange(db, id, ask('old-pass', email.toUpperCase()), now)).toBe(
+    expect(await requestEmailChange(db, me(id), ask('wrong-pass'), now)).toBe('wrong');
+    expect(await requestEmailChange(db, me(id), ask('old-pass', email.toUpperCase()), now)).toBe(
       'same',
     );
-    expect(await requestEmailChange(db, id, ask('old-pass'), now)).toBe('sent');
+    expect(await requestEmailChange(db, me(id), ask('old-pass'), now)).toBe('sent');
     expect(mail.sent.at(-1)?.link).toMatch(/^http:\/\/localhost:3000\/en\/profile#email=/);
     const link = changeLink(next);
     expect((await row(email)).email).toBe(email);
@@ -397,7 +416,7 @@ describe('changes while signed in', () => {
     const { id } = await row(email);
     const before = letters(taken);
     expect(
-      await requestEmailChange(db, id, { email: taken, password: 'old-pass', locale }, now),
+      await requestEmailChange(db, me(id), { email: taken, password: 'old-pass', locale }, now),
     ).toBe('sent');
     expect(letters(taken)).toBe(before);
   });
@@ -406,9 +425,35 @@ describe('changes while signed in', () => {
     const email = await confirmed('change-race');
     const { id } = await row(email);
     const next = testEmail('change-race-new');
-    await requestEmailChange(db, id, { email: next, password: 'old-pass', locale }, now);
+    await requestEmailChange(db, me(id), { email: next, password: 'old-pass', locale }, now);
     const link = changeLink(next);
     await rememberGoogleUser(db, `sub-${randomUUID()}`, next);
     expect(await confirmEmailChange(db, link, now)).toBe('taken');
+  });
+
+  test('a new password ends the sessions signed in before it, not the one made with it', async () => {
+    const email = await confirmed('change-ends');
+    const { id } = await row(email);
+    const before = me(id, now - MINUTE);
+    expect(
+      await changePassword(db, me(id), { current: 'old-pass', password: 'new-pass-1' }, now),
+    ).toBe('ok');
+    expect(await signInMethods(db, before)).toBeNull();
+    const ask = { email: testEmail('change-ends-new'), password: 'new-pass-1', locale };
+    expect(await requestEmailChange(db, before, ask, now)).toBe('gone');
+    // The browser that changed it is signed in again as of that moment, and new sign-ins count.
+    expect(await signInMethods(db, me(id))).toEqual({ password: true, google: false });
+    expect(await signInMethods(db, me(id, now + MINUTE))).not.toBeNull();
+  });
+
+  test('a new password by letter ends the sessions signed in before it', async () => {
+    const email = await confirmed('reset-ends');
+    const { id } = await row(email);
+    const before = me(id, now - MINUTE);
+    expect(await signInMethods(db, before)).not.toBeNull();
+    await requestReset(db, { email, locale }, now);
+    await reset(email, 'new-pass');
+    expect(await signInMethods(db, before)).toBeNull();
+    expect(await signInMethods(db, me(id))).not.toBeNull();
   });
 });

@@ -1,7 +1,7 @@
 import { systemClock } from '@vocabx/core';
 import { and, eq, gt, lt, inArray } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
-import { NO_STORE, requestUserId } from '@/lib/api-user';
+import { NO_STORE, requestCaller } from '@/lib/api-user';
 import { dbFromEnv, type Db } from '@/lib/db/client';
 import { rateLimits, translationCache } from '@/lib/db/schema';
 import { googleAccessToken, serviceAccountFromEnv } from '@/lib/google-auth';
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   const sender = senderKey(request);
   const quick = burst.spend([{ key: sender, ...BURST }], now);
   if (!quick.ok) return tooMany(quick);
-  const userId = await requestUserId(request);
+  const userId = (await requestCaller(request))?.id;
   const who: TranslateLimited = userId ? 'account' : 'anonymous';
   const rule: Rule = userId
     ? { key: `translate:u:${hashed(userId)}`, max: ACCOUNT_PER_DAY, windowMs: DAY_MS }

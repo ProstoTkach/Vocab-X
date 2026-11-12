@@ -3,6 +3,7 @@
 // they are secrets, not the learner's data. Rows taken back (tombstones) are not listed.
 import { and, eq, isNull } from 'drizzle-orm';
 import type { Db } from './db/client';
+import { liveAccount, type Caller } from './sessions';
 import {
   cardProgress,
   decks,
@@ -16,8 +17,10 @@ import {
 
 const iso = (d: Date | null) => (d ? d.toISOString() : null);
 
-export async function exportAccount(db: Db, userId: string) {
-  const [account] = await db.select().from(users).where(eq(users.id, userId));
+/** Null: no such account, or this session was ended. */
+export async function exportAccount(db: Db, caller: Caller) {
+  const userId = caller.id;
+  const [account] = await db.select().from(users).where(liveAccount(caller));
   if (!account) return null;
   const alive = <T extends { userId: unknown; deletedAt: unknown }>(t: T) =>
     and(eq(t.userId as never, userId), isNull(t.deletedAt as never));

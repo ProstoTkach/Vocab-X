@@ -1,12 +1,21 @@
 import { getToken } from 'next-auth/jwt';
 import type { NextRequest } from 'next/server';
+import type { Caller } from './sessions';
 
-/** Who is asking, from the signed cookie alone (no database). Null: not signed in. */
-export async function requestUserId(request: NextRequest): Promise<string | null> {
+/**
+ * Who is asking, from the signed cookie alone (no database). Null: not signed in. Whether this
+ * session still counts is for the route to check where it reads the account (`liveAccount`).
+ */
+export async function requestCaller(request: NextRequest): Promise<Caller | null> {
   const secret = process.env.NEXTAUTH_SECRET;
   if (!secret) return null;
   const token = await getToken({ req: request, secret });
-  return token?.sub ?? null;
+  if (!token?.sub) return null;
+  return {
+    id: token.sub,
+    email: typeof token.email === 'string' ? token.email : null,
+    authAt: typeof token.authAt === 'number' ? token.authAt : 0,
+  };
 }
 
 export const NO_STORE = { 'Cache-Control': 'no-store' };

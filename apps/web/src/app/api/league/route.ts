@@ -8,12 +8,13 @@ import {
 import { eq, sql } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { crossSite, fail, NO_STORE, readJson, requestUserId } from '@/lib/api-user';
+import { crossSite, fail, NO_STORE, readJson, requestCaller } from '@/lib/api-user';
 import { dbFromEnv, inTransaction } from '@/lib/db/client';
 import { leagueProfiles, users } from '@/lib/db/schema';
 import { ensureMember, leaveLeague, readScores, readStanding } from '@/lib/league-server';
 import { switchedOff } from '@/lib/kill-switch';
 import { MINUTE_MS, hashed, spend, tooMany } from '@/lib/rate-limit';
+import { liveAccount } from '@/lib/sessions';
 
 /** The biggest body is a name, a look and a frame: well under this. */
 const BODY_MAX_BYTES = 8 * 1024;
@@ -49,7 +50,8 @@ const earnedRing = (ring: AvatarFrame['ring'], tier: number): AvatarFrame['ring'
 /**
  * The learner's group this week: only the places when the device knows the group and the week has
  * not changed, otherwise all of it. Answers `{ joined: false }` to someone not taking part, and
- * `startsAt` to someone waiting for their first race. 401: not signed in, or the account is gone;
+ * `startsAt` to someone waiting for their first race. 401: not signed in, the account is gone, or
+ * this session was ended;
  * 429: too many requests.
  */
 export async function POST(request: NextRequest): Promise<Response> {
@@ -58,8 +60,9 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (switchedOff('league')) return fail(503);
   const url = process.env.DATABASE_URL;
   if (!url) return fail(503);
-  const userId = await requestUserId(request);
-  if (!userId) return fail(401);
+  const caller = await requestCaller(request);
+  if (!caller) return fail(401);
+  const userId = caller.id;
   const limit = await spend(dbFromEnv(), rules(userId), new Date().getTime());
   if (!limit.ok) return tooMany(limit);
   const read = await readJson(request, BODY_MAX_BYTES);
@@ -71,8 +74,8 @@ export async function POST(request: NextRequest): Promise<Response> {
   try {
     const result = await inTransaction(url, async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`);
-      // The account was deleted on another device, but this cookie lives on.
-      const [user] = await tx.select({ id: users.id }).from(users).where(eq(users.id, userId));
+      // The account was deleted on another device (or this session ended), but the cookie lives on.
+      const [user] = await tx.select({ id: users.id }).from(users).where(liveAccount(caller));
       if (!user) return null;
       const [profile] = await tx
         .select({ tier: leagueProfiles.tier })
@@ -116,16 +119,24 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 }
 
-/** Leaving the league: the rows are gone, and the others no longer see this learner. */
+/**
+ * Leaving the league: the rows are gone, and the others no longer see this learner. 401 also for
+ * a session that was ended: it must not take a learner out.
+ */
 export async function DELETE(request: NextRequest): Promise<Response> {
   if (crossSite(request)) return fail(403);
   const url = process.env.DATABASE_URL;
   if (!url) return fail(503);
-  const userId = await requestUserId(request);
-  if (!userId) return fail(401);
+  const caller = await requestCaller(request);
+  if (!caller) return fail(401);
   try {
-    await inTransaction(url, (tx) => leaveLeague(tx, userId));
-    return fail(204);
+    const left = await inTransaction(url, async (tx) => {
+      const [user] = await tx.select({ id: users.id }).from(users).where(liveAccount(caller));
+      if (!user) return false;
+      await leaveLeague(tx, caller.id);
+      return true;
+    });
+    return fail(left ? 204 : 401);
   } catch (e) {
     console.error('league failed', e instanceof Error ? e.message : 'unknown');
     return fail(500);

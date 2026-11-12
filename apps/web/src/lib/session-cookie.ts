@@ -23,13 +23,15 @@ export const PROOF_COOKIE_OPTIONS = {
 /** As long as next-auth keeps a session it made itself. */
 const SESSION_SECONDS = 30 * 24 * 3600;
 
+/** A session that signs in now (`authAt`: see lib/sessions.ts). */
 export async function setSessionCookie(
   response: NextResponse,
   user: { id: string; email: string },
   secret: string,
+  authAt = new Date().getTime(),
 ) {
   const value = await encode({
-    token: { sub: user.id, email: user.email },
+    token: { sub: user.id, email: user.email, authAt },
     secret,
     maxAge: SESSION_SECONDS,
   });

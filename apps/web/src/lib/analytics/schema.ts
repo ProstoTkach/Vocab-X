@@ -99,11 +99,11 @@ export const EVENTS = {
     'Пропозиція нагадувань після повторення (10+ відповідей): показано / увімкнено / не зараз / заборонено / не вдалося.',
   profile_name: 'Змінено імʼя в профілі (set — задано, cleared — очищено).',
   account:
-    'Акаунт у профілі: to — sign_in (натиснуто вхід) / email_sign_in / registered / failed / sign_out / deleted.',
+    'Акаунт у профілі: to — sign_in (натиснуто вхід) / email_sign_in / registered / failed / sign_out / sign_out_all (вихід на всіх пристроях) / deleted.',
   auto_speak: 'Автоматичне озвучування на екрані повторення: to — on / off.',
   league: 'Рейтинг: to — asked (натиснуто кнопку участі) / join / leave.',
   profile_frame: 'Змінено кольори рамки персонажа (to — фон/рамка).',
-  sync: 'Синхронізація: to — linked (перший вхід) / merged / started_over (інший акаунт) / rejected / outdated (сервер просить оновити застосунок).',
+  sync: 'Синхронізація: to — linked (перший вхід) / merged / started_over (інший акаунт) / rejected / outdated (сервер просить оновити застосунок) / ended (сеанс завершено з іншого пристрою, вихід тут).',
   page_tour:
     'Тур сторінки (повторення, мої слова, бібліотека, мої колоди): показано / пройдено / пропущено.',
   setting_change: 'Змінено інше налаштування навчання.',

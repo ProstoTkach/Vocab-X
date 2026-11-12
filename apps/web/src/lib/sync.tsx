@@ -1,6 +1,7 @@
 'use client';
 
 import { SYNC_PROTOCOL, type SyncResponse } from '@vocabx/data';
+import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import {
   createContext,
@@ -41,6 +42,7 @@ const KEEPALIVE_BYTES = 60_000;
 const MAX_ROUNDS = 50;
 const SIGNED_IN_PARAM = 'signedIn';
 const EMAIL_VERIFIED_PARAM = 'emailVerified';
+const SESSION_ENDED_PARAM = 'sessionEnded';
 
 /**
  * `full`: the server holds all the rows an account may keep, so more are not sent. `outdated`:
@@ -136,6 +138,13 @@ export function SyncProvider({ children }: { children: ReactNode }) {
           if (res.status === 401 || res.status === 409) {
             journal.setActive(false);
             setStatus('idle');
+            // The session no longer counts (signed out everywhere, a new password elsewhere, the
+            // account deleted): signed out here too, saying why. Not when signing out anyway.
+            if (res.status === 401 && !signingOut.current) {
+              signingOut.current = true;
+              track('sync', { to: 'ended' });
+              void signOut({ callbackUrl: `${window.location.pathname}?${SESSION_ENDED_PARAM}=1` });
+            }
             return;
           }
           if (res.status === 426) {
@@ -258,6 +267,15 @@ export function SyncProvider({ children }: { children: ReactNode }) {
           ? { title: t('verified'), tone: 'success' }
           : { title: t('verifyFailed'), tone: 'danger' },
     );
+  }, [t, toast]);
+
+  // Signed out because the session was ended elsewhere (see exchange).
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has(SESSION_ENDED_PARAM)) return;
+    url.searchParams.delete(SESSION_ENDED_PARAM);
+    window.history.replaceState(null, '', url);
+    toast({ title: t('sessionEnded'), tone: 'warning' });
   }, [t, toast]);
 
   // Back from signing in, wherever it started.

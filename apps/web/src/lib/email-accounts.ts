@@ -19,6 +19,7 @@ import {
   renderVerifyEmail,
 } from './email-templates';
 import { hashPassword, newToken, tokenHash, verifyPassword } from './password';
+import { liveAccount, type Caller } from './sessions';
 import {
   forgetQuery,
   hashed,
@@ -208,7 +209,7 @@ export async function requestReset(
   const { token, columns } = newLink(now, RESET_LIFETIME_MS);
   await db
     .update(users)
-    .set({ ...columns, pendingPasswordHash: null })
+    .set({ ...columns, verifyTokenHash: resetHash(token), pendingPasswordHash: null })
     .where(eq(users.id, row.id));
   const lang = emailLocale(input.locale);
   // After '#': the token never reaches a server, a log or the next page's Referer.
@@ -219,15 +220,32 @@ export async function requestReset(
 }
 
 /**
- * Sets the password chosen on the page the link opened. Any link of the account's latest letter
- * works (confirm or reset): it proves the address is the asker's, so the address counts as
- * confirmed too. Once only; also lifts a lock. Null: the link is wrong, used or too old.
+ * The hash a reset link keeps: of its own kind, so that only a reset letter's link sets a password.
+ * A confirmation link lives a day, travels in an address (server logs) and keeps working after
+ * use, so it must not be one too.
+ */
+const resetHash = (token: string) =>
+  tokenHash(`reset
+${token}`);
+
+/**
+ * Sets the password chosen on the page the link of the latest reset letter opened. It proves the
+ * address is the asker's, so the address counts as confirmed too. Once only; also lifts a lock and
+ * ends every session signed in before (the caller signs this browser in as of `now`). Null: the
+ * link is wrong, used or too old, and then no password is even hashed: a flood of made-up links
+ * costs a lookup each.
  */
 export async function resetPassword(
   db: Db,
   input: { token: string; password: string },
   now: number,
 ): Promise<{ id: string; email: string } | null> {
+  const valid = and(
+    eq(users.verifyTokenHash, resetHash(input.token)),
+    gt(users.verifyExpiresAt, new Date(now)),
+  );
+  const [known] = await db.select({ id: users.id }).from(users).where(valid);
+  if (!known) return null;
   const passwordHash = await hashPassword(input.password);
   const rows = await db
     .update(users)
@@ -237,13 +255,9 @@ export async function resetPassword(
       emailVerifiedAt: sql`coalesce(${users.emailVerifiedAt}, now())`,
       verifyTokenHash: null,
       verifyExpiresAt: null,
+      sessionsSince: new Date(now),
     })
-    .where(
-      and(
-        eq(users.verifyTokenHash, tokenHash(input.token)),
-        gt(users.verifyExpiresAt, new Date(now)),
-      ),
-    )
+    .where(valid)
     .returning({ id: users.id, email: users.email });
   const user = rows[0] ?? null;
   // The owner of the address has proved it: the wrong passwords of others no longer count.
@@ -376,12 +390,12 @@ export async function checkLogin(
 /** How the account signs in, for the profile's choices. Null: there is no such account. */
 export async function signInMethods(
   db: Db,
-  userId: string,
+  caller: Caller,
 ): Promise<{ password: boolean; google: boolean } | null> {
   const [row] = await db
     .select({ hash: users.passwordHash, sub: users.googleSub })
     .from(users)
-    .where(eq(users.id, userId));
+    .where(liveAccount(caller));
   return row ? { password: !!row.hash, google: !!row.sub } : null;
 }
 
@@ -389,16 +403,19 @@ export async function signInMethods(
 const CHECKS: Omit<Rule, 'key'> = { max: 10, windowMs: 15 * MINUTE_MS };
 const checksOf = (userId: string): Rule => ({ key: `account-check:${hashed(userId)}`, ...CHECKS });
 
-/** The account, with this try counted. `limited`: too many tries; null: no such account. */
+/**
+ * The account, with this try counted. `limited`: too many tries; null: no such account, or this
+ * session no longer counts for it.
+ */
 async function checkedAccount(
   db: Db,
-  userId: string,
+  caller: Caller,
   now: number,
 ): Promise<Row | 'limited' | null> {
-  const rule = checksOf(userId);
+  const rule = checksOf(caller.id);
   const [counted, found] = await db.batch([
     spendQuery(db, [rule], now),
-    db.select().from(users).where(eq(users.id, userId)),
+    db.select().from(users).where(liveAccount(caller)),
   ]);
   if (!verdictOf(counted, [rule], now).ok) return 'limited';
   return found[0] ?? null;
@@ -408,15 +425,17 @@ export type ChangeResult = 'ok' | 'wrong' | 'limited' | 'none' | 'gone';
 
 /**
  * A new password while signed in: the current one must be right. `none`: the account has no
- * password (Google only); a letter sets one (`requestReset`). Links still waiting stop working.
+ * password (Google only); a letter sets one (`requestReset`). Links still waiting stop working,
+ * and so do the other sessions (whoever knew the old password may be signed in somewhere): the
+ * caller signs this one in again as of `now`.
  */
 export async function changePassword(
   db: Db,
-  userId: string,
+  caller: Caller,
   input: { current: string; password: string },
   now: number,
 ): Promise<ChangeResult> {
-  const row = await checkedAccount(db, userId, now);
+  const row = await checkedAccount(db, caller, now);
   if (row === 'limited') return 'limited';
   if (!row) return 'gone';
   if (!row.passwordHash) return 'none';
@@ -431,8 +450,9 @@ export async function changePassword(
       pendingPasswordHash: null,
       verifyTokenHash: null,
       verifyExpiresAt: null,
+      sessionsSince: new Date(now),
     })
-    .where(eq(users.id, userId));
+    .where(eq(users.id, row.id));
   return 'ok';
 }
 
@@ -450,11 +470,12 @@ export type EmailChangeResult = 'sent' | 'same' | 'wrong' | 'limited' | 'google'
  */
 export async function requestEmailChange(
   db: Db,
-  userId: string,
+  caller: Caller,
   input: { email: string; password: string; locale: string },
   now: number,
 ): Promise<EmailChangeResult> {
-  const row = await checkedAccount(db, userId, now);
+  const row = await checkedAccount(db, caller, now);
+  const userId = caller.id;
   if (row === 'limited') return 'limited';
   if (!row) return 'gone';
   if (row.googleSub) return 'google';

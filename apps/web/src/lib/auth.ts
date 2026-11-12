@@ -50,12 +50,18 @@ export const authOptions: NextAuthOptions = {
     signIn: ({ account, profile }) =>
       account?.provider === 'credentials' ||
       (profile as GoogleProfile | undefined)?.email_verified === true,
+    // `authAt`: when this session signed in, kept as the cookie is renewed (see lib/sessions.ts).
     jwt: async ({ token, account, profile, user }) => {
+      const authAt = new Date().getTime();
       if (account?.provider === 'credentials')
-        return { sub: user.id, ...(user.email ? { email: user.email } : {}) };
+        return { sub: user.id, ...(user.email ? { email: user.email } : {}), authAt };
       // Only the id and the address stay in the cookie, not the name or the picture.
       if (account && profile?.sub && profile.email)
-        return { sub: await rememberUser(profile.sub, profile.email), email: profile.email };
+        return {
+          sub: await rememberUser(profile.sub, profile.email),
+          email: profile.email,
+          authAt,
+        };
       return token;
     },
     // The id is what the browser's data is linked to.

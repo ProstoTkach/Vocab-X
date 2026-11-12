@@ -179,6 +179,11 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByRole('dialog', { name: 'Змінити пароль' })).toBeVisible();
       await page.waitForTimeout(400);
       await page.screenshot({ path: `screenshots/account/change-password-${vp.name}.png` });
+      await page.keyboard.press('Escape');
+      await card.getByRole('button', { name: 'Вийти на всіх пристроях' }).click();
+      await expect(page.getByRole('dialog', { name: 'Вийти на всіх пристроях?' })).toBeVisible();
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `screenshots/account/sign-out-all-${vp.name}.png` });
     });
 
     // Step 6.6: the "update the app" screen, and the account card when the server asks for it.

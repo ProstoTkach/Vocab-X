@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { letterRules } from '@/lib/account-limits';
-import { crossSite, fail, NO_STORE, requestUserId } from '@/lib/api-user';
+import { crossSite, fail, NO_STORE, requestCaller } from '@/lib/api-user';
 import { dbFromEnv } from '@/lib/db/client';
 import { confirmEmailChange, requestEmailChange } from '@/lib/email-accounts';
 import { count, senderKey, tooMany, verdictOf } from '@/lib/rate-limit';
@@ -39,14 +39,14 @@ export async function POST(request: NextRequest): Promise<Response> {
   try {
     const ask = askSchema.safeParse(body);
     if (ask.success) {
-      const userId = await requestUserId(request);
-      if (!userId) return fail(401);
+      const caller = await requestCaller(request);
+      if (!caller) return fail(401);
       const [mine, everyone] = letterRules('email-change', senderKey(request));
       const counts = await count(db, [mine, everyone], now);
       const limit = verdictOf(counts, [mine], now);
       if (!limit.ok) return tooMany(limit);
       if (!verdictOf(counts, [everyone], now).ok) return fail(503);
-      return fail(ASK_STATUS[await requestEmailChange(db, userId, ask.data, now)]);
+      return fail(ASK_STATUS[await requestEmailChange(db, caller, ask.data, now)]);
     }
     const confirm = confirmSchema.safeParse(body);
     if (!confirm.success) return fail(400);

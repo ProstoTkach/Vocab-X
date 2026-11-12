@@ -44,12 +44,18 @@ export const users = pgTable(
     /** Until then, an account with a password cannot sign in. */
     emailVerifiedAt: time('email_verified_at'),
     /**
-     * Hash of the token in the latest letter (confirm or reset); only the letter holds the token
-     * itself. A new letter replaces it, so earlier links stop working.
+     * Hash of the token in the latest letter (confirm, reset or a new address, each hashed its
+     * own way); only the letter holds the token itself. A new letter replaces it, so earlier links
+     * stop working.
      */
     verifyTokenHash: text('verify_token_hash'),
     verifyExpiresAt: time('verify_expires_at'),
     verifySentAt: time('verify_sent_at'),
+    /**
+     * Sessions that signed in before this no longer count (see lib/sessions.ts): set by "sign out
+     * on all devices", a new password and a password reset. Empty: every session counts.
+     */
+    sessionsSince: time('sessions_since'),
     createdAt: time('created_at').notNull().defaultNow(),
   },
   (t) => [

@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { crossSite, fail, NO_STORE, readJson, requestUserId } from '@/lib/api-user';
+import { crossSite, fail, NO_STORE, readJson, requestCaller } from '@/lib/api-user';
 import { dbFromEnv, inTransaction } from '@/lib/db/client';
 import { HOUR_MS, MINUTE_MS, hashed, spend, tooMany } from '@/lib/rate-limit';
 import { exchange, parseSyncRequest, protocolFit } from '@/lib/sync-server';
@@ -22,8 +22,8 @@ const rules = (userId: string) => [
 ];
 
 /**
- * Exchanges changes with a signed-in device (see lib/sync-server.ts). 401: not signed in, or the
- * account is gone; 409: this browser's data belongs to another account; 400: not a sync request;
+ * Exchanges changes with a signed-in device (see lib/sync-server.ts). 401: not signed in, the
+ * account is gone, or this session was ended (lib/sessions.ts); 409: this browser's data belongs to another account; 400: not a sync request;
  * 413: too big, or the account already holds all the rows it may keep; 426: the device's sync
  * protocol is older than this server serves (the app must update); 429: too many requests;
  * 503: no database here, or a device newer than this server (it tries again later).
@@ -32,8 +32,9 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (crossSite(request)) return fail(403);
   const url = process.env.DATABASE_URL;
   if (!url) return fail(503);
-  const userId = await requestUserId(request);
-  if (!userId) return fail(401);
+  const caller = await requestCaller(request);
+  if (!caller) return fail(401);
+  const userId = caller.id;
   const limit = await spend(dbFromEnv(), rules(userId), new Date().getTime());
   if (!limit.ok) return tooMany(limit);
 
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (!body) return fail(400);
   if (body.owner !== userId) return fail(409);
   try {
-    const result = await inTransaction(url, (tx) => exchange(tx, userId, body));
+    const result = await inTransaction(url, (tx) => exchange(tx, caller, body));
     if (!result) return fail(401);
     if ('quota' in result) return fail(413);
     return Response.json(result, { headers: NO_STORE });

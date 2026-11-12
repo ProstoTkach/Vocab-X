@@ -175,7 +175,14 @@ describe('changes in the profile', () => {
         }),
       );
     expect((await change('wrong-pass')).status).toBe(422);
-    expect((await change('password-1')).status).toBe(204);
+    const newPassword = await change('password-1');
+    expect(newPassword.status).toBe(204);
+    // The other sessions end with the old password; this browser gets a new one and goes on.
+    const before = { ...cookies };
+    cookies[SESSION] = cookieOf(newPassword, SESSION)!;
+    expect(cookies[SESSION]).toBeTruthy();
+    expect((await account.GET(request('/api/account', { cookies: before }))).status).toBe(401);
+    expect((await account.GET(request('/api/account', { cookies }))).status).toBe(200);
 
     const next = testEmail('route-change-new');
     // Past the minute between letters to one account.

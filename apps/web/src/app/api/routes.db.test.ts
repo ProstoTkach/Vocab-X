@@ -14,6 +14,11 @@ import { SYNC_QUOTA } from '@/lib/sync-server';
 const sync = await import('./sync/route');
 const league = await import('./league/route');
 const feedback = await import('./feedback/route');
+const account = await import('./account/route');
+const accountExport = await import('./account/export/route');
+const sessions = await import('./account/sessions/route');
+const reset = await import('./account/reset/route');
+const verify = await import('./account/verify/route');
 
 const db = testDb();
 const SITE = 'http://localhost:3000';
@@ -27,7 +32,16 @@ afterAll(async () => {
   for (const id of made) await db.delete(rateLimits).where(like(rateLimits.key, `%${hashed(id)}`));
 });
 
-async function learner() {
+/** The cookie of a session of this account that signed in at `authAt` (none: an older cookie). */
+async function session(id: string, email: string, authAt?: number) {
+  const token = await encode({
+    token: { sub: id, email, ...(authAt === undefined ? {} : { authAt }) },
+    secret: process.env.NEXTAUTH_SECRET!,
+  });
+  return { id, email, cookie: `${SESSION}=${token}` };
+}
+
+async function learner(authAt?: number) {
   const email = testEmail('routes');
   const [user] = await db
     .insert(users)
@@ -35,9 +49,20 @@ async function learner() {
     .returning({ id: users.id });
   const id = user!.id;
   made.push(id);
-  const token = await encode({ token: { sub: id, email }, secret: process.env.NEXTAUTH_SECRET! });
-  return { id, cookie: `${SESSION}=${token}` };
+  return session(id, email, authAt);
 }
+
+/** A request without a body (GET, DELETE) from the site itself. */
+const plain = (method: string, path: string, who?: { cookie: string }, ip = sender) =>
+  new NextRequest(`${SITE}${path}`, {
+    method,
+    headers: {
+      host: 'localhost:3000',
+      origin: SITE,
+      'x-real-ip': ip,
+      ...(who ? { cookie: who.cookie } : {}),
+    },
+  });
 
 function post(
   path: string,
@@ -233,5 +258,59 @@ describe('feedback: limit and size', () => {
       vi.unstubAllEnvs();
       vi.unstubAllGlobals();
     }
+  });
+});
+
+describe('sessions ended from the server (threat model: lost phone, stolen password)', () => {
+  test('after "sign out on all devices" no earlier session reads, leaves or deletes', async () => {
+    const phone = await learner(new Date().getTime() - 60_000);
+    const old = await session(phone.id, phone.email);
+    expect((await sync.POST(post('/api/sync', syncBody(phone.id), phone))).status).toBe(200);
+    expect((await sessions.DELETE(plain('DELETE', '/api/account/sessions', phone))).status).toBe(
+      204,
+    );
+    for (const who of [phone, old]) {
+      expect((await sync.POST(post('/api/sync', syncBody(phone.id), who))).status).toBe(401);
+      expect((await league.POST(post('/api/league', { join: false }, who))).status).toBe(401);
+      expect((await league.DELETE(plain('DELETE', '/api/league', who))).status).toBe(401);
+      expect((await account.GET(plain('GET', '/api/account', who))).status).toBe(401);
+      expect((await accountExport.GET(plain('GET', '/api/account/export', who))).status).toBe(401);
+      expect((await account.DELETE(plain('DELETE', '/api/account', who))).status).toBe(401);
+      expect((await sessions.DELETE(plain('DELETE', '/api/account/sessions', who))).status).toBe(
+        401,
+      );
+    }
+    const [row] = await db.select({ id: users.id }).from(users).where(eq(users.id, phone.id));
+    expect(row).toBeDefined();
+    // Signing in again counts.
+    const again = await session(phone.id, phone.email, new Date().getTime() + 1000);
+    expect((await sync.POST(post('/api/sync', syncBody(phone.id), again))).status).toBe(200);
+  });
+});
+
+describe('account links: limits before any work', () => {
+  test('setting a password by made-up links: 20 from one sender, then 429', async () => {
+    const from = `reset-${randomUUID()}`;
+    const send = () =>
+      reset.POST(
+        post('/api/account/reset', { token: randomUUID(), password: 'new-pass-1' }, undefined, {
+          'x-real-ip': from,
+        }),
+      );
+    for (let i = 0; i < 20; i += 1) expect((await send()).status).toBe(410);
+    const over = await send();
+    expect(over.status).toBe(429);
+    expect(Number(over.headers.get('retry-after'))).toBeGreaterThan(0);
+    await db.delete(rateLimits).where(eq(rateLimits.key, `reset-set:${hashed(from)}`));
+  });
+
+  test('opening confirmation links: 30 from one sender in ten minutes, then 429', async () => {
+    const from = `verify-${randomUUID()}`;
+    const open = () =>
+      verify.GET(
+        plain('GET', `/api/account/verify?token=${randomUUID()}&lang=en`, undefined, from),
+      );
+    for (let i = 0; i < 30; i += 1) expect((await open()).status).toBe(303);
+    expect((await open()).status).toBe(429);
   });
 });

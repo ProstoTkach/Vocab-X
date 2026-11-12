@@ -8,6 +8,7 @@ import { ChangeEmail } from '@/components/account/change-email';
 import { ChangePassword } from '@/components/account/change-password';
 import { DeleteAccount } from '@/components/account/delete-account';
 import { SignInDialog } from '@/components/account/sign-in-dialog';
+import { SignOutEverywhere } from '@/components/account/sign-out-everywhere';
 import { LegalLinks } from '@/components/legal/legal-links';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -169,6 +170,7 @@ export function AccountCard({ email }: { email: string }) {
           <LogOut aria-hidden className="size-4" />
           {t('signOut')}
         </Button>
+        <SignOutEverywhere />
         <DeleteAccount />
       </div>
       <LegalLinks only={['privacy', 'terms']} />

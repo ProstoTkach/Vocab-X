@@ -70,9 +70,72 @@ test('the account: a failed sign-in is told once; signed in, the address and sig
   });
   await page.reload();
   await expect(page.getByText('olena@example.com')).toBeVisible();
-  await page.getByRole('button', { name: 'Вийти' }).click();
+  await page.getByRole('button', { name: 'Вийти', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Google', exact: true })).toBeVisible();
   await expect(page.getByText('olena@example.com')).toHaveCount(0);
+});
+
+test('signing out on all devices ends the sessions; a session ended elsewhere signs out and says why', async ({
+  page,
+}) => {
+  const empty = {
+    words: [],
+    decks: [],
+    cards: [],
+    events: [],
+    deleted: { words: [], decks: [], cards: [], events: [] },
+  };
+  let syncStatus = 200;
+  await page.route('**/api/sync', (route) =>
+    syncStatus === 200
+      ? route.fulfill({ json: { applied: true, cursor: 1, more: false, changes: empty } })
+      : route.fulfill({ status: syncStatus }),
+  );
+  let ended = 0;
+  await page.route('**/api/account/sessions', async (route) => {
+    if (route.request().method() === 'DELETE') ended += 1;
+    await route.fulfill({ status: 204 });
+  });
+  const session = '**/api/auth/session';
+  const signedIn = () =>
+    page.route(session, (route) =>
+      route.fulfill({ json: { user: { email: 'olena@example.com', id: 'u1' } } }),
+    );
+  const signOutTo = (url: string) =>
+    page.route('**/api/auth/signout', async (route) => {
+      await page.unroute(session);
+      await route.fulfill({ json: { url } });
+    });
+
+  await onboard(page);
+  await signedIn();
+  await signOutTo('/uk/profile');
+  await page.goto('/uk/profile');
+  await expect(page.getByText(/^Синхронізовано:/)).toBeVisible();
+  await page.getByRole('button', { name: 'Вийти на всіх пристроях' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Вийти на всіх пристроях?' });
+  await expect(dialog).toBeVisible();
+  // Cancelled: nothing happens.
+  await dialog.getByRole('button', { name: 'Скасувати' }).click();
+  expect(ended).toBe(0);
+  await page.getByRole('button', { name: 'Вийти на всіх пристроях' }).click();
+  await dialog.getByRole('button', { name: 'Вийти всюди' }).click();
+  await expect(page.getByRole('button', { name: 'Google', exact: true })).toBeVisible();
+  expect(ended).toBe(1);
+
+  // Signed in again; then the server says this session no longer counts.
+  await page.unroute('**/api/auth/signout');
+  await signedIn();
+  await signOutTo('/uk/profile?sessionEnded=1');
+  await page.reload();
+  await expect(page.getByText('olena@example.com')).toBeVisible();
+  syncStatus = 401;
+  await page.getByRole('button', { name: 'Синхронізувати зараз' }).click();
+  await expect(page.getByRole('button', { name: 'Google', exact: true })).toBeVisible();
+  await expect(
+    page.getByText(/^Ви вийшли з акаунта на цьому пристрої/, { exact: false }).first(),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/uk\/profile$/);
 });
 
 test('syncing: signing in sends what is here, news comes in; signed out or never signed in, nothing goes', async ({
@@ -130,7 +193,7 @@ test('syncing: signing in sends what is here, news comes in; signed out or never
     await page.unroute(session);
     await route.fulfill({ json: { url: '/uk/profile' } });
   });
-  await page.getByRole('button', { name: 'Вийти' }).click();
+  await page.getByRole('button', { name: 'Вийти', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Google', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { level: 1, name: 'З іншого пристрою' })).toBeVisible();
   const sent = bodies.length;

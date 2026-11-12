@@ -34,6 +34,7 @@ import { z } from 'zod';
 import type { Tx } from './db/client';
 import { cardProgress, decks, reviewEvents, users, userState, words } from './db/schema';
 import { addLeagueXp, leagueCredits } from './league-server';
+import { liveAccount, type Caller } from './sessions';
 
 /** Rows of one table in one answer. */
 export const SYNC_PAGE = 500;
@@ -372,16 +373,18 @@ async function write(tx: Tx, userId: string, c: SyncChanges): Promise<number[]> 
 
 /**
  * One exchange, in one transaction. Requests of one learner wait for each other. Null: the account
- * no longer exists (deleted on another device), though its cookie still does. `quota`: nothing was
- * written, as these tables already hold all an account may keep.
+ * no longer exists (deleted on another device), though its cookie still does, or this session was
+ * ended (lib/sessions.ts). `quota`: nothing was written, as these tables already hold all an
+ * account may keep.
  */
 export async function exchange(
   tx: Tx,
-  userId: string,
+  caller: Caller,
   { cursor, changes }: SyncRequest,
 ): Promise<SyncResponse | { quota: QuotaTable[] } | null> {
+  const userId = caller.id;
   await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`);
-  const [user] = await tx.select({ id: users.id }).from(users).where(eq(users.id, userId));
+  const [user] = await tx.select({ id: users.id }).from(users).where(liveAccount(caller));
   if (!user) return null;
   const read = await readAfter(tx, userId, cursor);
   if (read.unseen)

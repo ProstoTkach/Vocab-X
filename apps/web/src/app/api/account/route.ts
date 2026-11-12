@@ -1,20 +1,20 @@
-import { eq } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
-import { crossSite, fail, NO_STORE, requestUserId } from '@/lib/api-user';
+import { crossSite, fail, NO_STORE, requestCaller } from '@/lib/api-user';
 import { dbFromEnv } from '@/lib/db/client';
 import { users } from '@/lib/db/schema';
 import { signInMethods } from '@/lib/email-accounts';
 import { sheetsConfigFromEnv } from '@/lib/google-sheets';
 import { pushEndpoint } from '@/lib/push';
 import { removeReminder } from '@/lib/reminder-store';
+import { liveAccount } from '@/lib/sessions';
 
 /** How the signed-in account signs in (`{ password, google }`), for the profile's choices. */
 export async function GET(request: NextRequest): Promise<Response> {
   const db = dbFromEnv();
   if (!db) return fail(503);
-  const userId = await requestUserId(request);
-  if (!userId) return fail(401);
-  const methods = await signInMethods(db, userId);
+  const caller = await requestCaller(request);
+  if (!caller) return fail(401);
+  const methods = await signInMethods(db, caller);
   return methods ? Response.json(methods, { headers: NO_STORE }) : fail(401);
 }
 
@@ -28,10 +28,12 @@ export async function DELETE(request: NextRequest): Promise<Response> {
   if (crossSite(request)) return fail(403);
   const db = dbFromEnv();
   if (!db) return fail(503);
-  const userId = await requestUserId(request);
-  if (!userId) return fail(401);
+  const caller = await requestCaller(request);
+  if (!caller) return fail(401);
   try {
-    await db.delete(users).where(eq(users.id, userId));
+    // A session that was ended cannot delete the account.
+    const gone = await db.delete(users).where(liveAccount(caller)).returning({ id: users.id });
+    if (gone.length === 0) return fail(401);
     await forgetReminder(request);
     return fail(204);
   } catch (e) {
