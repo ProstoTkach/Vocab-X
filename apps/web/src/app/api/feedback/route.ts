@@ -76,7 +76,7 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json({ ok: true });
     } catch (e) {
       // The spreadsheet is down or not set up yet: the chat still gets it, if there is one.
-      console.error('feedback: spreadsheet', e);
+      console.error('feedback: spreadsheet', e instanceof Error ? e.name : 'unknown');
       forgetSheets(sheets);
       if (!token || !chatId) return Response.json({ error: 'upstream' }, { status: 502 });
     }

@@ -148,3 +148,14 @@
 - Решения: потолок ответов в сутки 2000 = 40 в минуту × 50 минут; честный ученик не доходит, дальше платить всё равно почти нечем (затухание). Квота проверяется как «уже полна», так что последний запрос может перешагнуть потолок не больше чем на 1000 строк. `/api/dictionary` не трогал: лимит на отправителя входит в 6.15 (сессия 13).
 - Осталось / риски: лимиты `track`/`push` в памяти инстанса до 3.1; при полной квоте устройство только показывает сообщение (очистка данных на сервере — через удаление аккаунта); цифры квот и потолка XP подбираются по реальным данным после мягкого запуска.
 - Коммит: см. git log.
+
+## 2.3 + 2.4 + 2.5 + подключение 6.1 и 6.3 — Заголовки, секреты и логи, зависимости, адрес и почта (2026-11-12, модель S)
+
+- Зачем: закрыть конфигурацию перед запуском: заголовки безопасности, утечки в логах, уязвимости в зависимостях, зашитый адрес сайта.
+- Сделано: `next.config.ts` — CSP (без nonce; `connect-src` только Tatoeba, Free Dictionary, Wiktionary; `form-action` + Google для входа; `frame-ancestors 'none'`), HSTS, `nosniff`, Referrer-Policy, Permissions-Policy (микрофон только свой). `nodemailer` 7.0.13 → 10.5.0 (закрыто 4 high и 15 moderate; peer next-auth `^7.0.7` необязательный, письма шлём своим `lib/email.ts`). Логи: `register` больше не пишет текст ошибки почтовика (он может цитировать адрес), `email.ts` бросает только SMTP-код и не печатает адрес в консоль, `feedback` пишет только имя ошибки; остальные `console.*` просмотрены — маршрут и короткий текст. 6.1: VAPID-субъект и `SITE_URL` берутся из `NEXTAUTH_URL` вместо зашитого адреса. 6.3: лимит Gmail (500/сутки) и наш 300 записаны в DEVELOPMENT.md. Добавлены `.env.example`, CI-задача (`pnpm audit --prod --audit-level=high` + gitleaks), `.github/dependabot.yml`.
+- Файлы: `apps/web/next.config.ts`, `apps/web/.env.example`, `lib/{email,push,site}.ts`, `api/account/register/route.ts`, `api/feedback/route.ts`, `apps/web/package.json`, `.github/{workflows/ci.yml,dependabot.yml}`, `docs/{DATA_MAP,DEVELOPMENT}.md`.
+- Проверено: typecheck, lint, test (586); `pnpm audit --prod --audit-level=high` — чисто; клиентская сборка (`.next/static`, 60 файлов) не содержит значений 10 секретов из `.env`; история git: `.env*`, ключей и токенов нет (ротировать нечего). e2e:changed — см. отчёт сессии. Вход Google, речь, микрофон, push руками не проверялись (см. `to_test_locally.md`).
+- Цифры: аудит всего дерева 20 → 2 (оба moderate, только dev: esbuild у drizzle-kit, minimatch у eslint). Логи Vercel Hobby — 1 час (документация Vercel, 2026-11-12).
+- Решения: CSP с `unsafe-inline` для script/style — nonce сделал бы все страницы динамическими (без кэша CDN). gitleaks-action бесплатен для личных репозиториев.
+- Осталось / риски: в `/privacy` срок логов (1 час) упомянуть, если ещё нет (тексты сессии 5). Если gitleaks-action в CI потребует лицензию — заменить на CLI.
+- Коммит: см. git log.

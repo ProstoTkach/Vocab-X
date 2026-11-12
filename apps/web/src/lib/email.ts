@@ -40,7 +40,8 @@ export async function sendEmail(
   const pass = process.env.EMAIL_SERVER_PASSWORD;
   if (!user || !pass) {
     if (process.env.NODE_ENV === 'production') throw new EmailNotSent('not configured');
-    console.info(`[email to ${to}] ${link}`);
+    // Local only (production throws above): the link is what a developer needs, not the address.
+    console.info(`[email] ${link}`);
     return;
   }
   const picture = await wolfPicture();
@@ -63,6 +64,8 @@ export async function sendEmail(
         : {}),
     });
   } catch (e) {
-    throw new EmailNotSent(e instanceof Error ? e.message : 'send failed');
+    // The server's own text may quote the address: keep only the SMTP code.
+    const code = e as { responseCode?: number; code?: string };
+    throw new EmailNotSent(`send failed ${code.responseCode ?? code.code ?? ''}`.trim());
   }
 }

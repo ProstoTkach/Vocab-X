@@ -10,23 +10,25 @@
 
 Змінні середовища (локально — `apps/web/.env`, на Vercel — у налаштуваннях проєкту):
 
-| Змінна                                                           | Для чого                                                                                   |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_PROJECT_ID` | сервісний акаунт Google (Sheets API, Cloud Translation API)                                |
-| `GOOGLE_SPREADSHEET_POLLS_ID`                                    | таблиця «Vocab-X polls»: відгуки, рядок на відгук                                          |
-| `GOOGLE_SPREADSHEET_ANALYTICS_ID`                                | таблиця «Vocab-X analytics»: листи «Події», «Сесії», «Відгуки», «Словник»                  |
-| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`                         | запасний канал відгуків, коли таблиця недоступна                                           |
-| `DATABASE_URL`, `DATABASE_URL_DIRECT`                            | Neon: застосунок (через пул) і міграції (напряму)                                          |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                       | OAuth-клієнт Google: вхід у профілі                                                        |
-| `NEXTAUTH_URL`, `NEXTAUTH_SECRET`                                | адреса сайту й ключ підпису сесії (`openssl rand -base64 32`)                              |
-| `EMAIL_SERVER_USER`, `EMAIL_SERVER_PASSWORD`                     | SMTP для листів (Gmail: пароль застосунку); без них локально посилання в консолі           |
-| `EMAIL_FROM`, `EMAIL_SERVER_HOST`, `EMAIL_SERVER_PORT`           | необовʼязково: відправник і інший SMTP-сервер                                              |
-| `DEVELOPER_CODE`                                                 | код, що відкриває режим розробника в налаштуваннях                                         |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`              | ключі Web Push для нагадувань (публічний іде в браузер)                                    |
-| `VAPID_SUBJECT`                                                  | необовʼязково: mailto: чи https: відправника (типово адреса сайту)                         |
-| `CRON_SECRET`                                                    | Vercel Cron надсилає його до `/api/push/cron` і `/api/cleanup`                             |
-| `TRANSLATE_DAILY_CHARS`                                          | необовʼязково: символів до Google Translate на добу для всіх (типово 15 000; 0 — вимкнено) |
-| `EMAIL_DAILY_LIMIT`                                              | необовʼязково: листів на добу для всіх (типово 300, під лімітом Gmail 500)                 |
+| Змінна                                                           | Для чого                                                                                        |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_PROJECT_ID` | сервісний акаунт Google (Sheets API, Cloud Translation API)                                     |
+| `GOOGLE_SPREADSHEET_POLLS_ID`                                    | таблиця «Vocab-X polls»: відгуки, рядок на відгук                                               |
+| `GOOGLE_SPREADSHEET_ANALYTICS_ID`                                | таблиця «Vocab-X analytics»: листи «Події», «Сесії», «Відгуки», «Словник»                       |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`                         | запасний канал відгуків, коли таблиця недоступна                                                |
+| `DATABASE_URL`, `DATABASE_URL_DIRECT`                            | Neon: застосунок (через пул) і міграції (напряму)                                               |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                       | OAuth-клієнт Google: вхід у профілі                                                             |
+| `NEXTAUTH_URL`, `NEXTAUTH_SECRET`                                | адреса сайту (листи, sitemap, відправник push) і ключ підпису сесії (`openssl rand -base64 32`) |
+| `EMAIL_SERVER_USER`, `EMAIL_SERVER_PASSWORD`                     | SMTP для листів (Gmail: пароль застосунку); без них локально посилання в консолі                |
+| `EMAIL_FROM`, `EMAIL_SERVER_HOST`, `EMAIL_SERVER_PORT`           | необовʼязково: відправник і інший SMTP-сервер                                                   |
+| `DEVELOPER_CODE`                                                 | код, що відкриває режим розробника в налаштуваннях                                              |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`              | ключі Web Push для нагадувань (публічний іде в браузер)                                         |
+| `VAPID_SUBJECT`                                                  | необовʼязково: mailto: чи https: відправника (типово адреса сайту)                              |
+| `CRON_SECRET`                                                    | Vercel Cron надсилає його до `/api/push/cron` і `/api/cleanup`                                  |
+| `TRANSLATE_DAILY_CHARS`                                          | необовʼязково: символів до Google Translate на добу для всіх (типово 15 000; 0 — вимкнено)      |
+| `EMAIL_DAILY_LIMIT`                                              | необовʼязково: листів на добу для всіх (типово 300, під лімітом Gmail 500)                      |
+
+Повний список з поясненнями — `apps/web/.env.example`. Заголовки безпеки (CSP, HSTS, `nosniff`, `Referrer-Policy`, `Permissions-Policy`) задає `apps/web/next.config.ts`: CSP без nonce (інакше всі сторінки стали б динамічними), тож `script-src`/`style-src` мають `unsafe-inline`; браузер ходить напряму лише до Tatoeba, Free Dictionary і Wiktionary — новий зовнішній домен у `connect-src` додавати там. CI (`.github/workflows/ci.yml`): `pnpm audit --prod --audit-level=high` і gitleaks; Dependabot — `.github/dependabot.yml`. Ліміт Gmail — 500 листів/добу, наш `EMAIL_DAILY_LIMIT` — 300; без власного домену SPF/DKIM/DMARC не налаштувати (рішення 6.3).
 
 Обидві таблиці мають бути відкриті для `GOOGLE_CLIENT_EMAIL` з правами редактора. Ключі
 використовуються лише на сервері (`/api/feedback`, `/api/track`) і ніколи не потрапляють у

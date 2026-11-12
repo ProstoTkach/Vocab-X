@@ -40,7 +40,8 @@ describe('push', () => {
   test('without keys there is no push; with them, a token the public key verifies', () => {
     expect(vapidFromEnv({})).toBeNull();
     const { env, jwk } = keys();
-    const v = vapidFromEnv(env)!;
+    const v = vapidFromEnv({ ...env, NEXTAUTH_URL: 'https://vocabx-sigma.vercel.app/' })!;
+    expect(vapidFromEnv({ ...env, VAPID_SUBJECT: 'mailto:a@b.c' })!.subject).toBe('mailto:a@b.c');
     const token = vapidToken(v, 'https://fcm.googleapis.com/fcm/send/abc', NOW);
     const [header, claims, signature] = token.split('.');
     expect(JSON.parse(Buffer.from(claims!, 'base64url').toString())).toEqual({

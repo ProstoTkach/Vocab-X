@@ -29,7 +29,7 @@
     "next": "^16.4.3",
     "next-auth": "^4.24.15",
     "next-intl": "^4.14.9",
-    "nodemailer": "^7.0.13",
+    "nodemailer": "^10.5.0",
     "radix-ui": "^1.8.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

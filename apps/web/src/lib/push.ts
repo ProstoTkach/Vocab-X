@@ -56,7 +56,8 @@ export function vapidFromEnv(env: Record<string, string | undefined> = process.e
   return {
     publicKey,
     key,
-    subject: env.VAPID_SUBJECT || 'https://vocabx-sigma.vercel.app',
+    // The site's own address (NEXTAUTH_URL) unless a mailto: address is set.
+    subject: env.VAPID_SUBJECT || env.NEXTAUTH_URL?.replace(/\/$/, '') || 'http://localhost:3000',
   } satisfies VapidConfig;
 }
 

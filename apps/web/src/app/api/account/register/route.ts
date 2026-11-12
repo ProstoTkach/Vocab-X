@@ -55,7 +55,8 @@ export async function POST(request: NextRequest): Promise<Response> {
     return response;
   } catch (e) {
     if (e instanceof EmailNotSent) {
-      console.error('email not sent', e.message);
+      // No message: the mail server's text may quote the recipient's address.
+      console.error('register: email not sent');
       return fail(502);
     }
     console.error('registration failed', e instanceof Error ? e.message : 'unknown');
