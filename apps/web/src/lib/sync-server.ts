@@ -7,6 +7,7 @@ import {
   cardProgressSchema,
   deckSchema,
   gamificationSchema,
+  MAX_TIME_MS,
   profileSchema,
   settingsPatchSchema,
   wordSchema,
@@ -35,16 +36,23 @@ export const SYNC_MAX_ROWS = 1000;
 
 const id = z.string().min(1).max(200);
 const list = <T extends z.ZodType>(item: T) => z.array(item).max(SYNC_MAX_ROWS);
+/** An answer that took longer than this was left open: it is kept as this long (fits the column). */
+export const MAX_RESPONSE_MS = 3_600_000;
 const eventSchema = z.object({
   id,
   wordId: id,
-  at: z.number().nonnegative(),
+  // A time past the year 3000 would be a date the database cannot store (and a 500).
+  at: z.number().nonnegative().max(MAX_TIME_MS),
   grade: z.number().int().min(1).max(4),
   format: z.enum(ALL_FORMATS as unknown as [string, ...string[]]),
-  responseMs: z.number().int().nonnegative(),
+  responseMs: z
+    .number()
+    .int()
+    .nonnegative()
+    .transform((ms) => Math.min(ms, MAX_RESPONSE_MS)),
   wasNew: z.boolean(),
-  retention: z.number(),
-  xp: z.number().int(),
+  retention: z.number().min(0).max(1),
+  xp: z.number().int().min(-10_000).max(10_000),
   kind: z.enum(['placement', 'mixed']).optional(),
 });
 const requestSchema = z.object({
@@ -70,6 +78,31 @@ const requestSchema = z.object({
     }),
   }),
 });
+
+/**
+ * Most rows one account may keep on the server. A learner far past these is not learning: the
+ * numbers are a ceiling for a script that fills the database (Neon's free plan holds 0.5 GB),
+ * well above a daily learner of many years (100 answers a day for five years is 180 000 events).
+ * Checked before a write, so the last request may go a little over.
+ */
+export const SYNC_QUOTA = { words: 20_000, decks: 1_000, cards: 20_000, events: 250_000 } as const;
+export type QuotaTable = keyof typeof SYNC_QUOTA;
+
+const TABLES = { words, decks, cards: cardProgress, events: reviewEvents } as const;
+
+/** The tables this request would add rows to, and that already hold their quota (empty: fine). */
+export async function overQuota(tx: Tx, userId: string, c: SyncChanges): Promise<QuotaTable[]> {
+  const sent = (Object.keys(SYNC_QUOTA) as QuotaTable[]).filter((t) => c[t].length > 0);
+  const full: QuotaTable[] = [];
+  for (const t of sent) {
+    const [row] = await tx
+      .select({ n: sql<number>`count(*)::int` })
+      .from(TABLES[t])
+      .where(eq(TABLES[t].userId, userId));
+    if ((row?.n ?? 0) >= SYNC_QUOTA[t]) full.push(t);
+  }
+  return full;
+}
 
 /** The request, once checked: it comes from outside. Null when it is not one. */
 export function parseSyncRequest(body: unknown): SyncRequest | null {
@@ -308,19 +341,22 @@ async function write(tx: Tx, userId: string, c: SyncChanges): Promise<number[]> 
 
 /**
  * One exchange, in one transaction. Requests of one learner wait for each other. Null: the account
- * no longer exists (deleted on another device), though its cookie still does.
+ * no longer exists (deleted on another device), though its cookie still does. `quota`: nothing was
+ * written, as these tables already hold all an account may keep.
  */
 export async function exchange(
   tx: Tx,
   userId: string,
   { cursor, changes }: SyncRequest,
-): Promise<SyncResponse | null> {
+): Promise<SyncResponse | { quota: QuotaTable[] } | null> {
   await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`);
   const [user] = await tx.select({ id: users.id }).from(users).where(eq(users.id, userId));
   if (!user) return null;
   const read = await readAfter(tx, userId, cursor);
   if (read.unseen)
     return { applied: false, cursor: read.cursor, more: read.more, changes: read.changes };
+  const full = await overQuota(tx, userId, changes);
+  if (full.length > 0) return { quota: full };
   const seqs = await write(tx, userId, changes);
   return { applied: true, cursor: Math.max(cursor, ...seqs), more: false, changes: noChanges() };
 }

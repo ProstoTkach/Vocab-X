@@ -7,12 +7,13 @@ rows of "Additions to existing steps" that name them.
 
 ## Progress and handoff
 
-Next: **session 9** (model S); owner's legal review of session 5 texts (`docs/LEGAL_REVIEW.md` §3) can run in parallel. Migration `0005` is applied to the main database (2026-11-12); migration `0006` (drops unused `users` columns) is applied **only after** the deploy with session 8 is live. Update this line and the "Done" line at the end of every session.
+Next: **session 10** (model S); owner's legal review of session 5 texts (`docs/LEGAL_REVIEW.md` §3) can run in parallel. Migration `0005` is applied to the main database (2026-11-12); migration `0006` (drops unused `users` columns) is applied **only after** the deploy with session 8 is live. Update this line and the "Done" line at the end of every session.
 Done: 0.1 (`docs/AUDIT.md`, 2026-11-12); 1.0 + 5.3a (session 1, 2026-11-12, commit b076026); 1.1 + 1.2 (session 2, 2026-11-12);
 2.1a (session 3, 2026-11-12); 1.3 + 5.4 + 6.7 + 1.6 terms (session 4, 2026-11-12);
 1.4 text + 5.1 text (session 5, 2026-11-12; `messages/*/legal.json`, format and review list in `docs/LEGAL_REVIEW.md`);
 1.4 page + 5.1 page + Credits + links + 5.8 (session 6, 2026-11-12; contact address: `CONTACT_EMAIL` in `src/lib/contact.ts`, empty until the owner fills it in);
 1.5 (session 7, 2026-11-12); 1.6 implementation + 5.3b (session 8, 2026-11-12; cleanup cron `/api/cleanup`, full resync rule in `@vocabx/data`, see `docs/DATA_MAP.md` §6.2–6.3);
+2.1b + 2.2 + 5.2 (session 9, 2026-11-12; limits, body caps and quotas of the data routes, daily XP cap in the league, see `docs/DEVELOPMENT.md`);
 owner: 6.8 (two-step sign-in everywhere), Neon test branch created.
 
 Owner decisions that later sessions must respect (2026-11-12):

@@ -1,6 +1,5 @@
 import { systemClock } from '@vocabx/core';
 import {
-  anonIdOf,
   BODY_MAX_BYTES,
   DICTIONARY_COLUMNS,
   dictionaryRows,
@@ -22,26 +21,21 @@ import {
   sheetsConfigFromEnv,
   upsertRows,
 } from '@/lib/google-sheets';
-import { crossSite, fail } from '@/lib/api-user';
+import { crossSite, fail, readJson } from '@/lib/api-user';
+import { MINUTE_MS, memoryLimiter, senderKey, tooMany } from '@/lib/rate-limit';
 
 /** Sheet names of the analytics spreadsheet. */
 const SHEETS = ANALYTICS_SHEETS;
 
-/** Requests per browser (anon_id) in a window; kept in memory, so it resets with the server. */
-const LIMIT = 30;
-const WINDOW_MS = 10 * 60_000;
-const recent = new Map<string, number[]>();
-
-function tooMany(key: string): boolean {
-  const now = systemClock.now();
-  const times = (recent.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
-  const over = times.length >= LIMIT;
-  if (!over) times.push(now);
-  recent.set(key, times);
-  // Forget quiet browsers, so the map stays small.
-  if (recent.size > 5000) for (const [k, v] of recent) if (!v.length) recent.delete(k);
-  return over;
-}
+/**
+ * Batches per sender (the hashed network address, not the browser's own `anon_id`, which anyone can
+ * change at will): a browser sends a few a minute at most, so 600 in ten minutes leaves room for a
+ * whole class behind one address. Counted in this server instance only (this route must not wake
+ * the database for a limit check, see step 2.1), so it holds back a flood from one place, not a
+ * spread-out one; that waits for analytics to move into the database (step 3.1).
+ */
+const limiter = memoryLimiter();
+const rules = (sender: string) => [{ key: `track:${sender}`, max: 600, windowMs: 10 * MINUTE_MS }];
 
 /**
  * Events already written, by id (kept for a while, per server instance): a batch the browser
@@ -81,24 +75,12 @@ export async function POST(request: Request): Promise<Response> {
   const sheets = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
   if (!sheets) return new Response(null, { status: 204 });
 
-  const length = Number(request.headers.get('content-length') ?? 0);
-  if (length > BODY_MAX_BYTES) return new Response(null, { status: 413 });
-  let text: string;
-  try {
-    text = await request.text();
-  } catch {
-    return new Response(null, { status: 400 });
-  }
-  if (text.length > BODY_MAX_BYTES) return new Response(null, { status: 413 });
-  let raw: unknown;
-  try {
-    raw = JSON.parse(text);
-  } catch {
-    return new Response(null, { status: 400 });
-  }
-  const body = parseTrackBody(raw, systemClock.now());
+  const limit = limiter.spend(rules(senderKey(request)), systemClock.now());
+  if (!limit.ok) return tooMany(limit);
+  const read = await readJson(request, BODY_MAX_BYTES);
+  if (!read.ok) return new Response(null, { status: read.status });
+  const body = parseTrackBody(read.value, systemClock.now());
   if (!body) return new Response(null, { status: 400 });
-  if (tooMany(anonIdOf(body))) return new Response(null, { status: 429 });
 
   const events = fresh(body.events);
   try {

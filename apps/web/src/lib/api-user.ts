@@ -29,3 +29,38 @@ export function crossSite(request: Request): boolean {
     return true;
   }
 }
+
+export type Body = { ok: true; value: unknown } | { ok: false; status: 400 | 413 };
+
+/**
+ * The JSON body of a request, read no further than `maxBytes` (a body that says it is bigger, or
+ * proves to be, is cut off at once: 413) so a huge one never fills the function's memory.
+ * 400: empty or not JSON.
+ */
+export async function readJson(request: Request, maxBytes: number): Promise<Body> {
+  const declared = Number(request.headers.get('content-length') ?? 0);
+  if (declared > maxBytes) return { ok: false, status: 413 };
+  const reader = request.body?.getReader();
+  if (!reader) return { ok: false, status: 400 };
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > maxBytes) {
+        await reader.cancel().catch(() => undefined);
+        return { ok: false, status: 413 };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { ok: false, status: 400 };
+  }
+  try {
+    return { ok: true, value: JSON.parse(Buffer.concat(chunks).toString('utf8')) as unknown };
+  } catch {
+    return { ok: false, status: 400 };
+  }
+}

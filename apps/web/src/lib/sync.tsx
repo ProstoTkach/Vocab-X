@@ -41,7 +41,8 @@ const MAX_ROUNDS = 50;
 const SIGNED_IN_PARAM = 'signedIn';
 const EMAIL_VERIFIED_PARAM = 'emailVerified';
 
-export type SyncStatus = 'idle' | 'syncing' | 'failed';
+/** `full`: the server holds all the rows an account may keep, so more are not sent. */
+export type SyncStatus = 'idle' | 'syncing' | 'failed' | 'full';
 
 interface SyncValue {
   status: SyncStatus;
@@ -130,7 +131,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
           }
           if (!res.ok) {
             if (res.status === 400) track('sync', { to: 'rejected' });
-            setStatus('failed');
+            setStatus(res.status === 413 ? 'full' : 'failed');
             return;
           }
           const answer = (await res.json()) as SyncResponse;

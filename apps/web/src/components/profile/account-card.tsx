@@ -125,8 +125,8 @@ export function AccountCard({ email }: { email: string }) {
       <p aria-live="polite" className="text-sm text-fg-muted">
         {status === 'syncing'
           ? t('syncing')
-          : status === 'failed'
-            ? t('syncFailed')
+          : status === 'failed' || status === 'full'
+            ? t(status === 'full' ? 'syncFull' : 'syncFailed')
             : syncedAt > 0
               ? t('syncedAt', {
                   time: format.dateTime(syncedAt, { dateStyle: 'medium', timeStyle: 'short' }),

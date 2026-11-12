@@ -39,6 +39,7 @@
     "failed": "Could not sign in. Please try again.",
     "syncing": "Syncing…",
     "syncFailed": "Could not sync. Your data is safe here; we will try again later.",
+    "syncFull": "The server holds all the data an account can keep, so new data is not sent. Your data is safe here.",
     "syncedAt": "Synced: {time}",
     "syncNow": "Sync now",
     "otherTitle": "Another account’s data",

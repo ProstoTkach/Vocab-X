@@ -12,8 +12,10 @@ import {
   forgetSheets,
   sheetsConfigFromEnv,
 } from '@/lib/google-sheets';
-import { crossSite, fail } from '@/lib/api-user';
+import { crossSite, fail, readJson } from '@/lib/api-user';
 import { ANALYTICS_SHEETS } from '@/lib/analytics/schema';
+import { dbFromEnv } from '@/lib/db/client';
+import { DAY_MS, MINUTE_MS, senderKey, spend, tooMany } from '@/lib/rate-limit';
 
 /** The feedback sheet of the analytics spreadsheet, next to the usage statistics. */
 const ANALYTICS_SHEET = ANALYTICS_SHEETS.feedback;
@@ -31,29 +33,24 @@ async function copyToAnalytics(row: ReturnType<typeof feedbackRow>) {
   }
 }
 
-/** Requests per address in a window; kept in memory, so it resets with the server. */
-const LIMIT = 5;
-const WINDOW_MS = 10 * 60_000;
-const recent = new Map<string, number[]>();
+/** A survey with every comment filled in, in four-byte letters, is under this. */
+const BODY_MAX_BYTES = 32 * 1024;
 
-function tooMany(key: string): boolean {
-  const now = performance.now();
-  const times = (recent.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
-  if (times.length >= LIMIT) {
-    recent.set(key, times);
-    return true;
-  }
-  times.push(now);
-  recent.set(key, times);
-  return false;
-}
+/**
+ * Five from one sender in ten minutes (a class may send together, a script may not), and a ceiling
+ * for everyone together, so a flood from many addresses still cannot fill the sheet or the chat.
+ */
+const rules = (sender: string) => [
+  { key: `feedback:${sender}`, max: 5, windowMs: 10 * MINUTE_MS },
+  { key: 'feedback:all', max: 500, windowMs: DAY_MS },
+];
 
 /**
  * Forwards learner feedback to the developer: for now as a row of the "Vocab-X polls" Google
  * spreadsheet when its service account is set up, otherwise to the Telegram chat; a copy goes
  * to the "Відгуки" sheet of the analytics spreadsheet. Keys stay on
- * the server. The sender's address is used only for the in-memory rate limit above and is never
- * forwarded or stored, so the feedback stays anonymous.
+ * the server. The sender's address is used only for the rate limit above, as a short keyed hash that
+ * lives for the length of the window, and is never forwarded, so the feedback stays anonymous.
  */
 export async function POST(request: Request): Promise<Response> {
   if (crossSite(request)) return fail(403);
@@ -63,16 +60,12 @@ export async function POST(request: Request): Promise<Response> {
   if (!sheets && (!token || !chatId))
     return Response.json({ error: 'not-configured' }, { status: 503 });
 
-  const address = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
-  if (tooMany(address)) return Response.json({ error: 'rate-limited' }, { status: 429 });
+  const limit = await spend(dbFromEnv(), rules(senderKey(request)), new Date().getTime());
+  if (!limit.ok) return tooMany(limit, { error: 'rate-limited' });
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return Response.json({ error: 'invalid' }, { status: 400 });
-  }
-  const payload = parsePayload(body);
+  const body = await readJson(request, BODY_MAX_BYTES);
+  if (!body.ok) return Response.json({ error: 'invalid' }, { status: body.status });
+  const payload = parsePayload(body.value);
   if (!payload) return Response.json({ error: 'invalid' }, { status: 400 });
 
   const row = feedbackRow(payload, new Date());

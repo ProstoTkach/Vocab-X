@@ -9,6 +9,7 @@ import {
   rankLeague,
   TOP_TIER,
 } from './league';
+import { DEFAULT_EVENT_VALIDATION_PARAMS } from './config/params';
 import type { ReviewEvent } from './model';
 
 const T0 = Date.parse('2026-11-04T10:00:00Z');
@@ -130,5 +131,22 @@ describe('what an answer earns in the league', () => {
   test('a flood of answers fades, so a day cannot earn without end', () => {
     const known = Array.from({ length: 1000 }, (_, i) => ({ wordId: `old${i}`, at: T0 - 1000 }));
     expect(credit(answer({ xp: 10 }), { known })).toBe(0);
+  });
+
+  test('past the answers a day can hold, nothing more is paid, however it is spread', () => {
+    const rules = { ...DEFAULT_EVENT_VALIDATION_PARAMS, maxEventsPerDay: 3 };
+    // One a minute, so the per-minute limit never applies.
+    const spread = Array.from({ length: 5 }, (_, i) => answer({ at: T0 + i * 60_000 }));
+    const credits = creditXp(spread, { ...ctx, now: T0 + 600_000, rules });
+    expect(spread.map((e) => credits.get(e.id))).toEqual([10, 10, 10, 0, 0]);
+    // The next day starts again.
+    const next = answer({ at: T0 + 86_400_000 });
+    expect(creditXp([next], { ...ctx, now: T0 + 90_000_000, rules }).get(next.id)).toBe(10);
+  });
+
+  test('the answers already on the server count against the day', () => {
+    const rules = { ...DEFAULT_EVENT_VALIDATION_PARAMS, maxEventsPerDay: 3 };
+    const known = [1, 2, 3].map((i) => ({ wordId: `old${i}`, at: T0 - i * 60_000 }));
+    expect(credit(answer(), { known, rules })).toBe(0);
   });
 });

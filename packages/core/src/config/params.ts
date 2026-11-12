@@ -175,10 +175,15 @@ export interface EventValidationParams {
   defaultMinResponseMs: number;
   /** r_max: events per minute. */
   maxEventsPerMinute: number;
+  /** Answers that earn league XP in one (UTC) day; the rest of the day's answers earn nothing. */
+  maxEventsPerDay: number;
 }
 export const DEFAULT_EVENT_VALIDATION_PARAMS: EventValidationParams = {
   skewMs: 120_000,
   minResponseMs: { REC: 400 },
   defaultMinResponseMs: 400,
   maxEventsPerMinute: 40,
+  // Hours of nonstop studying at the fastest honest pace; the decay of a day's XP already makes
+  // the late ones nearly worthless, this only ends the arithmetic for a script.
+  maxEventsPerDay: 2000,
 };

@@ -89,7 +89,7 @@ const minuteOf = (t: number) => Math.floor(t / 60_000);
 /**
  * What each new answer earns in the league, by id. A device can send anything, so an answer gets
  * no more than the most its grade and format can give at that point of the day, and nothing if it
- * is implausible: from the future, too fast, one of too many in a minute, or one more for a word
+ * is implausible: from the future, too fast, one of too many in a minute or a day, or one more for a word
  * already rewarded that day. The daily decay also makes every day's total finite.
  *
  * Days are UTC here, so around a learner's midnight this can come out a little lower than the XP
@@ -125,6 +125,7 @@ export function creditXp(events: readonly ReviewEvent[], c: CreditContext): Map<
       e.at <= c.now + rules.skewMs &&
       e.responseMs >= (rules.minResponseMs[e.format] ?? rules.defaultMinResponseMs) &&
       nMinute < rules.maxEventsPerMinute &&
+      nDay < rules.maxEventsPerDay &&
       nWord < params.maxAwardsPerCardPerDay;
     const most = plausible ? xpFor(e.grade, e.format, null, nDay, DEFAULT_RETENTION, params) : 0;
     credits.set(e.id, Math.max(0, Math.min(e.xp, most)));

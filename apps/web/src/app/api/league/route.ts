@@ -8,10 +8,19 @@ import {
 import { eq, sql } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { crossSite, fail, NO_STORE, requestUserId } from '@/lib/api-user';
-import { inTransaction } from '@/lib/db/client';
+import { crossSite, fail, NO_STORE, readJson, requestUserId } from '@/lib/api-user';
+import { dbFromEnv, inTransaction } from '@/lib/db/client';
 import { leagueProfiles, users } from '@/lib/db/schema';
 import { ensureMember, leaveLeague, readScores, readStanding } from '@/lib/league-server';
+import { MINUTE_MS, hashed, spend, tooMany } from '@/lib/rate-limit';
+
+/** The biggest body is a name, a look and a frame: well under this. */
+const BODY_MAX_BYTES = 8 * 1024;
+
+/** Sixty in ten minutes per account: the league opens a few times a day, a script loops. */
+const rules = (userId: string) => [
+  { key: `league:${hashed(userId)}`, max: 60, windowMs: 10 * MINUTE_MS },
+];
 
 const itemId = z.string().min(1).max(64);
 const bodySchema = z.object({
@@ -39,7 +48,8 @@ const earnedRing = (ring: AvatarFrame['ring'], tier: number): AvatarFrame['ring'
 /**
  * The learner's group this week: only the places when the device knows the group and the week has
  * not changed, otherwise all of it. Answers `{ joined: false }` to someone not taking part, and
- * `startsAt` to someone waiting for their first race. 401: not signed in, or the account is gone.
+ * `startsAt` to someone waiting for their first race. 401: not signed in, or the account is gone;
+ * 429: too many requests.
  */
 export async function POST(request: NextRequest): Promise<Response> {
   if (crossSite(request)) return fail(403);
@@ -47,7 +57,11 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (!url) return fail(503);
   const userId = await requestUserId(request);
   if (!userId) return fail(401);
-  const parsed = bodySchema.safeParse(await request.json().catch(() => null));
+  const limit = await spend(dbFromEnv(), rules(userId), new Date().getTime());
+  if (!limit.ok) return tooMany(limit);
+  const read = await readJson(request, BODY_MAX_BYTES);
+  if (!read.ok) return fail(read.status);
+  const parsed = bodySchema.safeParse(read.value);
   if (!parsed.success) return fail(400);
   const { join, shown: asked, scoresOf } = parsed.data;
   if (join && !asked) return fail(400);

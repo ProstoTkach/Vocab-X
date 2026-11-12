@@ -5,7 +5,9 @@ import { z } from 'zod';
 
 const id = z.string().min(1).max(200);
 const lang = z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/);
-const time = z.number().nonnegative();
+/** The year 3000 in ms: far past any real date, and still a date the database can store. */
+export const MAX_TIME_MS = 32_503_680_000_000;
+const time = z.number().nonnegative().max(MAX_TIME_MS);
 const langMap = <T extends z.ZodType>(v: T) => z.record(lang, v);
 
 export const cefrSchema = z.enum(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);

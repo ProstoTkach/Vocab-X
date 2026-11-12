@@ -2,9 +2,18 @@ import { systemClock } from '@vocabx/core';
 import { sheetsConfigFromEnv } from '@/lib/google-sheets';
 import { pushEndpoint, vapidFromEnv } from '@/lib/push';
 import { saveReminder } from '@/lib/reminder-store';
-import { crossSite, fail } from '@/lib/api-user';
+import { crossSite, fail, readJson } from '@/lib/api-user';
+import { MINUTE_MS, memoryLimiter, senderKey, tooMany } from '@/lib/rate-limit';
 
 const BODY_MAX = 2000;
+
+/**
+ * Thirty changes in ten minutes from one sender (each writes to the spreadsheet). In this server
+ * instance only, so the route does not wake the database for a check (step 2.1); it moves with
+ * the reminders into the database in step 3.1.
+ */
+const limiter = memoryLimiter();
+const rules = (sender: string) => [{ key: `push:${sender}`, max: 30, windowMs: 10 * MINUTE_MS }];
 
 /**
  * Turns the reminder on or off for one phone and plans the next one: `{ endpoint, on, locale,
@@ -15,14 +24,16 @@ export async function POST(request: Request): Promise<Response> {
   if (crossSite(request)) return fail(403);
   const sheets = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
   if (!sheets || !vapidFromEnv()) return new Response(null, { status: 503 });
-  let body: { endpoint?: unknown; on?: unknown; locale?: unknown; at?: unknown };
-  try {
-    const text = await request.text();
-    if (text.length > BODY_MAX) return new Response(null, { status: 413 });
-    body = JSON.parse(text) as typeof body;
-  } catch {
-    return new Response(null, { status: 400 });
-  }
+  const limit = limiter.spend(rules(senderKey(request)), systemClock.now());
+  if (!limit.ok) return tooMany(limit);
+  const read = await readJson(request, BODY_MAX);
+  if (!read.ok) return new Response(null, { status: read.status });
+  const body = (typeof read.value === 'object' && read.value ? read.value : {}) as {
+    endpoint?: unknown;
+    on?: unknown;
+    locale?: unknown;
+    at?: unknown;
+  };
   const endpoint = pushEndpoint(body.endpoint);
   if (!endpoint || typeof body.on !== 'boolean') return new Response(null, { status: 400 });
   const locale =

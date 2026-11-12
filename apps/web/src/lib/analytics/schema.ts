@@ -309,9 +309,6 @@ export function parseTrackBody(body: unknown, now: number): TrackBody | null {
   return { events, sessions };
 }
 
-/** The browser the request is about (all items of a request come from one). */
-export const anonIdOf = (b: TrackBody) => b.events[0]?.anon_id ?? b.sessions[0]?.anon_id ?? '';
-
 // ---------------------------------------------------------------------------------------------
 // The spreadsheet. Column order is fixed: new columns are only ever added at the end.
 
