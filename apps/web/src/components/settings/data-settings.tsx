@@ -69,9 +69,17 @@ export function DataSettings() {
   const [leagueJoined, setLeagueJoined] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [busy, setBusy] = useState(false);
+  // What only this browser knows is read after the first render, so it matches the server's HTML.
+  const [here, setHere] = useState<{
+    linked: boolean;
+    syncedAt: number;
+    browserId: string | null;
+    firstVisit: number | null;
+  } | null>(null);
   // The server's side exists only for a browser tied to an account.
-  const linked = repos.journal.owner !== null;
-  const { id: browserId, firstVisit, choice } = storedAnalytics();
+  const linked = here?.linked ?? false;
+  const browserId = here?.browserId ?? null;
+  const firstVisit = here?.firstVisit ?? null;
 
   useEffect(() => {
     void (async () => {
@@ -85,6 +93,13 @@ export function DataSettings() {
       const cards = await Promise.all(
         (profile?.targetLangs ?? []).map((l) => repos.progress.listByLang(l)),
       );
+      const { id, firstVisit: first } = storedAnalytics();
+      setHere({
+        linked: repos.journal.owner !== null,
+        syncedAt: repos.journal.syncedAt,
+        browserId: id,
+        firstVisit: first,
+      });
       setCounts({
         decks: decks.length,
         cards: cards.reduce((n, c) => n + c.length, 0),
@@ -98,11 +113,12 @@ export function DataSettings() {
 
   const resetData = async () => {
     track('data_reset');
+    const signedIn = repos.journal.owner !== null;
     await repos.reset();
     // Full navigation: clears in-memory state and re-runs the onboarding redirect.
     const home = `/${locale}/onboarding`;
     // This browser starts clean, so it leaves the account; the account's copy stays on the server.
-    if (linked) void signOut({ callbackUrl: home });
+    if (signedIn) void signOut({ callbackUrl: home });
     else window.location.assign(home);
   };
 
@@ -112,7 +128,7 @@ export function DataSettings() {
     try {
       let server: unknown = null;
       let serverFailed = false;
-      if (linked) {
+      if (repos.journal.owner !== null) {
         try {
           const res = await fetch('/api/account/export');
           if (!res.ok) throw new Error('export');
@@ -130,7 +146,7 @@ export function DataSettings() {
         analytics: {
           browserId,
           firstVisitAt: firstVisit ? new Date(firstVisit).toISOString() : null,
-          choice,
+          choice: storedAnalytics().choice,
         },
       };
       const url = URL.createObjectURL(
@@ -183,8 +199,8 @@ export function DataSettings() {
             <Fact
               label={t('lastSync')}
               value={
-                repos.journal.syncedAt > 0
-                  ? format.dateTime(repos.journal.syncedAt, {
+                (here?.syncedAt ?? 0) > 0
+                  ? format.dateTime(here?.syncedAt ?? 0, {
                       dateStyle: 'medium',
                       timeStyle: 'short',
                     })
@@ -201,7 +217,7 @@ export function DataSettings() {
       <Block title={t('analyticsTitle')}>
         <AnalyticsSwitch />
         <dl>
-          <Fact label={t('browserId')} value={browserId ?? t('browserIdNone')} />
+          <Fact label={t('browserId')} value={here ? (browserId ?? t('browserIdNone')) : ''} />
         </dl>
         <p className="text-sm text-fg-muted">{t('analyticsNever')}</p>
         <LegalLinks only={['privacy']} />

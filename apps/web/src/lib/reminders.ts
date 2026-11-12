@@ -145,13 +145,15 @@ export async function turnRemindersOff(locale: string): Promise<void> {
 
 /** The push address of this browser's subscription, if reminders are on here. */
 export async function pushEndpointHere(): Promise<string | null> {
-  if (typeof window === 'undefined') return null;
+  // No permission, no subscription: nothing to wait for (the service worker can be slow to answer).
+  if (typeof window === 'undefined' || !remindersGranted()) return null;
   const sub = await (await registration())?.pushManager.getSubscription();
   return sub?.endpoint ?? null;
 }
 
 /** Unsubscribes this browser without telling the server (its row is already gone). */
 export async function dropReminders(): Promise<void> {
+  if (typeof window === 'undefined' || !remindersGranted()) return;
   const sub = await (await registration())?.pushManager.getSubscription();
   await sub?.unsubscribe();
 }
