@@ -61,6 +61,7 @@ Lives until the learner resets data on the device or clears the browser. No expi
 | `vocabx:league`, `vocabx:league-wait`                                                                                | Last league standings shown (names and looks of the group), "waiting for the week to start" | Overwritten; removed on leaving the league                             |
 | `vocabx:tour:home`, `…:game`, `…:review`, `…:words`, `…:library`, `…:mine`                                           | "Tour seen" flags                                                                           | Until reset                                                            |
 | `vocabx:probe`                                                                                                       | Empty test write (is storage available)                                                     | Removed at once                                                        |
+| `vocabx:backup-nudge`                                                                                                | Number of started words when "Keep your words" was last shown or a file saved (§2.6)        | Overwritten                                                            |
 
 ### 2.4 localStorage / sessionStorage — analytics (`lib/analytics/identity.ts`)
 
@@ -90,6 +91,65 @@ is a legal question for the owner's review (session 5).
 | Push subscription (browser) | —                                      | The push address of this browser at its push service                                                                     | Until reminders are turned off or the browser drops it |
 | Cache Storage               | `vocabx-v2`                            | App pages and files for offline use; `/__vocabx/meta` (home page and time of the last warm-up). `/api/*` is never cached | Replaced on each app update                            |
 | Web Locks                   | `vocabx-sync`, `vocabx-export`         | Nothing stored: only stops two tabs syncing / exporting at once                                                          | —                                                      |
+
+### 2.6 Local data durability (step 6.4, measured 2026-11-12)
+
+Without an account this browser holds the only copy of the learner's data.
+
+**Size** (`packages/data/src/local/durability.test.ts`, realistic ids, UTF-16 characters):
+
+| Part                                   | Size                    |
+| -------------------------------------- | ----------------------- |
+| Answer log, per 1000 answers           | about 88 000 characters |
+| Card state, per started word           | about 282               |
+| Own word (2 translations, one example) | about 333               |
+| Daily stats, per day                   | about 84                |
+
+The log keeps the newest 5000 answers (older ones live on in the stats and cards). The full log
+with 2000 started words, a year of stats and 300 own words is about 1.14 million characters:
+43 % of 5 MiB counted as 2 bytes a character (the strictest reading; MDN: about 5 MiB of
+localStorage per origin). In that reading room is left for about 5000 more started words
+(about 7000 in all).
+
+**Storage full** (`LocalStorageRepo.makeRoom`): a write that does not fit first drops the cached
+online lookups (`vocabx:cache:*`), then the older half of the answer log, and is tried again. Ids
+of dropped answers leave the sync journal, so they never go to the server as deletions. Learning
+state (cards, stats, words, decks, settings) is never dropped. If still nothing fits, the review
+shows "The browser is out of space" with the way out (download a copy, sign in), the card stays
+on screen, and `storage_error` is counted. A migration that does not fit puts the old data back
+with its old version (the app then runs on an empty in-memory store and tries again next start);
+an import that does not fit leaves the data as it was.
+
+**What the browsers do** (MDN "Storage quotas and eviction criteria" and WebKit "Updates to
+Storage Policy", 2023, read 2026-11-12):
+
+- localStorage is part of the origin's storage: under disk pressure a browser evicts a
+  best-effort origin as a whole (all its storage at once).
+- `navigator.storage.persist()` asks for persistent mode (evicted only by the user). Chrome and
+  Safari decide silently (engagement, installed web app); Firefox shows a permission prompt. The
+  app asks once the learner has 20 started words (`keepStorage` in `lib/backup.ts`, called on
+  Home), so the Firefox prompt never comes on a first visit. Settings → Data shows the result.
+- Safari with tracking prevention deletes script-written data (localStorage included) of a site
+  without user interaction in the last 7 days of Safari use. A web app added to the Home Screen
+  has its own counter and is not affected while it is used. Neither source says that persistent
+  mode exempts a site from this rule, so it is assumed not to. Not checked on a device (needs a
+  week of Safari use).
+- No CSP or Permissions-Policy entry governs `persist()`; nothing new goes over the network.
+
+**Way out** (also for the accepted domain risk, owner decision 6.1): learners without an account
+see "Keep your words" on Home (from 20 started words, not on the first day, again every 100 more
+words): sign in, or download the file that Settings → Data → "Restore from a file" puts back, on
+any device or address. Restoring is offered only without an account (an account has the server
+copy).
+
+**Before a domain move** (whenever it happens): keep the old address serving the app for at least
+a few weeks with a notice to sign in or download a copy; data stays per address, so nothing
+moves by itself. PWA installs and push subscriptions have to be made again on the new address.
+
+**For the threat model (2.6):** "cleared browser / Safari's 7-day rule without an account" →
+lost unless signed in or a file was saved (protection: nudge, restore, `persist()`); "lost phone"
+→ the same; with an account, everything synced is on the server, only changes made offline since
+the last sync are lost.
 
 ## 3. Server data
 

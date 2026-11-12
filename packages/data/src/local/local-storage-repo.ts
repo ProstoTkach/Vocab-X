@@ -30,6 +30,7 @@ import {
   type Word,
   type WordRepo,
 } from '@vocabx/core';
+import { CACHE_PREFIX } from '../lookup-cache';
 import type { KeyValueStorage } from '../storage';
 import { packEvent, unpackEvent, type PackedEvent } from './log-codec';
 import {
@@ -84,6 +85,9 @@ export class LocalStorageRepo implements Repos, DataPort {
   readonly journal: SyncJournal;
 
   private readonly store: LocalStore;
+  private readonly storage: KeyValueStorage;
+  /** Off while importing or migrating: those are all-or-nothing, never silently shortened. */
+  private trimLogOnFull = true;
   private readonly catalog: BuiltinCatalog;
   private readonly builtinDecks: Map<Id, Deck>;
   private readonly builtinWords: Map<Id, Word>;
@@ -93,8 +97,9 @@ export class LocalStorageRepo implements Repos, DataPort {
   private readonly schemaVersion: number;
 
   constructor(storage: KeyValueStorage, o: LocalStorageRepoOptions = {}) {
-    this.store = new LocalStore(storage);
-    this.journal = new SyncJournal(storage);
+    this.storage = storage;
+    this.store = new LocalStore(storage, (key) => this.makeRoom(key));
+    this.journal = new SyncJournal(storage, () => this.makeRoom(null));
     this.catalog = o.catalog ?? { decks: [], words: [] };
     this.builtinDecks = new Map(this.catalog.decks.map((d) => [d.id, d]));
     this.builtinWords = new Map(this.catalog.words.map((w) => [w.id, w]));
@@ -166,6 +171,7 @@ export class LocalStorageRepo implements Repos, DataPort {
 
     // All-or-nothing: keep the current state to roll back if the new one does not fit.
     const backup = this.snapshot();
+    this.trimLogOnFull = false;
     try {
       this.clearOwnKeys();
       for (const [k, v] of Object.entries(data)) this.store.write(k, v);
@@ -173,7 +179,10 @@ export class LocalStorageRepo implements Repos, DataPort {
     } catch (e) {
       this.clearOwnKeys();
       for (const [k, v] of Object.entries(backup)) this.store.write(k, v);
+      this.writeMeta();
       throw e;
+    } finally {
+      this.trimLogOnFull = true;
     }
     this.markAllDirty();
     return Promise.resolve();
@@ -449,15 +458,74 @@ export class LocalStorageRepo implements Repos, DataPort {
         `Stored schema v${meta.schemaVersion} is newer than supported v${this.schemaVersion}`,
       );
     }
-    const migrated = migrate(
-      this.snapshot(),
-      meta.schemaVersion,
-      this.migrations,
-      this.schemaVersion,
+    const before = this.snapshot();
+    const migrated = migrate(before, meta.schemaVersion, this.migrations, this.schemaVersion);
+    this.trimLogOnFull = false;
+    try {
+      this.replaceOwnKeys(migrated);
+      this.writeMeta();
+    } catch (e) {
+      // No room for the new shape: the old data goes back, untouched, with its old version, so a
+      // later start can try again (the caller runs on an empty store meanwhile).
+      try {
+        this.replaceOwnKeys(before);
+      } catch {
+        // Nothing more can be done here; the error below says why.
+      }
+      throw e;
+    } finally {
+      this.trimLogOnFull = true;
+    }
+  }
+
+  /** The own keys (but the version) become exactly `data`; removals first, to make room. */
+  private replaceOwnKeys(data: RawData) {
+    for (const k of this.store.keys()) if (k !== KEYS.meta && !(k in data)) this.store.remove(k);
+    for (const [k, v] of Object.entries(data)) this.store.write(k, v);
+  }
+
+  /**
+   * A write did not fit (`key`: of the app's own keys; null: the sync journal). Frees one thing
+   * and says whether it did: first the online lookups cached here (fetched again when needed),
+   * then the older half of the answer log (those answers are already in the daily stats and the
+   * cards). The learning state itself is never dropped.
+   */
+  private makeRoom(key: string | null): boolean {
+    try {
+      const caches: string[] = [];
+      for (let i = 0; i < this.storage.length; i++) {
+        const k = this.storage.key(i);
+        if (k?.startsWith(CACHE_PREFIX)) caches.push(k);
+      }
+      if (caches.length > 0) {
+        for (const k of caches) this.storage.removeItem(k);
+        return true;
+      }
+      // The log itself shortens what it writes (writeLog).
+      if (key === KEYS.log || !this.trimLogOnFull) return false;
+      const log = this.readLog();
+      if (log.length < 2) return false;
+      const tail = log.slice(Math.floor(log.length / 2));
+      // Marks first: a mark left for an answer no longer here would go out as a deletion.
+      this.forgetDropped(log, tail);
+      this.store.write(KEYS.log, tail);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Answers dropped from the log are not sent: an id with nothing behind it would tell the
+   * server they were deleted.
+   */
+  private forgetDropped(before: readonly PackedEvent[], after: readonly PackedEvent[]) {
+    if (after.length === before.length) return;
+    const kept = new Set(after.map((p) => p[0]));
+    this.journal.settle(
+      'events',
+      before.filter((p) => !kept.has(p[0])).map((p) => p[0]),
     );
-    this.clearOwnKeys();
-    for (const [k, v] of Object.entries(migrated)) this.store.write(k, v);
-    this.writeMeta();
   }
 
   private writeMeta() {
@@ -503,15 +571,18 @@ export class LocalStorageRepo implements Repos, DataPort {
 
   private writeLog(log: PackedEvent[]) {
     let tail = log.length > this.maxLogEvents ? log.slice(-this.maxLogEvents) : log;
-    try {
-      this.writeOrRemove(KEYS.log, tail);
-    } catch (e) {
-      if (!(e instanceof StorageQuotaError) || tail.length < 2) throw e;
-      // Out of space: older events are already folded into stats and card snapshots,
-      // so dropping the older half of the tail loses no learning state.
-      tail = tail.slice(Math.floor(tail.length / 2));
-      this.store.write(KEYS.log, tail);
+    for (;;) {
+      try {
+        this.writeOrRemove(KEYS.log, tail);
+        break;
+      } catch (e) {
+        if (!(e instanceof StorageQuotaError) || tail.length < 2 || !this.trimLogOnFull) throw e;
+        // Out of space: older events are already folded into stats and card snapshots,
+        // so dropping the older half of the tail loses no learning state.
+        tail = tail.slice(Math.floor(tail.length / 2));
+      }
     }
+    this.forgetDropped(log, tail);
   }
 
   /** The daily stats with an answer counted (or taken back). */

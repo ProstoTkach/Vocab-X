@@ -93,6 +93,36 @@ export async function pinAnalytics(page: Page, o: { consent?: 'granted' | 'denie
   );
 }
 
+/** `count` started English words, none due for decades (for counts, not for reviewing). */
+export async function seedStartedWords(page: Page, count: number) {
+  await page.addInitScript((n) => {
+    const key = 'vocabx:v1:progress:en';
+    if (localStorage.getItem(key)) return;
+    const cards = Object.fromEntries(
+      Array.from({ length: n }, (_, i) => [
+        `en:word${i}`,
+        {
+          wordId: `en:word${i}`,
+          lang: 'en',
+          card: {
+            stability: 30,
+            difficulty: 5,
+            lastReviewAt: 1,
+            level: 1,
+            levelStreak: 0,
+            lapses: 0,
+            reps: 1,
+            streak: 1,
+          },
+          dueAt: 4_000_000_000_000,
+          lastEventId: `e${i}`,
+        },
+      ]),
+    );
+    localStorage.setItem(key, JSON.stringify(cards));
+  }, count);
+}
+
 /**
  * Seeds a learner who has finished onboarding (no decks), so shell tests start in the app.
  * Only writes when the key is missing, so state changed during a test survives reloads.

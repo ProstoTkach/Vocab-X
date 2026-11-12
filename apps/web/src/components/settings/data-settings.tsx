@@ -1,9 +1,10 @@
 'use client';
 
-import { Download, RotateCcw } from 'lucide-react';
+import { ImportError, StorageQuotaError } from '@vocabx/core';
+import { Download, RotateCcw, Upload } from 'lucide-react';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { signOut } from 'next-auth/react';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { DeleteAccount } from '@/components/account/delete-account';
 import { useAnalytics } from '@/components/analytics/analytics-provider';
 import { LegalLinks } from '@/components/legal/legal-links';
@@ -12,6 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/toast';
 import { storedAnalytics, track } from '@/lib/analytics';
+import { downloadMyData, markBackupNudged, restorablePart, storageKept } from '@/lib/backup';
 import { useClock } from '@/lib/clock';
 import { reminderState } from '@/lib/reminders';
 import { useRepos } from '@/lib/repos';
@@ -69,6 +71,10 @@ export function DataSettings() {
   const [leagueJoined, setLeagueJoined] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [busy, setBusy] = useState(false);
+  // A chosen file waiting for "Restore" to be confirmed.
+  const [restoring, setRestoring] = useState<{ data: unknown } | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [kept, setKept] = useState<boolean | null>(null);
   // What only this browser knows is read after the first render, so it matches the server's HTML.
   const [here, setHere] = useState<{
     linked: boolean;
@@ -109,6 +115,7 @@ export function DataSettings() {
       setLeagueJoined(settings.leagueJoined);
     })();
     void reminderState().then((s) => setRemindersOn(s === 'on'));
+    void storageKept().then(setKept);
   }, [repos]);
 
   const resetData = async () => {
@@ -125,46 +132,56 @@ export function DataSettings() {
   /** One JSON file: this device, the server (if signed in) and what analytics keeps here. */
   const download = async () => {
     setBusy(true);
+    const result = await downloadMyData(repos, clock.now());
+    setBusy(false);
+    if (result !== 'failed' && counts) markBackupNudged(counts.cards);
+    toast(
+      result === 'ok'
+        ? { title: t('downloaded'), tone: 'success' }
+        : {
+            title: t(result === 'no-server' ? 'downloadNoServer' : 'downloadFailed'),
+            tone: 'danger',
+          },
+    );
+  };
+
+  /** A file chosen: read it, then ask before it replaces what is here. */
+  const pickFile = async (file: File | undefined) => {
+    if (fileInput.current) fileInput.current.value = '';
+    if (!file) return;
     try {
-      let server: unknown = null;
-      let serverFailed = false;
-      if (repos.journal.owner !== null) {
-        try {
-          const res = await fetch('/api/account/export');
-          if (!res.ok) throw new Error('export');
-          server = await res.json();
-        } catch {
-          serverFailed = true;
-        }
-      }
-      const now = clock.now();
-      const file = {
-        format: 'vocabx-my-data',
-        exportedAt: new Date(now).toISOString(),
-        device: await repos.exportAll(),
-        server,
-        analytics: {
-          browserId,
-          firstVisitAt: firstVisit ? new Date(firstVisit).toISOString() : null,
-          choice: storedAnalytics().choice,
-        },
-      };
-      const url = URL.createObjectURL(
-        new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' }),
-      );
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `vocabx-data-${new Date(now).toISOString().slice(0, 10)}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
-      toast(
-        serverFailed
-          ? { title: t('downloadNoServer'), tone: 'danger' }
-          : { title: t('downloaded'), tone: 'success' },
-      );
+      setRestoring({ data: restorablePart(await file.text()) });
     } catch {
-      toast({ title: t('downloadFailed'), tone: 'danger' });
-    } finally {
+      toast({ title: t('restoreFailed'), tone: 'danger' });
+    }
+  };
+
+  const restore = async () => {
+    if (!restoring) return;
+    const { data } = restoring;
+    setRestoring(null);
+    setBusy(true);
+    try {
+      await repos.importAll(data);
+      track('data_restore', { to: 'ok' });
+      // Full navigation: every screen reads the restored data from the start.
+      window.location.assign(`/${locale}`);
+    } catch (e) {
+      const code =
+        e instanceof ImportError ? e.code : e instanceof StorageQuotaError ? 'full' : 'other';
+      track('data_restore', { to: code });
+      toast({
+        title: t(
+          code === 'unsupported_version'
+            ? 'restoreNewer'
+            : code === 'full'
+              ? 'restoreFull'
+              : code === 'other'
+                ? 'restoreFailed'
+                : 'restoreBad',
+        ),
+        tone: 'danger',
+      });
       setBusy(false);
     }
   };
@@ -175,12 +192,14 @@ export function DataSettings() {
     <div className="flex flex-col gap-4">
       <Block title={t('deviceTitle')}>
         <p className="text-sm text-fg-muted">{t('deviceText')}</p>
+        {!linked && <p className="text-sm text-fg-muted">{t('keepText')}</p>}
         {counts && (
           <dl className="flex flex-col gap-1">
             <Fact label={t('decks')} value={format.number(counts.decks)} />
             <Fact label={t('cards')} value={format.number(counts.cards)} />
             <Fact label={t('answers')} value={format.number(counts.answers)} />
             <Fact label={t('usageLabel')} value={t('usage', { kb: counts.kb })} />
+            {kept !== null && <Fact label={t('kept')} value={yes(kept)} />}
             {firstVisit && (
               <Fact
                 label={t('firstVisit')}
@@ -228,12 +247,43 @@ export function DataSettings() {
           <Download aria-hidden className="size-4" />
           {t('download')}
         </Button>
+        {!linked && (
+          <Button variant="secondary" disabled={busy} onClick={() => fileInput.current?.click()}>
+            <Upload aria-hidden className="size-4" />
+            {t('restore')}
+          </Button>
+        )}
+        <input
+          ref={fileInput}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          aria-hidden
+          tabIndex={-1}
+          data-testid="restore-file"
+          onChange={(e) => void pickFile(e.target.files?.[0])}
+        />
         <Button variant="ghost" className="text-danger" onClick={() => setConfirmReset(true)}>
           <RotateCcw aria-hidden className="size-4" />
           {t('reset')}
         </Button>
         {linked && <DeleteAccount />}
       </div>
+
+      <Dialog open={restoring !== null} onOpenChange={(o) => !o && setRestoring(null)}>
+        <DialogContent
+          title={t('restoreConfirmTitle')}
+          description={t('restoreConfirmText')}
+          footer={
+            <>
+              <DialogClose asChild>
+                <Button variant="secondary">{common('cancel')}</Button>
+              </DialogClose>
+              <Button onClick={() => void restore()}>{t('restore')}</Button>
+            </>
+          }
+        />
+      </Dialog>
 
       <Dialog open={confirmReset} onOpenChange={setConfirmReset}>
         <DialogContent

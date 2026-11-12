@@ -346,6 +346,24 @@ describe('/api/track body and sheet rows', () => {
     expect(parseTrackBody('nope', NOW)).toBeNull();
   });
 
+  test('the local-data events (6.4) pass the check with their parameters', () => {
+    const body = parseTrackBody(
+      {
+        events: [
+          event({ type: 'data_restore', params: { to: 'unsupported_version' } }),
+          event({ type: 'storage_error', params: { source: 'answer', to: 'quota' } }),
+          event({ type: 'backup_nudge', params: { to: 'download', count: 120 } }),
+        ],
+      },
+      NOW,
+    );
+    expect(body?.events.map((e) => [e.type, e.params])).toEqual([
+      ['data_restore', { to: 'unsupported_version' }],
+      ['storage_error', { source: 'answer', to: 'quota' }],
+      ['backup_nudge', { to: 'download', count: 120 }],
+    ]);
+  });
+
   test('an event row: frequent parameters in columns, the rest as JSON, the time as a date', () => {
     const [e] = parseTrackBody({ events: [event()] }, NOW)!.events;
     const row = eventRow(e!);

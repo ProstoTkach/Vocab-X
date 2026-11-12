@@ -158,5 +158,11 @@
     "toSettings": "To the settings"
   },
   "autoSpeakOff": "Turn off automatic speech",
-  "autoSpeakOn": "Turn on automatic speech"
+  "autoSpeakOn": "Turn on automatic speech",
+  "saveFailed": {
+    "title": "The answer was not saved",
+    "text": "Try answering again.",
+    "fullTitle": "The browser is out of space",
+    "fullText": "The answer was not saved. Save a copy in Settings → Data, or sign in on the profile so your words are kept in your account."
+  }
 }

@@ -15,7 +15,14 @@ export const KEY_PREFIX = 'vocabx:v1:';
 export class LocalStore {
   private readonly cache = new Map<string, { raw: string; value: unknown }>();
 
-  constructor(readonly storage: KeyValueStorage) {}
+  /**
+   * `makeRoom`: called when a write does not fit; it frees something and says whether it did,
+   * and the write is tried again. Writes it makes itself never call it again.
+   */
+  constructor(
+    readonly storage: KeyValueStorage,
+    private readonly makeRoom: (key: string) => boolean = () => false,
+  ) {}
 
   read<T>(key: string): T | undefined {
     const raw = this.storage.getItem(KEY_PREFIX + key);
@@ -39,10 +46,13 @@ export class LocalStore {
   write(key: string, value: unknown): void {
     const raw = JSON.stringify(value);
     try {
-      this.storage.setItem(KEY_PREFIX + key, raw);
+      withRoom(
+        () => this.storage.setItem(KEY_PREFIX + key, raw),
+        () => this.makeRoom(key),
+        key,
+      );
     } catch (e) {
       this.cache.delete(key);
-      if (isQuotaError(e)) throw new StorageQuotaError(key, { cause: e });
       throw e;
     }
     // Written values are plain JSON data that nobody changes afterwards, so the value itself
@@ -71,5 +81,35 @@ export class LocalStore {
     for (const k of this.keys())
       n += (KEY_PREFIX.length + k.length + (this.storage.getItem(KEY_PREFIX + k)?.length ?? 0)) * 2;
     return n;
+  }
+}
+
+let makingRoom = false;
+
+/**
+ * Runs `attempt` (a storage write); on a full storage lets `makeRoom` free space and runs it
+ * again, until it can free nothing more: then a StorageQuotaError named `name`. `attempt` runs
+ * anew each time, so it should read what it changes inside. Shared by the app's keys and the
+ * sync journal.
+ */
+export function withRoom(attempt: () => void, makeRoom: () => boolean, name: string): void {
+  for (;;) {
+    try {
+      attempt();
+      return;
+    } catch (e) {
+      if (!isQuotaError(e)) throw e;
+      // A write made while freeing space does not free space again (no loops).
+      let freed = false;
+      if (!makingRoom) {
+        makingRoom = true;
+        try {
+          freed = makeRoom();
+        } finally {
+          makingRoom = false;
+        }
+      }
+      if (!freed) throw new StorageQuotaError(name, { cause: e });
+    }
   }
 }

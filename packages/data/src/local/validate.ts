@@ -1,5 +1,6 @@
 // Validates a whole data snapshot (an imported file) key by key against the storage layout.
 import {
+  ALL_FORMATS,
   cardProgressSchema,
   dailyStatsSchema,
   deckSchema,
@@ -18,13 +19,19 @@ const packedEventSchema = z.tuple(
     z.string().min(1),
     z.number().nonnegative(),
     z.number().int().min(1).max(4),
-    z.number().int().min(0).max(7),
+    // Index into ALL_FORMATS (quiz and sentence formats come after the first eight).
+    z
+      .number()
+      .int()
+      .min(0)
+      .max(ALL_FORMATS.length - 1),
     z.number().nonnegative(),
     z.number().min(0).max(1),
     z.number().int(),
     z.union([z.literal(0), z.literal(1)]),
   ],
-  z.literal(1),
+  // The optional kind: 1 = placement, 2 = the mixed mode (log-codec.ts).
+  z.union([z.literal(1), z.literal(2)]),
 );
 
 const FIXED: Record<string, z.ZodType> = {

@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { HomeDashboard } from '@/components/home/home-dashboard';
+import { BackupNudge } from '@/components/home/backup-nudge';
 import { DeckRow } from '@/components/home/deck-row';
 import { HomeTour } from '@/components/home/home-tour';
 import { InstallPrompt } from '@/components/home/install-prompt';
@@ -17,6 +18,8 @@ export default async function HomePage() {
       <InstallPrompt />
       {/* The first visit: what each part of the screen and each page is for. */}
       <HomeTour />
+      {/* No account and enough words: sign in or save a copy, the browser is the only one. */}
+      <BackupNudge />
     </div>
   );
 }

@@ -25,6 +25,7 @@ import {
   showNowUpTo,
   sessionReturnAt,
   startSession,
+  StorageQuotaError,
   submitReview,
   undoReview,
   type Grade,
@@ -44,6 +45,7 @@ import { useClock } from '@/lib/clock';
 import { useDevTools } from '@/lib/dev-tools';
 import { track } from '@/lib/analytics';
 import { BackLink } from '@/components/back-link';
+import { useToast } from '@/components/ui/toast';
 import { useFeedback } from '@/components/feedback/feedback-provider';
 import { useGamification } from '@/lib/gamification';
 import { newId } from '@/lib/ids';
@@ -99,6 +101,7 @@ import {
  */
 export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
   const t = useTranslations('review');
+  const toast = useToast();
   /** The lab tries modes and levels: nothing is saved and nothing goes to the statistics. */
   const log: typeof track = lab ? silent : track;
   const tn = useTranslations('nav');
@@ -569,8 +572,23 @@ export function ReviewSession({ lab = false }: { lab?: boolean } = {}) {
     window.clearTimeout(presaveTimer.current);
     const saved = presaved.current;
     presaved.current = null;
-    const outcome =
-      quizAnswer && saved?.key === cardKey ? await saved.outcome : await record(g, responseMs);
+    let outcome: Awaited<ReturnType<typeof record>>;
+    try {
+      outcome =
+        quizAnswer && saved?.key === cardKey ? await saved.outcome : await record(g, responseMs);
+    } catch (e) {
+      // Not saved (the browser's storage is full even after clearing what can go): the card
+      // stays, so the answer can be given again, and the learner learns how to keep the words.
+      const full = e instanceof StorageQuotaError;
+      toast({
+        title: t(full ? 'saveFailed.fullTitle' : 'saveFailed.title'),
+        description: t(full ? 'saveFailed.fullText' : 'saveFailed.text'),
+        tone: 'danger',
+      });
+      track('storage_error', { source: 'answer', to: full ? 'quota' : 'other' });
+      setBusy(false);
+      return;
+    }
     const now = outcome.event.at;
     const updated: StudyCard = {
       ...card,

@@ -31,5 +31,14 @@
   "download": "Download my data",
   "downloaded": "File saved.",
   "downloadNoServer": "The file was saved without the server’s data: it could not be fetched. Try again.",
-  "downloadFailed": "Could not build the file. Try again."
+  "downloadFailed": "Could not build the file. Try again.",
+  "keepText": "Without an account this browser is the only copy. Save a file with “Download my data” or sign in on the profile.",
+  "kept": "Protected from the browser’s clean-up",
+  "restore": "Restore from a file",
+  "restoreConfirmTitle": "Restore data from the file?",
+  "restoreConfirmText": "The words, decks and progress in this browser will be replaced by those in the “Download my data” file.",
+  "restoreBad": "This is not a VocabX data file, or it is damaged.",
+  "restoreNewer": "The file comes from a newer version of VocabX. Reload the page and try again.",
+  "restoreFull": "There is not enough room in this browser for this data. Nothing was changed.",
+  "restoreFailed": "Could not restore the data. Nothing was changed."
 }

@@ -12,6 +12,7 @@ import type {
   Word,
 } from '@vocabx/core';
 import type { KeyValueStorage } from '../storage';
+import { withRoom } from './store';
 
 const KEY = 'vocabx:sync';
 
@@ -89,7 +90,11 @@ export type SentMarks = { collection: SyncCollection; id: Id; mark: number }[];
 const emptyMarks = (): Marks => ({ state: {}, words: {}, decks: {}, cards: {}, events: {} });
 
 export class SyncJournal {
-  constructor(private readonly storage: KeyValueStorage) {}
+  /** `makeRoom`: as in LocalStore, frees space when a write does not fit. */
+  constructor(
+    private readonly storage: KeyValueStorage,
+    private readonly makeRoom: () => boolean = () => false,
+  ) {}
 
   private read(): JournalData | null {
     try {
@@ -100,11 +105,18 @@ export class SyncJournal {
     }
   }
 
+  /** Read, change, write; read again if space had to be freed first (that changes the marks). */
   private update(change: (d: JournalData) => void) {
-    const data = this.read();
-    if (!data) return;
-    change(data);
-    this.storage.setItem(KEY, JSON.stringify(data));
+    withRoom(
+      () => {
+        const data = this.read();
+        if (!data) return;
+        change(data);
+        this.storage.setItem(KEY, JSON.stringify(data));
+      },
+      this.makeRoom,
+      KEY,
+    );
   }
 
   get owner(): string | null {
@@ -130,7 +142,7 @@ export class SyncJournal {
       tick: 0,
       dirty: emptyMarks(),
     };
-    this.storage.setItem(KEY, JSON.stringify(data));
+    withRoom(() => this.storage.setItem(KEY, JSON.stringify(data)), this.makeRoom, KEY);
   }
 
   clear() {

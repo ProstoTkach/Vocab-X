@@ -109,7 +109,12 @@ export const EVENTS = {
   setting_change: 'Змінено інше налаштування навчання.',
   ui_lang_change: 'Змінено мову інтерфейсу.',
   data_reset: '«Скинути демо-дані».',
-  storage_error: 'Сховище браузера переповнене.',
+  data_restore:
+    'Відновлення даних з файлу в «Налаштування → Дані»: to — ok / invalid_json / not_vocabx / invalid_data / unsupported_version / full / other.',
+  backup_nudge:
+    'Вікно «Збережіть свої слова» (без акаунта, від 20 слів): to — shown / sign_in / download / later / closed; count — скільки слів.',
+  storage_error:
+    'Відповідь не збереглася: to — quota (сховище браузера переповнене навіть після очищення кешу) / other.',
   feedback_open: 'Відкрито вікно відгуку; звідки.',
   feedback_kind: 'Обрано тип відгуку.',
   feedback_sent: 'Відгук надіслано.',

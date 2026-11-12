@@ -1,7 +1,7 @@
 // Visual review: /dev/ui and key routes in every control viewport and theme.
 // Output goes to apps/web/screenshots (not committed).
 import { expect, test } from '@playwright/test';
-import { onboard, seedOnboarded } from './fixtures';
+import { onboard, seedOnboarded, seedStartedWords } from './fixtures';
 
 const VIEWPORTS = [
   { name: '360x740', width: 360, height: 740 },
@@ -110,6 +110,18 @@ for (const vp of VIEWPORTS) {
         await page.waitForTimeout(400);
         await card.screenshot({ path: `screenshots/data-trust/my-data-${theme}-${vp.name}.png` });
       }
+    });
+
+    // Step 6.4: "keep your words" on Home, for a learner without an account.
+    test('backup nudge', async ({ page }) => {
+      test.skip(vp.name !== '390x844' && vp.name !== '1280x800');
+      await seedOnboarded(page);
+      await seedStartedWords(page, 20);
+      await page.addInitScript(() => localStorage.removeItem('vocabx:backup-nudge'));
+      await page.goto('/uk');
+      await expect(page.getByRole('heading', { name: 'Збережіть свої слова' })).toBeVisible();
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `screenshots/data-trust/backup-nudge-${vp.name}.png` });
     });
 
     test('consent window', async ({ page }) => {

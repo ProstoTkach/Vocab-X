@@ -116,6 +116,15 @@
         "title": "On to new levels!",
         "text": "Every review brings a new level — and new things for your friend — a little closer."
       }
+    },
+    "backup": {
+      "title": "Keep your words safe",
+      "text": "You are already learning {count, plural, one {# word} other {# words}}. For now they live only in this browser: clearing it, a new device or VocabX moving to another address would erase them, and Safari deletes the data of sites not opened for a week.",
+      "signInWhy": "Sign in, and your words and progress are kept in your account, on all your devices.",
+      "downloadWhy": "Or download a copy: put it back in Settings → Data → Restore from a file, even on another device.",
+      "signIn": "Sign in",
+      "download": "Download a copy",
+      "later": "Later"
     }
   },
   "review": {
