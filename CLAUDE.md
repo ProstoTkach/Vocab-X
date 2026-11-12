@@ -37,6 +37,7 @@ Inside `apps/web`:
 - Do not run e2e after ordinary edits, but update e2e specs together with the code and list the affected ones in the report.
 - No commit unless asked. Exception: on "прогони тесты" make a local commit (no push), then run `pnpm e2e:changed` (picks specs from the diff).
 - Push only on explicit request. When the owner asks to push, run the full `pnpm e2e` once first, without asking, and push only if it passes; skip it only if a full run already passed on this exact commit. Never run the full suite at any other time unless asked.
+- Before a push, if `docs/to_test_locally.md` has unchecked items (`- [ ]`), list their section titles and ask the owner whether they were checked by hand; push only after the answer.
 - The assistant runs the tests itself (the owner does not paste output): write the output to a log and grep it. E2E failure: rerun only the failed test once before diagnosing (flaky runs).
 
 ## Visual check
@@ -50,7 +51,7 @@ Any visual change (markup, classes, CSS, themes, layout, animation) must be chec
 
 ## Pre-launch plan
 
-Work from `docs/PRELAUNCH_PLAN.md`, one row of its "Sessions" table per chat (the row sets the model and the steps); read only that row, its steps and their "Additions" rows; grep `docs/AUDIT.md` by finding id, never read it whole. Follow its "Handoff rule" at the end of each session (the model to use and a ready prompt for the new chat). Before the handoff, append an entry to `docs/WORKLOG.md` (Russian, format at the top of that file).
+Work from `docs/PRELAUNCH_PLAN.md`, one row of its "Sessions" table per chat (the row sets the model and the steps); read only that row, its steps and their "Additions" rows; grep `docs/AUDIT.md` by finding id, never read it whole. Follow its "Handoff rule" at the end of each session (the model to use and a ready prompt for the new chat). Before the handoff, append an entry to `docs/WORKLOG.md` and a section of manual checks to `docs/to_test_locally.md` (both Russian, format at the top of each file; rule 11 of the plan's working protocol), without being asked.
 
 ## Token economy
 

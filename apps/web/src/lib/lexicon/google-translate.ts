@@ -15,16 +15,19 @@ export interface GoogleTranslateOptions {
 }
 
 /**
- * The server's 429 for the day's limit, read before `getJson` (which drops any answer that is
- * not OK). Null: not a limit, the answer goes on as usual.
+ * The server's 429, read before `getJson` (which drops any answer that is not OK). `who` only for
+ * the day's limit; a 429 without it is a short pause for too many at once, worth no message.
+ * Null: not a 429, the answer goes on as usual.
  */
-async function limitOf(res: Response): Promise<{ who: TranslateLimited; waitMs: number } | null> {
+async function limitOf(
+  res: Response,
+): Promise<{ who: TranslateLimited | null; waitMs: number } | null> {
   if (res.status !== 429) return null;
   const body = (await res
     .clone()
     .json()
     .catch(() => null)) as { limited?: unknown } | null;
-  const who = body?.limited === 'account' ? 'account' : 'anonymous';
+  const who = body?.limited === 'account' || body?.limited === 'anonymous' ? body.limited : null;
   const wait = Number(res.headers.get('retry-after'));
   return { who, waitMs: (Number.isFinite(wait) && wait > 0 ? wait : 60) * 1000 };
 }
@@ -50,7 +53,7 @@ export function createGoogleTranslateProvider(o: GoogleTranslateOptions): Transl
     const limit = await limitOf(res);
     if (limit) {
       blockedUntil = now() + limit.waitMs;
-      o.onLimited?.(limit.who);
+      if (limit.who) o.onLimited?.(limit.who);
     }
     return res;
   };

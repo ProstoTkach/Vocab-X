@@ -72,6 +72,20 @@ describe('Google Translate', () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
+  test('a 429 without a day limit is a short pause, with no message', async () => {
+    let now = 0;
+    const fetch = vi.fn<FetchLike>(() =>
+      Promise.resolve(new Response(null, { status: 429, headers: { 'Retry-After': '30' } })),
+    );
+    const onLimited = vi.fn();
+    const p = createGoogleTranslateProvider({ fetch, onLimited, now: () => now });
+    expect(await p.translate({ text: 'a', from: 'en', to: 'uk' })).toEqual([]);
+    now = 29_000;
+    await p.translate({ text: 'b', from: 'en', to: 'uk' });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(onLimited).not.toHaveBeenCalled();
+  });
+
   test('times out', async () => {
     const hang: FetchLike = (_url, init) =>
       new Promise((_, reject) =>

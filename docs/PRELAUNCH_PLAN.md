@@ -7,10 +7,9 @@ rows of "Additions to existing steps" that name them.
 
 ## Progress and handoff
 
-Next: **session 4** (model O); before any deploy the owner applies migration `0005` to the main
-database (`pnpm db:migrate`). Update this line and the "Done" line at the end of every session.
+Next: **session 5** (model O). Migration `0005` is applied to the main database (2026-11-12). Update this line and the "Done" line at the end of every session.
 Done: 0.1 (`docs/AUDIT.md`, 2026-11-12); 1.0 + 5.3a (session 1, 2026-11-12, commit b076026); 1.1 + 1.2 (session 2, 2026-11-12);
-2.1a (session 3, 2026-11-12);
+2.1a (session 3, 2026-11-12); 1.3 + 5.4 + 6.7 + 1.6 terms (session 4, 2026-11-12);
 owner: 6.8 (two-step sign-in everywhere), Neon test branch created.
 
 Owner decisions that later sessions must respect (2026-11-12):
@@ -26,11 +25,17 @@ Owner decisions that later sessions must respect (2026-11-12):
 - **6.3 E-mail:** without an own domain SPF/DKIM/DMARC cannot be set up; sending stays on the
   current SMTP account. Session 10 documents its daily cap; the register limit (2.1a) must stay
   under it.
+- **1.6 Retention terms:** approved as written in `docs/DATA_MAP.md` §6 (tombstones 90 days,
+  `CACHE_MS` and translate `s-maxage` 15 days, drop `users.deleted_at` with `login_failures` and
+  `locked_until` in one migration after a deploy). Session 8 implements them.
+- **Art:** character pictures and icons are the owner's own (Gemini + Photoshop); no credit needed.
 - **Tests:** the assistant runs them itself (output to a log, grep). `pnpm e2e:changed` after a
   local commit; one full `pnpm e2e` right before a push that gathers many changes.
 
-**Handoff rule (assistant):** when a session is finished, end the report with a block the owner
-can use without thinking (the next row of "Sessions" not done, or the one the owner chose):
+**Handoff rule (assistant):** when a session is finished, first append its entry to
+`docs/WORKLOG.md` (rule 9) and its manual checks to `docs/to_test_locally.md` (rule 11), then end
+the report with a block the owner can use without thinking (the next row of "Sessions" not done,
+or the one the owner chose):
 
 1. **Модель:** the model's name in full (Opus or Sonnet), the effort level (see "Effort" under
    "Sessions") and one line on why.
@@ -62,6 +67,15 @@ switch models; the owner does it in the new chat.
    without it. Steps done by the owner by hand get an entry too (the assistant writes it when told).
 10. Before starting a step, grep `docs/PRELAUNCH_PLAN.md` for its number: the table "Additions to
     existing steps" may add work to it.
+11. **Manual checks for the owner:** before the handoff, without being asked, append a section
+    for the session to `docs/to_test_locally.md` (format at the top of that file; in Russian):
+    what the owner should click through locally and look at before a push — every visible change
+    (texts, screens, states, phone and desktop, dark theme if colors changed), how to reach each
+    state by hand (which words, how many times, which setting), what to prepare first (migration,
+    `.env`, an account), and what can only be seen on Vercel. Each item is a checkbox with an
+    action and the expected result. Only what tests and screenshots did not settle, or what the
+    owner should see with their own eyes; nothing from the plan retold. A session with nothing
+    to check by hand writes one line saying so. In the report, say that the section was added.
 
 Models: **F** = Fable (hardest reasoning), **O** = Opus, **S** = Sonnet (default for implementation).
 "F→S" = plan with F, implement with S.
