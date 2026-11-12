@@ -376,7 +376,7 @@ test('signed in: the password and the email change from the profile', async ({ p
   await password.getByRole('button', { name: 'Зберегти пароль' }).click();
   await expect(password.getByRole('alert')).toHaveText('Неправильний пароль.');
   await password.getByRole('button', { name: 'Зберегти пароль' }).click();
-  await expect(page.getByText('Пароль змінено.')).toBeVisible();
+  await expect(page.getByText('Пароль змінено.', { exact: true })).toBeVisible();
   await expect(password).toHaveCount(0);
   expect(changes[1]).toEqual({ current: 'old-pass', password: 'new-password' });
 
@@ -401,7 +401,7 @@ test('the link of a new email changes it and says so', async ({ page }) => {
   await onboard(page);
   await page.goto('/uk/profile#email=tok&to=new%40example.com');
   await expect(
-    page.getByText('Готово! Тепер ваш акаунт використовує new@example.com.'),
+    page.getByText('Готово! Тепер ваш акаунт використовує new@example.com.', { exact: true }),
   ).toBeVisible();
   await expect(page).toHaveURL(/\/uk\/profile$/);
   expect(body).toEqual({ token: 'tok', email: 'new@example.com' });
