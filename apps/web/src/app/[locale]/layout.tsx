@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
-import { localeInfo } from '@/i18n/locales';
+import { localeInfo, SERVER_ONLY_NAMESPACES } from '@/i18n/locales';
 import { routing } from '@/i18n/routing';
 import { bootScript } from '@/lib/boot-script';
 import { BootScriptTag } from '@/lib/boot-script-tag';
@@ -65,6 +65,12 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const info = localeInfo(locale);
+  const messages = await getMessages();
+  const clientMessages = Object.fromEntries(
+    Object.entries(messages).filter(
+      ([ns]) => !(SERVER_ONLY_NAMESPACES as readonly string[]).includes(ns),
+    ),
+  );
 
   return (
     <html
@@ -82,7 +88,7 @@ export default async function LocaleLayout({
         <BootScriptTag code={bootScript()} />
       </head>
       <body className="min-h-dvh font-sans antialiased">
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={clientMessages}>
           <Providers dir={info.dir}>{children}</Providers>
         </NextIntlClientProvider>
       </body>

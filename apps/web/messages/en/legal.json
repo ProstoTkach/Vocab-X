@@ -1,0 +1,273 @@
+{
+  "privacy": {
+    "title": "Privacy policy",
+    "updated": "Version of 12 November 2026",
+    "intro": "This page explains what data VocabX uses, where it is kept, who receives it, how long it stays, and how to view, download or delete it.",
+    "summary": {
+      "title": "In short",
+      "blocks": {
+        "li1": "VocabX works without an account: your words, progress and settings are kept only in your browser.",
+        "li2": "If you sign in, a copy of this data is kept on the server so you can continue on another device.",
+        "li3": "We send anonymous usage statistics only with your consent — without your name, e-mail, IP address or the words themselves.",
+        "li4": "No ads, no third-party trackers, no advertising cookies. We do not sell your data or share it for advertising.",
+        "li5": "You can delete your account and all your data on the server at any time in your profile."
+      }
+    },
+    "sections": {
+      "who": {
+        "title": "Who is responsible for your data",
+        "blocks": {
+          "p1": "VocabX is a free, non-commercial app for learning words at vocabx-sigma.vercel.app. It is made and run by one person, the author of VocabX. The author decides which data the app needs and how it is processed, and is therefore the controller of personal data.",
+          "p2": "For any question about your data, write to {email}."
+        }
+      },
+      "device": {
+        "title": "What is stored on your device",
+        "blocks": {
+          "p1": "Everything the app needs to work is kept in your browser's storage (localStorage, IndexedDB, Cache Storage) and in cookies:",
+          "li1": "your words and decks: the word, translations, examples and, if you add them, a link to an image or a video;",
+          "li2": "every answer to a card: which word, when, the grade, the task type, the response time and the XP earned; they decide when a word comes back for review;",
+          "li3": "profile and settings: display name, interface language, native and learned languages, level, day streak, character look;",
+          "li4": "answers of online dictionaries for words you looked up on this device (so they are not asked twice): Google translations for up to 15 days, other dictionaries for up to 30 days;",
+          "li5": "the app's pages and files for offline use, and a short reminder text (how many words are waiting, without the words);",
+          "li6": "service flags: which changes are not synced yet, which tips you have seen, the last league table shown.",
+          "p2": "Cookies: being signed in (an encrypted token with your account id and e-mail, 30 days), protection of the sign-in forms, temporary values for Google sign-in (15 minutes), confirming a registration in the same browser (24 hours, no address in clear text) and the interface language. All of them are needed for the site to work; there are no advertising or third-party cookies.",
+          "p3": "This data stays on the device until you reset data in the app or clear your browser. Anyone with access to your device and browser can see it."
+        }
+      },
+      "account": {
+        "title": "Account and sync",
+        "blocks": {
+          "p1": "An account is optional. If you create one, we keep:",
+          "li1": "your e-mail address;",
+          "li2": "with Google sign-in, your Google account id. We do not keep the name and picture Google sends;",
+          "li3": "with e-mail sign-in, your password only as a one-way hash (scrypt), plus a hash of the latest link in a letter and when it was sent;",
+          "li4": "a copy of the data on your device: profile, settings, XP and character, words, decks, card progress and answer history.",
+          "p2": "Why: so you can sign in, continue on another device and not lose your progress. The data is kept in a Neon database (Amazon Web Services servers in the USA)."
+        }
+      },
+      "league": {
+        "title": "League",
+        "blocks": {
+          "p1": "The league is on only if you choose it. Then the members of your group see your display name, character look and weekly XP. We keep your participation and the weekly groups; weeks older than 12 weeks are deleted. You can leave the league at any time."
+        }
+      },
+      "analytics": {
+        "title": "Anonymous statistics",
+        "blocks": {
+          "p1": "We send statistics only after you tap \"OK, I agree\". They help us see what in the app works well and what does not.",
+          "p2": "What is sent: which screens you open, onboarding steps, the grade and time of answers, study mode, device type, interface language, days since the first visit, and a random id of the browser and of the session.",
+          "p3": "What is never sent: name, e-mail, IP address, browser details (user agent), the words themselves and the account id. The random id is made in your browser and is never linked to an account.",
+          "p4": "Even before you answer, the app keeps a random id, the date of the first visit and session counters on the device, but sends nothing without consent.",
+          "p5": "Statistics are kept in the author's Google Sheets spreadsheets for 12 months. You can change your choice at any time in Settings → Data. After you decline, nothing is sent."
+        }
+      },
+      "feedback": {
+        "title": "Feedback",
+        "blocks": {
+          "p1": "If you send feedback, we receive your text, the kind of feedback, ratings and chosen options, your level, interface language, device type, platform and the random browser id. Feedback is kept in the author's Google Sheets spreadsheets or arrives in the author's Telegram chat, and is kept for 24 months.",
+          "p2": "Please do not put your e-mail, phone number or other personal details into feedback: the author reads the text as it is."
+        }
+      },
+      "reminders": {
+        "title": "Reminders",
+        "blocks": {
+          "p1": "When you turn reminders on, your browser gives the app a push address at its own service (Google, Mozilla, Apple or Microsoft, depending on the browser). We keep this address in Google Sheets with the interface language, the on/off state and the time of the next reminder. The notification itself carries none of your words: your device fills in the text.",
+          "p2": "The address of turned-off reminders is deleted after 30 days, and an address not updated for 90 days is deleted too."
+        }
+      },
+      "letters": {
+        "title": "Letters",
+        "blocks": {
+          "p1": "To confirm your e-mail and to reset a password we send a letter through a mail service (Gmail). A copy of the letter with your address and the link stays in the \"Sent\" folder of the sending mailbox until the author deletes it."
+        }
+      },
+      "thirdParties": {
+        "title": "Who else receives data",
+        "blocks": {
+          "p1": "The app needs outside services. Each of them processes data under its own terms:",
+          "li1": "Vercel — hosting. Receives every request: IP address, browser details and the page address (a translation request has the word in its address). Request logs are kept for a short time.",
+          "li2": "Neon — database (Amazon Web Services servers in the USA). Keeps the account and synced data, and a change history for restoring the database for a limited time.",
+          "li3": "Google Cloud Translation — translation in the word form (\"Find\"). Receives the word and the language pair from our server, without your IP address or account. The answer is kept in a shared cache for 15 days, with no link to who asked. These are automatic translations by Google Translate and may be inaccurate.",
+          "li4": "Sign in with Google — Google learns that you sign in to VocabX and gives us your e-mail, id, name and picture (we keep only the e-mail and the id).",
+          "li5": "Google Sheets — the author's spreadsheets for statistics (only with consent), feedback and reminder addresses.",
+          "li6": "Gmail — sends the letters; sees your address and the letter's text.",
+          "li7": "Telegram — receives the feedback text if feedback goes to the author's chat.",
+          "li8": "Your browser's push services — receive an empty notification for your browser when a reminder is due.",
+          "li9": "Tatoeba — example sentences. Your browser sends the word and language straight to Tatoeba, so Tatoeba sees your IP address.",
+          "li10": "Wiktionary — translations and definitions. For translations your browser sends the word directly (Wiktionary sees your IP address); definitions are asked by our server.",
+          "li11": "Free Dictionary API — definitions and examples. Receives only the word, from our server.",
+          "li12": "Your browser's speech services. Microphone tasks use the speech recognition built into your browser: Chrome sends the audio to Google, Safari to Apple, under their own terms. We do not receive the audio. Reading words aloud may also use online voices of the browser or system, in which case their provider receives the text. If this does not suit you, do not use the microphone tasks.",
+          "p2": "Fonts are served from our own site, not from Google. We do not sell data or pass it to advertising networks."
+        }
+      },
+      "transfers": {
+        "title": "Transfers abroad",
+        "blocks": {
+          "p1": "Servers of Vercel, Neon and Google are located, among other places, in the USA, so your data may be processed outside Ukraine and the European Union. These companies work under their own data protection agreements, which provide safeguards for such transfers."
+        }
+      },
+      "basis": {
+        "title": "Legal bases",
+        "blocks": {
+          "p1": "We process data on these bases:",
+          "li1": "to provide the service you asked for: account, sync, league, reminders, letters;",
+          "li2": "with your consent: anonymous statistics and the feedback you send yourself. You can withdraw consent at any time;",
+          "li3": "legitimate interest: security and protection against abuse — request limits, protection of the sign-in forms, hosting logs."
+        }
+      },
+      "retention": {
+        "title": "How long we keep data",
+        "blocks": {
+          "li1": "Account and synced data — until you delete the account.",
+          "li2": "Markers of deleted words, decks and answers (needed so a deletion reaches all your devices) — 90 days.",
+          "li3": "Unconfirmed accounts — 7 days after the last letter. Link hashes and pending passwords — 7 days after the link expired.",
+          "li4": "Request limit counters — up to a day plus an hour.",
+          "li5": "Shared cache of Google translations — 15 days.",
+          "li6": "Weekly league groups — 12 weeks.",
+          "li7": "Reminder addresses — 30 days after turning off, or 90 days without updates.",
+          "li8": "Anonymous statistics — 12 months. Feedback — 24 months.",
+          "li9": "Hosting logs and the database restore history — a short time, under the free plans of Vercel and Neon.",
+          "li10": "Data on your device — until you reset it or clear your browser."
+        }
+      },
+      "security": {
+        "title": "How we protect data",
+        "blocks": {
+          "p1": "The connection to the site is encrypted (HTTPS). Passwords are kept only as a hash, sign-in cookies cannot be read by page scripts, and addresses used for request limits are kept only as a hash. Only the author has access to the data on the server. No system is fully secure; if a breach happens, we will inform those affected as the law requires."
+        }
+      },
+      "rights": {
+        "title": "Your rights and how to use them",
+        "blocks": {
+          "li1": "View and download: Settings → Data → Download my data — a file with the data from your device and the server.",
+          "li2": "Correct: words, translations, name and settings are changed in the app itself.",
+          "li3": "Delete your account: Profile → Delete account. All your data on the server is deleted at once.",
+          "li4": "Delete data on your device: Settings → Data → Reset data.",
+          "li5": "Withdraw consent to statistics: Settings → Data.",
+          "li6": "To object to processing, restrict it or ask anything else, write to {email}. We will answer within 30 days.",
+          "li7": "Complain to a supervisory authority: in Ukraine, the Ukrainian Parliament Commissioner for Human Rights; in the EU, the data protection authority of your country.",
+          "p1": "Deleting the account does not touch anonymous statistics and feedback (they are not linked to the account), copies of letters in the sent folder, the database restore history until it runs out, and the data on your devices until you reset it. To delete statistics already sent, write to us with the random browser id shown in the Data section."
+        }
+      },
+      "children": {
+        "title": "Children",
+        "blocks": {
+          "p1": "You can use VocabX on your own from the age of 16. Children aged 13 to 16 may use it only with the permission of a parent or guardian, who also decides on consent to statistics. The app is not meant for children under 13. If you believe a child created an account without permission, write to us and we will delete it."
+        }
+      },
+      "changes": {
+        "title": "Changes to this policy",
+        "blocks": {
+          "p1": "If we change the policy, the new version with its date will appear on this page. We will announce significant changes (new data or new recipients) in the app in advance."
+        }
+      },
+      "contact": {
+        "title": "Contact",
+        "blocks": {
+          "p1": "Questions and requests about your data: {email}."
+        }
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms of use",
+    "updated": "Version of 12 November 2026",
+    "intro": "These terms apply to everyone who uses VocabX. By using the app, you accept them. How we handle data is described in the Privacy policy.",
+    "sections": {
+      "service": {
+        "title": "What VocabX is",
+        "blocks": {
+          "p1": "VocabX is a free, non-commercial app for learning words with spaced repetition at vocabx-sigma.vercel.app. It is made and run by one person, the author of VocabX. The app has no ads and no payments.",
+          "p2": "The app works without an account. An account is only needed to sync between devices and to take part in the league."
+        }
+      },
+      "age": {
+        "title": "Age",
+        "blocks": {
+          "p1": "You can use VocabX on your own from the age of 16. From 13 to 16, only with the permission of a parent or guardian. The app is not meant for children under 13."
+        }
+      },
+      "account": {
+        "title": "Account",
+        "blocks": {
+          "li1": "Use an e-mail address you can access: confirmation and password reset letters are sent to it.",
+          "li2": "Keep your password secret. You are responsible for what happens in your account.",
+          "li3": "One account is for one person.",
+          "li4": "If someone else got into your account, change the password and write to us.",
+          "li5": "You can delete your account at any time in your profile."
+        }
+      },
+      "content": {
+        "title": "Your content",
+        "blocks": {
+          "p1": "The words, translations, examples and links to images and videos you add remain yours. You allow us to store them and copy them between your devices only so that the app works.",
+          "p2": "Do not add unlawful content or other people's personal details. Others see your display name in the league: it must not be offensive, misleading or someone else's. We may change such a name or remove you from the league."
+        }
+      },
+      "rules": {
+        "title": "What you must not do",
+        "blocks": {
+          "li1": "use bots and scripts or inflate XP in the league;",
+          "li2": "get around request limits, overload or break the service;",
+          "li3": "try to access other people's accounts or data;",
+          "li4": "resell access to the app or its translations."
+        }
+      },
+      "thirdContent": {
+        "title": "Translations and examples from others",
+        "blocks": {
+          "p1": "Translation suggestions are automatic translations by Google Translate and may be inaccurate. Example sentences come from Tatoeba (CC BY 2.0 FR licence), definitions and translations from Wiktionary (CC BY-SA) through the Free Dictionary API. Check translations that matter. The full list of sources is on the Credits page.",
+          "p2": "Google's disclaimer applies to Google translations:"
+        }
+      },
+      "ip": {
+        "title": "Rights in the app",
+        "blocks": {
+          "p1": "The code of VocabX is open source under the GPL-3.0 licence. The built-in decks, interface texts, character art, icons and the name VocabX belong to the author. Fonts and libraries are used under their own licences (Credits page)."
+        }
+      },
+      "availability": {
+        "title": "Availability and changes",
+        "blocks": {
+          "p1": "VocabX is provided \"as is\", free of charge and without a guarantee of uninterrupted operation. We may change features, pause the service or close it. Before closing it we will announce it in the app at least 30 days ahead, so you have time to download your data. The data in your browser stays with you.",
+          "p2": "We suggest downloading your data now and then: Settings → Data → Download my data."
+        }
+      },
+      "liability": {
+        "title": "Liability",
+        "blocks": {
+          "p1": "As far as the law allows, the author is not liable for indirect losses, lost progress or the consequences of inaccurate translations. These terms do not limit the rights you have under mandatory law, including as a consumer."
+        }
+      },
+      "termination": {
+        "title": "Ending use",
+        "blocks": {
+          "p1": "You can stop using VocabX at any time and delete your account. If someone breaks these terms, we may limit their part in the league or block the account; where possible, we will explain the reason by e-mail."
+        }
+      },
+      "changes": {
+        "title": "Changes to the terms",
+        "blocks": {
+          "p1": "A new version of the terms will appear on this page with its date. We will announce significant changes in the app in advance. If you do not accept the new terms, you can delete your account."
+        }
+      },
+      "law": {
+        "title": "Governing law",
+        "blocks": {
+          "p1": "These terms are governed by the law of Ukraine. If you live in another country, you keep the rights that its mandatory laws give you."
+        }
+      },
+      "contact": {
+        "title": "Contact",
+        "blocks": {
+          "p1": "Questions about these terms: {email}."
+        }
+      }
+    }
+  },
+  "google": {
+    "attribution": "Powered by Google Translate",
+    "disclaimer": "THIS SERVICE MAY CONTAIN TRANSLATIONS POWERED BY GOOGLE. GOOGLE DISCLAIMS ALL WARRANTIES RELATED TO THE TRANSLATIONS, EXPRESS OR IMPLIED, INCLUDING ANY WARRANTIES OF ACCURACY, RELIABILITY, AND ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT."
+  }
+}

@@ -20,6 +20,7 @@ import type themes from '../../messages/uk/themes.json';
 import type tours from '../../messages/uk/tours.json';
 import type profile from '../../messages/uk/profile.json';
 import type league from '../../messages/uk/league.json';
+import type legal from '../../messages/uk/legal.json';
 import type words from '../../messages/uk/words.json';
 import type { Locale } from './locales';
 
@@ -48,6 +49,7 @@ declare module 'next-intl' {
       tours: typeof tours;
       profile: typeof profile;
       league: typeof league;
+      legal: typeof legal;
       words: typeof words;
     };
   }
