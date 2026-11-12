@@ -4,6 +4,7 @@
 // <html> (a locale switch clears its attributes). It reads localStorage directly because
 // it must be synchronous and repositories are not loaded yet.
 import { KEY_PREFIX } from '@vocabx/data';
+import { INFO_PAGES } from '@/lib/site';
 import {
   EXPANDED_SIDEBAR_ROUTES,
   SIDEBAR_AUTO_COLLAPSE_PX,
@@ -78,7 +79,9 @@ function gate(c: GateConfig) {
   if (!onboarded) location.replace('/' + locale + '/onboarding' + location.search);
 }
 
-export const OPEN_SECTIONS = ['onboarding', 'dev'];
+// The policy, the terms and the credits must open for anyone, also before onboarding (and for
+// crawlers and the Google sign-in review, which have no stored profile).
+export const OPEN_SECTIONS = ['onboarding', 'dev', ...INFO_PAGES];
 
 function config(): BootConfig {
   return {

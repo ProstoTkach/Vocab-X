@@ -67,16 +67,16 @@ export default async function SettingsPage() {
           <CardText className="mt-1 mb-4">{t('tourHint')}</CardText>
           <TourRestart />
         </Card>
+        <Card aria-labelledby="settings-about">
+          <CardTitle id="settings-about">{t('about.title')}</CardTitle>
+          <CardText className="mt-1 mb-4">{t('about.hint')}</CardText>
+          <LegalLinks />
+        </Card>
         <Card aria-labelledby="settings-data">
           <CardTitle id="settings-data">{data('title')}</CardTitle>
           <CardText className="mt-1 mb-4">{data('hint')}</CardText>
           <DataSettings />
           <DevToggle />
-        </Card>
-        <Card aria-labelledby="settings-about">
-          <CardTitle id="settings-about">{t('about.title')}</CardTitle>
-          <CardText className="mt-1 mb-4">{t('about.hint')}</CardText>
-          <LegalLinks />
         </Card>
       </div>
     </>
