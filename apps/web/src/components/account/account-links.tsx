@@ -31,12 +31,25 @@ export function AccountLinks() {
     typeof window === 'undefined' ? null : linkFromHash(window.location.hash),
   );
   const [emailOutcome, setEmailOutcome] = useState<EmailOutcome>('busy');
-  const started = useRef(false);
+  /** The link already taken care of (an effect may run twice for one). */
+  const handled = useRef<Link | null>(null);
+
+  // A link pasted into a tab already on the profile changes only what follows `#`.
+  useEffect(() => {
+    const onHash = () => {
+      const found = linkFromHash(window.location.hash);
+      if (!found) return;
+      setEmailOutcome('busy');
+      setLink(found);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
 
   useEffect(() => {
     const found = link;
-    if (!found || started.current) return;
-    started.current = true;
+    if (!found || handled.current === found) return;
+    handled.current = found;
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
     if (found.kind !== 'email') return;
     void fetch('/api/account/email', {
@@ -62,6 +75,7 @@ export function AccountLinks() {
   if (link.kind === 'reset')
     return (
       <SignInDialog
+        key={link.token}
         open
         onOpenChange={(open) => {
           if (!open) setLink(null);
