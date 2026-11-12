@@ -32,6 +32,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { track, writeKey } from '@/lib/analytics';
 import { KEYS } from '@/lib/analytics/identity';
 import { SignInDialog } from '@/components/account/sign-in-dialog';
+import { LegalLinks } from '@/components/legal/legal-links';
 import { ThemePicker } from '@/components/settings/theme-picker';
 import { Button } from '@/components/ui/button';
 import { CheckCard, RadioCard } from '@/components/ui/choice';
@@ -323,6 +324,7 @@ export function OnboardingFlow({ accounts }: { accounts: boolean }) {
                 </Button>
               )}
               <SignInDialog open={signingIn} onOpenChange={setSigningIn} google />
+              <LegalLinks newTab className="justify-center" />
             </div>
           )}
 

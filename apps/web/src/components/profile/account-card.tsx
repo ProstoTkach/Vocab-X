@@ -5,6 +5,7 @@ import { signIn, signOut } from 'next-auth/react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { SignInDialog } from '@/components/account/sign-in-dialog';
+import { LegalLinks } from '@/components/legal/legal-links';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
@@ -98,6 +99,7 @@ export function SignInCard() {
           </Button>
         </div>
       </div>
+      <LegalLinks only={['privacy', 'terms']} className="sm:basis-full" />
       <SignInDialog open={emailOpen} onOpenChange={setEmailOpen} />
     </Card>
   );
@@ -167,6 +169,7 @@ export function AccountCard({ email }: { email: string }) {
           {t('delete')}
         </Button>
       </div>
+      <LegalLinks only={['privacy', 'terms']} />
       <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <DialogContent
           title={t('deleteTitle')}

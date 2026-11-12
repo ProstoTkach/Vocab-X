@@ -213,6 +213,16 @@ export function TranslationSuggestions({
             );
           })}
         </div>
+        <p className="text-xs text-fg-muted">
+          <a
+            href="https://translate.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-line-strong underline-offset-2 hover:text-fg"
+          >
+            {t('googleAttribution')}
+          </a>
+        </p>
       </div>
       {notice}
     </>

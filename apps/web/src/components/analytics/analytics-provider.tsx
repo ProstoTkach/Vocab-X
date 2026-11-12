@@ -15,6 +15,7 @@ import {
   type ReactNode,
 } from 'react';
 import { Button } from '@/components/ui/button';
+import { LegalLinks } from '@/components/legal/legal-links';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { usePathname } from '@/i18n/navigation';
 import {
@@ -31,6 +32,7 @@ import { useClock } from '@/lib/clock';
 import { useDevTools } from '@/lib/dev-tools';
 import { useGamification } from '@/lib/gamification';
 import { useRepos } from '@/lib/repos';
+import { INFO_PAGES } from '@/lib/site';
 
 interface AnalyticsValue {
   consent: Consent;
@@ -50,6 +52,9 @@ const FLUSH_MS = 2 * 60_000;
 const ACTIVITY_THROTTLE_MS = 1000;
 /** On app pages the consent window waits a moment, so it never pops up mid-click. */
 const ASK_DELAY_MS = 600;
+
+/** The policy, the terms and the credits are read first, asked about later. */
+const isInfoPage = (pathname: string) => INFO_PAGES.some((p) => pathname.startsWith(`/${p}`));
 
 /** Sections of the app, as screen_view names them. */
 export function screenOf(pathname: string): string {
@@ -270,7 +275,8 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   // The consent window: as soon as the first page loads (onboarding or the app).
   const onboarding = pathname.startsWith('/onboarding');
   // Onboarding asks at once, on its first page; elsewhere never in the middle of a review.
-  const wantsAsk = started && consent === null && !pathname.startsWith('/review');
+  const wantsAsk =
+    started && consent === null && !pathname.startsWith('/review') && !isInfoPage(pathname);
   useEffect(() => {
     // Nothing is ever sent from a developer's machine, so there is nothing to ask about.
     if (!wantsAsk || (isLocalHost(window.location.hostname) && !sendsFromLocalhost)) return;
@@ -320,6 +326,8 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
             <ShieldCheck aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
             {t('where')}
           </p>
+          {/* A new tab: leaving this page would keep the window open on top of the policy. */}
+          <LegalLinks only={['privacy']} newTab className="mt-3" />
         </DialogContent>
       </Dialog>
     </AnalyticsContext>

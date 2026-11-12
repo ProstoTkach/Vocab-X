@@ -89,5 +89,9 @@
       "done": "Reminders are on",
       "failed": "Could not turn the reminders on. Try in the settings."
     }
+  },
+  "about": {
+    "title": "About VocabX",
+    "hint": "How we handle data, the terms of use and who we are grateful to."
   }
 }

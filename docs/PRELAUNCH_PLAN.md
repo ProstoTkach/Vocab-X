@@ -7,10 +7,11 @@ rows of "Additions to existing steps" that name them.
 
 ## Progress and handoff
 
-Next: **session 6** (model S); owner's legal review of session 5 texts (`docs/LEGAL_REVIEW.md` §3) can run in parallel. Migration `0005` is applied to the main database (2026-11-12). Update this line and the "Done" line at the end of every session.
+Next: **session 7** (model S); owner's legal review of session 5 texts (`docs/LEGAL_REVIEW.md` §3) can run in parallel. Migration `0005` is applied to the main database (2026-11-12). Update this line and the "Done" line at the end of every session.
 Done: 0.1 (`docs/AUDIT.md`, 2026-11-12); 1.0 + 5.3a (session 1, 2026-11-12, commit b076026); 1.1 + 1.2 (session 2, 2026-11-12);
 2.1a (session 3, 2026-11-12); 1.3 + 5.4 + 6.7 + 1.6 terms (session 4, 2026-11-12);
 1.4 text + 5.1 text (session 5, 2026-11-12; `messages/*/legal.json`, format and review list in `docs/LEGAL_REVIEW.md`);
+1.4 page + 5.1 page + Credits + links + 5.8 (session 6, 2026-11-12; contact address: `CONTACT_EMAIL` in `src/lib/contact.ts`, empty until the owner fills it in);
 owner: 6.8 (two-step sign-in everywhere), Neon test branch created.
 
 Owner decisions that later sessions must respect (2026-11-12):

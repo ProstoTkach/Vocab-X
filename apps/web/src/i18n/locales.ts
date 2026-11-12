@@ -48,6 +48,7 @@ export const NAMESPACES = [
   'profile',
   'league',
   'legal',
+  'credits',
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 
@@ -55,4 +56,4 @@ export type Namespace = (typeof NAMESPACES)[number];
  * Namespaces rendered only by server components (long legal texts): kept out of the client
  * provider so they are not shipped with every page.
  */
-export const SERVER_ONLY_NAMESPACES: readonly Namespace[] = ['legal'];
+export const SERVER_ONLY_NAMESPACES: readonly Namespace[] = ['legal', 'credits'];

@@ -1,0 +1,39 @@
+{
+  "title": "Credits",
+  "updated": "Updated 12 November 2026",
+  "intro": "VocabX stands on other people's work: dictionaries, sentence collections, fonts and open-source libraries. Here they are.",
+  "sections": {
+    "translations": {
+      "title": "Translations",
+      "text": "Translation suggestions in the word form are automatic translations by Google Translate. They may be inaccurate."
+    },
+    "sentences": {
+      "title": "Example sentences",
+      "text": "Sentences come from Tatoeba (tatoeba.org) under the CC BY 2.0 FR licence. Each sentence credits its author."
+    },
+    "definitions": {
+      "title": "Definitions and translations",
+      "text": "Wiktionary (CC BY-SA 4.0 licence) through the Free Dictionary API."
+    },
+    "fonts": {
+      "title": "Fonts",
+      "text": "Inter and Manrope — SIL Open Font License 1.1."
+    },
+    "icons": {
+      "title": "Icons",
+      "text": "Lucide — ISC licence."
+    },
+    "art": {
+      "title": "Artwork",
+      "text": "Characters, app icons and link-preview images: the author of VocabX."
+    },
+    "libraries": {
+      "title": "Open-source libraries",
+      "text": "Next.js, React, next-intl, Radix UI, motion, zod, Neon serverless (MIT licence); next-auth (ISC); drizzle-orm (Apache-2.0); nodemailer (MIT-0). Licence texts ship with their code."
+    },
+    "google": {
+      "title": "Google disclaimer",
+      "text": "Google's disclaimer about translations:"
+    }
+  }
+}

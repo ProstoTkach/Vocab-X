@@ -94,6 +94,18 @@ for (const vp of VIEWPORTS) {
       await page.screenshot({ path: `screenshots/onboarding-${vp.name}.png`, fullPage: true });
     });
 
+    test('legal pages', async ({ page }) => {
+      await seedOnboarded(page);
+      for (const name of ['privacy', 'credits']) {
+        await page.goto(`/uk/${name}`);
+        await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+        await page.screenshot({
+          path: `screenshots/${name}-${vp.name}.png`,
+          fullPage: name === 'credits',
+        });
+      }
+    });
+
     for (const theme of THEMES) {
       test(`app in ${theme}`, async ({ page }) => {
         await seedOnboarded(page);

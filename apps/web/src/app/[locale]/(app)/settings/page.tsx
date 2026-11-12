@@ -11,6 +11,7 @@ import { StudySettingsForm } from '@/components/settings/study-settings';
 import { TextSizePicker } from '@/components/settings/text-size-picker';
 import { ThemePicker } from '@/components/settings/theme-picker';
 import { TourRestart } from '@/components/settings/tour-restart';
+import { LegalLinks } from '@/components/legal/legal-links';
 import { Card, CardText, CardTitle } from '@/components/ui/card';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -71,6 +72,11 @@ export default async function SettingsPage() {
           <CardText className="mt-1 mb-4">{data('hint')}</CardText>
           <DataSettings />
           <DevToggle />
+        </Card>
+        <Card aria-labelledby="settings-about">
+          <CardTitle id="settings-about">{t('about.title')}</CardTitle>
+          <CardText className="mt-1 mb-4">{t('about.hint')}</CardText>
+          <LegalLinks />
         </Card>
       </div>
     </>

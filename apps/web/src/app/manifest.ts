@@ -6,6 +6,10 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'VocabX',
     short_name: 'VocabX',
+    description: 'Вивчайте слова з інтервальним повторенням: картки, вікторини, ліги.',
+    lang: 'uk',
+    id: '/',
+    categories: ['education'],
     start_url: '/',
     display: 'standalone',
     background_color: DEFAULT_THEME.colors.bg,

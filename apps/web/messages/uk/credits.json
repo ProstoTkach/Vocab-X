@@ -1,0 +1,39 @@
+{
+  "title": "Подяки",
+  "updated": "Оновлено 12 листопада 2026 року",
+  "intro": "VocabX збудований на чужій праці: словниках, корпусах речень, шрифтах і відкритих бібліотеках. Ось вони.",
+  "sections": {
+    "translations": {
+      "title": "Переклади",
+      "text": "Підказки перекладу в формі слова — автоматичні переклади Google Translate. Вони можуть бути неточними."
+    },
+    "sentences": {
+      "title": "Приклади речень",
+      "text": "Речення беремо з Tatoeba (tatoeba.org) за ліцензією CC BY 2.0 FR. Автори речень зазначені біля кожного з них."
+    },
+    "definitions": {
+      "title": "Визначення та переклади",
+      "text": "Wiktionary (ліцензія CC BY-SA 4.0) через Free Dictionary API."
+    },
+    "fonts": {
+      "title": "Шрифти",
+      "text": "Inter та Manrope — ліцензія SIL Open Font License 1.1."
+    },
+    "icons": {
+      "title": "Іконки",
+      "text": "Lucide — ліцензія ISC."
+    },
+    "art": {
+      "title": "Малюнки",
+      "text": "Персонажі, іконки застосунку та зображення для посилань: автор VocabX."
+    },
+    "libraries": {
+      "title": "Відкриті бібліотеки",
+      "text": "Next.js, React, next-intl, Radix UI, motion, zod, Neon serverless (ліцензія MIT); next-auth (ISC); drizzle-orm (Apache-2.0); nodemailer (MIT-0). Тексти ліцензій входять до складу їхнього коду."
+    },
+    "google": {
+      "title": "Застереження Google",
+      "text": "Застереження Google щодо перекладів (мовою оригіналу):"
+    }
+  }
+}

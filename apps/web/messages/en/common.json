@@ -10,5 +10,14 @@
   "comingSoon": "This section arrives in stage {stage}.",
   "notFoundTitle": "Page not found",
   "notFoundText": "The link may be outdated or the page has moved.",
-  "goHome": "Go home"
+  "goHome": "Go home",
+  "links": {
+    "label": "Policies and credits",
+    "privacy": "Privacy policy",
+    "terms": "Terms of service",
+    "credits": "Credits"
+  },
+  "legalBack": "To the home page",
+  "legalNav": "Legal pages",
+  "contactMissing": "[contact address not set yet]"
 }

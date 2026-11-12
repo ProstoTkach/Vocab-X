@@ -5,6 +5,7 @@ import { getMessages, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { localeInfo, SERVER_ONLY_NAMESPACES } from '@/i18n/locales';
 import { routing } from '@/i18n/routing';
+import { SITE_URL } from '@/lib/site';
 import { bootScript } from '@/lib/boot-script';
 import { BootScriptTag } from '@/lib/boot-script-tag';
 import { themesCss } from '@/themes/css';
@@ -16,11 +17,6 @@ import '../globals.css';
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
-
-/** The address shared links point to (images in link previews need it in full). */
-const SITE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : 'https://vocabx-sigma.vercel.app';
 
 export async function generateMetadata({
   params,
