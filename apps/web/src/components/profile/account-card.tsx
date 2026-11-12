@@ -4,6 +4,8 @@ import { LogOut, Mail, RefreshCw } from 'lucide-react';
 import { signIn, signOut } from 'next-auth/react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { ChangeEmail } from '@/components/account/change-email';
+import { ChangePassword } from '@/components/account/change-password';
 import { DeleteAccount } from '@/components/account/delete-account';
 import { SignInDialog } from '@/components/account/sign-in-dialog';
 import { LegalLinks } from '@/components/legal/legal-links';
@@ -104,7 +106,10 @@ export function SignInCard() {
   );
 }
 
-/** Signed in: the address, how syncing goes, signing out and deleting the account. */
+/**
+ * Signed in: the address, changing it or the password, how syncing goes, signing out and
+ * deleting the account.
+ */
 export function AccountCard({ email }: { email: string }) {
   const t = useTranslations('profile.account');
   const format = useFormatter();
@@ -128,6 +133,10 @@ export function AccountCard({ email }: { email: string }) {
                 })
               : null}
       </p>
+      <div className="-my-1 flex flex-wrap gap-x-2">
+        <ChangePassword email={email} />
+        <ChangeEmail email={email} />
+      </div>
       <div className="flex flex-wrap gap-2">
         <Button variant="secondary" disabled={status === 'syncing'} onClick={() => void syncNow()}>
           <RefreshCw aria-hidden className="size-4" />

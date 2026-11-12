@@ -116,10 +116,17 @@ retention ends. Tested on the test database (`account.db.test.ts`).
 | `rate_limits`       | key (rule + **HMAC** of the sender address /64, account id or e-mail — never in clear), count, reset_at                                                                                                                    | `lib/rate-limit.ts` (translate, register, reset, sign-in, dev-unlock) | Limits on costly routes (step 2.1a)                       | Until its window ends (15 minutes to 1 day) + up to an hour; each check deletes up to 20 ended rows | same, plus the cleanup cron deletes what checks left                                                                                                            |
 | `translation_cache` | key `from\|to\|word`, Google's translations, created_at                                                                                                                                                                    | `api/translate`                                                       | One answer for everyone, so a repeated word costs nothing | 30 days (`CACHE_MS`); each write deletes up to 20 older rows                                        | **15 days** (6.7: see `docs/LICENSES.md` §2.1), plus the cleanup cron                                                                                           |
 
-**To drop (separate migration after the next deploy):** `users.login_failures`,
-`users.locked_until` (unused since 2.1a: wrong passwords count in `rate_limits`) and (owner, 2026-11-12)
-`users.deleted_at` (written by nothing: deletion is hard; AUDIT §5). Drop them only
-after the deploy that stops reading them is live, so the old version never meets a missing column.
+Since session 8 the "Approved (1.6)" column is what runs: the daily cleanup (`/api/cleanup`,
+terms in `apps/web/src/lib/retention.ts`, see §6.3); "Retention now" shows the state before it.
+`verify_token_hash` also holds the link of an address change: the hash of the token together with
+the new address (the new address itself is only in the letter's link, never stored before it is
+confirmed).
+
+**To drop:** `users.login_failures`, `users.locked_until` (unused since 2.1a: wrong passwords count
+in `rate_limits`) and (owner, 2026-11-12) `users.deleted_at` (written by nothing: deletion is hard;
+AUDIT §5). Since session 8 no code reads them; migration `0006_drop_unused_user_columns` drops them
+(undo SQL in the file). Apply it only after that deploy is live, so the old version never meets a
+missing column.
 
 The translation cache has no link to a person: the key is the word, not who asked. The learner's
 own confirmed translation is stored with their word (`words.data`), like anything they type.
@@ -135,6 +142,8 @@ own confirmed translation is stored with their word (`words.data`), like anythin
 | Analytics / «Нагадування» | **push endpoint** (the browser's push address), on/off, ui_lang, updated_at, next reminder time                                                                                                                                                                            | `api/push`, `api/push/cron`     | Forever, also switched-off rows | Off rows deleted after 30 days; rows not updated for 90 days deleted |
 | Polls / feedback sheet    | time, kind (survey / bug / review / idea), ui_lang, player level, ratings, **free text** (may hold anything the learner types), likes/improve choices, device type, platform, anon_id                                                                                      | `api/feedback`                  | Forever                         | 24 months                                                            |
 
+Since session 8 the "Approved (1.6)" column is what runs (rows deleted by the daily cleanup).
+
 ### 3.3 Other places
 
 | Place                                                                   | What                                                                                                                                                         | Retention                                                                                                           |
@@ -142,7 +151,7 @@ own confirmed translation is stored with their word (`words.data`), like anythin
 | Telegram chat (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`)                | Feedback text, when the polls spreadsheet is not set up                                                                                                      | Chat history: until the owner deletes it (a bot can delete its messages only within 48 hours, so this stays manual) |
 | Mailbox of the sending account (SMTP, Gmail unless `EMAIL_SERVER_HOST`) | Sent letters: the learner's **e-mail** and the confirm / reset link                                                                                          | Owner's mailbox "Sent" folder; owner deletes by hand or turns off saving sent mail                                  |
 | Vercel logs                                                             | Request lines with the sender's **IP**, path (the word asked in `/api/translate?q=` is in the URL), status; `console.error` texts (no secrets, no addresses) | Free plan keeps runtime logs for a short time; step 2.4 measures and records it here                                |
-| Vercel CDN                                                              | Cached answers of `/api/translate` (`s-maxage` 30 days) and `/api/dictionary` (1 day)                                                                        | As in the header; **approved 15 days** for translate, same as the cache (6.7)                                       |
+| Vercel CDN                                                              | Cached answers of `/api/translate` (`s-maxage` 15 days since session 8) and `/api/dictionary` (1 day)                                                        | As in the header: 15 days for translate, same as the cache (6.7)                                                    |
 | Neon history (point-in-time restore)                                    | Old versions of every row, deleted ones too                                                                                                                  | The plan's restore window (free tier); step 4.3 / session 16 records it                                             |
 
 ## 4. Diagrams
@@ -238,14 +247,25 @@ A11); a check on a test DB that nothing stays.
 
 A device learns about a deletion from its tombstone. A device that stays offline longer than the
 purge term would never learn of it and could send the deleted word back. 90 days covers a phone
-left in a drawer for a season; the rows are small. Session 8 also adds a rule: the server keeps
-the highest purged `server_seq`, and a device whose last-seen number is below it does a full
-resync instead of an incremental one.
+left in a drawer for a season; the rows are small.
+
+The rule for such a device (session 8, `@vocabx/data`): the browser notes when an answer last left
+nothing unseen on the server (`caughtUpAt` in its sync journal). If that was more than 80 days ago
+(`FULL_RESYNC_MS`, 10 days short of the term so a clock a few days off still errs on the safe
+side), it fetches everything from the start; every row the server sends (alive or as a tombstone)
+is ticked off, and at the end the rows it had already sent but the server never mentioned are
+removed here. Rows changed here meanwhile stay and go to the server ("an edit brings it back", as
+always). Chosen over the planned "server keeps the highest purged `server_seq`": same guarantee,
+no new column or migration before the deploy, and the server and old browsers are unchanged.
 
 ### 6.3 Mechanism and free-tier fit (6.9)
 
-One more daily Vercel cron (`/api/cleanup`, `CRON_SECRET`, logs only row counts), or a step at the
-end of the existing `/api/push/cron` if the cron count of the free plan is used up. Each run
-deletes in batches with a cap, so a run stays short and the database wakes once a day. Free-plan
-cron runs once a day at most, so reminders stay daily (17:00 UTC) unless the owner adds a free
-outside scheduler; session 8 checks the current limits before choosing.
+One more daily Vercel cron: `/api/cleanup` at 03:00 UTC (`vercel.json`), `CRON_SECRET`, answers
+and logs only row counts. Checked 2026-11-12 in Vercel's docs: Hobby allows 100 cron jobs per
+project, each at most once a day (and only within the hour), so a second cron fits and reminders
+stay daily (17:00 UTC) unless the owner adds a free outside scheduler. The database gets one
+request a run (`db.batch`), each statement capped at 2000 rows (the rest goes the next day), so
+Neon wakes once a day. The spreadsheets: one column read per tab and one `batchUpdate` deleting
+row runs bottom-up; the reminder tab is read whole (it is small). A failing step is logged and
+skipped; the others still run. The cron runs at night, away from the reminder cron, because a row
+deleted while another request is between reading and writing the same tab could shift that write.

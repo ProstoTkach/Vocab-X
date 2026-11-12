@@ -1,19 +1,11 @@
-import { timingSafeEqual } from 'node:crypto';
 import { systemClock } from '@vocabx/core';
+import { cronAuthorized } from '@/lib/cron';
 import { sheetsConfigFromEnv } from '@/lib/google-sheets';
 import { sendPush, vapidFromEnv } from '@/lib/push';
 import { activeReminders, updateReminders, type Reminder } from '@/lib/reminder-store';
 
 /** Pushes in flight at a time. */
 const PARALLEL = 10;
-
-const authorized = (request: Request) => {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  const given = Buffer.from(request.headers.get('authorization') ?? '');
-  const expected = Buffer.from(`Bearer ${secret}`);
-  return given.length === expected.length && timingSafeEqual(given, expected);
-};
 
 /**
  * Sends the reminders that are due (run on a schedule: Vercel Cron or an outside scheduler,
@@ -23,7 +15,7 @@ const authorized = (request: Request) => {
  * A sent reminder is not planned again until the app is used; ended subscriptions go off.
  */
 export async function GET(request: Request): Promise<Response> {
-  if (!authorized(request)) return new Response(null, { status: 401 });
+  if (!cronAuthorized(request)) return new Response(null, { status: 401 });
   const sheets = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
   const vapid = vapidFromEnv();
   if (!sheets || !vapid) return new Response(null, { status: 503 });

@@ -13,6 +13,7 @@ import { Check, Palette, Pencil } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useState, type SyntheticEvent } from 'react';
 import { AvatarBadge } from '@/components/character/avatar-badge';
+import { AccountLinks } from '@/components/account/account-links';
 import { AccountCard, SignInCard, useAccount } from '@/components/profile/account-card';
 import { FramePicker } from '@/components/profile/frame-picker';
 import { Button } from '@/components/ui/button';
@@ -215,6 +216,7 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
       </Card>
 
       {account?.email === null && <SignInCard />}
+      {accounts && <AccountLinks />}
       {/* Room for that line while the server answers, so the page does not jump. */}
       {accounts && account === undefined && !repos.journal.active && (
         <div aria-hidden className="h-20" />

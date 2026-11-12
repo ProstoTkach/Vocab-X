@@ -112,6 +112,8 @@ export function SyncProvider({ children }: { children: ReactNode }) {
       const owner = journal.owner;
       if (!hidden) setStatus('syncing');
       try {
+        // Away for months: everything is fetched again (not while the page is being left).
+        if (!hidden) repos.beginSync(clock.now());
         for (let round = 0; round < MAX_ROUNDS; round++) {
           const { changes, sent } = repos.collectChanges(hidden ? HIDDEN_ROWS : PUSH_ROWS);
           const body = JSON.stringify({ owner, cursor: journal.cursor, changes });
@@ -132,9 +134,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
             return;
           }
           const answer = (await res.json()) as SyncResponse;
-          if (repos.applyRemote(answer.changes)) changed = true;
-          if (answer.applied) journal.acknowledge(sent);
-          journal.received(answer.cursor, clock.now());
+          if (repos.takeAnswer(answer, sent, clock.now())) changed = true;
           setSyncedAt(journal.syncedAt);
           if (hidden || (answer.applied && !journal.hasDirty())) break;
         }

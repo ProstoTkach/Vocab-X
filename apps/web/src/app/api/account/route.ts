@@ -1,11 +1,22 @@
 import { eq } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
-import { crossSite, fail, requestUserId } from '@/lib/api-user';
+import { crossSite, fail, NO_STORE, requestUserId } from '@/lib/api-user';
 import { dbFromEnv } from '@/lib/db/client';
 import { users } from '@/lib/db/schema';
+import { signInMethods } from '@/lib/email-accounts';
 import { sheetsConfigFromEnv } from '@/lib/google-sheets';
 import { pushEndpoint } from '@/lib/push';
 import { removeReminder } from '@/lib/reminder-store';
+
+/** How the signed-in account signs in (`{ password, google }`), for the profile's choices. */
+export async function GET(request: NextRequest): Promise<Response> {
+  const db = dbFromEnv();
+  if (!db) return fail(503);
+  const userId = await requestUserId(request);
+  if (!userId) return fail(401);
+  const methods = await signInMethods(db, userId);
+  return methods ? Response.json(methods, { headers: NO_STORE }) : fail(401);
+}
 
 /**
  * Deletes the account and, with it, everything the server has of this learner: every table

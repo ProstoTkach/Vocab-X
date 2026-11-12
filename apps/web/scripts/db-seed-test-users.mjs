@@ -21,9 +21,8 @@ const hash = `scrypt:16384:8:1:${salt.toString('base64')}:${key.toString('base64
 const sql = neon(url);
 for (const email of EMAILS) {
   const [row] = await sql`
-    UPDATE users SET password_hash = ${hash}, email_verified_at = coalesce(email_verified_at, now()),
-      login_failures = 0, locked_until = NULL
-    WHERE lower(email) = ${email} AND deleted_at IS NULL RETURNING id`;
+    UPDATE users SET password_hash = ${hash}, email_verified_at = coalesce(email_verified_at, now())
+    WHERE lower(email) = ${email} RETURNING id`;
   if (!row)
     await sql`INSERT INTO users (email, password_hash, email_verified_at) VALUES (${email}, ${hash}, now())`;
 }

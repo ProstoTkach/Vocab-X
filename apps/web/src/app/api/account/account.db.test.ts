@@ -30,6 +30,8 @@ const verify = await import('./verify/route');
 const resetRoute = await import('./reset/route');
 const account = await import('./route');
 const exportRoute = await import('./export/route');
+const passwordRoute = await import('./password/route');
+const emailRoute = await import('./email/route');
 const league = await import('../league/route');
 
 // The day's letters for everyone are tried on their own below; here they never run out.
@@ -144,6 +146,74 @@ describe('registration in the browser', () => {
       }),
     );
     expect(res.status).toBe(410);
+  });
+});
+
+describe('changes in the profile', () => {
+  test('the password and the address change from the profile; the link signs in anew', async () => {
+    const email = testEmail('route-change');
+    await register.POST(
+      request('/api/account/register', {
+        method: 'POST',
+        body: { email, password: 'password-1', locale: 'uk' },
+      }),
+    );
+    await verify.GET(request(`/api/account/verify?token=${lastToken(email)}&lang=uk`));
+    const [row] = await db.select().from(users).where(eq(users.email, email));
+    const cookies = { [SESSION]: await session(row!.id, email) };
+
+    const methods = await account.GET(request('/api/account', { cookies }));
+    expect(await methods.json()).toEqual({ password: true, google: false });
+    expect((await account.GET(request('/api/account'))).status).toBe(401);
+
+    const change = (current: string) =>
+      passwordRoute.POST(
+        request('/api/account/password', {
+          method: 'POST',
+          cookies,
+          body: { current, password: 'password-2' },
+        }),
+      );
+    expect((await change('wrong-pass')).status).toBe(422);
+    expect((await change('password-1')).status).toBe(204);
+
+    const next = testEmail('route-change-new');
+    // Past the minute between letters to one account.
+    await db
+      .update(users)
+      .set({ verifySentAt: new Date(0) })
+      .where(eq(users.id, row!.id));
+    const ask = await emailRoute.POST(
+      request('/api/account/email', {
+        method: 'POST',
+        cookies,
+        body: { email: next, password: 'password-2', locale: 'uk' },
+      }),
+    );
+    expect(ask.status).toBe(202);
+    const link = mail.sent.findLast((l) => l.to === next)!.link;
+    const params = new URLSearchParams(link.split('#')[1]);
+    const confirm = await emailRoute.POST(
+      request('/api/account/email', {
+        method: 'POST',
+        body: { token: params.get('email'), email: params.get('to') },
+      }),
+    );
+    expect(confirm.status).toBe(204);
+    expect(cookieOf(confirm, SESSION)).toBeTruthy();
+    const [changed] = await db.select().from(users).where(eq(users.id, row!.id));
+    expect(changed!.email).toBe(next);
+  });
+
+  test('another site cannot change the password or the address', async () => {
+    const evil = { method: 'POST', origin: 'https://evil.test' };
+    const body = { current: 'a', password: 'password-2', email: testEmail('evil-2'), locale: 'uk' };
+    expect(
+      (await passwordRoute.POST(request('/api/account/password', { ...evil, body }))).status,
+    ).toBe(403);
+    expect((await emailRoute.POST(request('/api/account/email', { ...evil, body }))).status).toBe(
+      403,
+    );
   });
 });
 

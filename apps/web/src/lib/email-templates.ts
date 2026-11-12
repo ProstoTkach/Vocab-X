@@ -106,3 +106,12 @@ export function renderResetEmail(
 ): RenderedEmail {
   return layout({ ...TEXTS[locale].reset, fallback: TEXTS[locale].fallback, link }, wolf);
 }
+
+/** A new address for an account: the link makes the change. */
+export function renderEmailChangeEmail(
+  locale: EmailLocale,
+  link: string,
+  wolf: string | null,
+): RenderedEmail {
+  return layout({ ...TEXTS[locale].change, fallback: TEXTS[locale].fallback, link }, wolf);
+}

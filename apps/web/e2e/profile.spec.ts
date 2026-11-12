@@ -315,3 +315,94 @@ test('coming back from the letter says how it went, once', async ({ page }) => {
   ).toBeVisible();
   await expect(page).toHaveURL(/\/uk\/profile$/);
 });
+
+test('a forgotten password: a letter is asked for; its link opens the new password, an old link says so', async ({
+  page,
+}) => {
+  const asked: { email?: string; locale?: string; token?: string; password?: string }[] = [];
+  await page.route('**/api/account/reset', (route) => {
+    const body = route.request().postDataJSON() as (typeof asked)[number];
+    asked.push(body);
+    return route.fulfill({ status: body.token ? 410 : 202 });
+  });
+  await onboard(page);
+  await page.goto('/uk/profile');
+  await page.getByRole('button', { name: 'Email', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Забули пароль?' }).click();
+  await dialog.getByRole('textbox', { name: 'Email' }).fill('olena@example.com');
+  await dialog.getByRole('button', { name: 'Надіслати посилання' }).click();
+  await expect(dialog.getByText(/Якщо для olena@example.com є акаунт VocabX/)).toBeVisible();
+  expect(asked[0]).toEqual({ email: 'olena@example.com', locale: 'uk' });
+
+  await page.goto('/uk/profile#reset=old-token');
+  await expect(page).toHaveURL(/\/uk\/profile$/);
+  const reset = page.getByRole('dialog', { name: 'Виберіть новий пароль' });
+  await reset.getByLabel('Новий пароль').fill('long-enough');
+  await reset.getByLabel('Підтвердження пароля').fill('long-enough');
+  await reset.getByRole('button', { name: 'Зберегти й увійти' }).click();
+  await expect(reset.getByRole('alert')).toHaveCount(0);
+  const forgot = page.getByRole('dialog', { name: 'Новий пароль' });
+  await expect(forgot.getByRole('alert')).toHaveText(/Посилання вже не діє/);
+  expect(asked[1]).toEqual({ token: 'old-token', password: 'long-enough' });
+});
+
+test('signed in: the password and the email change from the profile', async ({ page }) => {
+  const changes: unknown[] = [];
+  await page.route('**/api/auth/session', (route) =>
+    route.fulfill({ json: { user: { email: 'olena@example.com', id: 'u1' } } }),
+  );
+  await page.route('**/api/account', (route) =>
+    route.fulfill({ json: { password: true, google: false } }),
+  );
+  let passwordTries = 0;
+  await page.route('**/api/account/password', (route) => {
+    changes.push(route.request().postDataJSON());
+    passwordTries += 1;
+    return route.fulfill({ status: passwordTries === 1 ? 422 : 204 });
+  });
+  await page.route('**/api/account/email', (route) => {
+    changes.push(route.request().postDataJSON());
+    return route.fulfill({ status: 202 });
+  });
+  await onboard(page);
+  await page.goto('/uk/profile');
+
+  await page.getByRole('button', { name: 'Змінити пароль' }).click();
+  const password = page.getByRole('dialog', { name: 'Змінити пароль' });
+  await password.getByLabel('Поточний пароль').fill('old-pass');
+  await password.getByLabel('Новий пароль').fill('new-password');
+  await password.getByLabel('Підтвердження пароля').fill('new-password');
+  await password.getByRole('button', { name: 'Зберегти пароль' }).click();
+  await expect(password.getByRole('alert')).toHaveText('Неправильний пароль.');
+  await password.getByRole('button', { name: 'Зберегти пароль' }).click();
+  await expect(page.getByText('Пароль змінено.')).toBeVisible();
+  await expect(password).toHaveCount(0);
+  expect(changes[1]).toEqual({ current: 'old-pass', password: 'new-password' });
+
+  await page.getByRole('button', { name: 'Змінити пошту' }).click();
+  const email = page.getByRole('dialog', { name: 'Нова пошта' });
+  await email.getByRole('textbox', { name: 'Нова пошта' }).fill('OLENA@example.com');
+  await email.getByLabel('Поточний пароль').fill('new-password');
+  await email.getByRole('button', { name: 'Надіслати посилання' }).click();
+  await expect(email.getByRole('alert')).toHaveText('Це й так ваша пошта.');
+  await email.getByRole('textbox', { name: 'Нова пошта' }).fill('new@example.com');
+  await email.getByRole('button', { name: 'Надіслати посилання' }).click();
+  await expect(email.getByText(/Ми надіслали лист на new@example.com/)).toBeVisible();
+  expect(changes[2]).toEqual({ email: 'new@example.com', password: 'new-password', locale: 'uk' });
+});
+
+test('the link of a new email changes it and says so', async ({ page }) => {
+  let body: unknown = null;
+  await page.route('**/api/account/email', (route) => {
+    body = route.request().postDataJSON();
+    return route.fulfill({ status: 204 });
+  });
+  await onboard(page);
+  await page.goto('/uk/profile#email=tok&to=new%40example.com');
+  await expect(
+    page.getByText('Готово! Тепер ваш акаунт використовує new@example.com.'),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/uk\/profile$/);
+  expect(body).toEqual({ token: 'tok', email: 'new@example.com' });
+});

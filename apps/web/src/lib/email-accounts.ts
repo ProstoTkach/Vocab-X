@@ -14,6 +14,7 @@ import { siteUrl, sendEmail } from './email';
 import {
   emailLocale,
   renderAlreadyEmail,
+  renderEmailChangeEmail,
   renderResetEmail,
   renderVerifyEmail,
 } from './email-templates';
@@ -52,8 +53,7 @@ const WRONG_DELAY_MS = 800;
 
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
-const byEmail = (email: string) =>
-  and(sql`lower(${users.email}) = ${normalizeEmail(email)}`, isNull(users.deletedAt));
+const byEmail = (email: string) => sql`lower(${users.email}) = ${normalizeEmail(email)}`;
 
 type Row = typeof users.$inferSelect;
 
@@ -187,11 +187,7 @@ export async function confirmEmail(
       emailVerifiedAt: sql`coalesce(${users.emailVerifiedAt}, now())`,
     })
     .where(
-      and(
-        eq(users.verifyTokenHash, tokenHash(token)),
-        gt(users.verifyExpiresAt, new Date(now)),
-        isNull(users.deletedAt),
-      ),
+      and(eq(users.verifyTokenHash, tokenHash(token)), gt(users.verifyExpiresAt, new Date(now))),
     )
     .returning({ id: users.id, email: users.email, key: users.pendingPasswordHash });
   return rows[0] ?? null;
@@ -246,7 +242,6 @@ export async function resetPassword(
       and(
         eq(users.verifyTokenHash, tokenHash(input.token)),
         gt(users.verifyExpiresAt, new Date(now)),
-        isNull(users.deletedAt),
       ),
     )
     .returning({ id: users.id, email: users.email });
@@ -376,4 +371,148 @@ export async function checkLogin(
   if (!row.emailVerifiedAt) return { ok: false, code: 'unverified' };
   if (wrong.length) await forgetQuery(db, wrongKey(email));
   return { ok: true, id: row.id, email: row.email };
+}
+
+/** How the account signs in, for the profile's choices. Null: there is no such account. */
+export async function signInMethods(
+  db: Db,
+  userId: string,
+): Promise<{ password: boolean; google: boolean } | null> {
+  const [row] = await db
+    .select({ hash: users.passwordHash, sub: users.googleSub })
+    .from(users)
+    .where(eq(users.id, userId));
+  return row ? { password: !!row.hash, google: !!row.sub } : null;
+}
+
+/** Changes asked for while signed in that need the password: ten tries per account in 15 minutes. */
+const CHECKS: Omit<Rule, 'key'> = { max: 10, windowMs: 15 * MINUTE_MS };
+const checksOf = (userId: string): Rule => ({ key: `account-check:${hashed(userId)}`, ...CHECKS });
+
+/** The account, with this try counted. `limited`: too many tries; null: no such account. */
+async function checkedAccount(
+  db: Db,
+  userId: string,
+  now: number,
+): Promise<Row | 'limited' | null> {
+  const rule = checksOf(userId);
+  const [counted, found] = await db.batch([
+    spendQuery(db, [rule], now),
+    db.select().from(users).where(eq(users.id, userId)),
+  ]);
+  if (!verdictOf(counted, [rule], now).ok) return 'limited';
+  return found[0] ?? null;
+}
+
+export type ChangeResult = 'ok' | 'wrong' | 'limited' | 'none' | 'gone';
+
+/**
+ * A new password while signed in: the current one must be right. `none`: the account has no
+ * password (Google only); a letter sets one (`requestReset`). Links still waiting stop working.
+ */
+export async function changePassword(
+  db: Db,
+  userId: string,
+  input: { current: string; password: string },
+  now: number,
+): Promise<ChangeResult> {
+  const row = await checkedAccount(db, userId, now);
+  if (row === 'limited') return 'limited';
+  if (!row) return 'gone';
+  if (!row.passwordHash) return 'none';
+  if (!(await verifyPassword(input.current, row.passwordHash))) {
+    await pause();
+    return 'wrong';
+  }
+  await db
+    .update(users)
+    .set({
+      passwordHash: await hashPassword(input.password),
+      pendingPasswordHash: null,
+      verifyTokenHash: null,
+      verifyExpiresAt: null,
+    })
+    .where(eq(users.id, userId));
+  return 'ok';
+}
+
+/** The hash an address change keeps: of the token and the new address, so neither can change. */
+const changeHash = (token: string, email: string) =>
+  tokenHash(`${token}\n${normalizeEmail(email)}`);
+
+export type EmailChangeResult = 'sent' | 'same' | 'wrong' | 'limited' | 'google' | 'gone';
+
+/**
+ * A new address for the account: a letter goes to it, and only its link makes the change (the
+ * old address stays until then). With a password, it must be given. An account with Google keeps
+ * Google's address (`google`). An address another account has gets no letter, and the answer is
+ * the same `sent`, so nothing tells which addresses have accounts.
+ */
+export async function requestEmailChange(
+  db: Db,
+  userId: string,
+  input: { email: string; password: string; locale: string },
+  now: number,
+): Promise<EmailChangeResult> {
+  const row = await checkedAccount(db, userId, now);
+  if (row === 'limited') return 'limited';
+  if (!row) return 'gone';
+  if (row.googleSub) return 'google';
+  if (!row.passwordHash || !(await verifyPassword(input.password, row.passwordHash))) {
+    await pause();
+    return 'wrong';
+  }
+  const email = normalizeEmail(input.email);
+  if (email === normalizeEmail(row.email)) return 'same';
+  if (sentRecently(row, now) || (await findByEmail(db, email))) return 'sent';
+  const { token, columns } = newLink(now, LINK_LIFETIME_MS);
+  await db
+    .update(users)
+    .set({ ...columns, verifyTokenHash: changeHash(token, email) })
+    .where(eq(users.id, userId));
+  const lang = emailLocale(input.locale);
+  const link = `${siteUrl()}/${lang}/profile#email=${token}&to=${encodeURIComponent(email)}`;
+  await sendCounted(db, userId, () =>
+    sendEmail(email, (wolf) => renderEmailChangeEmail(lang, link, wolf), link),
+  );
+  return 'sent';
+}
+
+const isUniqueViolation = (e: unknown): boolean => {
+  const code = (x: unknown) => (x as { code?: unknown } | null)?.code;
+  return code(e) === '23505' || code((e as { cause?: unknown } | null)?.cause) === '23505';
+};
+
+/**
+ * The link of an address change: the account takes the new address, confirmed. Once only, for a
+ * day. Null: the link is wrong, used or too old; `taken`: another account got the address since.
+ */
+export async function confirmEmailChange(
+  db: Db,
+  input: { token: string; email: string },
+  now: number,
+): Promise<{ id: string; email: string } | 'taken' | null> {
+  const email = normalizeEmail(input.email);
+  try {
+    const [user] = await db
+      .update(users)
+      .set({
+        email,
+        emailVerifiedAt: sql`coalesce(${users.emailVerifiedAt}, now())`,
+        verifyTokenHash: null,
+        verifyExpiresAt: null,
+      })
+      .where(
+        and(
+          eq(users.verifyTokenHash, changeHash(input.token, email)),
+          gt(users.verifyExpiresAt, new Date(now)),
+          isNull(users.googleSub),
+        ),
+      )
+      .returning({ id: users.id, email: users.email });
+    return user ?? null;
+  } catch (e) {
+    if (isUniqueViolation(e)) return 'taken';
+    throw e;
+  }
 }

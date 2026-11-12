@@ -20,5 +20,12 @@
     "body": "Someone asked for a new password for the account with this email. If that was you, press the button and choose a new password.",
     "button": "Choose a new password",
     "footer": "The link works for an hour and only once. If you did not ask for anything, simply ignore this letter: your password stays the same."
+  },
+  "change": {
+    "subject": "Confirm your new email for VocabX",
+    "title": "A new email",
+    "body": "Someone asked to use this email for a VocabX account. If that was you, press the button: from then on you sign in with this email.",
+    "button": "Use this email",
+    "footer": "The link works for a day and only once. If you did not ask for anything, simply ignore this letter: nothing changes."
   }
 }

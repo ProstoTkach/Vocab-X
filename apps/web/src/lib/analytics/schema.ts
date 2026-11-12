@@ -380,6 +380,14 @@ export const EVENT_PARAM_COLUMNS: Column[] = [
   { key: 'count', label: 'Кількість', about: 'Число, головне для події (карток, слів, рядків).' },
 ];
 
+/** Tabs of the analytics spreadsheet (feedback has a copy there too). */
+export const ANALYTICS_SHEETS = {
+  events: 'Події',
+  sessions: 'Сесії',
+  dictionary: 'Словник',
+  feedback: 'Відгуки',
+} as const;
+
 export const EVENT_COLUMNS: Column[] = [
   { key: 'ts', label: 'Час', about: 'Дата й час події (Київ).', date: true },
   { key: 'type', label: 'Подія', about: 'Тип події; опис — нижче в цьому словнику.' },

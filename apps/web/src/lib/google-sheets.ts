@@ -301,6 +301,68 @@ export async function clearRowByKey(
   return rows.length > 0;
 }
 
+/** One column of a tab under its header, as stored; index 0 is row 2. Empty rows are ''. */
+export async function readColumn(
+  c: SheetsConfig,
+  title: string,
+  column: number,
+): Promise<unknown[]> {
+  const col = columnName(column);
+  const res = await call<{ values?: unknown[][] }>(
+    c,
+    `/values/${range(title, `${col}2:${col}`)}?valueRenderOption=UNFORMATTED_VALUE`,
+  );
+  return (res.values ?? []).map((v) => v[0] ?? '');
+}
+
+/** Rows given by number (1-based, as the sheet shows them) as runs of neighbours, last run first. */
+export function rowRuns(rows: readonly number[]): [number, number][] {
+  const sorted = [...new Set(rows)].sort((a, b) => a - b);
+  const runs: [number, number][] = [];
+  for (const n of sorted) {
+    const last = runs.at(-1);
+    if (last && last[1] === n - 1) last[1] = n;
+    else runs.push([n, n]);
+  }
+  return runs.reverse();
+}
+
+/**
+ * Deletes whole rows (1-based numbers; never the header), the rows below move up. One request;
+ * from the bottom up, so each run's numbers still hold when its turn comes. False: no such tab.
+ */
+export async function deleteRows(
+  c: SheetsConfig,
+  title: string,
+  rows: readonly number[],
+): Promise<boolean> {
+  const tab = (await tabsOf(c)).find((t) => t.title === title);
+  if (!tab) return false;
+  const runs = rowRuns(rows.filter((n) => n > 1));
+  if (!runs.length) return true;
+  await call(c, ':batchUpdate', {
+    method: 'POST',
+    body: JSON.stringify({
+      requests: runs.map(([from, to]) => ({
+        deleteDimension: {
+          range: { sheetId: tab.sheetId, dimension: 'ROWS', startIndex: from - 1, endIndex: to },
+        },
+      })),
+    }),
+  });
+  return true;
+}
+
+/** The title of the spreadsheet's first tab (the polls table), or null when it has none. */
+export async function firstTab(c: SheetsConfig): Promise<string | null> {
+  return (await tabsOf(c))[0]?.title ?? null;
+}
+
+/** Whether a tab exists (without making it). */
+export async function hasTab(c: SheetsConfig, title: string): Promise<boolean> {
+  return (await tabsOf(c)).some((t) => t.title === title);
+}
+
 /** The rows of a tab under its header, as stored (numbers, booleans and text, not formatted). */
 export async function readRows(c: SheetsConfig, title: string): Promise<unknown[][]> {
   const res = await call<{ values?: unknown[][] }>(

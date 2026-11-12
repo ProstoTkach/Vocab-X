@@ -11,6 +11,7 @@ import {
   SESSION_COLUMNS,
   sessionRow,
   type Column,
+  ANALYTICS_SHEETS,
 } from '@/lib/analytics/schema';
 import { FEEDBACK_COLUMNS } from '@/lib/feedback';
 import {
@@ -24,7 +25,7 @@ import {
 import { crossSite, fail } from '@/lib/api-user';
 
 /** Sheet names of the analytics spreadsheet. */
-const SHEETS = { events: 'Події', sessions: 'Сесії', dictionary: 'Словник' } as const;
+const SHEETS = ANALYTICS_SHEETS;
 
 /** Requests per browser (anon_id) in a window; kept in memory, so it resets with the server. */
 const LIMIT = 30;

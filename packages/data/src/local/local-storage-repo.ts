@@ -49,7 +49,14 @@ import {
   mergeProfile,
   sharedSettings,
 } from './sync-merge';
-import { noChanges, SyncJournal, type SentMarks, type SyncChanges } from './sync-journal';
+import {
+  noChanges,
+  SyncJournal,
+  type RowCollection,
+  type SentMarks,
+  type SyncChanges,
+  type SyncResponse,
+} from './sync-journal';
 import { validateData } from './validate';
 
 export interface LocalStorageRepoOptions {
@@ -248,6 +255,42 @@ export class LocalStorageRepo implements Repos, DataPort {
       else changes.deleted.events.push(id);
     });
     return { changes, sent };
+  }
+
+  /**
+   * Before a sync: a browser away for too long (`FULL_RESYNC_MS`) fetches everything again, so a
+   * deletion whose marker the server no longer keeps still reaches it.
+   */
+  beginSync(now: number) {
+    if (!this.journal.needsResync(now)) return;
+    const dirty = this.journal.dirty();
+    const sent = (c: RowCollection, ids: readonly Id[]) => ids.filter((id) => !(id in dirty[c]));
+    this.journal.startResync({
+      words: sent('words', Object.keys(this.readMap<Word>(KEYS.words))),
+      decks: sent('decks', Object.keys(this.readMap<Deck>(KEYS.decks))),
+      cards: sent('cards', Object.keys(this.readCards())),
+      events: sent(
+        'events',
+        this.readLog().map((p) => p[0]),
+      ),
+    });
+  }
+
+  /**
+   * One answer of the server, `sent`: what the request carried. Returns whether anything here
+   * changed. At the end of a resync, the rows the server never sent are removed (unless changed
+   * here meanwhile: those go to the server as they are).
+   */
+  takeAnswer(answer: SyncResponse, sent: SentMarks, now: number): boolean {
+    let changed = this.applyRemote(answer.changes);
+    if (answer.applied) this.journal.acknowledge(sent);
+    this.journal.seen(answer.changes);
+    this.journal.received(answer.cursor, now, !answer.more);
+    if (!answer.more) {
+      const gone = this.journal.finishResync();
+      if (gone && this.applyRemote({ ...noChanges(), deleted: gone })) changed = true;
+    }
+    return changed;
   }
 
   /**

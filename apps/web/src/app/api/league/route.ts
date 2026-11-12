@@ -5,7 +5,7 @@ import {
   ringLeague,
   type AvatarFrame,
 } from '@vocabx/core';
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { crossSite, fail, NO_STORE, requestUserId } from '@/lib/api-user';
@@ -55,10 +55,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     const result = await inTransaction(url, async (tx) => {
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))`);
       // The account was deleted on another device, but this cookie lives on.
-      const [user] = await tx
-        .select({ id: users.id })
-        .from(users)
-        .where(and(eq(users.id, userId), isNull(users.deletedAt)));
+      const [user] = await tx.select({ id: users.id }).from(users).where(eq(users.id, userId));
       if (!user) return null;
       const [profile] = await tx
         .select({ tier: leagueProfiles.tier })

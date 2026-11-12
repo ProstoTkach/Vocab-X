@@ -123,6 +123,33 @@ for (const vp of VIEWPORTS) {
       await page.screenshot({ path: `screenshots/data-trust/consent-${vp.name}.png` });
     });
 
+    test('account changes', async ({ page }) => {
+      test.skip(vp.name !== '360x740' && vp.name !== '1280x800');
+      await onboard(page);
+      await page.goto('/uk/profile');
+      await page.getByRole('button', { name: 'Email', exact: true }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Забули пароль?' }).click();
+      await expect(page.getByRole('dialog', { name: 'Новий пароль' })).toBeVisible();
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `screenshots/account/forgot-${vp.name}.png` });
+
+      await page.route('**/api/auth/session', (route) =>
+        route.fulfill({ json: { user: { email: 'olena@example.com', id: 'u1' } } }),
+      );
+      await page.route('**/api/account', (route) =>
+        route.fulfill({ json: { password: true, google: false } }),
+      );
+      await page.goto('/uk/profile');
+      const card = page.locator('section[aria-labelledby="profile-account"]');
+      await expect(card.getByRole('button', { name: 'Змінити пошту' })).toBeVisible();
+      await card.scrollIntoViewIfNeeded();
+      await card.screenshot({ path: `screenshots/account/card-${vp.name}.png` });
+      await card.getByRole('button', { name: 'Змінити пароль' }).click();
+      await expect(page.getByRole('dialog', { name: 'Змінити пароль' })).toBeVisible();
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `screenshots/account/change-password-${vp.name}.png` });
+    });
+
     test('legal pages', async ({ page }) => {
       await seedOnboarded(page);
       for (const name of ['privacy', 'credits']) {

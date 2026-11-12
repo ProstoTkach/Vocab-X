@@ -15,16 +15,20 @@ vi.mock('./email', () => ({
 }));
 
 const {
+  changePassword,
   checkLogin: checkLoginFrom,
   confirmEmail,
+  confirmEmailChange,
   provesRegistration,
   register,
   registrationProof,
   rememberGoogleUser,
+  requestEmailChange,
   requestReset,
   resendConfirmation,
   resetPassword,
   normalizeEmail,
+  signInMethods,
 } = await import('./email-accounts');
 
 const db = testDb();
@@ -317,5 +321,94 @@ describe('signing in says nothing about which addresses exist', () => {
     await spendQuery(db, [{ key: `login:${sender}`, max: 30, windowMs: 900_000, cost: 30 }], now);
     expect(await checkLogin(email, 'old-pass')).toEqual(limited);
     expect(await signsIn(email, 'old-pass', newSender())).toBe(true);
+  });
+});
+
+describe('changes while signed in', () => {
+  /** The token and the address of the last address-change letter to `email`. */
+  const changeLink = (email: string) => {
+    const link = mail.sent.findLast((l) => l.to === email)!.link;
+    const params = new URLSearchParams(link.split('#')[1]);
+    return { token: params.get('email')!, email: params.get('to')! };
+  };
+
+  test('a new password needs the current one; old reset links die', async () => {
+    const email = await confirmed('change-pass');
+    const { id } = await row(email);
+    expect(await signInMethods(db, id)).toEqual({ password: true, google: false });
+    await requestReset(db, { email, locale }, now);
+    const resetToken = lastToken(email);
+    const input = (current: string) => ({ current, password: 'new-pass-1' });
+    expect(await changePassword(db, id, input('wrong-pass'), now)).toBe('wrong');
+    expect(await changePassword(db, id, input('old-pass'), now)).toBe('ok');
+    expect(await signsIn(email, 'new-pass-1')).toBe(true);
+    expect(await signsIn(email, 'old-pass')).toBe(false);
+    expect(await resetPassword(db, { token: resetToken, password: 'x-pass-123' }, now)).toBeNull();
+  });
+
+  test('ten tries in a quarter of an hour, then limited even with the right password', async () => {
+    const email = await confirmed('change-limit');
+    const { id } = await row(email);
+    const input = (current: string) => ({ current, password: 'new-pass-1' });
+    await Promise.all(
+      Array.from({ length: 10 }, () => changePassword(db, id, input('wrong-pass'), now)),
+    );
+    expect(await changePassword(db, id, input('old-pass'), now)).toBe('limited');
+  });
+
+  test('an account with Google only has no password to change', async () => {
+    const email = testEmail('change-google');
+    const id = await rememberGoogleUser(db, `sub-${randomUUID()}`, email);
+    expect(await signInMethods(db, id)).toEqual({ password: false, google: true });
+    expect(await changePassword(db, id, { current: 'x', password: 'new-pass-1' }, now)).toBe(
+      'none',
+    );
+    const ask = { email: testEmail('elsewhere'), password: '', locale };
+    expect(await requestEmailChange(db, id, ask, now)).toBe('google');
+  });
+
+  test('a new address counts only through the link sent to it', async () => {
+    const email = await confirmed('change-mail');
+    const { id } = await row(email);
+    const next = testEmail('change-mail-new');
+    const ask = (password: string, to = next) => ({ email: to, password, locale: 'en' });
+    expect(await requestEmailChange(db, id, ask('wrong-pass'), now)).toBe('wrong');
+    expect(await requestEmailChange(db, id, ask('old-pass', email.toUpperCase()), now)).toBe(
+      'same',
+    );
+    expect(await requestEmailChange(db, id, ask('old-pass'), now)).toBe('sent');
+    expect(mail.sent.at(-1)?.link).toMatch(/^http:\/\/localhost:3000\/en\/profile#email=/);
+    const link = changeLink(next);
+    expect((await row(email)).email).toBe(email);
+    // The link is bound to its address: another one does not go through.
+    const other = testEmail('change-mail-other');
+    expect(await confirmEmailChange(db, { ...link, email: other }, now)).toBeNull();
+    expect(await confirmEmailChange(db, link, now + 25 * 3_600_000)).toBeNull();
+    expect(await confirmEmailChange(db, link, now)).toEqual({ id, email: next });
+    expect(await confirmEmailChange(db, link, now)).toBeNull();
+    expect(await signsIn(next, 'old-pass')).toBe(true);
+    // Nor is a reset link made from it.
+    expect(await resetPassword(db, { token: link.token, password: 'x-pass-123' }, now)).toBeNull();
+  });
+
+  test('an address another account has gets no letter, and the answer is the same', async () => {
+    const email = await confirmed('change-taken');
+    const taken = await confirmed('change-taken-other');
+    const { id } = await row(email);
+    const before = letters(taken);
+    expect(
+      await requestEmailChange(db, id, { email: taken, password: 'old-pass', locale }, now),
+    ).toBe('sent');
+    expect(letters(taken)).toBe(before);
+  });
+
+  test('an address taken while the letter waited: the link says so', async () => {
+    const email = await confirmed('change-race');
+    const { id } = await row(email);
+    const next = testEmail('change-race-new');
+    await requestEmailChange(db, id, { email: next, password: 'old-pass', locale }, now);
+    const link = changeLink(next);
+    await rememberGoogleUser(db, `sub-${randomUUID()}`, next);
+    expect(await confirmEmailChange(db, link, now)).toBe('taken');
   });
 });

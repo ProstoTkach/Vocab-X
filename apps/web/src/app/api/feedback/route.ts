@@ -13,9 +13,10 @@ import {
   sheetsConfigFromEnv,
 } from '@/lib/google-sheets';
 import { crossSite, fail } from '@/lib/api-user';
+import { ANALYTICS_SHEETS } from '@/lib/analytics/schema';
 
 /** The feedback sheet of the analytics spreadsheet, next to the usage statistics. */
-const ANALYTICS_SHEET = 'Відгуки';
+const ANALYTICS_SHEET = ANALYTICS_SHEETS.feedback;
 
 async function copyToAnalytics(row: ReturnType<typeof feedbackRow>) {
   const analytics = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');

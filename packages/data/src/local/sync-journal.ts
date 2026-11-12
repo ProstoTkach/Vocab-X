@@ -55,6 +55,19 @@ export interface SyncResponse {
 
 type Marks = Record<SyncCollection, Record<Id, number>>;
 
+/** How long the server keeps the marker of a deleted row (`apps/web/src/lib/retention.ts`). */
+export const TOMBSTONE_DAYS = 90;
+/**
+ * Not caught up with the server for this long: a deletion's marker may be gone, so everything is
+ * fetched again and what the server no longer has goes. Shorter than `TOMBSTONE_DAYS`, so a
+ * clock a few days off still errs on the safe side.
+ */
+export const FULL_RESYNC_MS = (TOMBSTONE_DAYS - 10) * 86_400_000;
+
+export type RowCollection = Exclude<SyncCollection, 'state'>;
+type IdSet = Record<RowCollection, Record<Id, 1>>;
+const ROW_COLLECTIONS: readonly RowCollection[] = ['words', 'decks', 'cards', 'events'];
+
 interface JournalData {
   /** The account this browser's data goes to. */
   owner: string;
@@ -62,6 +75,10 @@ interface JournalData {
   active: boolean;
   cursor: number;
   syncedAt: number;
+  /** The last answer after which nothing on the server was left unseen (older journals: none). */
+  caughtUpAt?: number;
+  /** Fetching everything again: rows here not seen from the server by the end are gone there. */
+  resync?: IdSet;
   tick: number;
   dirty: Marks;
 }
@@ -173,10 +190,64 @@ export class SyncJournal {
     });
   }
 
-  received(cursor: number, now: number) {
+  /** `complete`: the answer left nothing unseen on the server. */
+  received(cursor: number, now: number, complete = false) {
     this.update((d) => {
       d.cursor = cursor;
       d.syncedAt = now;
+      if (complete) d.caughtUpAt = now;
     });
+  }
+
+  get resyncing(): boolean {
+    return !!this.read()?.resync;
+  }
+
+  /** Whether this browser was away so long that it should fetch everything again. */
+  needsResync(now: number): boolean {
+    const d = this.read();
+    if (!d || d.resync) return false;
+    const at = d.caughtUpAt ?? d.syncedAt;
+    return at > 0 && now - at > FULL_RESYNC_MS;
+  }
+
+  /** From the beginning again; `kept`: the rows here already sent (the others go anyway). */
+  startResync(kept: Record<RowCollection, readonly Id[]>) {
+    this.update((d) => {
+      d.cursor = 0;
+      d.resync = { words: {}, decks: {}, cards: {}, events: {} };
+      for (const c of ROW_COLLECTIONS) for (const id of kept[c]) d.resync[c][id] = 1;
+    });
+  }
+
+  /** Rows the server still has (or has as deleted): not gone. */
+  seen(changes: SyncChanges) {
+    if (!this.resyncing) return;
+    const ids: Record<RowCollection, Id[]> = {
+      words: [...changes.words.map((w) => w.id), ...changes.deleted.words],
+      decks: [...changes.decks.map((d) => d.id), ...changes.deleted.decks],
+      cards: [...changes.cards.map((c) => c.wordId), ...changes.deleted.cards],
+      events: [...changes.events.map((e) => e.id), ...changes.deleted.events],
+    };
+    this.update((d) => {
+      if (!d.resync) return;
+      for (const c of ROW_COLLECTIONS)
+        for (const id of ids[c]) Reflect.deleteProperty(d.resync[c], id);
+    });
+  }
+
+  /** Everything was fetched: what the server never sent is gone there. Null: no resync. */
+  finishResync(): SyncChanges['deleted'] | null {
+    const resync = this.read()?.resync;
+    if (!resync) return null;
+    this.update((d) => {
+      delete d.resync;
+    });
+    return {
+      words: Object.keys(resync.words),
+      decks: Object.keys(resync.decks),
+      cards: Object.keys(resync.cards),
+      events: Object.keys(resync.events),
+    };
   }
 }

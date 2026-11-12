@@ -50,17 +50,11 @@ export const users = pgTable(
     verifyTokenHash: text('verify_token_hash'),
     verifyExpiresAt: time('verify_expires_at'),
     verifySentAt: time('verify_sent_at'),
-    /** Unused since step 2.1a (wrong passwords count in `rate_limits`); to be dropped later. */
-    loginFailures: smallint('login_failures').notNull().default(0),
-    /** Unused since step 2.1a, like `loginFailures`. */
-    lockedUntil: time('locked_until'),
     createdAt: time('created_at').notNull().defaultNow(),
-    deletedAt: time('deleted_at'),
   },
   (t) => [
-    uniqueIndex('users_email_uq')
-      .on(sql`lower(${t.email})`)
-      .where(sql`deleted_at IS NULL`),
+    // Deleting an account removes its row (no soft delete), so one address, one row.
+    uniqueIndex('users_email_uq').on(sql`lower(${t.email})`),
     index('users_verify_token_idx').on(t.verifyTokenHash),
   ],
 );

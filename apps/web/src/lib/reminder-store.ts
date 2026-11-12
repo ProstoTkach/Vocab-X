@@ -2,7 +2,17 @@
 // spreadsheet (server only). Only the push address, the interface language, whether it is on
 // and when the next reminder is due (the phone works that out itself); nothing about the
 // learner or the words.
-import { clearRowByKey, ensureSheet, readRows, upsertRows, type SheetsConfig } from './google-sheets';
+import {
+  clearRowByKey,
+  deleteRows,
+  ensureSheet,
+  hasTab,
+  kyivSerial,
+  readRows,
+  upsertRows,
+  type SheetsConfig,
+} from './google-sheets';
+import { daysAgo, RETENTION } from './retention';
 
 export const REMINDER_SHEET = 'Нагадування';
 const COLUMNS = [
@@ -71,4 +81,28 @@ export async function updateReminders(c: SheetsConfig, list: Reminder[], now: nu
 export async function removeReminder(c: SheetsConfig, endpoint: string): Promise<boolean> {
   await ensureSheet(c, REMINDER_SHEET, COLUMNS, DATE_COLUMNS);
   return clearRowByKey(c, REMINDER_SHEET, 0, endpoint);
+}
+
+/**
+ * Rows (1-based) the cleanup deletes: emptied ones (an account was deleted), switched off for
+ * `reminderOffDays`, or not updated for `reminderStaleDays` (the phone stopped using the app).
+ */
+export function staleReminderRows(rows: readonly unknown[][], now: number): number[] {
+  const off = kyivSerial(daysAgo(now, RETENTION.reminderOffDays).getTime());
+  const stale = kyivSerial(daysAgo(now, RETENTION.reminderStaleDays).getTime());
+  return rows.flatMap((r, i) => {
+    const [endpoint, active, , updated] = r;
+    const empty = typeof endpoint !== 'string' || !endpoint;
+    const at = typeof updated === 'number' ? updated : null;
+    const gone = empty || (at !== null && (at < stale || (active !== true && at < off)));
+    return gone ? [i + 2] : [];
+  });
+}
+
+/** Deletes the rows `staleReminderRows` picks; returns how many (-1: no reminder tab yet). */
+export async function removeStaleReminders(c: SheetsConfig, now: number): Promise<number> {
+  if (!(await hasTab(c, REMINDER_SHEET))) return -1;
+  const rows = staleReminderRows(await readRows(c, REMINDER_SHEET), now);
+  if (rows.length) await deleteRows(c, REMINDER_SHEET, rows);
+  return rows.length;
 }

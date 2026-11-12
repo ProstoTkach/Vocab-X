@@ -14,6 +14,7 @@ import {
 import { beforeEach, describe, expect, test } from 'vitest';
 import { LocalStorageRepo } from './local/local-storage-repo';
 import {
+  FULL_RESYNC_MS,
   noChanges,
   type SyncChanges,
   type SyncRequest,
@@ -35,6 +36,11 @@ class FakeServer {
     { seq: number; table: string; id: string; value: unknown; deleted: boolean }
   >();
   writes = 0;
+
+  /** The cleanup: deletion markers go, as after their term on the real server. */
+  purgeDeleted() {
+    for (const [key, r] of this.rows) if (r.deleted) this.rows.delete(key);
+  }
 
   private put(table: string, id: string, value: unknown, deleted = false) {
     this.rows.set(`${table}/${id}`, { seq: ++this.seq, table, id, value, deleted });
@@ -68,6 +74,7 @@ class FakeServer {
 }
 
 function sync(repo: LocalStorageRepo, server: FakeServer, now = T0) {
+  repo.beginSync(now);
   for (let round = 0; round < 10; round++) {
     const { changes, sent } = repo.collectChanges(1000);
     const res = JSON.parse(
@@ -79,9 +86,7 @@ function sync(repo: LocalStorageRepo, server: FakeServer, now = T0) {
         ),
       ),
     ) as SyncResponse;
-    repo.applyRemote(res.changes);
-    if (res.applied) repo.journal.acknowledge(sent);
-    repo.journal.received(res.cursor, now);
+    repo.takeAnswer(res, sent, now);
     if (res.applied && !repo.journal.hasDirty()) return;
   }
   throw new Error('sync did not settle');
@@ -361,5 +366,45 @@ describe('sync', () => {
     expect(changes.words).toHaveLength(1);
     expect(changes.cards).toHaveLength(1);
     expect(changes.events).toHaveLength(1);
+  });
+
+  describe('a device away for months', () => {
+    const LATER = T0 + FULL_RESYNC_MS + DAY_MS;
+
+    test('drops what was deleted elsewhere after its marker was gone', async () => {
+      await a.words.save(word('en:u:1'));
+      await a.words.save(word('en:u:2'));
+      sync(a, server);
+      sync(b, server);
+      await b.words.remove('en:u:1');
+      sync(b, server, T0 + DAY_MS);
+      server.purgeDeleted();
+      sync(a, server, LATER);
+      expect(await a.words.get('en:u:1')).toBeNull();
+      expect(await a.words.get('en:u:2')).toMatchObject({ term: 'en:u:2' });
+      expect(a.journal.resyncing).toBe(false);
+      expect(a.journal.needsResync(LATER)).toBe(false);
+    });
+
+    test('keeps what was changed here, and it goes to the server', async () => {
+      await a.words.save(word('en:u:1'));
+      sync(a, server);
+      sync(b, server);
+      await b.words.remove('en:u:1');
+      sync(b, server, T0 + DAY_MS);
+      server.purgeDeleted();
+      await a.words.save(word('en:u:1', T0 + 2 * DAY_MS));
+      sync(a, server, LATER);
+      expect(await a.words.get('en:u:1')).toMatchObject({ term: 'en:u:1' });
+      expect(a.journal.hasDirty()).toBe(false);
+      expect([...server.rows.keys()]).toContain('words/en:u:1');
+    });
+
+    test('a device that caught up recently fetches nothing again', async () => {
+      await a.words.save(word('en:u:1'));
+      sync(a, server);
+      expect(a.journal.needsResync(T0 + FULL_RESYNC_MS - DAY_MS)).toBe(false);
+      expect(a.journal.needsResync(LATER)).toBe(true);
+    });
   });
 });

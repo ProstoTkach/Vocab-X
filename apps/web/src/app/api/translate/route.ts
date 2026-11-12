@@ -20,6 +20,7 @@ import {
   type Rule,
   type Verdict,
 } from '@/lib/rate-limit';
+import { RETENTION } from '@/lib/retention';
 
 const API = 'https://translation.googleapis.com/language/translate/v2';
 const SCOPE = 'https://www.googleapis.com/auth/cloud-translation';
@@ -45,8 +46,9 @@ const BURST: Omit<Rule, 'key'> = { max: 20, windowMs: MINUTE_MS };
  */
 const DAILY_CHARS = 15_000;
 const CEILING_KEY = 'translate:all';
-/** How long a shared answer is kept: as long as a CDN kept one before (see 6.7 on the terms). */
-const CACHE_MS = 30 * DAY_MS;
+/** How long a shared answer is kept, here and by the CDN (see 6.7 on Google's terms). */
+const CACHE_DAYS = RETENTION.translationDays;
+const CACHE_MS = CACHE_DAYS * DAY_MS;
 const SWEEP = 20;
 
 const burst = memoryLimiter();
@@ -67,7 +69,7 @@ const answer = (translations: string[]) =>
       headers: {
         // The same for everyone, so a CDN may keep it: a word asked there costs nothing at all,
         // not even a count. An empty answer is retried sooner.
-        'Cache-Control': `public, s-maxage=${translations.length ? 30 * DAY_S : 600}, stale-while-revalidate=${DAY_S}`,
+        'Cache-Control': `public, s-maxage=${translations.length ? CACHE_DAYS * DAY_S : 600}, stale-while-revalidate=${DAY_S}`,
       },
     },
   );
