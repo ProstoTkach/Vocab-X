@@ -36,7 +36,10 @@ can use without thinking (the next row of "Sessions" not done, or the one the ow
 2. **Промпт для нового чата:** a ready prompt in a code block, in Russian, to paste as it is. It
    names the session and its steps, and carries what the new chat cannot learn from the plan:
    decisions made in this chat, what was left unfinished ("part 2"), files that changed and
-   matter, anything the owner must have done first. No retelling of the plan itself.
+   matter, anything the owner must have done first. No retelling of the plan itself. The prompt
+   always ends with: "If everything is fine and nothing needs a change or a question to the owner,
+   run the tests (as on «прогони тесты»: local commit, then `pnpm e2e:changed`) and make the
+   commit right away, without waiting for a reply." (In Russian in the prompt itself.)
 3. **До запуска:** what the owner has to do by hand before starting it, if anything; if the next
    session needs approval or owner work first, say that instead of a prompt.
 
