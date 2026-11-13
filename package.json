@@ -14,6 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:db": "pnpm --filter @vocabx/web test:db",
+    "analytics:import": "pnpm --filter @vocabx/web analytics:import",
+    "analytics:report": "pnpm --filter @vocabx/web analytics:report",
     "dev": "pnpm --filter @vocabx/web dev",
     "build": "pnpm --filter @vocabx/web build",
     "e2e": "pnpm --filter @vocabx/web e2e --project mobile --project desktop",

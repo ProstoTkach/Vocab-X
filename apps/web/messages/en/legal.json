@@ -59,20 +59,20 @@
           "p2": "What is sent: which screens you open, onboarding steps, the grade and time of answers, study mode, device type, interface language, days since the first visit, and a random id of the browser and of the session.",
           "p3": "What is never sent: name, e-mail, IP address, browser details (user agent), the words themselves and the account id. The random id is made in your browser and is never linked to an account.",
           "p4": "Even before you answer, the app keeps a random id, the date of the first visit and session counters on the device, but sends nothing without consent.",
-          "p5": "Statistics are kept in the author's Google Sheets spreadsheets for 12 months. You can change your choice at any time in Settings → Data. After you decline, nothing is sent."
+          "p5": "Statistics are kept in a separate Neon database (USA) that is not linked to the account: individual events for 14 days, session summaries for 90 days, daily totals (counters only, no individual events) for 12 months. For a short time, no longer than a day, the events also sit in the author's Google Sheets spreadsheet, from where they are moved to the database every night. You can change your choice at any time in Settings → Data. After you decline, nothing is sent."
         }
       },
       "feedback": {
         "title": "Feedback",
         "blocks": {
-          "p1": "If you send feedback, we receive your text, the kind of feedback, ratings and chosen options, your level, interface language, device type, platform and the random browser id. Feedback is kept in the author's Google Sheets spreadsheets or arrives in the author's Telegram chat, and is kept for 24 months.",
+          "p1": "If you send feedback, we receive your text, the kind of feedback, ratings and chosen options, your level, interface language, device type, platform and the random browser id. Feedback is kept in the author's Google Sheets spreadsheets (with a copy in a separate Neon database in the USA) or arrives in the author's Telegram chat, and is kept for 24 months.",
           "p2": "Please do not put your e-mail, phone number or other personal details into feedback: the author reads the text as it is."
         }
       },
       "reminders": {
         "title": "Reminders",
         "blocks": {
-          "p1": "When you turn reminders on, your browser gives the app a push address at its own service (Google, Mozilla, Apple or Microsoft, depending on the browser). We keep this address in Google Sheets with the interface language, the on/off state and the time of the next reminder. The notification itself carries none of your words: your device fills in the text.",
+          "p1": "When you turn reminders on, your browser gives the app a push address at its own service (Google, Mozilla, Apple or Microsoft, depending on the browser). We keep this address in a separate Neon database (USA) and in the author's Google Sheets spreadsheet, with the interface language, the on/off state and the time of the next reminder. The notification itself carries none of your words: your device fills in the text.",
           "p2": "The address of turned-off reminders is deleted after 30 days, and an address not updated for 90 days is deleted too."
         }
       },
@@ -87,10 +87,10 @@
         "blocks": {
           "p1": "The app needs outside services. Each of them processes data under its own terms:",
           "li1": "Vercel — hosting. Receives every request: IP address, browser details and the page address (a translation request has the word in its address). Request logs are kept for a short time.",
-          "li2": "Neon — database (Amazon Web Services servers in the USA). Keeps the account and synced data, and a change history for restoring the database for a limited time.",
+          "li2": "Neon — database (Amazon Web Services servers in the USA). Keeps the account and synced data, and a change history for restoring the database for a limited time. A separate Neon project, not linked to the account, holds the anonymous statistics (with consent), a copy of the feedback and the reminder addresses.",
           "li3": "Google Cloud Translation — translation in the word form (\"Find\"). Receives the word and the language pair from our server, without your IP address or account. The answer is kept in a shared cache for 15 days, with no link to who asked. These are automatic translations by Google Translate and may be inaccurate.",
           "li4": "Sign in with Google — Google learns that you sign in to VocabX and gives us your e-mail, id, name and picture (we keep only the e-mail and the id).",
-          "li5": "Google Sheets — the author's spreadsheets for statistics (only with consent), feedback and reminder addresses.",
+          "li5": "Google Sheets — the author's spreadsheets: statistics (only with consent; for no longer than a day, then moved to the Neon database), feedback and reminder addresses arrive there first.",
           "li6": "Gmail — sends the letters; sees your address and the letter's text.",
           "li7": "Telegram — receives the feedback text if feedback goes to the author's chat.",
           "li8": "Your browser's push services — receive an empty notification for your browser when a reminder is due.",
@@ -127,7 +127,7 @@
           "li5": "Shared cache of Google translations — 15 days.",
           "li6": "Weekly league groups — 12 weeks.",
           "li7": "Reminder addresses — 30 days after turning off, or 90 days without updates.",
-          "li8": "Anonymous statistics — 12 months. Feedback — 24 months.",
+          "li8": "Anonymous statistics: individual events 14 days, session summaries 90 days, daily totals 12 months; in the Google spreadsheet no longer than a day. Feedback — 24 months.",
           "li9": "Hosting logs and the database restore history — a short time, under the free plans of Vercel and Neon.",
           "li10": "Data on your device — until you reset it or clear your browser."
         }

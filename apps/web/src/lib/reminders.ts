@@ -104,15 +104,44 @@ const tell = (endpoint: string, on: boolean, locale: string, at: number | null =
     keepalive: true,
   }).then((r) => r.ok);
 
-/** The last time planned on the server, so leaving the app again plans it only if it moved. */
-let planned: number | null | undefined;
+/** The server sends the reminders once a day, at this hour (UTC): `crons` in vercel.json. */
+export const PUSH_CRON_HOUR_UTC = 17;
+const DAY_MS = 86_400_000;
+
+/**
+ * Which daily run of the server's cron a reminder time falls into (a day number; the run at 17:00
+ * sends everything due by then). Two times in the same run are the same to the server, so the
+ * phone tells it only when this changes: not on every exit from the app, which would wake the
+ * database each time. Null (nothing planned) is its own value.
+ */
+export function broadcastDay(at: number | null): number | null {
+  return at === null ? null : Math.ceil((at - PUSH_CRON_HOUR_UTC * 3_600_000) / DAY_MS);
+}
+
+/** What the server was last told, kept on the device (IndexedDB: the service worker reads it too). */
+export interface PlannedReminder {
+  locale: string;
+  day: number | null;
+}
+
+const readPlanned = (): Promise<PlannedReminder | null> =>
+  new Promise((resolve) => {
+    void withStore('readonly', (store) => {
+      const get = store.get('planned');
+      get.onsuccess = () => resolve((get.result as PlannedReminder | undefined) ?? null);
+      get.onerror = () => resolve(null);
+    }).then(() => resolve(null));
+  });
 
 /** Tells the server when this phone wants its next reminder (if reminders are on here). */
 export async function planReminder(locale: string, at: number | null): Promise<void> {
-  if (planned !== undefined && planned === at) return;
+  const day = broadcastDay(at);
+  const before = await readPlanned();
+  if (before && before.locale === locale && before.day === day) return;
   const sub = await (await registration())?.pushManager.getSubscription();
   if (!sub) return;
-  if (await tell(sub.endpoint, true, locale, at).catch(() => false)) planned = at;
+  if (await tell(sub.endpoint, true, locale, at).catch(() => false))
+    await withStore('readwrite', (store) => store.put({ locale, day }, 'planned'));
 }
 
 /** Asks for the permission and subscribes; the state it ends in. */
@@ -128,6 +157,8 @@ export async function turnRemindersOn(locale: string): Promise<ReminderState | '
         userVisibleOnly: true,
         applicationServerKey: publicKey(),
       }));
+    // Told fresh: what the server knows of this phone starts again.
+    await withStore('readwrite', (store) => store.delete('planned'));
     if (await tell(sub.endpoint, true, locale)) return 'on';
     await sub.unsubscribe();
     return 'failed';
@@ -140,6 +171,7 @@ export async function turnRemindersOff(locale: string): Promise<void> {
   const sub = await (await registration())?.pushManager.getSubscription();
   if (!sub) return;
   await tell(sub.endpoint, false, locale).catch(() => false);
+  await withStore('readwrite', (store) => store.delete('planned'));
   await sub.unsubscribe();
 }
 

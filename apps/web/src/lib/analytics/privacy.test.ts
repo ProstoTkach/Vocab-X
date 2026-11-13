@@ -316,17 +316,88 @@ describe('anon_id and the account', () => {
     expect(schema.text).not.toMatch(/anon/i);
   });
 
-  test('the only server code that stores an analytics id is the sheets (events, sessions, feedback)', () => {
+  test('the only server code that stores an analytics id: the sheets, their copy in the anonymous database, the report', () => {
     const users = files
       .filter((f) => f.rel.startsWith('app/api/') || f.rel.startsWith('lib/'))
       .filter((f) => !f.rel.startsWith('lib/analytics/'))
       .filter((f) => ANON_ID_USE.test(f.text))
       .map((f) => f.rel)
       .sort();
-    expect(users).toEqual(['app/api/track/route.ts', 'lib/feedback.ts']);
+    expect(users).toEqual([
+      'app/api/track/route.ts',
+      'lib/analytics-report.ts',
+      'lib/analytics-store.ts',
+      'lib/db/anon-schema.ts',
+      'lib/feedback.ts',
+    ]);
     // Neither the feedback route nor its library knows who is signed in.
     for (const rel of ['app/api/feedback/route.ts', 'lib/feedback.ts'])
       expect(files.find((f) => f.rel === rel)!.text).not.toMatch(ACCOUNT_USE);
+  });
+});
+
+// ---- the anonymous-data database (step 3.1) ----------------------------------------------------
+
+/** Server code that may open the anonymous-data database (analytics, feedback, push). */
+const ANON_DB_USERS = [
+  'app/api/account/route.ts',
+  'app/api/cleanup/route.ts',
+  'app/api/feedback/route.ts',
+  'app/api/push/route.ts',
+  'lib/db/anon-client.ts',
+  'lib/db/testing.ts',
+];
+
+describe('the anonymous-data database', () => {
+  const schema = () => files.find((f) => f.rel === 'lib/db/anon-schema.ts')!;
+
+  test('its schema has no user id, e-mail or other personal column', () => {
+    const kinds = 'text|boolean|integer|smallint|jsonb|date|timestamp|bigserial';
+    const columns = [...schema().text.matchAll(new RegExp(`(?:${kinds})\\('([a-z_]+)'`, 'g'))].map(
+      (m) => m[1]!,
+    );
+    expect(columns.length).toBeGreaterThan(40);
+    for (const c of columns) expect(personal(c), c).toBe(false);
+    expect(schema().text).not.toMatch(/user_id|userId|email|references\(/i);
+  });
+
+  test('the schema of the accounts database still has no analytics id', () => {
+    expect(files.find((f) => f.rel === 'lib/db/schema.ts')!.text).not.toMatch(/anon/i);
+  });
+
+  test('only analytics, feedback and push code opens it', () => {
+    const users = files
+      .filter((f) => /anonDbFromEnv|anonDbFromUrl/.test(f.text))
+      .map((f) => f.rel)
+      .sort();
+    expect(users).toEqual(ANON_DB_USERS);
+  });
+
+  test('the code that writes to it never reaches for the account', () => {
+    const own = [
+      'lib/analytics-store.ts',
+      'lib/analytics-report.ts',
+      'lib/db/anon-schema.ts',
+      'lib/db/anon-client.ts',
+    ];
+    for (const rel of own)
+      expect(files.find((f) => f.rel === rel)!.text, rel).not.toMatch(ACCOUNT_USE);
+  });
+
+  test('the accounts database client and the accounts schema stay out of the analytics store', () => {
+    for (const rel of [
+      'lib/analytics-store.ts',
+      'lib/analytics-report.ts',
+      'lib/reminder-store.ts',
+    ]) {
+      const text = files.find((f) => f.rel === rel)!.text;
+      expect(text, rel).not.toMatch(/from '[.][/]db[/](client|schema)'|dbFromEnv/);
+    }
+  });
+
+  test('the account routes only ever remove a push address from it, and know no analytics id', () => {
+    const route = files.find((f) => f.rel === 'app/api/account/route.ts')!.text;
+    expect(route).not.toMatch(/insertEvents|upsertSessions|insertFeedback|copySheetsToDb/);
   });
 });
 

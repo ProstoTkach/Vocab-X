@@ -10,13 +10,14 @@ Retention: "now" is what the code does today; "approved" is the 1.6 term (sectio
 
 ## 1. Summary
 
-| Where                                                                    | What                                                                                                                                                                                              | Who can read it                                                           |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Browser of the learner (localStorage, IndexedDB, Cache Storage, cookies) | Everything the app needs to work: words, decks, answers, progress, settings, profile, analytics id                                                                                                | The learner (and anyone with the device)                                  |
-| Neon (Postgres, AWS `us-east-1`, from the connection host)               | Accounts and the synced copy of the learner's data; league; rate-limit counts; shared translation cache                                                                                           | Server code; the owner through the Neon console                           |
-| Google Sheets (owner's spreadsheets, server service account)             | Analytics events and sessions (only with consent), feedback, push subscriptions for reminders                                                                                                     | Server code; the owner and whoever the owner shares the spreadsheets with |
-| Telegram chat (owner's bot)                                              | Feedback, when the polls spreadsheet is not set up                                                                                                                                                | Members of the owner's chat                                               |
-| Third parties reached at run time                                        | Google Translate, Google OAuth, SMTP (Gmail by default), browser push services, Sentry (errors), Tatoeba, Wiktionary, Free Dictionary, the browser's speech services, Vercel (hosting, logs, CDN) | Each under its own terms (section 5)                                      |
+| Where                                                                    | What                                                                                                                                                                                                | Who can read it                                                           |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Browser of the learner (localStorage, IndexedDB, Cache Storage, cookies) | Everything the app needs to work: words, decks, answers, progress, settings, profile, analytics id                                                                                                  | The learner (and anyone with the device)                                  |
+| Neon (Postgres, AWS `us-east-1`, from the connection host)               | Accounts and the synced copy of the learner's data; league; rate-limit counts; shared translation cache                                                                                             | Server code; the owner through the Neon console                           |
+| Neon, second project "anonymous data" (`vocabx-anon`, AWS `us-east-2`)   | Analytics events, session rows and daily summaries (only with consent), a copy of the feedback, push subscriptions; no account id, nothing refers to the accounts database (step 3.1, section 3.1a) | Server code; the owner through the Neon console                           |
+| Google Sheets (owner's spreadsheets, server service account)             | Analytics events and sessions (only with consent; the inbox the nightly cleanup copies from), feedback, push subscriptions for reminders                                                            | Server code; the owner and whoever the owner shares the spreadsheets with |
+| Telegram chat (owner's bot)                                              | Feedback, when the polls spreadsheet is not set up                                                                                                                                                  | Members of the owner's chat                                               |
+| Third parties reached at run time                                        | Google Translate, Google OAuth, SMTP (Gmail by default), browser push services, Sentry (errors), Tatoeba, Wiktionary, Free Dictionary, the browser's speech services, Vercel (hosting, logs, CDN)   | Each under its own terms (section 5)                                      |
 
 ## 2. Browser storage (step 5.4)
 
@@ -191,6 +192,30 @@ missing column.
 The translation cache has no link to a person: the key is the word, not who asked. The learner's
 own confirmed translation is stored with their word (`words.data`), like anything they type.
 
+### 3.1a Neon project "anonymous data" (`apps/web/src/lib/db/anon-schema.ts`, `drizzle-anon/`, step 3.1)
+
+A second project (`DATABASE_URL_ANON`; test branch `DATABASE_URL_ANON_TEST`), so an `anon_id` is
+physically not in the database that holds `users`, and the statistics cannot use up the accounts
+database's compute hours. No `user_id`, e-mail or IP anywhere in it, and no foreign key to the
+accounts database; `privacy.test.ts` checks the schema and which code may open it
+(`anonDbFromEnv`: track, feedback, push, cleanup, the analytics store, the reminder store).
+Design and its numbers: `docs/ANALYTICS_DB.md`.
+
+| Table                | Fields                                                                                                                                                          | Written by                                                  | Term (approved 2026-11-13)       |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------- |
+| `events`             | event_id (key), ts, type, anon_id, session_id, internal, host, ui_lang, device, days_since_first_visit, game/study mode, params (all event parameters, as sent) | Nightly copy from the «Події» sheet                         | 14 days                          |
+| `sessions`           | session_id (key), anon_id, the session summary (counters, times, modes), `final`; the newest snapshot wins                                                      | Nightly copy from the «Сесії» sheet                         | 90 days                          |
+| `devices`            | anon_id (key), first visit, cohort day, internal, ui_lang, device, last seen, funnel milestones (booleans)                                                      | Computed from sessions and events by the copy               | 12 months after last seen        |
+| `device_days`        | anon_id + day since first visit: sessions, answers, active seconds                                                                                              | Computed by the copy                                        | 12 months                        |
+| `event_days`         | Kyiv day, event type, main parameter, internal: events and devices counted                                                                                      | Computed by the copy                                        | 12 months                        |
+| `feedback`           | received_at, kind, anon_id, the rest of the form by column name (**free text** may hold anything the learner types)                                             | `api/feedback` (next to the sheets); the one-off import     | 24 months                        |
+| `push_subscriptions` | **push endpoint**, on/off, locale, next reminder time, updated_at                                                                                               | `api/push` (next to the sheet); the nightly copy of the tab | Off: 30 days; no change: 90 days |
+
+Until step 3.1d the spreadsheet stays the main place and the database follows it ("copy mode": the
+nightly `/api/cleanup` reads the tabs and writes new rows here, the sheets are only read).
+`pnpm analytics:import` is the same function run once over the whole history. Deleting the
+account removes the browser's push row here too (`api/account`).
+
 ### 3.2 Google Sheets (owner's spreadsheets, `lib/google-sheets.ts`)
 
 | Spreadsheet / sheet       | Fields                                                                                                                                                                                                                                                                     | Written by                      | Retention now                   | Approved (1.6)                                                       |
@@ -229,6 +254,7 @@ flowchart LR
   A -->|consent given| H[tracker: event without word text]
   H --> I[POST /api/track]
   I --> J[(Sheets: Події / Сесії)]
+  J -. nightly copy, step 3.1 .-> J2[(Neon anonymous data: events, sessions, summaries)]
   A -->|no consent| K[nothing sent]
 ```
 
@@ -259,7 +285,8 @@ flowchart TD
   C --> D[CASCADE: user_state, words, decks, card_progress, review_events, league_profiles, league_members]
   B -. not yet, step 1.5 .-> E[Sheets: push row of this browser]
   B -. stays .-> F[rate_limits rows: hashed, expire within a day]
-  B -. stays .-> G[Sheets analytics and feedback: no account id, cannot be linked]
+  B --> E2[(Neon anonymous data: push row of this browser)]
+  B -. stays .-> G[Sheets and Neon anonymous data, analytics and feedback: no account id, cannot be linked]
   A --> H[Browser: sign out; local data stays until 'Reset data on device']
 ```
 
@@ -271,7 +298,7 @@ A11); a check on a test DB that nothing stays.
 | Service                                      | What it receives                                                                                                                                                                                                                                | From                                                  | When                                                       |
 | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
 | Vercel                                       | Every request (IP, user agent, path)                                                                                                                                                                                                            | browser                                               | Always (hosting)                                           |
-| Neon                                         | Account and synced data                                                                                                                                                                                                                         | server                                                | Sign-in, sync, league, limits, translate                   |
+| Neon                                         | Account and synced data; in a second project, the anonymous statistics, a copy of the feedback and push endpoints                                                                                                                               | server                                                | Sign-in, sync, league, limits, translate                   |
 | Google Cloud Translation                     | The word and the language pair                                                                                                                                                                                                                  | server (service account)                              | "Suggest" in the word form, if not in the cache            |
 | Google Sheets                                | Analytics rows, feedback, push endpoints                                                                                                                                                                                                        | server (service account)                              | After consent; on feedback; reminders on/off               |
 | Google OAuth                                 | The sign-in itself; returns e-mail, Google id, name, picture (only e-mail and Google id are kept)                                                                                                                                               | browser ↔ Google ↔ server                             | "Sign in with Google"                                      |
@@ -289,20 +316,23 @@ A11); a check on a test DB that nothing stays.
 
 ### 6.1 Terms
 
-| Data                                                             | Term                                                                        | Mechanism                                |
-| ---------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------- |
-| Tombstones in `words`, `decks`, `card_progress`, `review_events` | 90 days after `deleted_at`                                                  | Cleanup cron                             |
-| Unconfirmed e-mail accounts                                      | 7 days after the last letter                                                | Cleanup cron                             |
-| Link hashes, pending passwords                                   | Cleared 7 days after they expired                                           | Cleanup cron                             |
-| `users.deleted_at`, `login_failures`, `locked_until`             | Drop the columns                                                            | Migration after deploy                   |
-| `rate_limits`                                                    | End of window + 1 hour (as now)                                             | Checks + cron                            |
-| `translation_cache` and its CDN copy                             | 15 days (now 30)                                                            | Writes + cron; `CACHE_MS` and `s-maxage` |
-| `league_members`                                                 | 12 weeks                                                                    | Cleanup cron                             |
-| Push rows in Sheets                                              | Off: 30 days; not updated: 90 days                                          | Cleanup cron                             |
-| Analytics events and sessions                                    | 12 months                                                                   | Cleanup cron (Sheets: delete old rows)   |
-| Feedback (both spreadsheets)                                     | 24 months                                                                   | Cleanup cron; Telegram by hand           |
-| Learner's account and synced data                                | Until the learner deletes it; no auto-delete of inactive accounts at launch | —                                        |
-| Local browser data                                               | Until the learner resets it                                                 | —                                        |
+| Data                                                               | Term                                                                                    | Mechanism                                |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | ---------------------------------------- |
+| Tombstones in `words`, `decks`, `card_progress`, `review_events`   | 90 days after `deleted_at`                                                              | Cleanup cron                             |
+| Unconfirmed e-mail accounts                                        | 7 days after the last letter                                                            | Cleanup cron                             |
+| Link hashes, pending passwords                                     | Cleared 7 days after they expired                                                       | Cleanup cron                             |
+| `users.deleted_at`, `login_failures`, `locked_until`               | Drop the columns                                                                        | Migration after deploy                   |
+| `rate_limits`                                                      | End of window + 1 hour (as now)                                                         | Checks + cron                            |
+| `translation_cache` and its CDN copy                               | 15 days (now 30)                                                                        | Writes + cron; `CACHE_MS` and `s-maxage` |
+| `league_members`                                                   | 12 weeks                                                                                | Cleanup cron                             |
+| Push rows in Sheets and in the database (`push_subscriptions`)     | Off: 30 days; not updated: 90 days                                                      | Cleanup cron                             |
+| Analytics events and sessions in the spreadsheet                   | 12 months now; from step 3.1d (inbox): moved to the database and deleted, at most a day | Cleanup cron (Sheets: delete old rows)   |
+| Analytics raw events (database `events`)                           | 14 days (owner, 2026-11-13)                                                             | Cleanup cron (`purgeAnalytics`)          |
+| Analytics session rows (`sessions`)                                | 90 days                                                                                 | Cleanup cron                             |
+| Analytics daily summaries (`devices`, `device_days`, `event_days`) | 12 months                                                                               | Cleanup cron                             |
+| Feedback (both spreadsheets and the database copy)                 | 24 months                                                                               | Cleanup cron; Telegram by hand           |
+| Learner's account and synced data                                  | Until the learner deletes it; no auto-delete of inactive accounts at launch             | —                                        |
+| Local browser data                                                 | Until the learner resets it                                                             | —                                        |
 
 ### 6.2 Why 90 days, not 30, for tombstones
 

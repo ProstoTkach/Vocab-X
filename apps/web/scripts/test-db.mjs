@@ -1,6 +1,7 @@
 // Server tests against the test database: pnpm test:db. Not part of pnpm test.
 // Uses DATABASE_URL_TEST (a Neon branch of its own) and refuses to run when it points at the
-// database the app uses. Brings the test database up to the current migrations first, then runs
+// database the app uses (the same for DATABASE_URL_ANON_TEST, the test branch of the anonymous-data
+// project, if set). Brings the test databases up to the current migrations first, then runs
 // src/**/*.db.test.ts with DATABASE_URL set to it, no mail account and a secret of its own.
 // Prints no secrets.
 import { spawnSync } from 'node:child_process';
@@ -29,6 +30,14 @@ if (main.some((url) => url === test || endpoint(url) === endpoint(test))) {
   console.error('Stopped: DATABASE_URL_TEST points at the main database.');
   process.exit(1);
 }
+const testAnon = process.env.DATABASE_URL_ANON_TEST;
+const mainAnon = [process.env.DATABASE_URL_ANON, process.env.DATABASE_URL_ANON_DIRECT].filter(
+  Boolean,
+);
+if (testAnon && mainAnon.some((url) => url === testAnon || endpoint(url) === endpoint(testAnon))) {
+  console.error('Stopped: DATABASE_URL_ANON_TEST points at the main anonymous-data database.');
+  process.exit(1);
+}
 
 const sql = neon(test);
 const [{ tables, history }] = await sql`
@@ -42,6 +51,22 @@ if (tables > 0 && !history) {
 await migrate(drizzle(sql), { migrationsFolder: 'drizzle' });
 console.log('Test database: migrations applied.');
 
+if (testAnon) {
+  const anon = neon(testAnon.replace(/-pooler(?=\.)/, ''));
+  const [{ tables: anonTables, history: anonHistory }] = await anon`
+    SELECT
+      (SELECT count(*)::int FROM information_schema.tables WHERE table_schema = 'public') AS tables,
+      to_regclass('drizzle.__drizzle_migrations') IS NOT NULL AS history`;
+  if (anonTables > 0 && !anonHistory) {
+    console.error(
+      `Stopped: the anonymous test database has ${anonTables} tables and no migration history.`,
+    );
+    process.exit(1);
+  }
+  await migrate(drizzle(anon), { migrationsFolder: 'drizzle-anon' });
+  console.log('Anonymous test database: migrations applied.');
+}
+
 // Nothing here may reach the main database, a real mailbox or a real session.
 const {
   DATABASE_URL_DIRECT: _direct,
@@ -50,7 +75,13 @@ const {
   EMAIL_SERVER_HOST: _host,
   VERCEL: _vercel,
   ...env
-} = { ...process.env, DATABASE_URL: test, VOCABX_DB_TEST: '1' };
+} = {
+  ...process.env,
+  DATABASE_URL: test,
+  // Only the test branch of the anonymous-data project, or none (those tests are then skipped).
+  DATABASE_URL_ANON: testAnon ?? '',
+  VOCABX_DB_TEST: '1',
+};
 env.NEXTAUTH_SECRET = 'vocabx-db-test-secret';
 env.NEXTAUTH_URL = 'http://localhost:3000';
 

@@ -10,25 +10,26 @@
 
 Змінні середовища (локально — `apps/web/.env`, на Vercel — у налаштуваннях проєкту):
 
-| Змінна                                                                 | Для чого                                                                                        |
-| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_PROJECT_ID`       | сервісний акаунт Google (Sheets API, Cloud Translation API)                                     |
-| `GOOGLE_SPREADSHEET_POLLS_ID`                                          | таблиця «Vocab-X polls»: відгуки, рядок на відгук                                               |
-| `GOOGLE_SPREADSHEET_ANALYTICS_ID`                                      | таблиця «Vocab-X analytics»: листи «Події», «Сесії», «Відгуки», «Словник»                       |
-| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`                               | запасний канал відгуків, коли таблиця недоступна                                                |
-| `DATABASE_URL`, `DATABASE_URL_DIRECT`                                  | Neon: застосунок (через пул) і міграції (напряму)                                               |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                             | OAuth-клієнт Google: вхід у профілі                                                             |
-| `NEXTAUTH_URL`, `NEXTAUTH_SECRET`                                      | адреса сайту (листи, sitemap, відправник push) і ключ підпису сесії (`openssl rand -base64 32`) |
-| `EMAIL_SERVER_USER`, `EMAIL_SERVER_PASSWORD`                           | SMTP для листів (Gmail: пароль застосунку); без них локально посилання в консолі                |
-| `EMAIL_FROM`, `EMAIL_SERVER_HOST`, `EMAIL_SERVER_PORT`                 | необовʼязково: відправник і інший SMTP-сервер                                                   |
-| `DEVELOPER_CODE`                                                       | код, що відкриває режим розробника в налаштуваннях                                              |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`                    | ключі Web Push для нагадувань (публічний іде в браузер)                                         |
-| `VAPID_SUBJECT`                                                        | необовʼязково: mailto: чи https: відправника (типово адреса сайту)                              |
-| `CRON_SECRET`                                                          | Vercel Cron надсилає його до `/api/push/cron` і `/api/cleanup`                                  |
-| `HEALTH_DB_TOKEN`                                                      | необовʼязково: `/api/health?db=<токен>` перевіряє ще й базу (монітор раз на годину)             |
-| `TRANSLATE_DAILY_CHARS`                                                | необовʼязково: символів до Google Translate на добу для всіх (типово 15 000; 0 — вимкнено)      |
-| `KILL_TRANSLATE`, `KILL_REGISTRATION`, `KILL_LEAGUE`, `KILL_ANALYTICS` | необовʼязково: `1`/`true`/`on` вимикає функцію без зміни коду (див. «Вимикачі»)                 |
-| `EMAIL_DAILY_LIMIT`                                                    | необовʼязково: листів на добу для всіх (типово 300, під лімітом Gmail 500)                      |
+| Змінна                                                                 | Для чого                                                                                                                                                          |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GOOGLE_CLIENT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_PROJECT_ID`       | сервісний акаунт Google (Sheets API, Cloud Translation API)                                                                                                       |
+| `GOOGLE_SPREADSHEET_POLLS_ID`                                          | таблиця «Vocab-X polls»: відгуки, рядок на відгук                                                                                                                 |
+| `GOOGLE_SPREADSHEET_ANALYTICS_ID`                                      | таблиця «Vocab-X analytics»: листи «Події», «Сесії», «Відгуки», «Словник»                                                                                         |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`                               | запасний канал відгуків, коли таблиця недоступна                                                                                                                  |
+| `DATABASE_URL_ANON`, `DATABASE_URL_ANON_TEST`                          | другий проєкт Neon «анонімні дані» (`vocabx-anon`): статистика, копія відгуків, push-підписки; тестова гілка. Без `DATABASE_URL_ANON` код його пропускає (відкат) |
+| `DATABASE_URL`, `DATABASE_URL_DIRECT`                                  | Neon: застосунок (через пул) і міграції (напряму)                                                                                                                 |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                             | OAuth-клієнт Google: вхід у профілі                                                                                                                               |
+| `NEXTAUTH_URL`, `NEXTAUTH_SECRET`                                      | адреса сайту (листи, sitemap, відправник push) і ключ підпису сесії (`openssl rand -base64 32`)                                                                   |
+| `EMAIL_SERVER_USER`, `EMAIL_SERVER_PASSWORD`                           | SMTP для листів (Gmail: пароль застосунку); без них локально посилання в консолі                                                                                  |
+| `EMAIL_FROM`, `EMAIL_SERVER_HOST`, `EMAIL_SERVER_PORT`                 | необовʼязково: відправник і інший SMTP-сервер                                                                                                                     |
+| `DEVELOPER_CODE`                                                       | код, що відкриває режим розробника в налаштуваннях                                                                                                                |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`                    | ключі Web Push для нагадувань (публічний іде в браузер)                                                                                                           |
+| `VAPID_SUBJECT`                                                        | необовʼязково: mailto: чи https: відправника (типово адреса сайту)                                                                                                |
+| `CRON_SECRET`                                                          | Vercel Cron надсилає його до `/api/push/cron` і `/api/cleanup`                                                                                                    |
+| `HEALTH_DB_TOKEN`                                                      | необовʼязково: `/api/health?db=<токен>` перевіряє ще й базу (монітор раз на годину)                                                                               |
+| `TRANSLATE_DAILY_CHARS`                                                | необовʼязково: символів до Google Translate на добу для всіх (типово 15 000; 0 — вимкнено)                                                                        |
+| `KILL_TRANSLATE`, `KILL_REGISTRATION`, `KILL_LEAGUE`, `KILL_ANALYTICS` | необовʼязково: `1`/`true`/`on` вимикає функцію без зміни коду (див. «Вимикачі»)                                                                                   |
+| `EMAIL_DAILY_LIMIT`                                                    | необовʼязково: листів на добу для всіх (типово 300, під лімітом Gmail 500)                                                                                        |
 
 Повний список з поясненнями — `apps/web/.env.example`. Заголовки безпеки (CSP, HSTS, `nosniff`, `Referrer-Policy`, `Permissions-Policy`) задає `apps/web/next.config.ts`: CSP без nonce (інакше всі сторінки стали б динамічними), тож `script-src`/`style-src` мають `unsafe-inline`; браузер ходить напряму лише до Tatoeba, Free Dictionary і Wiktionary — новий зовнішній домен у `connect-src` додавати там. CI (`.github/workflows/ci.yml`): `pnpm audit --prod --audit-level=high` і gitleaks; Dependabot — `.github/dependabot.yml`. Ліміт Gmail — 500 листів/добу, наш `EMAIL_DAILY_LIMIT` — 300; без власного домену SPF/DKIM/DMARC не налаштувати (рішення 6.3).
 
@@ -345,7 +346,15 @@ PostgreSQL на Neon, Drizzle (`apps/web/src/lib/db/schema.ts`, міграції
 - `pnpm db:check` — підключення й перелік таблиць.
 - `pnpm db:generate` — нова міграція зі зміненої схеми.
 - `pnpm db:migrate` — застосувати міграції; відмовляється працювати з базою, де є таблиці, але
-  немає нашої історії міграцій.
+  немає нашої історії міграцій. Проганяє обидві бази: акаунтів (`drizzle/`) і, якщо задано
+  `DATABASE_URL_ANON`, «анонімні дані» (`drizzle-anon/`, схема `src/lib/db/anon-schema.ts`;
+  нова міграція для неї — `pnpm db:generate:anon`).
+- `pnpm analytics:import --test|--prod` — одноразовий імпорт усієї історії таблиці аналітики (листи
+  «Події», «Сесії», «Відгуки», «Нагадування») в базу «анонімні дані»; та сама функція, що щоночі
+  в `/api/cleanup` (режим «копії»: таблицю лише читає). Повторний запуск нічого не дублює. Спершу
+  `--test` (гілка `DATABASE_URL_ANON_TEST`), `--prod` — лише після копії таблиці.
+- `pnpm analytics:report --from 2026-10-26 [--today 2026-11-13] [--test]` — метрики запуску з бази
+  (ті самі визначення, що лист «Запуск», `docs/ANALYTICS.md`).
 - Міграцію, що видаляє колонки, застосовують лише після деплою коду, який їх уже не читає
   (інакше стара версія на Vercel упаде). Локальний `.env` дивиться в основну базу: `pnpm db:migrate`
   локально — це міграція продакшену. `0006` (прибирає `users.deleted_at`, `login_failures`,
@@ -359,6 +368,11 @@ PostgreSQL на Neon, Drizzle (`apps/web/src/lib/db/schema.ts`, міграції
   якщо вона збігається з `DATABASE_URL`/`DATABASE_URL_DIRECT` (той самий рядок або той самий endpoint),
   спершу застосовує до неї міграції, прибирає з оточення пошту й `DATABASE_URL_DIRECT`, а тести
   працюють лише з адресами `*@db.vocabx.test` і видаляють їх після себе (`lib/db/testing.ts`).
+  Якщо задано `DATABASE_URL_ANON_TEST`, скрипт так само мігрує й цю гілку проєкту «анонімні дані»
+  (відмовляється, якщо вона збігається з `DATABASE_URL_ANON`) і підставляє її як `DATABASE_URL_ANON`;
+  без неї тести цієї бази пропускаються. Тести бази аналітики (`analytics-store.db.test.ts`) працюють
+  з рядками з префіксом `dbtest…` і днями 2099 року, а перевірка строків чистить і давніші рядки
+  тестової гілки (імпортовану історію).
 
 Очищення (`/api/cleanup`, Vercel Cron щодня о 03:00 UTC, `CRON_SECRET`): видаляє те, чий строк
 минув (строки — `lib/retention.ts`, затверджені в `docs/DATA_MAP.md` §6 і обіцяні на /privacy).

@@ -4,6 +4,7 @@ import {
   appendRow,
   clearRowByKey,
   columnName,
+  fromKyivSerial,
   kyivSerial,
   rowsOf,
   sheetsConfigFromEnv,
@@ -69,6 +70,19 @@ describe('appended rows', () => {
     expect(kyivSerial(Date.UTC(2026, 9, 25, 10, 0))).toBeCloseTo(46320.5, 6);
     // Summer time: UTC+3.
     expect(kyivSerial(Date.UTC(2026, 6, 1, 9, 0))).toBeCloseTo(46204.5, 6);
+  });
+
+  test('and back: the moment a serial stands for, in winter and summer time', () => {
+    for (const ms of [
+      Date.UTC(2026, 9, 25, 10, 0),
+      Date.UTC(2026, 6, 1, 9, 0, 7),
+      Date.UTC(2026, 0, 15, 23, 59, 59),
+      // Around the clocks changing (29.03.2026 and 25.10.2026, 01:00 UTC).
+      Date.UTC(2026, 2, 29, 0, 59, 59),
+      Date.UTC(2026, 2, 29, 1, 0, 0),
+      Date.UTC(2026, 9, 24, 23, 59, 59),
+    ])
+      expect(fromKyivSerial(kyivSerial(ms))).toBe(ms);
   });
 });
 

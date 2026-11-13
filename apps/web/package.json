@@ -16,9 +16,12 @@
     "e2e:smoke": "playwright test --grep @smoke --project desktop",
     "db:check": "node scripts/db-check.mjs",
     "db:generate": "drizzle-kit generate",
+    "db:generate:anon": "drizzle-kit generate --config drizzle-anon.config.ts",
     "db:migrate": "node scripts/db-migrate.mjs",
     "db:seed-test": "node scripts/db-seed-test-users.mjs",
-    "test:db": "node scripts/test-db.mjs"
+    "test:db": "node scripts/test-db.mjs",
+    "analytics:import": "jiti scripts/analytics-import.ts",
+    "analytics:report": "jiti scripts/analytics-report.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

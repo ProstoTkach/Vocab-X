@@ -5,7 +5,8 @@ import { users } from '@/lib/db/schema';
 import { signInMethods } from '@/lib/email-accounts';
 import { sheetsConfigFromEnv } from '@/lib/google-sheets';
 import { pushEndpoint } from '@/lib/push';
-import { removeReminder } from '@/lib/reminder-store';
+import { anonDbFromEnv } from '@/lib/db/anon-client';
+import { removeReminder, removeReminderDb } from '@/lib/reminder-store';
 import { liveAccount } from '@/lib/sessions';
 
 /** How the signed-in account signs in (`{ password, google }`), for the profile's choices. */
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest): Promise<Response> {
  * Deletes the account and, with it, everything the server has of this learner: every table
  * refers to `users` with ON DELETE CASCADE, so no row stays behind. It cannot be undone.
  * Reminders are not tied to an account: the browser may send `{ endpoint }` (its push address),
- * and that subscription's row is emptied in the spreadsheet too.
+ * and that subscription's row is emptied in the spreadsheet and removed from the database.
  */
 export async function DELETE(request: NextRequest): Promise<Response> {
   if (crossSite(request)) return fail(403);
@@ -48,8 +49,20 @@ async function forgetReminder(request: Request): Promise<void> {
     const text = await request.text();
     if (!text || text.length > 2000) return;
     const endpoint = pushEndpoint((JSON.parse(text) as { endpoint?: unknown }).endpoint);
+    if (!endpoint) return;
     const sheets = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
-    if (endpoint && sheets) await removeReminder(sheets, endpoint);
+    const anon = anonDbFromEnv();
+    // Each place on its own: one failing must not leave the address in the other.
+    const results = await Promise.allSettled([
+      sheets ? removeReminder(sheets, endpoint) : null,
+      anon ? removeReminderDb(anon, endpoint) : null,
+    ]);
+    for (const r of results)
+      if (r.status === 'rejected')
+        console.error(
+          'account deletion: reminder row',
+          r.reason instanceof Error ? r.reason.message : 'unknown',
+        );
   } catch (e) {
     console.error('account deletion: reminder row', e instanceof Error ? e.message : 'unknown');
   }

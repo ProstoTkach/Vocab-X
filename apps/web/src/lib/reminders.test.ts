@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { nextReminderAt, REMIND_MIN_GAP_MS } from './reminders';
+import { broadcastDay, nextReminderAt, PUSH_CRON_HOUR_UTC, REMIND_MIN_GAP_MS } from './reminders';
 
 const NOW = 1_000_000_000_000;
 const MIN = 60_000;
@@ -19,5 +19,28 @@ describe('the next reminder', () => {
 
   test('fewer words than that, ever: no reminder', () => {
     expect(nextReminderAt(NOW, 3, [NOW + MIN])).toBeNull();
+  });
+});
+
+describe('the day of the broadcast', () => {
+  const at = (day: number, hour: number, minute = 0) => Date.UTC(2026, 10, day, hour, minute);
+
+  test('times that the same daily run picks up share a day', () => {
+    // The cron runs at 17:00 UTC and sends everything due by then.
+    const day = broadcastDay(at(14, PUSH_CRON_HOUR_UTC));
+    expect(broadcastDay(at(13, PUSH_CRON_HOUR_UTC, 1))).toBe(day);
+    expect(broadcastDay(at(14, 3))).toBe(day);
+    expect(broadcastDay(at(14, PUSH_CRON_HOUR_UTC - 1))).toBe(day);
+  });
+
+  test('the next run is the next day', () => {
+    const day = broadcastDay(at(14, PUSH_CRON_HOUR_UTC))!;
+    expect(broadcastDay(at(14, PUSH_CRON_HOUR_UTC, 1))).toBe(day + 1);
+    expect(broadcastDay(at(15, 9))).toBe(day + 1);
+  });
+
+  test('nothing planned is its own value', () => {
+    expect(broadcastDay(null)).toBeNull();
+    expect(broadcastDay(at(14, 12))).not.toBeNull();
   });
 });

@@ -14,13 +14,28 @@ import {
 } from '@/lib/google-sheets';
 import { crossSite, fail, readJson } from '@/lib/api-user';
 import { ANALYTICS_SHEETS } from '@/lib/analytics/schema';
+import { feedbackRecord, insertFeedback } from '@/lib/analytics-store';
+import { anonDbFromEnv } from '@/lib/db/anon-client';
 import { dbFromEnv } from '@/lib/db/client';
 import { DAY_MS, MINUTE_MS, senderKey, spend, tooMany } from '@/lib/rate-limit';
 
 /** The feedback sheet of the analytics spreadsheet, next to the usage statistics. */
 const ANALYTICS_SHEET = ANALYTICS_SHEETS.feedback;
 
+/** A copy in the anonymous-data database (step 3.1), next to the one in the spreadsheet. */
+async function copyToDatabase(row: ReturnType<typeof feedbackRow>) {
+  const anon = anonDbFromEnv();
+  const record = feedbackRecord(row);
+  if (!anon || !record) return;
+  try {
+    await insertFeedback(anon, [record]);
+  } catch (e) {
+    console.error('feedback: database copy', e instanceof Error ? e.message.slice(0, 200) : e);
+  }
+}
+
 async function copyToAnalytics(row: ReturnType<typeof feedbackRow>) {
+  await copyToDatabase(row);
   const analytics = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
   if (!analytics) return;
   try {

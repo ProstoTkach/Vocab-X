@@ -69,6 +69,19 @@ export function kyivSerial(ms: number): number {
   return local / 86_400_000 + 25_569;
 }
 
+/**
+ * The inverse of `kyivSerial`: the moment (Unix ms) that a Kyiv wall-clock serial stands for.
+ * Kyiv is 3 hours ahead of UTC in summer and 2 in winter; the offset that maps back is the right one.
+ */
+export function fromKyivSerial(serial: number): number {
+  const local = Math.round((serial - 25_569) * 86_400_000);
+  for (const hours of [3, 2]) {
+    const ms = local - hours * 3_600_000;
+    if (Math.abs(kyivSerial(ms) - serial) * 86_400_000 < 1_000) return ms;
+  }
+  return local - 2 * 3_600_000;
+}
+
 /** Cells as they are written (RAW): numbers, booleans and text as is, dates as serials. */
 const value = (c: SheetCell) => (typeof c === 'object' ? kyivSerial(c.date) : c);
 
@@ -368,6 +381,25 @@ export async function readRows(c: SheetsConfig, title: string): Promise<unknown[
   const res = await call<{ values?: unknown[][] }>(
     c,
     `/values/${range(title, 'A2:Z')}?valueRenderOption=UNFORMATTED_VALUE`,
+  );
+  return res.values ?? [];
+}
+
+/**
+ * Rows `from`..`to` (1-based, as the sheet numbers them) of the first `columns` columns, as
+ * stored. Rows past the end of the data are not returned; an empty row inside is `[]`.
+ */
+export async function readRowsRange(
+  c: SheetsConfig,
+  title: string,
+  from: number,
+  to: number,
+  columns: number,
+): Promise<unknown[][]> {
+  const a1 = `A${from}:${columnName(columns - 1)}${to}`;
+  const res = await call<{ values?: unknown[][] }>(
+    c,
+    `/values/${range(title, a1)}?valueRenderOption=UNFORMATTED_VALUE`,
   );
   return res.values ?? [];
 }

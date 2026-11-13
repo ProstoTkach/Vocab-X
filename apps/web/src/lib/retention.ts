@@ -24,8 +24,15 @@ export const RETENTION = {
   /** A phone's reminder row that is switched off / not updated. */
   reminderOffDays: 30,
   reminderStaleDays: 90,
-  /** Anonymous analytics (events and sessions). */
+  /** Anonymous analytics in the spreadsheet (events and sessions) until step 3.1d moves them. */
   analyticsDays: 365,
+  /**
+   * Anonymous analytics in the anonymous-data database (`docs/ANALYTICS_DB.md` §3, approved
+   * 2026-11-13): raw events, session rows, and the daily summaries (12 months).
+   */
+  analyticsEventDays: 14,
+  analyticsSessionDays: 90,
+  analyticsSummaryDays: 365,
   /** Feedback, in both spreadsheets. */
   feedbackDays: 730,
 } as const;
