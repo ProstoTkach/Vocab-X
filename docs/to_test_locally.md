@@ -306,7 +306,10 @@
 
 Код не менялся, смотреть в приложении нечего. Подготовка к сессии 23 (без неё сессия не начнётся):
 
-- [ ] Neon Console → New project «vocabx-anon» (тот же регион, что у основного) → строку подключения вписать в `apps/web/.env` как `DATABASE_URL_ANON` и в Vercel → Environment Variables только для Production → в списке проектов Neon два проекта.
+- [ ] Neon → проект `vocabx` → Usage/Billing: сколько трафика (public network transfer) израсходовано и когда сброс. До сброса на этом проекте ничего тяжёлого: `tools/load`, `pg_dump`, пробное восстановление (пункт сессии 16 отложить), наполнение данными.
+- [ ] Neon → проект `vocabx` → Branches: удалить ветку «load» (≈ 410 МБ; трафик это не вернёт, но место освободится и прогон на ней будет невозможен); из `apps/web/.env` можно убрать `DATABASE_URL_LOAD` и `DATABASE_URL_LOAD_DIRECT`.
+
+- [ ] Neon Console → New project «vocabx-anon», регион AWS US East 1 (N. Virginia) — как у основного → строку подключения вписать в `apps/web/.env` как `DATABASE_URL_ANON` и в Vercel → Environment Variables только для Production → в списке проектов Neon два проекта.
 - [ ] В новом проекте создать ветку «test» → её строку вписать в `apps/web/.env` как `DATABASE_URL_ANON_TEST` (не равна `DATABASE_URL_ANON`), а в Vercel — как `DATABASE_URL_ANON` для Preview (превью пишут в тестовую ветку, не в боевую).
 - [ ] Neon → Settings → Plan: записать в чат, сколько хранилища на проект у Free (0,5 или 1 ГБ — источники расходятся).
 - [ ] Таблица «Vocab-X analytics» → Файл → Создать копию (название с датой) → копия открывается, в ней те же «Події» и «Сесії».
