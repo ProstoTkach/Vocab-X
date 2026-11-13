@@ -1,3 +1,6 @@
+// WARNING: Neon Free has 5 GB of public network transfer a month per project, shared by all its
+// branches and production. `first` costs ≈ 0.2 MB a request (measured row text): the runs of 2026-11-13
+// used 4.9 GB of it (docs/SCALING.md §1). Count the transfer before a run; prefer a separate project.
 // Load tests against the preview of the load-test branch (never production: lib.mjs refuses any
 // other address). The users are the ones seed.mjs made; their sessions are minted here with the
 // preview's secret (LOAD_NEXTAUTH_SECRET in apps/web/.env), as Google sign-in is not set up there.
