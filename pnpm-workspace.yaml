@@ -7,6 +7,8 @@ packages:
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
+  # Only drizzle-kit (a dev tool) pulls it in; its install script just optimises a binary that works without it.
+  esbuild: false
   sharp: true
   unrs-resolver: true
 
