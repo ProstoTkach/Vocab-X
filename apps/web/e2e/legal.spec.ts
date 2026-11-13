@@ -50,7 +50,7 @@ test('the contact address stays a visible placeholder while it is empty', async 
 test('settings link to the policy; the footer links the other pages', async ({ page }) => {
   await seedOnboarded(page);
   await page.goto('/uk/settings');
-  await page.getByRole('link', { name: 'Конфіденційність' }).click();
+  await page.getByRole('link', { name: 'Конфіденційність' }).first().click();
   await expect(page).toHaveURL(/\/uk\/privacy$/);
   await page.getByRole('contentinfo').getByRole('link', { name: 'Подяки' }).click();
   await expect(page).toHaveURL(/\/uk\/credits$/);
