@@ -27,6 +27,9 @@ for (const { path, heading } of PAGES)
       if (m.type() === 'error') errors.push(m.text());
     });
     await page.goto(path);
+    // zod probes `Function("")` and falls back when the policy forbids it; Firefox (unlike
+    // Chromium and WebKit) reports that caught probe as a console error. Not a failure.
+    const real = () => errors.filter((e) => !e.includes('blocked a JavaScript eval'));
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(heading ? h1.filter({ hasText: heading }) : h1.first()).toBeAttached();
     await expect(page.getByRole('navigation').first()).toBeVisible();
@@ -36,5 +39,5 @@ for (const { path, heading } of PAGES)
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
     expect(overflow, 'the page scrolls sideways').toBeLessThanOrEqual(1);
-    expect(errors).toEqual([]);
+    expect(real()).toEqual([]);
   });

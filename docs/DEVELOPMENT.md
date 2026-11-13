@@ -48,10 +48,27 @@ pnpm test          # Vitest (ядро, дані, теми, переклади, �
 pnpm build         # production-збірка Next.js
 pnpm e2e           # Playwright: усі тести, мобільний (390×844) і десктопний (1280×800) в'юпорти
 pnpm e2e:changed   # лише тести того, що змінилося (див. нижче)
+pnpm --filter @vocabx/web e2e:browsers   # smoke у WebKit (десктоп + iPhone 14) і Firefox
 pnpm screenshots   # скріншоти /dev/ui і сторінок у 5 в'юпортах × 5 тем → apps/web/screenshots
 ```
 
 Перед першим `pnpm e2e`: `pnpm --filter @vocabx/web exec playwright install chromium`.
+
+**Доступність (`e2e/a11y.spec.ts`).** axe (WCAG 2.2 AA) на кожному екрані (15 сторінок, uk і en,
+теми light і dark), на вікнах відгуку, нового слова і входу; фокус усередині вікна, Escape
+повертає фокус на кнопку, що відкрила вікно (спільний `DialogContent` робить це й для вікон,
+відкритих зі стану, а не через `DialogTrigger`), на сторінках видно кільце фокуса при Tab.
+Теми Ocean і Sunset закриті для нового учня: їхній контраст перевіряє `themes.test.ts`. Тест
+лише в десктопному проєкті (розмітка однакова); змінено `components/ui/` або теми —
+`e2e:changed` запускає його сам.
+
+**Інші браузери.** Звичайний `pnpm e2e` ганяє лише Chromium. `pnpm --filter @vocabx/web
+e2e:browsers` запускає `smoke.spec.ts` у WebKit (Safari-рушій: десктоп і iPhone 14) та Firefox;
+перший раз: `pnpm --filter @vocabx/web exec playwright install webkit firefox`. CI ставить усі
+три рушії і запускає цей крок після `pnpm e2e`. Firefox пише в консоль перехоплену перевірку
+`Function("")` бібліотеки zod (політика CSP її забороняє, zod має запасний шлях) — `smoke`
+цей рядок пропускає. Playwright-браузери не замінюють справжні телефони: push, мікрофон і
+розпізнавання мови — за чеклістом у `docs/to_test_locally.md`.
 
 **Вибіркові e2e-тести.** `pnpm e2e:changed` дивиться, які файли змінено (ще не закомічені, або
 `--base main` — усе, чим гілка відрізняється від `main`), і запускає лише тести, що їх

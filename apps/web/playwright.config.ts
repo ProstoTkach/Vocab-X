@@ -33,6 +33,28 @@ export default defineConfig({
       testIgnore: /screenshots\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
     },
+    // Other engines (plan 6.11): only the quick look at every page and the shell, where Safari and
+    // Firefox differ most (layout, CSS, storage). Off by default so a local run needs only
+    // Chromium; CI and `pnpm e2e:browsers` turn them on.
+    ...(process.env.CI || process.env.E2E_BROWSERS
+      ? [
+          {
+            name: 'webkit',
+            testMatch: /smoke\.spec\.ts/,
+            use: { ...devices['Desktop Safari'], viewport: { width: 1280, height: 800 } },
+          },
+          {
+            name: 'webkit-phone',
+            testMatch: /smoke\.spec\.ts/,
+            use: { ...devices['iPhone 14'] },
+          },
+          {
+            name: 'firefox',
+            testMatch: /smoke\.spec\.ts/,
+            use: { ...devices['Desktop Firefox'], viewport: { width: 1280, height: 800 } },
+          },
+        ]
+      : []),
     {
       // Run explicitly: pnpm e2e --project screenshots
       name: 'screenshots',

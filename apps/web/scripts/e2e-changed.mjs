@@ -89,7 +89,7 @@ const RULES = [
   [/^apps\/web\/src\/components\/dev\//, ['quiz', 'sentences']],
   [/^apps\/web\/src\/components\/league\//, ['league']],
   [/^apps\/web\/src\/components\/(profile|account)\//, ['profile']],
-  [/^apps\/web\/src\/components\/ui\//, ['shell', 'review', 'decks']],
+  [/^apps\/web\/src\/components\/ui\//, ['shell', 'review', 'decks', 'a11y']],
   // Server only: the test server has no database, so no end-to-end test reaches this code.
   [
     /^apps\/web\/src\/lib\/(db\/|sync-server|league-server|email|password|session-cookie|api-user|google-|push\.ts|reminder-store)/,
@@ -104,7 +104,7 @@ const RULES = [
   [/^apps\/web\/src\/lib\/(study|clock)/, ['review', 'quiz', 'sentences']],
   [/^apps\/web\/src\/lib\/(speech|lexicon)/, ['sentences', 'decks']],
   [/^apps\/web\/src\/lib\//, ['shell', 'review', 'decks', 'onboarding']],
-  [/^apps\/web\/src\/(themes\/|app\/globals\.css)/, ['shell']],
+  [/^apps\/web\/src\/(themes\/|app\/globals\.css)/, ['shell', 'a11y']],
   [/^apps\/web\/src\/app\/\[locale\]\/onboarding\//, ['onboarding']],
   [/^apps\/web\/src\/app\/\[locale\]\/\(app\)\/review\//, ['review', 'quiz', 'sentences']],
   [/^apps\/web\/src\/app\/\[locale\]\/\(app\)\/decks\//, ['decks']],

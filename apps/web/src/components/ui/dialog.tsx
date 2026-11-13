@@ -9,6 +9,11 @@ import { cx } from '@/lib/cx';
 import { Button } from './button';
 
 const CloseContext = createContext<() => void>(() => {});
+/**
+ * The element that had the focus when the window opened. A window opened from state (no
+ * DialogTrigger) has no trigger for Radix to give the focus back to, so it would be lost.
+ */
+const OpenerContext = createContext<HTMLElement | null>(null);
 
 /** Radix Dialog.Root that also lets its content close it (the phone's "Back" button). */
 export function Dialog({
@@ -18,13 +23,29 @@ export function Dialog({
   ...props
 }: ComponentProps<typeof DialogPrimitive.Root>) {
   const [inner, setInner] = useState(defaultOpen ?? false);
+  const isOpen = open ?? inner;
+  const focused = () =>
+    typeof document !== 'undefined' && document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+  // Also for a window mounted already open (`{show && <Dialog open>}`).
+  const [opener, setOpener] = useState<HTMLElement | null>(() => (isOpen ? focused() : null));
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    // Still the render that opens it: the focus has not moved into the window yet.
+    setWasOpen(isOpen);
+    if (isOpen)
+      setOpener(document.activeElement instanceof HTMLElement ? document.activeElement : null);
+  }
   const change = (next: boolean) => {
     if (open === undefined) setInner(next);
     onOpenChange?.(next);
   };
   return (
     <CloseContext value={() => change(false)}>
-      <DialogPrimitive.Root {...props} open={open ?? inner} onOpenChange={change} />
+      <OpenerContext value={opener}>
+        <DialogPrimitive.Root {...props} open={isOpen} onOpenChange={change} />
+      </OpenerContext>
     </CloseContext>
   );
 }
@@ -69,11 +90,18 @@ export function DialogContent({
   dismissible = true,
 }: DialogContentProps) {
   const t = useTranslations('common');
+  const opener = use(OpenerContext);
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-scrim" />
       <DialogPrimitive.Content
         {...(description ? {} : { 'aria-describedby': undefined })}
+        onCloseAutoFocus={(e) => {
+          if (opener && opener !== document.body && opener.isConnected) {
+            e.preventDefault();
+            opener.focus();
+          }
+        }}
         {...(dismissible
           ? {}
           : {
