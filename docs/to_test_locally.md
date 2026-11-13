@@ -311,5 +311,5 @@
 
 - [ ] Neon Console → New project «vocabx-anon», регион AWS US East 1 (N. Virginia) — как у основного → строку подключения вписать в `apps/web/.env` как `DATABASE_URL_ANON` и в Vercel → Environment Variables только для Production → в списке проектов Neon два проекта.
 - [ ] В новом проекте создать ветку «test» → её строку вписать в `apps/web/.env` как `DATABASE_URL_ANON_TEST` (не равна `DATABASE_URL_ANON`), а в Vercel — как `DATABASE_URL_ANON` для Preview (превью пишут в тестовую ветку, не в боевую).
-- [ ] Neon → Settings → Plan: записать в чат, сколько хранилища на проект у Free (0,5 или 1 ГБ — источники расходятся).
+- [x] Neon → Settings → Plan: хранилище на проект у Free — 1 ГБ (владелец, 2026-11-13).
 - [ ] Таблица «Vocab-X analytics» → Файл → Создать копию (название с датой) → копия открывается, в ней те же «Події» и «Сесії».
