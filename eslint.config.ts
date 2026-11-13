@@ -93,5 +93,10 @@ export default defineConfig(
     languageOptions: { globals: globals.serviceworker },
     rules: { 'no-restricted-syntax': 'off' },
   },
+  {
+    // The load tools measure the real time and use real randomness; they are not part of the app.
+    files: ['tools/load/**/*.mjs'],
+    rules: { 'no-restricted-syntax': 'off' },
+  },
   prettier,
 );

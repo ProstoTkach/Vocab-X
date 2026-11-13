@@ -1,0 +1,15 @@
+{
+  "name": "vocabx-load",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Load tests against the Vercel preview of the load-test branch and its Neon branch. Never production.",
+  "scripts": {
+    "seed": "node seed.mjs",
+    "explain": "node explain.mjs",
+    "run": "node run.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0"
+  }
+}

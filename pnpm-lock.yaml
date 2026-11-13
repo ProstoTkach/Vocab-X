@@ -318,6 +318,12 @@ importers:
 
   tools/eslint-plugin-vocabx: {}
 
+  tools/load:
+    dependencies:
+      '@neondatabase/serverless':
+        specifier: ^1.2.0
+        version: 1.2.0
+
 packages:
 
   '@alloc/quick-lru@5.3.0':
