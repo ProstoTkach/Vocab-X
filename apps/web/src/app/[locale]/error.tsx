@@ -1,5 +1,6 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { buttonClass, Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ export default function RouteError({ error, retry }: { error: unknown; retry: ()
   useEffect(() => {
     // The text of an error may quote what the learner typed: only the kind goes to the console.
     console.error('route error', error instanceof Error ? error.name : 'unknown');
+    Sentry.captureException(error, { tags: { route: 'error-boundary' } });
   }, [error]);
   return (
     <main

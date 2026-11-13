@@ -227,3 +227,14 @@
 - Решения владельца: ассистенту разрешено применять миграции; `0007` уже в основной базе, `0006` — только после деплоя.
 - Осталось / риски: владельцу вписать контактный адрес (`CONTACT_EMAIL`), надзорный орган и контакт юриста в раздел 2 `INCIDENTS.md`, записать окно восстановления Neon (шаг 6.9, `docs/SCALING.md`). Миграции в этом чате не применялись: `0006` ждёт деплоя.
 - Коммит: см. git log.
+
+## 3.3 + 5.6 — Мониторинг ошибок и доступности (2026-11-13, модель S)
+
+- Зачем: о падении и ошибках узнавать не от пользователей; журналы Vercel живут около часа.
+- Сделано: Sentry (`@sentry/nextjs`) для клиента и сервера, выключен без DSN; `lib/monitoring.ts` вырезает всё личное перед отправкой (пользователь, IP, cookie, заголовки, query, тело, breadcrumbs, текст ошибок кроме движковых); `error.tsx`/`global-error.tsx` шлют ошибку; `/api/cleanup` обёрнут в cron-монитор Sentry, сбой базы теперь делает запуск неуспешным; `GET /api/health` (200 / 503 по `select 1`) для UptimeRobot; CSP разрешает `*.ingest.sentry.io`; строка в `privacy` (uk+en, `li13`), `DATA_MAP` §5, разделы в `DEVELOPMENT.md` («Моніторинг») и `INCIDENTS.md` §4.
+- Файлы: `apps/web/src/lib/monitoring.ts` (+тест), `src/instrumentation.ts`, `src/instrumentation-client.ts`, `src/app/api/health/route.ts` (+тест), `app/api/cleanup/route.ts`, `next.config.ts`, `.env.example`, `messages/{uk,en}/legal.json`, `docs/*`.
+- Проверено: typecheck, lint, `pnpm test`. НЕ проверялось: реальная отправка в Sentry и алерты (нет аккаунтов/DSN), сборка с Sentry на Vercel.
+- Цифры: лимиты бесплатных планов — по поиску 2026-11-13 (Sentry ~5000 событий/мес и 1 cron-монитор; UptimeRobot 5 минут), не по личному кабинету.
+- Решения владельца: Sentry + UptimeRobot (оба бесплатно).
+- Осталось / риски: владелец создаёт аккаунты, регион ЄС, выключает хранение IP, кладёт DSN в Vercel; юрист смотрит Ю17; `push/cron` не в cron-мониторе (лимит 1).
+- Коммит: см. git log.

@@ -9,7 +9,7 @@ const isDev = process.env.NODE_ENV !== 'production';
  * Content-Security-Policy without nonces: a nonce would make every page dynamic (no CDN cache), so
  * inline scripts and styles (Next's own, the boot script, the theme CSS) stay allowed and the rest
  * is pinned down: no foreign scripts, frames, plugins or base tags. The browser itself talks only
- * to the three lexicon sources (see lib/lexicon); the rest goes through our server. Google sign-in
+ * to the three lexicon sources (see lib/lexicon) and to the error monitor (Sentry, lib/monitoring); the rest goes through our server. Google sign-in
  * is a redirect, so it only needs form-action.
  */
 const CSP = [
@@ -19,7 +19,7 @@ const CSP = [
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
   "media-src 'self' blob: data:",
-  `connect-src 'self' https://api.tatoeba.org https://api.dictionaryapi.dev https://en.wiktionary.org${isDev ? ' ws://localhost:*' : ''}`,
+  `connect-src 'self' https://api.tatoeba.org https://api.dictionaryapi.dev https://en.wiktionary.org https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.ingest.us.sentry.io${isDev ? ' ws://localhost:*' : ''}`,
   "worker-src 'self'",
   "manifest-src 'self'",
   "object-src 'none'",

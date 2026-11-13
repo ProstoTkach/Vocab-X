@@ -98,6 +98,7 @@
           "li10": "Wiktionary — translations and definitions. For translations your browser sends the word directly (Wiktionary sees your IP address); definitions are asked by our server.",
           "li11": "Free Dictionary API — definitions and examples. Receives only the word, from our server.",
           "li12": "Your browser's speech services. Microphone tasks use the speech recognition built into your browser: Chrome sends the audio to Google, Safari to Apple, under their own terms. We do not receive the audio. Reading words aloud may also use online voices of the browser or system, in which case their provider receives the text. If this does not suit you, do not use the microphone tasks.",
+          "li13": "Sentry — error reports (servers in the European Union). When the app breaks, it receives the kind of error, the technical trace, the page path, the app version and your browser details. It does not receive your account, e-mail, words, answers or cookies, and we ask it not to store IP addresses.",
           "p2": "Fonts are served from our own site, not from Google. We do not sell data or pass it to advertising networks."
         }
       },

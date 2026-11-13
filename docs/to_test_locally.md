@@ -241,3 +241,17 @@
 - [ ] Прочитать `docs/INCIDENTS.md`, раздел 2: вписать надзорный орган и контакт юриста; решить срок ответа на запросы о данных (шаг 5.11).
 - [ ] Вписать `CONTACT_EMAIL` в `apps/web/src/lib/contact.ts` до запуска (сейчас пусто, страницы показывают заглушку).
       Не проверить локально: порядок «0006 после деплоя» — выполняется при реальном деплое (`pnpm db:migrate` после «Ready»).
+
+## Сессия 17 — 3.3 + 5.6: мониторинг (2026-11-13)
+
+Перед проверкой: аккаунты нужны на sentry.io и uptimerobot.com (бесплатные планы, карта не нужна).
+
+- [ ] Sentry: создать проект Next.js, **регион ЄС**; в Project Settings → Security & Privacy включить «Prevent Storing of IP Addresses»; скопировать DSN. → Если регион США, сказать в чате: текст `li13` в `/privacy` надо поменять.
+- [ ] Vercel → Environment Variables (Production): `SENTRY_DSN` и `NEXT_PUBLIC_SENTRY_DSN` = этот DSN, затем redeploy. → без них ничего не отправляется.
+- [ ] После деплоя открыть в консоли браузера на сайте `setTimeout(() => { throw new TypeError('test') })` → через минуту событие в Sentry без email, cookie и адреса с параметрами.
+- [ ] Sentry → Alerts: правило «новая проблема → письмо» (по умолчанию может быть уже включено).
+- [ ] Sentry → Crons: после первого запуска `/api/cleanup` (03:00 UTC) появился монитор `cleanup`; убедиться, что бесплатный план его принял.
+- [ ] UptimeRobot: монитор HTTP(s) на `https://vocabx-sigma.vercel.app/api/health`, интервал 5 минут, оповещение на почту. → статус Up; `{"ok":true}` открывается в браузере.
+- [ ] Локально `pnpm dev`, открыть `http://localhost:3000/api/health` → `{"ok":true}`.
+- [ ] Прочитать Ю17 в `docs/LEGAL_REVIEW.md` и строку про Sentry в `/privacy` → ок или что поменять.
+      Не проверить локально: всё про Sentry и UptimeRobot — только после деплоя с DSN.

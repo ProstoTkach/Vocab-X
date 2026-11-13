@@ -1,5 +1,7 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
+import { useEffect } from 'react';
 import en from '../../messages/en/common.json';
 import uk from '../../messages/uk/common.json';
 
@@ -11,7 +13,10 @@ const TEXTS = { uk, en } as const;
  * (`/en/...`, otherwise the default), the texts from the same message files, and the look from the
  * system's own colors, which follow the device's light or dark setting.
  */
-export default function GlobalError({ retry }: { error: unknown; retry: () => void }) {
+export default function GlobalError({ error, retry }: { error: unknown; retry: () => void }) {
+  useEffect(() => {
+    Sentry.captureException(error, { tags: { route: 'global-error' } });
+  }, [error]);
   const lang = typeof window !== 'undefined' && /^\/en(\/|$)/.test(window.location.pathname);
   const locale = lang ? 'en' : 'uk';
   const t = TEXTS[locale];
