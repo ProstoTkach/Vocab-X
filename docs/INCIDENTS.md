@@ -83,8 +83,8 @@ the incident.
    announce anything: their data is safe on their device.
 3. A migration gone wrong → restore (DEVELOPMENT.md); applied `0006`-type drop → its SQL for
    undo is in the file header.
-4. Alerts come from UptimeRobot (`/api/health` answers 503: the site is up but the database does
-   not) and Sentry (errors, a missed daily `cleanup` check-in) — set-up and what each sees:
+4. Alerts come from UptimeRobot (`/api/health` down: the site is not served; the hourly
+   `/api/health?db=…` monitor answers 503: the site is up but the database does not) and Sentry (errors, a missed daily `cleanup` check-in) — set-up and what each sees:
    DEVELOPMENT.md «Моніторинг». Until the owner has created both accounts and put the DSN into
    Vercel, nothing alerts and the owner learns from users. A Sentry flood of one error: look at
    the release (`NEXT_PUBLIC_BUILD_ID`) — it points at the deploy to roll back.

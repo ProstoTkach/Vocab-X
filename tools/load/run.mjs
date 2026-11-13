@@ -116,8 +116,17 @@ async function sync(u, changes) {
 }
 
 const SCENARIOS = {
-  // One query over HTTP: the floor of the platform.
-  health: () => call('/api/health', null, undefined, 'GET'),
+  // One query over HTTP: the floor of the platform. The database is asked only with the token
+  // (`HEALTH_DB_TOKEN`, the same in apps/web/.env and on the preview); without it, the site alone.
+  health: () =>
+    call(
+      env.HEALTH_DB_TOKEN
+        ? `/api/health?db=${encodeURIComponent(env.HEALTH_DB_TOKEN)}`
+        : '/api/health',
+      null,
+      undefined,
+      'GET',
+    ),
   // A device opens the app: nothing to send, nothing new to read.
   open: async (u) => (await sync(u)).res,
   // After a review: 20 answers and their 20 cards go up.
