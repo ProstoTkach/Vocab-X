@@ -1,33 +1,21 @@
-// The phones that asked for reminders: one row per push subscription in the analytics
-// spreadsheet (server only). Only the push address, the interface language, whether it is on
-// and when the next reminder is due (the phone works that out itself); nothing about the
-// learner or the words.
-import { eq, sql } from 'drizzle-orm';
+// The phones that asked for reminders: one row per push subscription in the "anonymous data"
+// database (server only; `docs/ANALYTICS_DB.md`). Only the push address, the interface language,
+// whether it is on and when the next reminder is due (the phone works that out itself); nothing
+// about the learner or the words. Until step 3.1d the rows also lived in a spreadsheet tab; that
+// tab is a leftover now: only the one-off import reads it and the nightly cleanup empties it.
+import { and, eq, isNotNull, lte, sql } from 'drizzle-orm';
 import type { AnonDb } from './db/anon-client';
 import { pushSubscriptions } from './db/anon-schema';
 import {
-  clearRowByKey,
-  deleteRows,
-  ensureSheet,
+  deleteTopRows,
   fromKyivSerial,
   hasTab,
-  kyivSerial,
   readRows,
-  upsertRows,
   type SheetsConfig,
 } from './google-sheets';
-import { daysAgo, RETENTION } from './retention';
 
+/** The tab the subscriptions were kept in before step 3.1d. */
 export const REMINDER_SHEET = 'Нагадування';
-const COLUMNS = [
-  'Адреса підписки (endpoint)',
-  'Увімкнено (active)',
-  'Мова (ui_lang)',
-  'Змінено (updated_at)',
-  'Наступне нагадування, мс (next_at)',
-  'Наступне нагадування (next_date)',
-];
-const DATE_COLUMNS = [3, 5];
 
 export interface Reminder {
   endpoint: string;
@@ -37,79 +25,12 @@ export interface Reminder {
   nextAt: number | null;
 }
 
-const row = (r: Reminder, now: number) => [
-  r.endpoint,
-  r.active,
-  r.locale,
-  { date: now },
-  r.nextAt ?? '',
-  r.nextAt ? { date: r.nextAt } : '',
-];
-
-/** Turns reminders on or off for one subscription (a new one is added), with its next time. */
-export async function saveReminder(c: SheetsConfig, r: Reminder, now: number): Promise<void> {
-  await ensureSheet(c, REMINDER_SHEET, COLUMNS, DATE_COLUMNS);
-  await upsertRows(c, REMINDER_SHEET, 0, [row(r, now)]);
-}
-
-/** The subscriptions with reminders on. */
-export async function activeReminders(c: SheetsConfig): Promise<Reminder[]> {
-  await ensureSheet(c, REMINDER_SHEET, COLUMNS, DATE_COLUMNS);
-  const rows = await readRows(c, REMINDER_SHEET);
-  return rows.flatMap((r) => {
-    const [endpoint, active, locale, , nextAt] = r;
-    if (typeof endpoint !== 'string' || !endpoint || active !== true) return [];
-    return [
-      {
-        endpoint,
-        active: true,
-        locale: typeof locale === 'string' ? locale : '',
-        nextAt: typeof nextAt === 'number' && nextAt > 0 ? nextAt : null,
-      },
-    ];
-  });
-}
-
-/** Writes several subscriptions at once (sent: nothing planned; ended: switched off). */
-export async function updateReminders(c: SheetsConfig, list: Reminder[], now: number) {
-  if (!list.length) return;
-  await upsertRows(
-    c,
-    REMINDER_SHEET,
-    0,
-    list.map((r) => row(r, now)),
-  );
-}
-
-/** Forgets a subscription altogether (its row is emptied): the learner deleted their account. */
-export async function removeReminder(c: SheetsConfig, endpoint: string): Promise<boolean> {
-  await ensureSheet(c, REMINDER_SHEET, COLUMNS, DATE_COLUMNS);
-  return clearRowByKey(c, REMINDER_SHEET, 0, endpoint);
-}
-
-/**
- * Rows (1-based) the cleanup deletes: emptied ones (an account was deleted), switched off for
- * `reminderOffDays`, or not updated for `reminderStaleDays` (the phone stopped using the app).
- */
-export function staleReminderRows(rows: readonly unknown[][], now: number): number[] {
-  const off = kyivSerial(daysAgo(now, RETENTION.reminderOffDays).getTime());
-  const stale = kyivSerial(daysAgo(now, RETENTION.reminderStaleDays).getTime());
-  return rows.flatMap((r, i) => {
-    const [endpoint, active, , updated] = r;
-    const empty = typeof endpoint !== 'string' || !endpoint;
-    const at = typeof updated === 'number' ? updated : null;
-    const gone = empty || (at !== null && (at < stale || (active !== true && at < off)));
-    return gone ? [i + 2] : [];
-  });
-}
-
 // ---------------------------------------------------------------------------------------------
-// The same subscriptions in the "anonymous data" database (step 3.1): written next to the
-// spreadsheet now, read by the cron from step 3.1d on. A failure here never fails the request.
+// Reading and writing (`/api/push`, its cron, the account deletion).
 
 const date = (ms: number | null) => (ms === null ? null : new Date(ms));
 
-/** Turns reminders on or off for one subscription in the database (a new one is added). */
+/** Turns reminders on or off for one subscription (a new one is added), with its next time. */
 export async function saveReminderDb(db: AnonDb, r: Reminder, now: number): Promise<void> {
   const values = {
     endpoint: r.endpoint,
@@ -122,6 +43,43 @@ export async function saveReminderDb(db: AnonDb, r: Reminder, now: number): Prom
     .insert(pushSubscriptions)
     .values(values)
     .onConflictDoUpdate({ target: pushSubscriptions.endpoint, set: values });
+}
+
+/** The subscriptions whose reminder is due. */
+export async function dueReminders(db: AnonDb, now: number): Promise<Reminder[]> {
+  const rows = await db
+    .select()
+    .from(pushSubscriptions)
+    .where(
+      and(
+        eq(pushSubscriptions.active, true),
+        isNotNull(pushSubscriptions.nextAt),
+        lte(pushSubscriptions.nextAt, new Date(now)),
+      ),
+    );
+  return rows.map((r) => ({
+    endpoint: r.endpoint,
+    active: r.active,
+    locale: r.locale,
+    nextAt: r.nextAt ? r.nextAt.getTime() : null,
+  }));
+}
+
+/** Writes several subscriptions at once (sent: nothing planned; ended: switched off). */
+export async function updateRemindersDb(db: AnonDb, list: readonly Reminder[], now: number) {
+  if (!list.length) return;
+  const json = JSON.stringify(
+    list.map((r) => ({
+      endpoint: r.endpoint,
+      active: r.active,
+      next_at: r.nextAt === null ? null : new Date(r.nextAt).toISOString(),
+    })),
+  );
+  await db.execute(sql`
+    UPDATE push_subscriptions p SET active = x.active, next_at = x.next_at,
+      updated_at = ${new Date(now).toISOString()}::timestamptz
+    FROM json_to_recordset(${json}::json) AS x(endpoint text, active boolean, next_at timestamptz)
+    WHERE p.endpoint = x.endpoint`);
 }
 
 /** Forgets a subscription altogether (the learner deleted their account). */
@@ -188,10 +146,13 @@ export async function copyReminders(db: AnonDb, rows: readonly unknown[][]): Pro
   return list.length;
 }
 
-/** Deletes the rows `staleReminderRows` picks; returns how many (-1: no reminder tab yet). */
-export async function removeStaleReminders(c: SheetsConfig, now: number): Promise<number> {
+/**
+ * Empties the leftover tab of the old spreadsheet storage (push addresses must not stay there
+ * after the move); returns how many rows went, -1 when there is no such tab.
+ */
+export async function clearLegacyReminders(c: SheetsConfig): Promise<number> {
   if (!(await hasTab(c, REMINDER_SHEET))) return -1;
-  const rows = staleReminderRows(await readRows(c, REMINDER_SHEET), now);
-  if (rows.length) await deleteRows(c, REMINDER_SHEET, rows);
-  return rows.length;
+  const rows = (await readRows(c, REMINDER_SHEET)).length;
+  if (rows) await deleteTopRows(c, REMINDER_SHEET, rows);
+  return rows;
 }

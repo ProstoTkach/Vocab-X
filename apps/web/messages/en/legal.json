@@ -72,7 +72,7 @@
       "reminders": {
         "title": "Reminders",
         "blocks": {
-          "p1": "When you turn reminders on, your browser gives the app a push address at its own service (Google, Mozilla, Apple or Microsoft, depending on the browser). We keep this address in a separate Neon database (USA) and in the author's Google Sheets spreadsheet, with the interface language, the on/off state and the time of the next reminder. The notification itself carries none of your words: your device fills in the text.",
+          "p1": "When you turn reminders on, your browser gives the app a push address at its own service (Google, Mozilla, Apple or Microsoft, depending on the browser). We keep this address in a separate Neon database (USA), with the interface language, the on/off state and the time of the next reminder. The notification itself carries none of your words: your device fills in the text.",
           "p2": "The address of turned-off reminders is deleted after 30 days, and an address not updated for 90 days is deleted too."
         }
       },
@@ -90,7 +90,7 @@
           "li2": "Neon — database (Amazon Web Services servers in the USA). Keeps the account and synced data, and a change history for restoring the database for a limited time. A separate Neon project, not linked to the account, holds the anonymous statistics (with consent), a copy of the feedback and the reminder addresses.",
           "li3": "Google Cloud Translation — translation in the word form (\"Find\"). Receives the word and the language pair from our server, without your IP address or account. The answer is kept in a shared cache for 15 days, with no link to who asked. These are automatic translations by Google Translate and may be inaccurate.",
           "li4": "Sign in with Google — Google learns that you sign in to VocabX and gives us your e-mail, id, name and picture (we keep only the e-mail and the id).",
-          "li5": "Google Sheets — the author's spreadsheets: statistics (only with consent; for no longer than a day, then moved to the Neon database), feedback and reminder addresses arrive there first.",
+          "li5": "Google Sheets — the author's spreadsheets: statistics (only with consent; for no longer than a day, then moved to the Neon database) and feedback arrive there first.",
           "li6": "Gmail — sends the letters; sees your address and the letter's text.",
           "li7": "Telegram — receives the feedback text if feedback goes to the author's chat.",
           "li8": "Your browser's push services — receive an empty notification for your browser when a reminder is due.",

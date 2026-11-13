@@ -161,6 +161,7 @@ describe('the launch metrics', () => {
   /** A first visit on a Kyiv day at an hour, as `CohortRow.firstVisit` has it. */
   const visit = (day: string, hour = 12) => Date.parse(day + 'T00:00:00Z') / 86_400_000 + hour / 24;
   const row = (over: Partial<CohortRow>): CohortRow => ({
+    cohortDay: '2026-10-26',
     firstVisit: visit('2026-10-26'),
     welcome: true,
     languages: true,

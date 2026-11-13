@@ -8,14 +8,16 @@ import {
   type CopyResult,
   type PurgeResult,
 } from '@/lib/analytics-store';
+import { exportSummaries, type ExportResult } from '@/lib/analytics-export';
 import { cleanupDatabase, cleanupSheets } from '@/lib/cleanup';
 import { cronAuthorized } from '@/lib/cron';
 import { anonDbFromEnv } from '@/lib/db/anon-client';
 import { dbFromEnv } from '@/lib/db/client';
 import { sheetsConfigFromEnv } from '@/lib/google-sheets';
 import { daysAgo, RETENTION } from '@/lib/retention';
+import { kyivDay } from '@/lib/analytics-store';
 
-/** The nightly copy of the analytics tabs can take a while (step 3.1); the cleanup waits for it. */
+/** The nightly transfer of the analytics tabs can take a while (step 3.1); the cleanup waits for it. */
 export const maxDuration = 60;
 
 /**
@@ -48,25 +50,38 @@ async function run(): Promise<Response> {
       failed = true;
     }
   const analytics = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
-  // Copy mode (step 3.1): the analytics tabs are copied into the anonymous-data database, the
-  // spreadsheet is only read. A failure is reported to Sentry but does not fail the cleanup: the
-  // next night copies the same rows again.
+  // Move mode (step 3.1d): the analytics tabs are an inbox. Stored rows are deleted from them,
+  // and the summary tabs are rewritten from the database. A failure is reported to Sentry but
+  // does not fail the cleanup: the rows are still in the inbox and the next night stores them
+  // again (storing is idempotent).
   let copy: CopyResult | null = null;
+  let exported: ExportResult | null = null;
   let purged: PurgeResult | null = null;
   const anon = anonDbFromEnv();
   if (anon) {
     try {
-      if (analytics)
+      if (analytics) {
         copy = await copySheetsToDb(analytics, anon, {
           budgetMs: COPY_BUDGET_MS,
-          // Rows past their term would be purged at once: not copied at all.
+          move: true,
+          // The old reminder tab is no longer a source (it would bring back deleted addresses).
+          reminders: false,
+          // Rows past their term would be purged at once: not stored, but still leave the inbox.
           since: {
             events: daysAgo(now, RETENTION.analyticsEventDays).getTime(),
             sessions: daysAgo(now, RETENTION.analyticsSessionDays).getTime(),
           },
         });
+        if (copy.deleteFailed) Sentry.captureMessage('cleanup: inbox rows could not be deleted');
+      }
     } catch (e) {
       console.error('cleanup: analytics copy', e instanceof Error ? e.message.slice(0, 200) : e);
+      Sentry.captureException(e);
+    }
+    try {
+      if (analytics) exported = await exportSummaries(analytics, anon, kyivDay(now));
+    } catch (e) {
+      console.error('cleanup: analytics export', e instanceof Error ? e.message.slice(0, 200) : e);
       Sentry.captureException(e);
     }
     try {
@@ -88,7 +103,13 @@ async function run(): Promise<Response> {
     sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_POLLS_ID'),
     now,
   );
-  const result = { database, sheets, analyticsCopy: copy, analyticsPurged: purged };
+  const result = {
+    database,
+    sheets,
+    analyticsCopy: copy,
+    analyticsExport: exported,
+    analyticsPurged: purged,
+  };
   console.log('cleanup', JSON.stringify(result));
   // A failed run must show as failed in the monitor, not only in a log that lives an hour.
   if (failed) throw new Error('cleanup failed');

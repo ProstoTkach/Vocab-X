@@ -24,7 +24,7 @@ import {
   readColumn,
   type SheetsConfig,
 } from './google-sheets';
-import { removeStaleReminders } from './reminder-store';
+import { clearLegacyReminders } from './reminder-store';
 import { daysAgo, RETENTION } from './retention';
 
 /** Rows one statement removes in a run at most. */
@@ -135,8 +135,8 @@ export interface SheetsCleanup {
 }
 
 /**
- * The spreadsheets: analytics (events, sessions, its copy of feedback, reminder rows) and polls
- * (feedback). A step that fails is skipped and reported as null; the others still run. -1: the
+ * The spreadsheets: analytics (the inbox tabs as a safety net for rows that could not be moved,
+ * the old feedback copy, the leftover reminder tab, which is emptied) and polls (feedback). A step that fails is skipped and reported as null; the others still run. -1: the
  * tab is not there (nothing to keep short).
  */
 export async function cleanupSheets(
@@ -169,7 +169,7 @@ export async function cleanupSheets(
         ? () => dropOlderRows(analytics, ANALYTICS_SHEETS.feedback, now, RETENTION.feedbackDays)
         : none,
     ),
-    reminders: await step(analytics ? () => removeStaleReminders(analytics, now) : none),
+    reminders: await step(analytics ? () => clearLegacyReminders(analytics) : none),
     polls: await step(
       polls
         ? async () => {

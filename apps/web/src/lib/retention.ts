@@ -24,7 +24,10 @@ export const RETENTION = {
   /** A phone's reminder row that is switched off / not updated. */
   reminderOffDays: 30,
   reminderStaleDays: 90,
-  /** Anonymous analytics in the spreadsheet (events and sessions) until step 3.1d moves them. */
+  /**
+   * The analytics inbox tabs (events and sessions): the nightly transfer empties them within a
+   * day; this is only the safety net for rows that could not be moved (database down).
+   */
   analyticsDays: 365,
   /**
    * Anonymous analytics in the anonymous-data database (`docs/ANALYTICS_DB.md` §3, approved

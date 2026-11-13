@@ -1,8 +1,8 @@
 import { systemClock } from '@vocabx/core';
 import { cronAuthorized } from '@/lib/cron';
-import { sheetsConfigFromEnv } from '@/lib/google-sheets';
+import { anonDbFromEnv } from '@/lib/db/anon-client';
 import { sendPush, vapidFromEnv } from '@/lib/push';
-import { activeReminders, updateReminders, type Reminder } from '@/lib/reminder-store';
+import { dueReminders, updateRemindersDb, type Reminder } from '@/lib/reminder-store';
 
 /** Pushes in flight at a time. */
 const PARALLEL = 10;
@@ -16,11 +16,11 @@ const PARALLEL = 10;
  */
 export async function GET(request: Request): Promise<Response> {
   if (!cronAuthorized(request)) return new Response(null, { status: 401 });
-  const sheets = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
+  const anon = anonDbFromEnv();
   const vapid = vapidFromEnv();
-  if (!sheets || !vapid) return new Response(null, { status: 503 });
+  if (!anon || !vapid) return new Response(null, { status: 503 });
   const now = systemClock.now();
-  const due = (await activeReminders(sheets)).filter((r) => r.nextAt !== null && r.nextAt <= now);
+  const due = await dueReminders(anon, now);
   const changed: Reminder[] = [];
   let sent = 0;
   let failed = 0;
@@ -36,7 +36,7 @@ export async function GET(request: Request): Promise<Response> {
       } else failed += 1;
     });
   }
-  await updateReminders(sheets, changed, now);
+  await updateRemindersDb(anon, changed, now);
   return Response.json(
     { due: due.length, sent, failed },
     { headers: { 'Cache-Control': 'no-store' } },

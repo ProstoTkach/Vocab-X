@@ -2,8 +2,10 @@ import { generateKeyPairSync } from 'node:crypto';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import {
   appendRow,
+  appendRows,
   clearRowByKey,
   columnName,
+  deleteTopRows,
   fromKyivSerial,
   kyivSerial,
   rowsOf,
@@ -151,5 +153,54 @@ describe('forgetting one row', () => {
     expect(await clearRowByKey(c, 'Т', 0, 'header')).toBe(false);
     expect(await clearRowByKey(c, 'Т', 0, 'nobody')).toBe(false);
     expect(calls.filter((x) => x.url.endsWith(':clear'))).toHaveLength(2);
+  });
+});
+
+describe('the inbox tabs', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  const stub = (calls: { url: string; body?: string }[]) =>
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init: RequestInit = {}) => {
+        calls.push({ url, ...(typeof init.body === 'string' ? { body: init.body } : {}) });
+        if (url.startsWith('https://oauth2'))
+          return Response.json({ access_token: 'token', expires_in: 3600 });
+        if (url.includes('?fields='))
+          return Response.json({ sheets: [{ properties: { title: 'Т', sheetId: 7 } }] });
+        if (url.includes(':append'))
+          return Response.json({ updates: { updatedRange: "'Т'!A5:B6" } });
+        return Response.json({});
+      }),
+    );
+  const c = { clientEmail: 'bot@x', privateKey: pem, spreadsheetId: 'inbox' };
+
+  test('rows are appended without a formatting request when asked', async () => {
+    const calls: { url: string; body?: string }[] = [];
+    stub(calls);
+    await appendRows(c, 'Т', [['a', { date: Date.UTC(2026, 0, 1) }]], { format: false });
+    const writes = calls.filter((x) => !x.url.startsWith('https://oauth2') && x.body);
+    expect(writes).toHaveLength(1);
+    expect(writes[0]!.url).toContain(':append');
+  });
+
+  test('the first rows are deleted together with one empty row added below', async () => {
+    const calls: { url: string; body?: string }[] = [];
+    stub(calls);
+    expect(await deleteTopRows(c, 'Т', 5000)).toBe(true);
+    const batch = calls.find((x) => x.url.endsWith(':batchUpdate'))!;
+    expect((JSON.parse(batch.body!) as { requests: unknown[] }).requests).toEqual([
+      { appendDimension: { sheetId: 7, dimension: 'ROWS', length: 1 } },
+      {
+        deleteDimension: {
+          range: { sheetId: 7, dimension: 'ROWS', startIndex: 1, endIndex: 5001 },
+        },
+      },
+    ]);
+    expect(await deleteTopRows(c, 'Нема', 3)).toBe(false);
+    // Nothing to delete: no request.
+    const before = calls.length;
+    expect(await deleteTopRows(c, 'Т', 0)).toBe(true);
+    expect(calls).toHaveLength(before);
   });
 });

@@ -6,6 +6,8 @@ import type { AnonDb } from './db/anon-client';
 
 /** One browser of the cohort with what the metrics need of it. */
 export interface CohortRow {
+  /** The Kyiv day of the browser's first session (YYYY-MM-DD). */
+  cohortDay: string;
   /** The first visit in Kyiv wall-clock time, as days since 1970-01-01 (with the time of day). */
   firstVisit: number;
   welcome: boolean;
@@ -52,8 +54,8 @@ export interface LaunchMetrics {
 /** Answers on day 0 that count as activation (the offer of reminders comes at the same count). */
 export const ACTIVATION_ANSWERS = 10;
 
-const DAY_MS = 86_400_000;
-const dayNumber = (day: string) => Date.parse(`${day}T00:00:00Z`) / DAY_MS;
+export const DAY_MS = 86_400_000;
+export const dayNumber = (day: string) => Date.parse(`${day}T00:00:00Z`) / DAY_MS;
 
 /**
  * The metrics of a cohort. A return is asked only once its window is over: D1 of browsers whose
@@ -91,6 +93,7 @@ export function launchMetrics(rows: readonly CohortRow[], today: string): Launch
 export async function cohortRows(db: AnonDb, from: string): Promise<CohortRow[]> {
   const res = await db.execute(sql`
     SELECT
+      d.cohort_day::text AS cohort_day,
       extract(epoch FROM d.first_visit_at AT TIME ZONE 'Europe/Kyiv') / 86400 AS first_visit,
       d.welcome, d.languages, d.goal, d.start, d.start_choice, d.onboarding_done, d.review_start,
       coalesce(sum(dd.answers) FILTER (WHERE dd.day_n = 0), 0)::int AS answers0,
@@ -101,6 +104,7 @@ export async function cohortRows(db: AnonDb, from: string): Promise<CohortRow[]>
     WHERE NOT d.internal AND d.cohort_day >= ${from}::date
     GROUP BY d.anon_id`);
   return res.rows.map((r) => ({
+    cohortDay: String(r.cohort_day),
     firstVisit: Number(r.first_visit),
     welcome: r.welcome === true,
     languages: r.languages === true,

@@ -19,7 +19,6 @@ import {
   forgetSheets,
   replaceSheet,
   sheetsConfigFromEnv,
-  upsertRows,
 } from '@/lib/google-sheets';
 import { crossSite, fail, readJson } from '@/lib/api-user';
 import { switchedOff } from '@/lib/kill-switch';
@@ -33,7 +32,7 @@ const SHEETS = ANALYTICS_SHEETS;
  * change at will): a browser sends a few a minute at most, so 600 in ten minutes leaves room for a
  * whole class behind one address. Counted in this server instance only (this route must not wake
  * the database for a limit check, see step 2.1), so it holds back a flood from one place, not a
- * spread-out one; that waits for analytics to move into the database (step 3.1).
+ * spread-out one.
  */
 const limiter = memoryLimiter();
 const rules = (sender: string) => [{ key: `track:${sender}`, max: 600, windowMs: 10 * MINUTE_MS }];
@@ -68,7 +67,8 @@ let dictionaryWritten = false;
 
 /**
  * Receives batches of anonymous usage events and session summaries from the app and appends them
- * to the analytics spreadsheet. The Google keys stay on the server. Neither the address nor any
+ * to the analytics spreadsheet, which is only an inbox: `/api/cleanup` moves the rows to the
+ * anonymous-data database every night and deletes them from the sheet (`lib/analytics-store.ts`). The Google keys stay on the server. Neither the address nor any
  * header of the request is logged or stored; the body is checked item by item.
  */
 export async function POST(request: Request): Promise<Response> {
@@ -103,7 +103,7 @@ export async function POST(request: Request): Promise<Response> {
         EVENT_COLUMNS.map(header),
         dateColumns(EVENT_COLUMNS),
       );
-      await appendRows(sheets, SHEETS.events, events.map(eventRow));
+      await appendRows(sheets, SHEETS.events, events.map(eventRow), { format: false });
     }
     if (body.sessions.length) {
       await ensureSheet(
@@ -112,13 +112,9 @@ export async function POST(request: Request): Promise<Response> {
         SESSION_COLUMNS.map(header),
         dateColumns(SESSION_COLUMNS),
       );
-      // One row per session: a newer summary (the session went on, or ended) replaces it.
-      await upsertRows(
-        sheets,
-        SHEETS.sessions,
-        SESSION_COLUMNS.findIndex((c) => c.key === 'session_id'),
-        body.sessions.map(sessionRow),
-      );
+      // The tab is an inbox: every snapshot is a new row (appending is safe while the nightly
+      // transfer deletes the rows above); the database keeps the newest snapshot per session.
+      await appendRows(sheets, SHEETS.sessions, body.sessions.map(sessionRow), { format: false });
     }
   } catch (e) {
     console.error('track: spreadsheet', e instanceof Error ? e.message : e);

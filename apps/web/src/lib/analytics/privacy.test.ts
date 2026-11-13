@@ -325,6 +325,7 @@ describe('anon_id and the account', () => {
       .sort();
     expect(users).toEqual([
       'app/api/track/route.ts',
+      'lib/analytics-export.ts',
       'lib/analytics-report.ts',
       'lib/analytics-store.ts',
       'lib/db/anon-schema.ts',
@@ -343,6 +344,7 @@ const ANON_DB_USERS = [
   'app/api/account/route.ts',
   'app/api/cleanup/route.ts',
   'app/api/feedback/route.ts',
+  'app/api/push/cron/route.ts',
   'app/api/push/route.ts',
   'lib/db/anon-client.ts',
   'lib/db/testing.ts',
@@ -376,6 +378,7 @@ describe('the anonymous-data database', () => {
   test('the code that writes to it never reaches for the account', () => {
     const own = [
       'lib/analytics-store.ts',
+      'lib/analytics-export.ts',
       'lib/analytics-report.ts',
       'lib/db/anon-schema.ts',
       'lib/db/anon-client.ts',
@@ -387,6 +390,7 @@ describe('the anonymous-data database', () => {
   test('the accounts database client and the accounts schema stay out of the analytics store', () => {
     for (const rel of [
       'lib/analytics-store.ts',
+      'lib/analytics-export.ts',
       'lib/analytics-report.ts',
       'lib/reminder-store.ts',
     ]) {

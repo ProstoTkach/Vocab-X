@@ -5,25 +5,19 @@ import {
   formatFeedback,
   parsePayload,
 } from '@/lib/feedback';
-import {
-  appendRow,
-  appendRows,
-  ensureSheet,
-  forgetSheets,
-  sheetsConfigFromEnv,
-} from '@/lib/google-sheets';
+import { appendRow, forgetSheets, sheetsConfigFromEnv } from '@/lib/google-sheets';
 import { crossSite, fail, readJson } from '@/lib/api-user';
-import { ANALYTICS_SHEETS } from '@/lib/analytics/schema';
 import { feedbackRecord, insertFeedback } from '@/lib/analytics-store';
 import { anonDbFromEnv } from '@/lib/db/anon-client';
 import { dbFromEnv } from '@/lib/db/client';
 import { DAY_MS, MINUTE_MS, senderKey, spend, tooMany } from '@/lib/rate-limit';
 
-/** The feedback sheet of the analytics spreadsheet, next to the usage statistics. */
-const ANALYTICS_SHEET = ANALYTICS_SHEETS.feedback;
-
-/** A copy in the anonymous-data database (step 3.1), next to the one in the spreadsheet. */
-async function copyToDatabase(row: ReturnType<typeof feedbackRow>) {
+/**
+ * The copy kept in the anonymous-data database (since step 3.1d the only one: the "Відгуки" tab of
+ * the analytics spreadsheet is no longer written). A failure never fails the request: the
+ * feedback itself goes to the polls table or the chat.
+ */
+async function copyToAnalytics(row: ReturnType<typeof feedbackRow>) {
   const anon = anonDbFromEnv();
   const record = feedbackRecord(row);
   if (!anon || !record) return;
@@ -31,20 +25,6 @@ async function copyToDatabase(row: ReturnType<typeof feedbackRow>) {
     await insertFeedback(anon, [record]);
   } catch (e) {
     console.error('feedback: database copy', e instanceof Error ? e.message.slice(0, 200) : e);
-  }
-}
-
-async function copyToAnalytics(row: ReturnType<typeof feedbackRow>) {
-  await copyToDatabase(row);
-  const analytics = sheetsConfigFromEnv(process.env, 'GOOGLE_SPREADSHEET_ANALYTICS_ID');
-  if (!analytics) return;
-  try {
-    await ensureSheet(analytics, ANALYTICS_SHEET, FEEDBACK_COLUMNS, FEEDBACK_DATE_COLUMNS);
-    await appendRows(analytics, ANALYTICS_SHEET, [row]);
-  } catch (e) {
-    // A copy only: the feedback itself went to the polls table or the chat.
-    console.error('feedback: analytics copy', e instanceof Error ? e.message : e);
-    forgetSheets(analytics);
   }
 }
 
@@ -63,7 +43,7 @@ const rules = (sender: string) => [
 /**
  * Forwards learner feedback to the developer: for now as a row of the "Vocab-X polls" Google
  * spreadsheet when its service account is set up, otherwise to the Telegram chat; a copy goes
- * to the "Відгуки" sheet of the analytics spreadsheet. Keys stay on
+ * to the anonymous-data database. Keys stay on
  * the server. The sender's address is used only for the rate limit above, as a short keyed hash that
  * lives for the length of the window, and is never forwarded, so the feedback stays anonymous.
  */

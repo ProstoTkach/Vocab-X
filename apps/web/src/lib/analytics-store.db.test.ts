@@ -9,7 +9,13 @@ import { cohortRows, launchMetrics } from './analytics-report';
 import { insertEvents, purgeAnalytics, rebuildSummaries, upsertSessions } from './analytics-store';
 import { testAnonDb } from './db/testing';
 import { kyivSerial } from './google-sheets';
-import { copyReminders, removeReminderDb, saveReminderDb } from './reminder-store';
+import {
+  copyReminders,
+  dueReminders,
+  removeReminderDb,
+  saveReminderDb,
+  updateRemindersDb,
+} from './reminder-store';
 
 const db = testAnonDb();
 const PREFIX = `dbtest${randomUUID().slice(0, 8)}`;
@@ -272,6 +278,28 @@ describe.skipIf(!db)('push subscriptions', () => {
     expect(await read('p1')).toMatchObject({ active: false, locale: 'en', next_at: null });
     expect(await removeReminderDb(db!, endpoint('p1'))).toBe(true);
     expect(await removeReminderDb(db!, endpoint('p1'))).toBe(false);
+  });
+
+  test('the cron reads what is due, and a sent or ended one is written back', async () => {
+    const at = Date.UTC(2099, 0, 5, 12);
+    const remind = (name: string, active: boolean, nextAt: number | null) => ({
+      endpoint: endpoint(name),
+      active,
+      locale: 'uk',
+      nextAt,
+    });
+    await saveReminderDb(db!, remind('d1', true, at - 1000), DAY0);
+    await saveReminderDb(db!, remind('d2', true, at + 1000), DAY0);
+    await saveReminderDb(db!, remind('d3', false, at - 1000), DAY0);
+    await saveReminderDb(db!, remind('d4', true, null), DAY0);
+    const mine = async () =>
+      (await dueReminders(db!, at)).filter((r) => r.endpoint.includes(PREFIX));
+    expect(await mine()).toEqual([remind('d1', true, at - 1000)]);
+    await updateRemindersDb(db!, [remind('d1', true, null)], at);
+    expect(await mine()).toEqual([]);
+    expect(await read('d1')).toMatchObject({ active: true, next_at: null });
+    await updateRemindersDb(db!, [remind('d2', false, null)], at);
+    expect(await read('d2')).toMatchObject({ active: false });
   });
 
   test('the copy of the spreadsheet adds new rows and keeps a newer one in the database', async () => {

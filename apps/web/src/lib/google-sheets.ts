@@ -202,6 +202,7 @@ export async function appendRows(
   c: SheetsConfig,
   title: string,
   rows: readonly (readonly SheetCell[])[],
+  { format = true }: { format?: boolean } = {},
 ): Promise<void> {
   if (!rows.length) return;
   const res = await call<{ updates?: { updatedRange?: string } }>(
@@ -209,6 +210,8 @@ export async function appendRows(
     `/values/${range(title, 'A1')}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
     { method: 'POST', body: JSON.stringify({ values: rows.map((r) => r.map(value)) }) },
   );
+  // The inbox tabs are emptied every night: one request per batch, no look to spend more on.
+  if (!format) return;
   const span = rowsOf(res.updates?.updatedRange ?? '');
   const tab = (await tabsOf(c)).find((t) => t.title === title);
   if (!span || !tab) return;
@@ -366,6 +369,36 @@ export async function deleteRows(
   return true;
 }
 
+/**
+ * Deletes the first `count` data rows of a tab (rows 2…count+1), the rows below move up. Rows
+ * appended meanwhile are below and untouched. Google refuses to delete every non-frozen row of a
+ * tab, so one empty row is added at the bottom in the same request (the tab never shrinks to
+ * just its header). False: no such tab.
+ */
+export async function deleteTopRows(
+  c: SheetsConfig,
+  title: string,
+  count: number,
+): Promise<boolean> {
+  const tab = (await tabsOf(c)).find((t) => t.title === title);
+  if (!tab) return false;
+  if (count < 1) return true;
+  await call(c, ':batchUpdate', {
+    method: 'POST',
+    body: JSON.stringify({
+      requests: [
+        { appendDimension: { sheetId: tab.sheetId, dimension: 'ROWS', length: 1 } },
+        {
+          deleteDimension: {
+            range: { sheetId: tab.sheetId, dimension: 'ROWS', startIndex: 1, endIndex: 1 + count },
+          },
+        },
+      ],
+    }),
+  });
+  return true;
+}
+
 /** The title of the spreadsheet's first tab (the polls table), or null when it has none. */
 export async function firstTab(c: SheetsConfig): Promise<string | null> {
   return (await tabsOf(c))[0]?.title ?? null;
@@ -410,8 +443,9 @@ export async function replaceSheet(
   title: string,
   headers: readonly string[],
   rows: readonly (readonly SheetCell[])[],
+  dateColumns: readonly number[] = [],
 ): Promise<void> {
-  await ensureSheet(c, title, headers);
+  await ensureSheet(c, title, headers, dateColumns);
   await call(c, `/values/${range(title, 'A2:Z')}:clear`, { method: 'POST', body: '{}' });
   await call(c, `/values/${range(title, 'A2')}?valueInputOption=RAW`, {
     method: 'PUT',

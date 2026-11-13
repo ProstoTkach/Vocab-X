@@ -16,7 +16,13 @@ import {
 } from './analytics/schema';
 import type { AnonDb } from './db/anon-client';
 import { FEEDBACK_FIELDS } from './feedback';
-import { fromKyivSerial, hasTab, readRowsRange, type SheetsConfig } from './google-sheets';
+import {
+  deleteTopRows,
+  fromKyivSerial,
+  hasTab,
+  readRowsRange,
+  type SheetsConfig,
+} from './google-sheets';
 import { copyReminders, REMINDER_SHEET } from './reminder-store';
 
 /** Rows read from the sheet at once (design §4). */
@@ -409,6 +415,11 @@ export interface CopyResult {
   eventsExpired: number;
   sessionsExpired: number;
   reminders: number;
+  /** Rows deleted from the sheets after they were stored (move mode). */
+  eventsDeleted: number;
+  sessionsDeleted: number;
+  /** Move mode: deleting stored rows failed; the next night stores them again (harmlessly). */
+  deleteFailed: boolean;
   /** Browsers and days whose summaries were rebuilt. */
   devices: number;
   days: number;
@@ -441,6 +452,14 @@ export interface CopyOptions {
   since?: { events: number; sessions: number };
   /** Milliseconds to spend reading and writing; none: no limit (the one-off import). */
   budgetMs?: number;
+  /**
+   * Move mode (the nightly transfer): once a chunk of rows is stored, exactly those rows (2…N+1)
+   * are deleted from the sheet and the next chunk is read from row 2 again. Rows appended
+   * meanwhile are below and keep their place. Without it (the one-off import) sheets are only read.
+   */
+  move?: boolean;
+  /** Also copy the leftover reminder tab (the one-off import only; default true). */
+  reminders?: boolean;
   now?: () => number;
 }
 
@@ -452,7 +471,7 @@ export interface CopyOptions {
 export async function copySheetsToDb(
   sheets: SheetsConfig,
   db: AnonDb,
-  { budgetMs, since, now = Date.now }: CopyOptions = {},
+  { budgetMs, since, move = false, reminders = true, now = Date.now }: CopyOptions = {},
 ): Promise<CopyResult> {
   const started = now();
   const stop = () => budgetMs !== undefined && now() - started > budgetMs;
@@ -467,50 +486,80 @@ export async function copySheetsToDb(
     eventsExpired: 0,
     sessionsExpired: 0,
     reminders: 0,
+    eventsDeleted: 0,
+    sessionsDeleted: 0,
+    deleteFailed: false,
     devices: 0,
     days: 0,
     complete: true,
     ms: 0,
   };
 
+  /** Reads a tab chunk by chunk; in move mode each stored chunk leaves the sheet. */
   const readsAll = async (
     title: string,
     columns: number,
     each: (rows: unknown[][]) => Promise<void>,
+    deleted: 'eventsDeleted' | 'sessionsDeleted',
   ) => {
     if (!(await hasTab(sheets, title))) return;
-    let ended = false;
-    for await (const { rows, last } of rowsOf(sheets, title, columns, stop)) {
+    for (let from = 2; ; from += READ_CHUNK) {
+      if (stop()) {
+        result.complete = false;
+        return;
+      }
+      const start = move ? 2 : from;
+      const rows = await readRowsRange(sheets, title, start, start + READ_CHUNK - 1, columns);
       await each(rows);
-      ended = last;
+      if (move && rows.length) {
+        try {
+          await deleteTopRows(sheets, title, rows.length);
+          result[deleted] += rows.length;
+        } catch (e) {
+          console.error('analytics: delete', e instanceof Error ? e.message.slice(0, 200) : e);
+          result.deleteFailed = true;
+          result.complete = false;
+          return;
+        }
+      }
+      if (rows.length < READ_CHUNK) return;
     }
-    if (!ended) result.complete = false;
   };
 
-  await readsAll(ANALYTICS_SHEETS.events, EVENT_COLUMNS.length, async (rows) => {
-    const all = rows.flatMap((r) => eventFromRow(r) ?? []);
-    const events = since ? all.filter((e) => e.ts >= since.events) : all;
-    result.eventsRead += rows.length;
-    result.eventsSkipped += rows.length - all.length;
-    result.eventsExpired += all.length - events.length;
-    for (const e of events) {
-      touched.anonIds.add(e.anon_id);
-      touched.days.add(kyivDay(e.ts));
-    }
-    result.eventsAdded += await insertEvents(db, events);
-  });
+  await readsAll(
+    ANALYTICS_SHEETS.events,
+    EVENT_COLUMNS.length,
+    async (rows) => {
+      const all = rows.flatMap((r) => eventFromRow(r) ?? []);
+      const events = since ? all.filter((e) => e.ts >= since.events) : all;
+      result.eventsRead += rows.length;
+      result.eventsSkipped += rows.length - all.length;
+      result.eventsExpired += all.length - events.length;
+      for (const e of events) {
+        touched.anonIds.add(e.anon_id);
+        touched.days.add(kyivDay(e.ts));
+      }
+      result.eventsAdded += await insertEvents(db, events);
+    },
+    'eventsDeleted',
+  );
 
-  await readsAll(ANALYTICS_SHEETS.sessions, SESSION_COLUMNS.length, async (rows) => {
-    const all = rows.flatMap((r) => sessionFromRow(r) ?? []);
-    const sessions = since ? all.filter((x) => x.started_at >= since.sessions) : all;
-    result.sessionsRead += rows.length;
-    result.sessionsSkipped += rows.length - all.length;
-    result.sessionsExpired += all.length - sessions.length;
-    for (const s of sessions) touched.anonIds.add(s.anon_id);
-    result.sessionsWritten += await upsertSessions(db, sessions);
-  });
+  await readsAll(
+    ANALYTICS_SHEETS.sessions,
+    SESSION_COLUMNS.length,
+    async (rows) => {
+      const all = rows.flatMap((r) => sessionFromRow(r) ?? []);
+      const sessions = since ? all.filter((x) => x.started_at >= since.sessions) : all;
+      result.sessionsRead += rows.length;
+      result.sessionsSkipped += rows.length - all.length;
+      result.sessionsExpired += all.length - sessions.length;
+      for (const s of sessions) touched.anonIds.add(s.anon_id);
+      result.sessionsWritten += await upsertSessions(db, sessions);
+    },
+    'sessionsDeleted',
+  );
 
-  if (await hasTab(sheets, REMINDER_SHEET)) {
+  if (reminders && (await hasTab(sheets, REMINDER_SHEET))) {
     const rows = await readRowsRange(sheets, REMINDER_SHEET, 2, 20_000, 6);
     result.reminders = await copyReminders(db, rows);
   }

@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { rowsBefore } from './cleanup';
 import { kyivSerial, rowRuns } from './google-sheets';
-import { staleReminderRows } from './reminder-store';
 
 const DAY = 86_400_000;
 const now = Date.UTC(2026, 10, 12, 12);
@@ -18,17 +17,5 @@ describe('spreadsheet cleanup', () => {
       [2, 5],
     ]);
     expect(rowRuns([])).toEqual([]);
-  });
-
-  test('reminder rows: emptied, off for 30 days, or not updated for 90', () => {
-    const rows = [
-      ['https://push/a', true, 'uk', at(10)],
-      [],
-      ['https://push/b', false, 'uk', at(31)],
-      ['https://push/c', false, 'uk', at(29)],
-      ['https://push/d', true, 'en', at(91)],
-      ['https://push/e', true, 'en', at(89)],
-    ];
-    expect(staleReminderRows(rows, now)).toEqual([3, 4, 6]);
   });
 });
