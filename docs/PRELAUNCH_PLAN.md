@@ -7,7 +7,7 @@ rows of "Additions to existing steps" that name them.
 
 ## Progress and handoff
 
-Next: **session 16** (model S); owner's legal review of session 5 texts (`docs/LEGAL_REVIEW.md` §3) can run in parallel. Migration `0005` is applied to the main database (2026-11-12); migration `0006` (drops unused `users` columns) is applied **only after** the deploy with session 8 is live. Migration `0007` (`users.sessions_since`, session 15) is needed **before** that deploy: its one statement was run on the main database by hand (2026-11-13, owner's permission), so `pnpm db:migrate` after the deploy applies `0006` and passes over `0007` (`IF NOT EXISTS`). Update this line and the "Done" line at the end of every session.
+Next: **session 17** (model S); owner's legal review of session 5 texts (`docs/LEGAL_REVIEW.md` §3) can run in parallel. Migration `0005` is applied to the main database (2026-11-12); migration `0006` (drops unused `users` columns) is applied **only after** the deploy with session 8 is live. Migration `0007` (`users.sessions_since`, session 15) is needed **before** that deploy: its one statement was run on the main database by hand (2026-11-13, owner's permission), so `pnpm db:migrate` after the deploy applies `0006` and passes over `0007` (`IF NOT EXISTS`). Update this line and the "Done" line at the end of every session.
 Done: 0.1 (`docs/AUDIT.md`, 2026-11-12); 1.0 + 5.3a (session 1, 2026-11-12, commit b076026); 1.1 + 1.2 (session 2, 2026-11-12);
 2.1a (session 3, 2026-11-12); 1.3 + 5.4 + 6.7 + 1.6 terms (session 4, 2026-11-12);
 1.4 text + 5.1 text (session 5, 2026-11-12; `messages/*/legal.json`, format and review list in `docs/LEGAL_REVIEW.md`);
@@ -18,6 +18,7 @@ Done: 0.1 (`docs/AUDIT.md`, 2026-11-12); 1.0 + 5.3a (session 1, 2026-11-12, comm
 6.5 + rest of 6.6 (session 12, 2026-11-12; sync integrity tests (fake server + `pnpm test:db`), `SYNC_PROTOCOL` / 426, "update the app" screen, service worker per build, see `docs/DEVELOPMENT.md` «Синхронізація», «Офлайн»);
 6.15 (session 13, 2026-11-12; static example sentences, owner reviews them); 6.10 + 5.9 (session 14, 2026-11-13; kill switches, route error screens);
 2.6 (session 15, 2026-11-13; `docs/THREAT_MODEL.md`; fixes W1–W4: sessions ended from the server (`lib/sessions.ts`, "sign out on all devices"), reset links of their own kind, limits on setting a password and on confirmation links, guard tests);
+5.5 + 4.3 + 6.13 (session 16, 2026-11-13; «Випуск і відкат» and «Резервні копії» in `docs/DEVELOPMENT.md`, `docs/INCIDENTS.md`; restore on a test branch not yet tried — owner, see `to_test_locally.md`);
 owner: 6.8 (two-step sign-in everywhere), Neon test branch created.
 
 Owner decisions that later sessions must respect (2026-11-12):
@@ -373,8 +374,8 @@ Contact address for `/privacy`; legal review of privacy/terms text; approve rete
 - [ ] `pnpm audit` clean (critical/high)
 - [ ] Monitoring and uptime alerts live
 - [ ] Load test report + scaling plan reviewed
-- [ ] Backup restore tried
-- [ ] Rollback procedure written
+- [ ] Backup restore tried (procedure written, session 16; the owner tries it on a test branch)
+- [x] Rollback procedure written (`docs/DEVELOPMENT.md`, session 16)
 - [ ] Unconfirmed address cannot be taken over; password reset works (A1, A8)
 - [ ] Final domain in place; OAuth consent screen in production; letters reach Gmail/Outlook/ukr.net inbox
 - [ ] Two-step sign-in on all owner accounts
