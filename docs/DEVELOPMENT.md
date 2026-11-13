@@ -50,6 +50,7 @@ pnpm e2e           # Playwright: усі тести, мобільний (390×844
 pnpm e2e:changed   # лише тести того, що змінилося (див. нижче)
 pnpm --filter @vocabx/web e2e:browsers   # smoke у WebKit (десктоп + iPhone 14) і Firefox
 pnpm screenshots   # скріншоти /dev/ui і сторінок у 5 в'юпортах × 5 тем → apps/web/screenshots
+pnpm metrics       # трафік, збірка, запити за сесію, вміст → docs/METRICS.md (≈ 3 хв, не входить в e2e)
 ```
 
 Перед першим `pnpm e2e`: `pnpm --filter @vocabx/web exec playwright install chromium`.
@@ -290,7 +291,7 @@ layout: без провайдерів, мова за адресою `/en/…`, �
 
 ## Офлайн і нагадування
 
-Service worker — `apps/web/public/sw.js` (у `next dev` — `sw.js?dev`: лише нагадування, нічого не кешує; реєструє
+Service worker — `public/sw.js` (копіюється в `apps/web/public/` через `sync-media`; правити тільки кореневий) (у `next dev` — `sw.js?dev`: лише нагадування, нічого не кешує; реєструє
 `lib/offline.ts` з `components/shell/offline-support.tsx`). Сторінки — спершу мережа, без неї
 збережена копія (ключ — шлях без параметрів); невідома сторінка без мережі — домашня сторінка
 в мові застосунку, інакше проста сторінка «Немає мережі». Статичні файли (`/_next/static`,

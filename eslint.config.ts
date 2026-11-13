@@ -21,6 +21,8 @@ export default defineConfig(
       '**/next-env.d.ts',
       '**/playwright-report/**',
       '**/test-results/**',
+      // Static files served as they are (the service worker runs in a worker scope, not the app's).
+      'public/**',
     ],
   },
   js.configs.recommended,

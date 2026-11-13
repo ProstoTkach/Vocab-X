@@ -122,12 +122,12 @@ const RULES = [
   [/^apps\/web\/messages\/[^/]+\/analytics\.json$/, ['analytics']],
   [/^apps\/web\/messages\/[^/]+\/league\.json$/, ['league']],
   [/^apps\/web\/messages\/[^/]+\/(profile|email)\.json$/, ['profile']],
-  [/^apps\/web\/public\/sw\.js$/, ['offline', 'install']],
+  [/^(apps\/web\/)?public\/sw\.js$/, ['offline', 'install']],
   [/^apps\/web\/messages\//, ['shell']],
-  [/^apps\/web\/public\//, ['shell', 'install']],
+  [/^(apps\/web\/)?public\/(?!examples)/, ['shell', 'install']],
 ];
 /** Anything the learner sees: the quick look at every page (smoke) runs too. */
-const UI = /^apps\/web\/(src\/.*\.(tsx|css)|messages\/|public\/)/;
+const UI = /^(apps\/web\/(src\/.*\.(tsx|css)|messages\/)|(apps\/web\/)?public\/)/;
 
 const specs = new Set();
 const why = [];
@@ -149,7 +149,10 @@ const files = [
     [...specs].filter((s) => s !== ALL).map((s) => (s.endsWith('.spec.ts') ? s : `${s}.spec.ts`)),
   ),
 ]
-  .filter((f) => existsSync(join(web, 'e2e', f)) && f !== 'screenshots.spec.ts')
+  .filter(
+    (f) =>
+      existsSync(join(web, 'e2e', f)) && f !== 'screenshots.spec.ts' && f !== 'metrics.spec.ts',
+  )
   .sort();
 
 console.log(

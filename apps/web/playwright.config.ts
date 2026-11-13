@@ -30,7 +30,7 @@ export default defineConfig({
     },
     {
       name: 'desktop',
-      testIgnore: /screenshots\.spec\.ts/,
+      testIgnore: /(screenshots|metrics)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
     },
     // Other engines (plan 6.11): only the quick look at every page and the shell, where Safari and
@@ -55,6 +55,13 @@ export default defineConfig({
           },
         ]
       : []),
+    {
+      // Run explicitly: pnpm metrics (traffic, requests and content size on a phone; plan 4.2)
+      name: 'metrics',
+      testMatch: /metrics\.spec\.ts/,
+      workers: 1,
+      use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } },
+    },
     {
       // Run explicitly: pnpm e2e --project screenshots
       name: 'screenshots',

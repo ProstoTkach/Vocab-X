@@ -18,7 +18,8 @@
     "build": "pnpm --filter @vocabx/web build",
     "e2e": "pnpm --filter @vocabx/web e2e --project mobile --project desktop",
     "e2e:changed": "pnpm --filter @vocabx/web e2e:changed",
-    "screenshots": "pnpm --filter @vocabx/web e2e --project screenshots"
+    "screenshots": "pnpm --filter @vocabx/web e2e --project screenshots",
+    "metrics": "pnpm --filter @vocabx/web metrics"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
