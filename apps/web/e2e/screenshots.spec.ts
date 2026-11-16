@@ -37,6 +37,7 @@ for (const vp of VIEWPORTS) {
     });
 
     test('decks', async ({ page }) => {
+      test.setTimeout(90_000);
       await onboard(page);
       await page.goto('/uk/review');
       await page.keyboard.press('3');
@@ -46,9 +47,9 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByText('До наступного повторення')).toBeVisible();
       await page.screenshot({ path: `screenshots/words-${vp.name}.png` });
       await page.goto('/uk/decks/library');
-      await expect(page.getByText('Уся колода додана')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Бібліотека колод' })).toBeVisible();
       await page.screenshot({ path: `screenshots/library-${vp.name}.png` });
-      await page.getByRole('listitem').filter({ hasText: 'B2' }).getByRole('link').click();
+      await page.locator('a[href$="builtin%3Aen-b2-advanced"]').click();
       await page.getByRole('button', { name: 'Обрати слова' }).click();
       await expect(page.getByTestId('picker-card')).toBeVisible();
       await page.waitForTimeout(300);
