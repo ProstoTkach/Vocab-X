@@ -20,9 +20,9 @@
     "terms": "Terms of service",
     "credits": "Credits"
   },
+  "back": "Back",
   "legalBack": "To the home page",
   "legalNav": "Legal pages",
-  "contactMissing": "[contact address not set yet]",
   "appUpdate": {
     "title": "Update VocabX",
     "text": "Your words were saved by a newer version of the app, and this page opened an older one. So as not to spoil them, it leaves them alone: reload the page and everything will be there.",

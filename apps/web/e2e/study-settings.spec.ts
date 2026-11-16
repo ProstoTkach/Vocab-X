@@ -1,6 +1,6 @@
 // Every learning setting must change the review session (stage A5 acceptance).
 import { expect, test, type Page } from '@playwright/test';
-import { onboard } from './fixtures';
+import { onboard, openSettingsSection } from './fixtures';
 
 const card = (page: Page) => page.getByTestId('review-card');
 const deckCount = (page: Page) => page.getByText(/^\d+ карт(ка|ки|ок)$/);
@@ -25,6 +25,7 @@ const openReview = async (page: Page) => {
 };
 
 test('two grades', async ({ page }) => {
+  await openSettingsSection(page, 'Параметри навчання');
   await page.getByRole('switch', { name: /Лише дві оцінки/ }).click();
   await openReview(page);
   await page.keyboard.press('Space');
@@ -32,6 +33,7 @@ test('two grades', async ({ page }) => {
 });
 
 test('typing the word', async ({ page }) => {
+  await openSettingsSection(page, 'Параметри навчання');
   await page.getByRole('switch', { name: 'Вводити слово замість перевертання' }).click();
   // Typing applies from recall (level 2) up; level-1 cards keep flipping.
   await openReview(page);
@@ -76,6 +78,7 @@ test('typing the word', async ({ page }) => {
 });
 
 test('auto-speak off', async ({ page }) => {
+  await openSettingsSection(page, 'Параметри навчання');
   await page.getByRole('switch', { name: /озвучувати слово/i }).click();
   await openReview(page);
   await page.keyboard.press('Space');
@@ -84,6 +87,7 @@ test('auto-speak off', async ({ page }) => {
 });
 
 test('mirrored swipe layout swaps Again and Good on arrows', async ({ page }) => {
+  await openSettingsSection(page, 'Картка і жести');
   await page.getByRole('radio', { name: '← Згадав · → Забув' }).click();
   await openReview(page);
   await page.keyboard.press('ArrowLeft'); // now "Good": the card leaves the deck
@@ -102,6 +106,7 @@ test('text size of the whole app: at once, and kept from the first paint', async
 });
 
 test('card font size', async ({ page }) => {
+  await openSettingsSection(page, 'Вигляд');
   await page
     .getByRole('radiogroup', { name: 'Розмір шрифту картки' })
     .getByRole('radio', { name: 'Великий' })
@@ -115,6 +120,7 @@ test('card font size', async ({ page }) => {
 });
 
 test('daily new-word limit', async ({ page }) => {
+  await openSettingsSection(page, 'Параметри навчання');
   await page.getByLabel('Нових слів на день').fill('5');
   await page.goto('/uk');
   await expect(page.getByRole('heading', { name: /^5 карток чекають/ })).toBeVisible();
@@ -136,6 +142,7 @@ test('target retention changes the next intervals', async ({ page }) => {
   await expect(await gradeAndReadCountdown()).toHaveText(/^0 год (9|10) хв/);
 
   await page.goto('/uk/settings');
+  await openSettingsSection(page, 'Параметри навчання');
   await page.getByRole('slider', { name: 'Цільова ймовірність пригадування' }).focus();
   await page.keyboard.press('Home'); // 80%
   await expect(page.getByText('Зараз 80%.')).toBeVisible();
@@ -143,6 +150,7 @@ test('target retention changes the next intervals', async ({ page }) => {
 });
 
 test('animations off still reviews', async ({ page }) => {
+  await openSettingsSection(page, 'Вигляд');
   await page
     .getByRole('radiogroup', { name: 'Швидкість анімацій' })
     .getByRole('radio', { name: 'Вимкнено' })

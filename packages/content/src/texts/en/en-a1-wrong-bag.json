@@ -1,0 +1,68 @@
+{
+  "id": "text:en-a1-wrong-bag",
+  "lang": "en",
+  "cefr": "A1",
+  "minutes": 1,
+  "format": "story",
+  "title": "The Wrong Bag",
+  "titleI18n": { "uk": "Не та сумка" },
+  "summaryI18n": {
+    "uk": "Том повертається з аеропорту й відкриває сумку. Усередині зовсім не його речі.",
+    "en": "Tom comes home from the airport and opens his bag. The things inside are not his."
+  },
+  "topics": ["travel"],
+  "keywords": ["airport", "bag", "clothes", "phone", "mistake"],
+  "paragraphs": [
+    {
+      "sentences": [
+        { "text": "Tom is at the airport.", "translations": { "uk": "Том в аеропорту." } },
+        { "text": "He is tired.", "translations": { "uk": "Він втомлений." } },
+        {
+          "text": "He takes his black bag and goes home.",
+          "translations": { "uk": "Він бере свою чорну сумку та їде додому." }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "At home, he opens the bag.",
+          "translations": { "uk": "Удома він відкриває сумку." }
+        },
+        {
+          "text": "His clothes are not in it.",
+          "translations": { "uk": "Його одягу в ній немає." }
+        },
+        {
+          "text": "There is a red dress, a big hat and a toy dog.",
+          "translations": { "uk": "Там червона сукня, великий капелюх та іграшковий песик." }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "Tom looks at the name on the bag.",
+          "translations": { "uk": "Том дивиться на ім'я на сумці." }
+        },
+        { "text": "It says “Anna”.", "translations": { "uk": "Там написано «Анна»." } }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "Then his phone rings.",
+          "translations": { "uk": "Тут дзвонить його телефон." }
+        },
+        {
+          "text": "“Hello, Tom,” a woman says.",
+          "translations": { "uk": "«Алло, Томе», — каже жінка." }
+        },
+        {
+          "text": "“I have your socks.”",
+          "translations": { "uk": "«Ваші шкарпетки в мене»." }
+        }
+      ]
+    }
+  ]
+}

@@ -39,4 +39,9 @@ describe('highlightTerm', () => {
       { text: 'Nothing here.', match: false },
     ]);
   });
+  test('a hyphen before or after the word makes it a suffix or a prefix', () => {
+    expect(marked('Anti-war protests and an antibody test.', 'anti-')).toEqual(['Anti', 'anti']);
+    expect(marked('The action needs attention.', '-tion')).toEqual(['tion', 'tion']);
+    expect(marked('Nothing here.', '-')).toEqual([]);
+  });
 });

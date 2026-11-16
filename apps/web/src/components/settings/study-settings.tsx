@@ -3,7 +3,8 @@
 import { learnableLanguages } from '@vocabx/content';
 import { RETENTION_RANGE, type Profile, type StudySettings } from '@vocabx/core';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { SettingsSection } from '@/components/settings/settings-section';
 import { SelectField, TextField } from '@/components/ui/field';
 import { Segmented } from '@/components/ui/segmented';
 import { Slider } from '@/components/ui/slider';
@@ -27,7 +28,7 @@ const FONT = [
 const GOALS = [20, 50, 100, 200];
 
 /** Learning settings; every change is saved immediately and used by the next card. */
-export function StudySettingsForm() {
+export function StudySettingsForm({ dictionaries }: { dictionaries: ReactNode }) {
   const t = useTranslations('settings');
   const tl = useTranslations('languages');
   const repos = useRepos();
@@ -92,106 +93,124 @@ export function StudySettingsForm() {
           { value: 'sentences', label: t('studyModes.sentences') },
         ]}
       />
-      <SelectField
-        label={t('targetLang')}
-        value={profile.activeTargetLang}
-        onChange={(e) => setTarget(e.target.value)}
-        options={learnableLanguages()
-          .filter((l) => l.code !== profile.nativeLang)
-          .map((l) => ({ value: l.code, label: `${tl(l.code as 'en')} · ${l.nativeName}` }))}
-      />
-
-      <Slider
-        label={t('retention')}
-        hint={t('retentionHint', { percent: Math.round(study.retention * 100) })}
-        value={study.retention}
-        min={RETENTION_RANGE.min}
-        max={RETENTION_RANGE.max}
-        step={0.01}
-        valueText={`${Math.round(study.retention * 100)}%`}
-        onChange={(retention) => setStudy({ ...study, retention })}
-        onCommit={(retention) => update({ retention })}
-      />
-
-      <fieldset className="flex flex-col gap-3">
-        <legend className="text-sm font-semibold">{t('limits')}</legend>
-        <p className="text-sm text-fg-muted">{t('limitsHint')}</p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <TextField
-            label={t('newLimit')}
-            type="number"
-            inputMode="numeric"
-            min={1}
-            placeholder={t('unlimited')}
-            value={study.newPerDay ?? ''}
-            onChange={(e) => update({ newPerDay: limit(e.target.value) }, true)}
-            onBlur={() => track('setting_change', { source: 'newPerDay', to: study.newPerDay })}
-          />
-          <TextField
-            label={t('reviewLimit')}
-            type="number"
-            inputMode="numeric"
-            min={1}
-            placeholder={t('unlimited')}
-            value={study.reviewsPerDay ?? ''}
-            onChange={(e) => update({ reviewsPerDay: limit(e.target.value) }, true)}
-            onBlur={() =>
-              track('setting_change', { source: 'reviewsPerDay', to: study.reviewsPerDay })
-            }
-          />
-        </div>
-      </fieldset>
-
-      <div className="flex flex-col divide-y divide-line/70">
-        <Switch
-          label={t('twoGrades')}
-          checked={study.twoGrades}
-          onCheckedChange={(twoGrades) => update({ twoGrades })}
-        />
-        <Switch
-          label={t('typing')}
-          checked={study.typing}
-          onCheckedChange={(typing) => update({ typing })}
-        />
-        <Switch
-          label={t('autoSpeak')}
-          checked={study.autoSpeak}
-          onCheckedChange={(autoSpeak) => update({ autoSpeak })}
-        />
-        <Switch
-          label={t('gradeButtonsOnPhone')}
-          checked={study.gradeButtonsOnPhone}
-          onCheckedChange={(gradeButtonsOnPhone) => update({ gradeButtonsOnPhone })}
-        />
-      </div>
-
-      <Segmented
-        label={t('swipeLayout')}
-        value={study.swipeLayout}
-        onChange={(swipeLayout) => update({ swipeLayout })}
-        options={[
-          { value: 'default', label: t('swipeDefault') },
-          { value: 'mirrored', label: t('swipeMirrored') },
-        ]}
-      />
-      <Segmented
-        label={t('fontSize')}
-        value={String(study.cardFontScale)}
-        onChange={(v) => update({ cardFontScale: Number(v) })}
-        options={FONT.map((o) => ({ value: o.value, label: t(o.key) }))}
-      />
-      <Segmented
-        label={t('animation')}
-        value={String(study.animationSpeed)}
-        onChange={(v) => update({ animationSpeed: Number(v) })}
-        options={ANIMATION.map((o) => ({ value: o.value, label: t(o.key) }))}
-      />
       <Segmented
         label={t('dailyGoal')}
         value={String(study.dailyGoalXp)}
         onChange={(v) => update({ dailyGoalXp: Number(v) })}
         options={GOALS.map((xp) => ({ value: String(xp), label: t('dailyGoalValue', { xp }) }))}
       />
+
+      <div className="flex flex-col divide-y divide-line/70 border-t border-line/70">
+        <SettingsSection title={t('sections.learning.title')} hint={t('sections.learning.hint')}>
+          <SelectField
+            label={t('targetLang')}
+            value={profile.activeTargetLang}
+            onChange={(e) => setTarget(e.target.value)}
+            options={learnableLanguages()
+              .filter((l) => l.code !== profile.nativeLang)
+              .map((l) => ({ value: l.code, label: `${tl(l.code as 'en')} · ${l.nativeName}` }))}
+          />
+
+          <Slider
+            label={t('retention')}
+            hint={t('retentionHint', { percent: Math.round(study.retention * 100) })}
+            value={study.retention}
+            min={RETENTION_RANGE.min}
+            max={RETENTION_RANGE.max}
+            step={0.01}
+            valueText={`${Math.round(study.retention * 100)}%`}
+            onChange={(retention) => setStudy({ ...study, retention })}
+            onCommit={(retention) => update({ retention })}
+          />
+
+          <fieldset className="flex flex-col gap-3">
+            <legend className="text-sm font-semibold">{t('limits')}</legend>
+            <p className="text-sm text-fg-muted">{t('limitsHint')}</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <TextField
+                label={t('newLimit')}
+                type="number"
+                inputMode="numeric"
+                min={1}
+                placeholder={t('unlimited')}
+                value={study.newPerDay ?? ''}
+                onChange={(e) => update({ newPerDay: limit(e.target.value) }, true)}
+                onBlur={() => track('setting_change', { source: 'newPerDay', to: study.newPerDay })}
+              />
+              <TextField
+                label={t('reviewLimit')}
+                type="number"
+                inputMode="numeric"
+                min={1}
+                placeholder={t('unlimited')}
+                value={study.reviewsPerDay ?? ''}
+                onChange={(e) => update({ reviewsPerDay: limit(e.target.value) }, true)}
+                onBlur={() =>
+                  track('setting_change', { source: 'reviewsPerDay', to: study.reviewsPerDay })
+                }
+              />
+            </div>
+          </fieldset>
+
+          <div className="flex flex-col divide-y divide-line/70">
+            <Switch
+              label={t('twoGrades')}
+              checked={study.twoGrades}
+              onCheckedChange={(twoGrades) => update({ twoGrades })}
+            />
+            <Switch
+              label={t('typing')}
+              checked={study.typing}
+              onCheckedChange={(typing) => update({ typing })}
+            />
+            <Switch
+              label={t('autoSpeak')}
+              checked={study.autoSpeak}
+              onCheckedChange={(autoSpeak) => update({ autoSpeak })}
+            />
+          </div>
+
+          <section aria-labelledby="settings-dictionaries" className="flex flex-col gap-2">
+            <h3 id="settings-dictionaries" className="text-sm font-semibold">
+              {t('dictionaries')}
+            </h3>
+            <p className="text-sm text-fg-muted">{t('dictionariesHint')}</p>
+            {dictionaries}
+          </section>
+        </SettingsSection>
+
+        <SettingsSection title={t('sections.card.title')} hint={t('sections.card.hint')}>
+          <Switch
+            label={t('gradeButtonsOnPhone')}
+            checked={study.gradeButtonsOnPhone}
+            onCheckedChange={(gradeButtonsOnPhone) => update({ gradeButtonsOnPhone })}
+          />
+          <Segmented
+            label={t('swipeLayout')}
+            value={study.swipeLayout}
+            onChange={(swipeLayout) => update({ swipeLayout })}
+            options={[
+              { value: 'default', label: t('swipeDefault') },
+              { value: 'mirrored', label: t('swipeMirrored') },
+            ]}
+          />
+        </SettingsSection>
+
+        <SettingsSection title={t('sections.look.title')} hint={t('sections.look.hint')}>
+          <Segmented
+            label={t('fontSize')}
+            value={String(study.cardFontScale)}
+            onChange={(v) => update({ cardFontScale: Number(v) })}
+            options={FONT.map((o) => ({ value: o.value, label: t(o.key) }))}
+          />
+          <Segmented
+            label={t('animation')}
+            value={String(study.animationSpeed)}
+            onChange={(v) => update({ animationSpeed: Number(v) })}
+            options={ANIMATION.map((o) => ({ value: o.value, label: t(o.key) }))}
+          />
+        </SettingsSection>
+      </div>
     </div>
   );
 }

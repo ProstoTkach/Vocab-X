@@ -1,0 +1,253 @@
+{
+  "id": "text:en-a2-feeding-milo",
+  "lang": "en",
+  "cefr": "A2",
+  "minutes": 3,
+  "format": "chat",
+  "title": "Who Is Feeding Milo?",
+  "titleI18n": { "uk": "Хто годує Майло?" },
+  "summaryI18n": {
+    "uk": "Мія пише новому сусідові з дивним запитанням про сірого кота.",
+    "en": "Mia writes to her new neighbour with a strange question about a grey cat."
+  },
+  "topics": ["home", "social"],
+  "keywords": ["cat", "neighbour", "food", "dinner", "chat", "promise"],
+  "paragraphs": [
+    {
+      "speaker": "Mia",
+      "sentences": [
+        { "text": "Hi!", "translations": { "uk": "Привіт!" } },
+        {
+          "text": "Sorry to write so late.",
+          "translations": { "uk": "Вибачте, що пишу так пізно." }
+        },
+        {
+          "text": "Are you the new neighbour from number 12?",
+          "translations": { "uk": "Ви новий сусід із дванадцятого будинку?" }
+        }
+      ]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        { "text": "Yes, that's me.", "translations": { "uk": "Так, це я." } },
+        {
+          "text": "I moved in last week.",
+          "translations": { "uk": "Я переїхав минулого тижня." }
+        },
+        { "text": "Is everything okay?", "translations": { "uk": "Усе гаразд?" } }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [
+        { "text": "Yes, don't worry.", "translations": { "uk": "Так, не хвилюйтеся." } },
+        {
+          "text": "I have a strange question.",
+          "translations": { "uk": "У мене дивне запитання." }
+        },
+        { "text": "Do you have a grey cat?", "translations": { "uk": "У вас є сірий кіт?" } }
+      ]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        {
+          "text": "No, but a grey cat visits me every evening.",
+          "translations": { "uk": "Ні, але сірий кіт приходить до мене щовечора." }
+        },
+        { "text": "He is very friendly.", "translations": { "uk": "Він дуже привітний." } },
+        {
+          "text": "I call him Mister Grey.",
+          "translations": { "uk": "Я називаю його Містер Сірий." }
+        }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [
+        { "text": "That is my cat!", "translations": { "uk": "Це мій кіт!" } },
+        { "text": "His name is Milo.", "translations": { "uk": "Його звати Майло." } }
+      ]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        { "text": "Oh no.", "translations": { "uk": "Ой, ні." } },
+        { "text": "I'm sorry!", "translations": { "uk": "Вибачте!" } },
+        {
+          "text": "He always looks so hungry, so I give him some chicken.",
+          "translations": {
+            "uk": "Він завжди має такий голодний вигляд, тож я даю йому трохи курятини."
+          }
+        }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [
+        { "text": "Chicken?", "translations": { "uk": "Курятини?" } },
+        { "text": "Every evening?", "translations": { "uk": "Щовечора?" } }
+      ]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        { "text": "And a little milk.", "translations": { "uk": "І трошки молока." } },
+        {
+          "text": "Sometimes fish on Fridays.",
+          "translations": { "uk": "Іноді рибу по п'ятницях." }
+        }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [
+        { "text": "Now I understand.", "translations": { "uk": "Тепер я розумію." } },
+        {
+          "text": "The doctor says Milo is too heavy.",
+          "translations": { "uk": "Лікар каже, що Майло важить забагато." }
+        },
+        {
+          "text": "I give him only a small dinner, but he gets bigger every week!",
+          "translations": { "uk": "Я даю йому лише маленьку вечерю, а він щотижня більшає!" }
+        }
+      ]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        { "text": "I really didn't know.", "translations": { "uk": "Я справді не знав." } },
+        {
+          "text": "He sits at my door and cries.",
+          "translations": { "uk": "Він сидить під моїми дверима й плаче." }
+        },
+        { "text": "It is hard to say no.", "translations": { "uk": "Важко сказати «ні»." } }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [
+        { "text": "I know.", "translations": { "uk": "Знаю." } },
+        {
+          "text": "He is a very good actor.",
+          "translations": { "uk": "Він дуже добрий актор." }
+        }
+      ]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        {
+          "text": "OK, no more chicken.",
+          "translations": { "uk": "Гаразд, більше ніякої курятини." }
+        },
+        { "text": "I promise.", "translations": { "uk": "Обіцяю." } },
+        {
+          "text": "Can he still visit me?",
+          "translations": { "uk": "А він зможе й далі до мене приходити?" }
+        },
+        { "text": "I like him.", "translations": { "uk": "Він мені подобається." } },
+        {
+          "text": "My flat is very quiet.",
+          "translations": { "uk": "У моїй квартирі дуже тихо." }
+        }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [
+        { "text": "Of course.", "translations": { "uk": "Звісно." } },
+        {
+          "text": "You can play with him.",
+          "translations": { "uk": "Можете з ним гратися." }
+        },
+        {
+          "text": "Just no food, please.",
+          "translations": { "uk": "Тільки без їжі, будь ласка." }
+        }
+      ]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        { "text": "Deal.", "translations": { "uk": "Домовилися." } },
+        { "text": "Wait.", "translations": { "uk": "Стривайте." } },
+        {
+          "text": "I am looking out of the window right now.",
+          "translations": { "uk": "Я саме зараз дивлюся у вікно." }
+        }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [{ "text": "And?", "translations": { "uk": "І що?" } }]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        {
+          "text": "Milo is in the garden of number 14.",
+          "translations": { "uk": "Майло в саду чотирнадцятого будинку." }
+        },
+        {
+          "text": "An old lady is giving him a plate of something.",
+          "translations": { "uk": "Літня пані дає йому тарілку з чимось." }
+        }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [
+        { "text": "I don't believe it.", "translations": { "uk": "Не вірю." } },
+        {
+          "text": "How many dinners does this cat have?",
+          "translations": { "uk": "Скільки ж вечер у цього кота?" }
+        }
+      ]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        {
+          "text": "I think we need to talk to the whole street.",
+          "translations": { "uk": "Думаю, нам треба поговорити з усією вулицею." }
+        }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [
+        {
+          "text": "I'll make a group chat.",
+          "translations": { "uk": "Я створю груповий чат." }
+        },
+        {
+          "text": "I'll call it “Do NOT feed Milo”.",
+          "translations": { "uk": "Назву його «НЕ годуйте Майло»." }
+        }
+      ]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        { "text": "Add me first.", "translations": { "uk": "Додайте мене першим." } },
+        { "text": "And Mia?", "translations": { "uk": "І ще, Міє?" } }
+      ]
+    },
+    {
+      "speaker": "Mia",
+      "sentences": [{ "text": "Yes?", "translations": { "uk": "Так?" } }]
+    },
+    {
+      "speaker": "Dan",
+      "sentences": [
+        { "text": "Don't tell Milo.", "translations": { "uk": "Не кажіть Майло." } },
+        {
+          "text": "He will be very angry with us.",
+          "translations": { "uk": "Він дуже на нас розсердиться." }
+        }
+      ]
+    }
+  ]
+}

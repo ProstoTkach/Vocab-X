@@ -106,6 +106,168 @@ test('add a word from my words goes to "My words"', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Мої слова' }).last()).toBeVisible();
 });
 
+test('"Знайти" is next to the field that is active', async ({ page }) => {
+  await page.goto('/uk/decks');
+  await page.getByRole('button', { name: /^Додати нове слово/ }).click();
+  const dialog = page.getByRole('dialog');
+  const find = dialog.getByRole('button', { name: 'Знайти' });
+  const term = dialog.getByLabel('Слово або вираз');
+  const translations = dialog.getByLabel(/Переклади/);
+  await term.fill('revenue');
+  await expect(find).toHaveCount(1);
+  // A click on the next field moves the focus there, and the button moves with it.
+  await translations.click();
+  await expect(translations).toBeFocused();
+  await expect(find).toHaveCount(1);
+  await term.click();
+  await expect(term).toBeFocused();
+  await dialog.getByLabel('Приклад речення').click();
+  await expect(dialog.getByLabel('Приклад речення')).toBeFocused();
+  await expect(find).toHaveCount(0);
+});
+
+test('the translation written first: "Знайти" fills in the English word and its example', async ({
+  page,
+}) => {
+  // Asked from Ukrainian, the translator gives English words; asked back, the Ukrainian ones.
+  await page.route('**/api/translate?**', (route) =>
+    route.fulfill({
+      json: {
+        translations:
+          new URL(route.request().url()).searchParams.get('from') !== 'uk'
+            ? ['дохід', 'виручка']
+            : new URL(route.request().url()).searchParams.get('q') === 'прибуток'
+              ? ['profit']
+              : ['revenue', 'income'],
+      },
+    }),
+  );
+  await page.goto('/uk/decks');
+  await page.getByRole('button', { name: /^Додати нове слово/ }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel(/Переклади/).fill('дохід');
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
+  await expect(dialog.getByLabel('Слово або вираз')).toHaveValue('revenue');
+  await expect(dialog.getByLabel(/Переклади/)).toHaveValue('дохід');
+  await expect(dialog.getByLabel('Приклад речення')).toHaveValue('Revenue grew by 10%.');
+  // The English words are choices of a radio group: the chosen one is on, another replaces it.
+  await expect(dialog.getByRole('radio', { name: 'revenue' })).toBeChecked();
+  await dialog.getByRole('radio', { name: 'income' }).click();
+  await expect(dialog.getByLabel('Слово або вираз')).toHaveValue('income');
+  await expect(dialog.getByRole('radio', { name: 'income' })).toBeChecked();
+  await expect(dialog.getByRole('radio', { name: 'revenue' })).not.toBeChecked();
+  await expect(dialog.getByLabel(/Переклади/)).toHaveValue('дохід');
+  // A new translation can be searched at once: the button is not locked by the earlier search.
+  await dialog.getByLabel(/Переклади/).fill('прибуток');
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
+  await expect(dialog.getByLabel('Слово або вираз')).toHaveValue('profit');
+  await expect(dialog.getByRole('radio', { name: 'profit' })).toBeChecked();
+});
+
+test('a new word after a search clears the translation, the example and the word choices', async ({
+  page,
+}) => {
+  await page.route('**/api/translate?**', (route) =>
+    route.fulfill({
+      json: {
+        translations:
+          new URL(route.request().url()).searchParams.get('from') === 'uk'
+            ? ['revenue', 'income']
+            : ['дохід', 'виручка'],
+      },
+    }),
+  );
+  await page.goto('/uk/decks');
+  await page.getByRole('button', { name: /^Додати нове слово/ }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel(/Переклади/).fill('дохід');
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
+  await expect(dialog.getByLabel('Приклад речення')).toHaveValue('Revenue grew by 10%.');
+  // Changing the word clears the example at once.
+  await dialog.getByLabel('Слово або вираз').fill('cat');
+  await expect(dialog.getByLabel('Приклад речення')).toHaveValue('');
+  // A search for the new word starts clean.
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
+  await expect(dialog.getByRole('radio')).toHaveCount(0);
+  await expect(dialog.getByLabel(/Переклади/)).toHaveValue('');
+});
+
+/** Translations by the question: from Ukrainian "яблоко" is an apple, the rest is "revenue". */
+async function mockApple(page: Page) {
+  await page.route('**/api/translate?**', (route) => {
+    const q = new URL(route.request().url()).searchParams;
+    void route.fulfill({
+      json: {
+        translations:
+          q.get('from') !== 'uk'
+            ? ['прибуток', 'вигода']
+            : q.get('q') === 'яблоко'
+              ? ['apple']
+              : ['revenue', 'income'],
+      },
+    });
+  });
+}
+
+test('a new translation after a search finds its word and keeps the translation', async ({
+  page,
+}) => {
+  await mockApple(page);
+  await page.goto('/uk/decks');
+  await page.getByRole('button', { name: /^Додати нове слово/ }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Слово або вираз').fill('profit');
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
+  await expect(dialog.getByRole('button', { name: 'прибуток' })).toBeVisible();
+  await dialog.getByLabel(/Переклади/).fill('яблоко');
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
+  await expect(dialog.getByLabel('Слово або вираз')).toHaveValue('apple');
+  await expect(dialog.getByLabel(/Переклади/)).toHaveValue('яблоко');
+});
+
+test('a translation like none of the variants asks to check it before adding', async ({ page }) => {
+  await mockApple(page);
+  await page.goto('/uk/decks');
+  await page.getByRole('button', { name: /^Додати нове слово/ }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Слово або вираз').fill('profit');
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
+  await expect(dialog.getByRole('button', { name: 'прибуток' })).toBeVisible();
+  await dialog.getByLabel(/Переклади/).fill('яблоко');
+  await dialog.getByRole('button', { name: 'Додати', exact: true }).click();
+  const check = page.getByRole('dialog', { name: 'Перевірте переклад' });
+  await expect(check).toBeVisible();
+  await check.getByRole('button', { name: 'Повернутися до полів' }).click();
+  await expect(check).toHaveCount(0);
+  await expect(dialog.getByLabel(/Переклади/)).toBeFocused();
+  await dialog.getByRole('button', { name: 'Додати', exact: true }).click();
+  await page
+    .getByRole('dialog', { name: 'Перевірте переклад' })
+    .getByRole('button', { name: 'Все одно додати' })
+    .click();
+  await expect(page.getByText('16 слів', { exact: true })).toBeVisible();
+});
+
+test('a word written in Ukrainian in the word field is found in English too', async ({ page }) => {
+  await page.route('**/api/translate?**', (route) =>
+    route.fulfill({
+      json: {
+        translations:
+          new URL(route.request().url()).searchParams.get('from') === 'uk'
+            ? ['revenue', 'income']
+            : ['дохід', 'виручка'],
+      },
+    }),
+  );
+  await page.goto('/uk/decks');
+  await page.getByRole('button', { name: /^Додати нове слово/ }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Слово або вираз').fill('дохід');
+  await dialog.getByRole('button', { name: 'Знайти' }).click();
+  await expect(dialog.getByLabel('Слово або вираз')).toHaveValue('revenue');
+  await expect(dialog.getByLabel(/Переклади/)).toHaveValue('дохід');
+});
+
 /** The server's answer past the day's free suggestions of a learner who is not signed in. */
 const LIMITED = {
   status: 429,

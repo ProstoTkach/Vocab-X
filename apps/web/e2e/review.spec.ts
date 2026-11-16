@@ -1,5 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
-import { onboard, setGradeButtonsOnPhone, setSettings, setStudySettings } from './fixtures';
+import {
+  onboard,
+  openSettingsSection,
+  setGradeButtonsOnPhone,
+  setSettings,
+  setStudySettings,
+} from './fixtures';
 
 const card = (page: Page) => page.getByTestId('review-card');
 const deckCount = (page: Page) => page.getByText(/^\d+ карт(ка|ки|ок)$/);
@@ -248,6 +254,7 @@ test('after "+2 days" the reviewed cards are due again', async ({ page }) => {
 
   await setSettings(page, { devUnlocked: true });
   await page.goto('/uk/settings');
+  await openSettingsSection(page, 'Дані');
   await page.getByRole('switch', { name: 'Панель розробника' }).click();
   const panel = page.getByTestId('dev-panel');
   // A new card starts a learning phase: it is due again in minutes.

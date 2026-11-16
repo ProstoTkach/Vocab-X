@@ -7,6 +7,7 @@ import { DictionarySources } from '@/components/settings/dictionary-sources';
 import { GamificationSettings } from '@/components/settings/gamification-settings';
 import { LocalePicker } from '@/components/settings/locale-picker';
 import { ReminderSettings } from '@/components/settings/reminder-settings';
+import { SettingsSection } from '@/components/settings/settings-section';
 import { StudySettingsForm } from '@/components/settings/study-settings';
 import { TextSizePicker } from '@/components/settings/text-size-picker';
 import { ThemePicker } from '@/components/settings/theme-picker';
@@ -30,7 +31,7 @@ export default async function SettingsPage() {
         <Card aria-labelledby="settings-study">
           <CardTitle id="settings-study">{t('study')}</CardTitle>
           <CardText className="mt-1 mb-5">{t('studyHint')}</CardText>
-          <StudySettingsForm />
+          <StudySettingsForm dictionaries={<DictionarySources />} />
         </Card>
         <Card aria-labelledby="settings-reminders">
           <CardTitle id="settings-reminders">{t('reminders.title')}</CardTitle>
@@ -57,11 +58,6 @@ export default async function SettingsPage() {
           <CardText className="mt-1 mb-4">{t('languageHint')}</CardText>
           <LocalePicker />
         </Card>
-        <Card aria-labelledby="settings-dictionaries">
-          <CardTitle id="settings-dictionaries">{t('dictionaries')}</CardTitle>
-          <CardText className="mt-1 mb-4">{t('dictionariesHint')}</CardText>
-          <DictionarySources />
-        </Card>
         <Card aria-labelledby="settings-tour">
           <CardTitle id="settings-tour">{t('tour')}</CardTitle>
           <CardText className="mt-1 mb-4">{t('tourHint')}</CardText>
@@ -73,10 +69,10 @@ export default async function SettingsPage() {
           <LegalLinks />
         </Card>
         <Card aria-labelledby="settings-data">
-          <CardTitle id="settings-data">{data('title')}</CardTitle>
-          <CardText className="mt-1 mb-4">{data('hint')}</CardText>
-          <DataSettings />
-          <DevToggle />
+          <SettingsSection titleId="settings-data" title={data('title')} hint={data('hint')}>
+            <DataSettings />
+            <DevToggle />
+          </SettingsSection>
         </Card>
       </div>
     </>

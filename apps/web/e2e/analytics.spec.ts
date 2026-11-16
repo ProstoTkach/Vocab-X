@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { openSettingsSection } from './fixtures';
 
 // A clean browser: no answer to the consent window yet.
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -153,6 +154,7 @@ test('the statistics can be switched in Settings → Data', async ({ page }) => 
   });
   page.on('dialog', (d) => void d.accept());
   await page.goto('/uk/settings');
+  await openSettingsSection(page, 'Дані');
   const toggle = page.getByRole('switch', { name: 'Надсилати анонімну статистику' });
   await expect(toggle).not.toBeChecked();
   expect(bodies).toEqual([]);
@@ -167,6 +169,7 @@ test('the statistics can be switched in Settings → Data', async ({ page }) => 
   const count = bodies.length;
   await page.goto('about:blank');
   await page.goto('/uk/settings');
+  await openSettingsSection(page, 'Дані');
   await expect(toggle).not.toBeChecked();
   await page.waitForTimeout(500);
   expect(bodies.length).toBe(count);

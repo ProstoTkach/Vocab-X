@@ -1,0 +1,228 @@
+{
+  "id": "text:en-b1-night-bus-1",
+  "lang": "en",
+  "cefr": "B1",
+  "minutes": 3,
+  "format": "serial",
+  "title": "The Night Bus: An Extra Stop",
+  "titleI18n": { "uk": "Нічний автобус: додаткова зупинка" },
+  "summaryI18n": {
+    "uk": "Нора три роки їздить додому тим самим автобусом. Сьогодні він не повернув біля мосту.",
+    "en": "Nora has taken the same bus home for three years. Tonight it does not turn at the bridge."
+  },
+  "topics": ["travel"],
+  "keywords": ["bus", "night", "driver", "passenger", "stop", "stranger", "mystery"],
+  "series": { "id": "series:en-b1-night-bus", "episode": 1, "of": 6 },
+  "paragraphs": [
+    {
+      "sentences": [
+        {
+          "text": "Nora had taken the 47 bus home from work every night for three years.",
+          "translations": {
+            "uk": "Нора три роки щовечора їздила з роботи додому автобусом номер 47."
+          }
+        },
+        {
+          "text": "She knew every stop, every traffic light and most of the other passengers.",
+          "translations": {
+            "uk": "Вона знала кожну зупинку, кожен світлофор і більшість інших пасажирів."
+          }
+        },
+        {
+          "text": "That was why, on a rainy Thursday in November, she noticed the mistake immediately.",
+          "translations": {
+            "uk": "Саме тому дощового листопадового четверга вона одразу помітила помилку."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "The bus did not turn left at the bridge.",
+          "translations": { "uk": "Автобус не повернув ліворуч біля мосту." }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "At first she thought the driver was avoiding traffic.",
+          "translations": { "uk": "Спершу вона подумала, що водій об'їжджає затори." }
+        },
+        {
+          "text": "But there was no traffic.",
+          "translations": { "uk": "Але заторів не було." }
+        },
+        {
+          "text": "The streets were empty, and the bus kept going straight, past buildings she had never seen before.",
+          "translations": {
+            "uk": "Вулиці були порожні, а автобус їхав далі прямо, повз будівлі, яких вона ніколи раніше не бачила."
+          }
+        },
+        { "text": "She looked around.", "translations": { "uk": "Вона роззирнулася." } },
+        {
+          "text": "There were only two other passengers: a teenager wearing headphones and an old man who was asleep with his hat over his eyes.",
+          "translations": {
+            "uk": "Інших пасажирів було тільки двоє: підліток у навушниках і старий чоловік, що спав, насунувши капелюха на очі."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "Nora walked to the front.",
+          "translations": { "uk": "Нора пройшла вперед." }
+        },
+        {
+          "text": "The driver was a woman she didn't recognise.",
+          "translations": { "uk": "За кермом була жінка, якої вона не впізнала." }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "“Excuse me,” Nora said.",
+          "translations": { "uk": "«Перепрошую», — сказала Нора." }
+        },
+        {
+          "text": "“I think we've missed the turn for Mill Road.”",
+          "translations": { "uk": "«Здається, ми проминули поворот на Мілл-роуд»." }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "“We don't go to Mill Road tonight,” the driver answered without looking at her.",
+          "translations": {
+            "uk": "«Сьогодні ми на Мілл-роуд не їдемо», — відповіла водійка, не дивлячись на неї."
+          }
+        },
+        {
+          "text": "Her voice was calm and friendly.",
+          "translations": { "uk": "Її голос був спокійний і привітний." }
+        },
+        {
+          "text": "“Tonight we have one extra stop.",
+          "translations": { "uk": "«Сьогодні в нас одна додаткова зупинка." }
+        },
+        { "text": "Please sit down.", "translations": { "uk": "Сідайте, будь ласка." } },
+        { "text": "It isn't far.”", "translations": { "uk": "Це недалеко»." } }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "“What extra stop?",
+          "translations": { "uk": "«Яка ще додаткова зупинка?" }
+        },
+        { "text": "It's not on the map.”", "translations": { "uk": "Її немає на мапі»." } }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "“It's never on the map,” the driver said, and she smiled a little.",
+          "translations": {
+            "uk": "«Її ніколи немає на мапі», — сказала водійка й ледь усміхнулася."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "Nora went back to her seat.",
+          "translations": { "uk": "Нора повернулася на своє місце." }
+        },
+        {
+          "text": "She took out her phone to check where they were, but the screen showed no signal.",
+          "translations": {
+            "uk": "Вона дістала телефон, щоб перевірити, де вони, але на екрані не було сигналу."
+          }
+        },
+        {
+          "text": "Outside, the street lights were getting further apart.",
+          "translations": { "uk": "За вікном вуличні ліхтарі траплялися дедалі рідше." }
+        },
+        {
+          "text": "Then there were no lights at all, only the dark shapes of trees.",
+          "translations": { "uk": "Потім світла не стало зовсім — лише темні обриси дерев." }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "After about ten minutes, the bus slowed down and stopped.",
+          "translations": { "uk": "Хвилин за десять автобус сповільнився й зупинився." }
+        },
+        { "text": "The doors opened.", "translations": { "uk": "Двері відчинилися." } },
+        {
+          "text": "Cold air came in, and with it the smell of the sea — which was strange, because the sea was two hundred kilometres away.",
+          "translations": {
+            "uk": "Усередину потягнуло холодом, а з ним — запахом моря, і це було дивно, бо до моря було двісті кілометрів."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "The old man woke up, lifted his hat and looked directly at Nora.",
+          "translations": {
+            "uk": "Старий прокинувся, підняв капелюха й подивився просто на Нору."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "“This is your stop,” he said.",
+          "translations": { "uk": "«Це ваша зупинка», — сказав він." }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        { "text": "“No, it isn't.", "translations": { "uk": "«Ні, не моя." } },
+        {
+          "text": "I live on Mill Road.”",
+          "translations": { "uk": "Я живу на Мілл-роуд»." }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "“I know where you live, Nora.”",
+          "translations": { "uk": "«Я знаю, де ви живете, Норо»." }
+        },
+        {
+          "text": "He pointed at the open door.",
+          "translations": { "uk": "Він показав на відчинені двері." }
+        },
+        {
+          "text": "“Somebody has been waiting for you here for a very long time.",
+          "translations": { "uk": "«Дехто чекає на вас тут уже дуже давно." }
+        },
+        {
+          "text": "You shouldn't make her wait any longer.”",
+          "translations": { "uk": "Не змушуйте її чекати ще довше»." }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "Nora had never told him her name.",
+          "translations": { "uk": "Нора ніколи не називала йому свого імені." }
+        }
+      ]
+    }
+  ]
+}

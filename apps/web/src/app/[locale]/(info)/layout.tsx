@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { LegalBack } from '@/components/legal/legal-back';
 import { LegalLinks } from '@/components/legal/legal-links';
 import { LanguageSwitcher } from '@/components/shell/language-switcher';
 import { Logo } from '@/components/shell/logo';
@@ -11,7 +12,10 @@ export default function InfoLayout({ children }: { children: ReactNode }) {
         <Logo />
         <LanguageSwitcher />
       </header>
-      <main className="flex-1 py-6">{children}</main>
+      <main className="flex flex-1 flex-col gap-4 py-6">
+        <LegalBack />
+        {children}
+      </main>
       <footer className="border-t border-line/60 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
         <LegalLinks />
       </footer>

@@ -128,7 +128,7 @@ export function Sidebar() {
         />
       </button>
 
-      <div data-tour="extras" className="flex flex-col gap-1 border-t border-line pt-2">
+      <div data-tour="extras" className="flex flex-col border-t border-line pt-2">
         <Tooltip content={t('feedback')} side="right" disabled={!collapsed}>
           <button type="button" onClick={() => feedback.open('sidebar')} className={itemClass}>
             <MessageSquareHeart aria-hidden className="size-5 shrink-0 text-accent" />

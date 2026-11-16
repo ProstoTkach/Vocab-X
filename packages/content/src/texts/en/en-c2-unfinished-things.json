@@ -1,0 +1,97 @@
+{
+  "id": "text:en-c2-unfinished-things",
+  "lang": "en",
+  "cefr": "C2",
+  "minutes": 1,
+  "format": "essay",
+  "title": "The Museum of Unfinished Things",
+  "titleI18n": { "uk": "Музей незавершених речей" },
+  "summaryI18n": {
+    "uk": "Чому покинутий на півдорозі твір притягує сильніше за відшліфований шедевр.",
+    "en": "Why a work abandoned halfway pulls at us harder than a polished masterpiece."
+  },
+  "topics": ["society"],
+  "keywords": ["museum", "art", "unfinished", "masterpiece", "fragment", "draft", "creativity"],
+  "paragraphs": [
+    {
+      "sentences": [
+        {
+          "text": "There is, or ought to be, a museum devoted to everything humanity has abandoned halfway.",
+          "translations": {
+            "uk": "Існує — або мав би існувати — музей, присвячений усьому, що людство покинуло на півдорозі."
+          }
+        },
+        {
+          "text": "Its corridors would be lined with novels that peter out mid-sentence, cathedrals lacking a second tower, and symphonies whose final movements exist only as a composer's exasperated scrawl in the margin.",
+          "translations": {
+            "uk": "Уздовж його коридорів стояли б романи, що уриваються посеред речення, собори без другої вежі й симфонії, фінальні частини яких існують лише як роздратовані композиторські карлючки на берегах."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "We are conditioned to regard such relics as failures, monuments to flagging willpower or untimely death.",
+          "translations": {
+            "uk": "Ми привчені вважати такі реліквії поразками, пам'ятниками згаслій силі волі чи передчасній смерті."
+          }
+        },
+        {
+          "text": "Yet the unfinished exerts a peculiar magnetism that the polished masterpiece cannot rival.",
+          "translations": {
+            "uk": "Проте незавершене має особливий магнетизм, з яким не зрівнятися відшліфованому шедевру."
+          }
+        },
+        {
+          "text": "A completed work is a closed door; it has said what it intended and requires nothing further of us.",
+          "translations": {
+            "uk": "Завершений твір — це зачинені двері: він сказав, що хотів, і більше нічого від нас не потребує."
+          }
+        },
+        {
+          "text": "The fragment, by contrast, is an invitation.",
+          "translations": { "uk": "Фрагмент, навпаки, — це запрошення." }
+        },
+        {
+          "text": "It recruits the onlooker as a collaborator, obliging us to supply the missing tower, to hum the absent bars.",
+          "translations": {
+            "uk": "Він робить глядача співавтором, змушуючи нас домальовувати відсутню вежу й наспівувати ненаписані такти."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "Perhaps this accounts for our stubborn affection for sketches over frescoes, for demo tapes over studio albums.",
+          "translations": {
+            "uk": "Можливо, саме тому ми так уперто любимо ескізи більше за фрески, а демозаписи — більше за студійні альбоми."
+          }
+        },
+        {
+          "text": "In the rough draft we glimpse the maker still deliberating, still fallible, still alive to other possibilities.",
+          "translations": {
+            "uk": "У чернетці ми на мить бачимо творця, який іще вагається, ще може помилитися, ще відкритий до інших можливостей."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "The museum's gift shop, naturally, would sell nothing but half-knitted scarves.",
+          "translations": {
+            "uk": "У сувенірній крамниці музею, звісно, продавали б самі лише недоплетені шарфи."
+          }
+        },
+        {
+          "text": "And the building itself, as a matter of principle, would have no roof — an omission the curators would defend, in the rain, as entirely deliberate.",
+          "translations": {
+            "uk": "А сама будівля принципово не мала б даху — недогляд, який куратори, стоячи під дощем, відстоювали б як цілком навмисний."
+          }
+        }
+      ]
+    }
+  ]
+}

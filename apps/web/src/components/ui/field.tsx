@@ -41,8 +41,15 @@ export function TextField({
   hint,
   error,
   className,
+  action,
   ...input
-}: Omit<ComponentProps<'input'>, 'id'> & { label: string; hint?: string; error?: string | null }) {
+}: Omit<ComponentProps<'input'>, 'id'> & {
+  label: string;
+  hint?: string;
+  error?: string | null;
+  /** A button next to the input (not the hint under it); a `[.field-row:not(:focus-within)_&]:hidden` class on it shows it only while the field is in use. */
+  action?: ReactNode;
+}) {
   return (
     <FieldShell
       label={label}
@@ -50,15 +57,25 @@ export function TextField({
       error={error ?? null}
       {...(className ? { className } : {})}
     >
-      {(id, describedBy) => (
-        <input
-          id={id}
-          aria-describedby={describedBy}
-          aria-invalid={error ? true : undefined}
-          className={inputClass}
-          {...input}
-        />
-      )}
+      {(id, describedBy) => {
+        const control = (
+          <input
+            id={id}
+            aria-describedby={describedBy}
+            aria-invalid={error ? true : undefined}
+            className={cx(inputClass, action ? 'min-w-0 flex-1' : null)}
+            {...input}
+          />
+        );
+        return action ? (
+          <div className="field-row flex items-center gap-2">
+            {control}
+            {action}
+          </div>
+        ) : (
+          control
+        );
+      }}
     </FieldShell>
   );
 }

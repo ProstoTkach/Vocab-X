@@ -1,7 +1,7 @@
 // Keeping the words of a learner without an account (step 6.4): the downloaded file goes back
 // with «Відновити з файлу», and Home asks to sign in or save a copy once there are words to keep.
 import { expect, test, type Page } from '@playwright/test';
-import { onboard, seedOnboarded, seedStartedWords } from './fixtures';
+import { onboard, openSettingsSection, seedOnboarded, seedStartedWords } from './fixtures';
 
 const profileOf = (page: Page) =>
   page.evaluate(() => JSON.parse(localStorage.getItem('vocabx:v1:profile') ?? 'null') as unknown);
@@ -10,6 +10,7 @@ test.describe('restoring a file', () => {
   test('the downloaded file brings the data back', async ({ page }) => {
     await onboard(page);
     await page.goto('/uk/settings');
+    await openSettingsSection(page, 'Дані');
     const download = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Завантажити мої дані' }).click();
     const path = await (await download).path();
@@ -31,6 +32,7 @@ test.describe('restoring a file', () => {
   test('a file that is not VocabX data changes nothing', async ({ page }) => {
     await onboard(page);
     await page.goto('/uk/settings');
+    await openSettingsSection(page, 'Дані');
     const before = await profileOf(page);
     await page.getByTestId('restore-file').setInputFiles({
       name: 'other.json',

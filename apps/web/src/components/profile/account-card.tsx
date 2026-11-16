@@ -12,10 +12,13 @@ import { SignOutEverywhere } from '@/components/account/sign-out-everywhere';
 import { LegalLinks } from '@/components/legal/legal-links';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { CardCollapsible } from '@/components/ui/collapsible';
 import { GoogleIcon } from '@/components/ui/google-icon';
 import { useToast } from '@/components/ui/toast';
 import { track } from '@/lib/analytics';
+import { useClock } from '@/lib/clock';
 import { signedInReturn, useSync } from '@/lib/sync';
+import { cooldownSeconds } from '@/lib/sync-cooldown';
 
 /**
  * Who is signed in, as the server says: undefined until it answers, null when it cannot (no
@@ -82,7 +85,7 @@ export function SignInCard() {
         <div className="flex gap-2">
           <Button
             variant="secondary"
-            className="flex-1 justify-center"
+            className="flex-1 justify-center border-accent!"
             onClick={() => setEmailOpen(true)}
           >
             <Mail aria-hidden className="size-4" />
@@ -90,7 +93,7 @@ export function SignInCard() {
           </Button>
           <Button
             variant="secondary"
-            className="flex-1 justify-center"
+            className="flex-1 justify-center border-accent!"
             onClick={() => {
               track('account', { to: 'sign_in' });
               void signIn('google', { callbackUrl: signedInReturn(window.location.pathname) });
@@ -100,80 +103,120 @@ export function SignInCard() {
             {t('google')}
           </Button>
         </div>
+        <LegalLinks only={['privacy', 'terms']} />
       </div>
-      <LegalLinks only={['privacy', 'terms']} className="sm:basis-full" />
       <SignInDialog open={emailOpen} onOpenChange={setEmailOpen} />
     </Card>
   );
 }
 
+/** When "Sync now" was last pressed; kept outside the card so leaving the page does not free it. */
+let lastSyncPress: number | null = null;
+
 /**
- * Signed in: the address, changing it or the password, how syncing goes, signing out and
- * deleting the account.
+ * Signed in: how syncing goes and the button for it; everything else (changing the address or
+ * the password, signing out, deleting the account) waits inside a part that is closed at first.
  */
 export function AccountCard({ email }: { email: string }) {
   const t = useTranslations('profile.account');
   const format = useFormatter();
+  const { clock } = useClock();
   const { status, syncedAt, syncNow, disconnect } = useSync();
+  const [open, setOpen] = useState(false);
+  const [now, setNow] = useState(() => clock.now());
+  const waiting = cooldownSeconds(lastSyncPress, now) > 0;
+
+  // Ticks only while the button waits.
+  useEffect(() => {
+    if (!waiting) return;
+    const timer = window.setInterval(() => setNow(clock.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [waiting, clock]);
 
   return (
     <Card aria-labelledby="profile-account" className="flex flex-col gap-3">
       <h2 id="profile-account" className="font-display text-title font-semibold">
         {t('title')}
       </h2>
-      <p className="truncate font-medium">{email}</p>
-      <p className="text-sm text-fg-muted">{t('signedIn')}</p>
-      <p aria-live="polite" className="text-sm text-fg-muted">
-        {status === 'syncing'
-          ? t('syncing')
-          : status === 'failed' || status === 'full' || status === 'outdated'
-            ? t(
-                status === 'full'
-                  ? 'syncFull'
-                  : status === 'outdated'
-                    ? 'syncOutdated'
-                    : 'syncFailed',
-              )
-            : syncedAt > 0
-              ? t('syncedAt', {
-                  time: format.dateTime(syncedAt, { dateStyle: 'medium', timeStyle: 'short' }),
-                })
-              : null}
-      </p>
-      <div className="-my-1 flex flex-wrap gap-x-2">
-        <ChangePassword email={email} />
-        <ChangeEmail email={email} />
-      </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <p aria-live="polite" className="min-h-5 text-sm text-fg-muted">
+          {status === 'syncing'
+            ? t('syncing')
+            : status === 'failed' || status === 'full' || status === 'outdated'
+              ? t(
+                  status === 'full'
+                    ? 'syncFull'
+                    : status === 'outdated'
+                      ? 'syncOutdated'
+                      : 'syncFailed',
+                )
+              : syncedAt > 0
+                ? t('syncedAt', {
+                    time: format.dateTime(syncedAt, { dateStyle: 'medium', timeStyle: 'short' }),
+                  }) + (waiting ? `. ${t('syncJustNow')}` : '')
+                : null}
+        </p>
         {status === 'outdated' ? (
-          <Button onClick={() => window.location.reload()}>
+          <Button className="shrink-0" onClick={() => window.location.reload()}>
             <RefreshCw aria-hidden className="size-4" />
             {t('updateApp')}
           </Button>
         ) : (
           <Button
             variant="secondary"
-            disabled={status === 'syncing'}
-            onClick={() => void syncNow()}
+            className="shrink-0"
+            disabled={status === 'syncing' || waiting}
+            onClick={() => {
+              lastSyncPress = clock.now();
+              setNow(lastSyncPress);
+              void syncNow();
+            }}
           >
             <RefreshCw aria-hidden className="size-4" />
             {t('syncNow')}
           </Button>
         )}
-        <Button
-          variant="ghost"
-          onClick={() => {
-            track('account', { to: 'sign_out' });
-            void disconnect().then(() => signOut({ callbackUrl: window.location.pathname }));
-          }}
-        >
-          <LogOut aria-hidden className="size-4" />
-          {t('signOut')}
-        </Button>
-        <SignOutEverywhere />
-        <DeleteAccount />
       </div>
-      <LegalLinks only={['privacy', 'terms']} />
+      <CardCollapsible
+        label={t('dataShow')}
+        openLabel={t('dataHide')}
+        open={open}
+        onOpenChange={setOpen}
+      >
+        <div className="flex flex-col gap-3 pt-1">
+          <p className="text-sm text-fg-muted">{t('signedIn')}</p>
+          <div className="-my-1 flex flex-wrap gap-x-2">
+            <ChangePassword email={email} />
+            <ChangeEmail email={email} />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                track('account', { to: 'sign_out' });
+                void disconnect().then(() => signOut({ callbackUrl: window.location.pathname }));
+              }}
+            >
+              <LogOut aria-hidden className="size-4" />
+              {t('signOut')}
+            </Button>
+            <SignOutEverywhere />
+            <DeleteAccount />
+          </div>
+          <LegalLinks only={['privacy', 'terms']} />
+        </div>
+      </CardCollapsible>
     </Card>
+  );
+}
+
+/** What the card takes while the server has not said who is signed in (a title and the sync row). */
+export function AccountCardSkeleton() {
+  return (
+    <div
+      aria-hidden
+      data-testid="account-skeleton"
+      className="h-[13rem] rounded-card bg-surface-2 sm:h-[10.33rem]"
+    />
   );
 }

@@ -3,12 +3,13 @@
 import { splitTranslations, systemClock, type LangCode } from '@vocabx/core';
 import { Check, EyeOff, Plus, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, type PointerEventHandler } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
 import { SignInDialog } from '@/components/account/sign-in-dialog';
 import { HighlightedText } from '@/components/words/highlighted-text';
 import { cx } from '@/lib/cx';
+import { wordsFromNative } from '@/lib/lexicon/native-input';
 import { suggestWord, type WordSuggestions } from '@/lib/lexicon/suggest';
 import type { TranslateLimited } from '@/lib/lexicon/google-translate';
 import type { Lexicon } from '@/lib/lexicon/use-lexicon';
@@ -20,12 +21,19 @@ export type SuggestLookup =
   | { state: 'idle' | 'loading' }
   | ({ state: 'done'; term: string; hidden: boolean } & WordSuggestions);
 
+/** What the learner wrote in their own language, and the words of the studied one found for it. */
+export interface WordChoicesFound {
+  native: string;
+  words: string[];
+}
+
 /** "Suggest" for one word: asks the free dictionaries, keeps what they found. */
 export function useWordSuggest(lexicon: Lexicon, wordLang: LangCode, nativeLang: LangCode) {
   const [lookup, setLookup] = useState<SuggestLookup>({ state: 'idle' });
-  const suggest = async (raw: string) => {
+  const [choices, setChoices] = useState<WordChoicesFound | null>(null);
+  const suggest = async (raw: string): Promise<WordSuggestions | null> => {
     const term = raw.trim();
-    if (!term) return;
+    if (!term) return null;
     setLookup({ state: 'loading' });
     const started = systemClock.now();
     const found = await suggestWord(lexicon, { term, from: wordLang, to: nativeLang });
@@ -36,12 +44,45 @@ export function useWordSuggest(lexicon: Lexicon, wordLang: LangCode, nativeLang:
       duration_s: Math.round((systemClock.now() - started) / 100) / 10,
     });
     setLookup({ state: 'done', term, hidden: false, ...found });
+    return found;
+  };
+  /**
+   * The learner wrote the word in their own language: the words of the studied one for it, the
+   * best first (the rest stay as `choices`). Null when the dictionaries know none.
+   */
+  const findWords = async (raw: string): Promise<string | null> => {
+    const native = raw.trim();
+    if (!native) return null;
+    setLookup({ state: 'loading' });
+    const started = systemClock.now();
+    const words = await wordsFromNative(lexicon, {
+      term: native,
+      native: nativeLang,
+      wordLang,
+    });
+    track('word_suggest', {
+      count: words.length,
+      examples_n: 0,
+      ok: words.length > 0,
+      duration_s: Math.round((systemClock.now() - started) / 100) / 10,
+    });
+    setChoices({ native, words });
+    setLookup({ state: 'idle' });
+    return words[0] ?? null;
+  };
+  /** What an earlier search left on screen, for a new one to start clean. */
+  const forget = () => {
+    setLookup({ state: 'idle' });
+    setChoices(null);
   };
   const hide = () => setLookup((l) => (l.state === 'done' ? { ...l, hidden: true } : l));
   return {
     lookup,
     found: lookup.state === 'done' && !lookup.hidden ? lookup : null,
+    choices,
     suggest,
+    findWords,
+    forget,
     hide,
   };
 }
@@ -50,7 +91,7 @@ export function useWordSuggest(lexicon: Lexicon, wordLang: LangCode, nativeLang:
  * The search runs once per word: "Find" stays off while its variants are on screen, until the
  * word is changed (or the variants are hidden, to bring them back).
  */
-const alreadyShown = (lookup: SuggestLookup, term: string) =>
+export const alreadyShown = (lookup: SuggestLookup, term: string) =>
   lookup.state === 'done' && !lookup.hidden && lookup.term === term.trim();
 
 const same = (a: string, b: string) => a.toLocaleLowerCase() === b.toLocaleLowerCase();
@@ -73,13 +114,19 @@ export function toggleTranslation(field: string, variant: string): string {
 export function SuggestButton({
   lookup,
   term,
+  done = alreadyShown(lookup, term),
   onSuggest,
   className,
+  onPointerDown,
 }: {
   lookup: SuggestLookup;
+  /** The text searched for: nothing to search while it is empty. */
   term: string;
+  /** Its results are on screen already. */
+  done?: boolean;
   onSuggest: () => void;
   className?: string;
+  onPointerDown?: PointerEventHandler<HTMLButtonElement>;
 }) {
   const t = useTranslations('decks.form');
   const loading = lookup.state === 'loading';
@@ -89,8 +136,14 @@ export function SuggestButton({
       <Button
         size="sm"
         onClick={onSuggest}
-        disabled={!term.trim() || loading || alreadyShown(lookup, term)}
-        className={cx('shrink-0 justify-center', className)}
+        {...(onPointerDown ? { onPointerDown } : {})}
+        disabled={!term.trim() || loading || done}
+        className={cx(
+          // Next to the word only while the learner is in its field (or on the button itself).
+          'shrink-0 justify-center',
+          '[.field-row:not(:focus-within)_&]:hidden',
+          className,
+        )}
       >
         <Sparkles aria-hidden className={cx('size-4', loading && 'motion-safe:animate-pulse')} />
         {loading ? t('suggesting') : t('suggest')}
@@ -118,7 +171,7 @@ export function HideSuggestionsButton({
       onClick={onHide}
       // As wide as whatever is above it (never widening it): a long label wraps instead.
       className={cx(
-        'h-auto w-0 min-w-full justify-center py-1.5 text-center leading-tight whitespace-normal text-fg-muted',
+        'h-auto min-h-3 w-0 min-w-full justify-center text-center leading-tight whitespace-normal text-fg-muted',
         className,
       )}
     >
@@ -167,6 +220,59 @@ function LimitNotice({ who }: { who: TranslateLimited }) {
   );
 }
 
+/**
+ * The word was written in the native language: its words in the studied one, one to choose like
+ * a radio button — the chosen one is the word of the card, and choosing another replaces it
+ * (the learner's own word stays as its translation).
+ */
+export function WordChoices({
+  native,
+  value,
+  wordLang,
+  onPick,
+}: {
+  native: WordChoicesFound | null;
+  /** The word in the field: the one of the choices that is on. */
+  value: string;
+  wordLang: LangCode;
+  onPick: (word: string) => void;
+}) {
+  const t = useTranslations('decks.form');
+  const tl = useTranslations('languages');
+  const label = t('pickWord', { lang: tl(wordLang as 'en') });
+  if (!native) return null;
+  if (!native.words.length) return <NotFound text={t('noWords')} />;
+  return (
+    <div aria-live="polite" className="-mt-2 flex flex-col gap-2">
+      <p id="word-choices-label" className="text-sm text-fg-muted">
+        {label}
+      </p>
+      <div role="radiogroup" aria-labelledby="word-choices-label" className="flex flex-wrap gap-2">
+        {native.words.map((w) => {
+          const on = same(w, value.trim());
+          return (
+            <button
+              key={w}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              lang={wordLang}
+              onClick={() => onPick(w)}
+              className={cx(
+                'inline-flex min-h-9 items-center gap-1 rounded-full border bg-surface px-3 text-sm transition-colors motion-fast',
+                on ? 'border-accent text-fg' : 'border-line hover:border-accent',
+              )}
+            >
+              {on && <Check aria-hidden className="size-3.5 text-accent" />}
+              {w}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /** Translation variants as chips; a tap adds one to the field, a second tap takes it out. */
 export function TranslationSuggestions({
   found,
@@ -191,7 +297,6 @@ export function TranslationSuggestions({
   return (
     <>
       <div aria-live="polite" className="-mt-2 flex flex-col gap-2">
-        <p className="text-sm text-fg-muted">{t('translationSuggestions')}</p>
         <div className="flex flex-wrap gap-2">
           {found.translations.map((s) => {
             const on = used.has(s.toLocaleLowerCase());
@@ -219,16 +324,6 @@ export function TranslationSuggestions({
             );
           })}
         </div>
-        <p className="text-xs text-fg-muted">
-          <a
-            href="https://translate.google.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline decoration-line-strong underline-offset-2 hover:text-fg"
-          >
-            {t('googleAttribution')}
-          </a>
-        </p>
       </div>
       {notice}
     </>
@@ -254,7 +349,6 @@ export function ExampleSuggestions({
   if (!found.examples.length) return <NotFound text={t('noExamples')} />;
   return (
     <div aria-live="polite" className="-mt-2 flex flex-col gap-2">
-      <p className="text-sm text-fg-muted">{t('exampleSuggestions')}</p>
       <ul className="flex flex-col gap-2">
         {found.examples.map((ex) => {
           const on = value.trim() === ex;

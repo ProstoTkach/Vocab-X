@@ -1,7 +1,7 @@
 // Visual review: /dev/ui and key routes in every control viewport and theme.
 // Output goes to apps/web/screenshots (not committed).
 import { expect, test } from '@playwright/test';
-import { onboard, seedOnboarded, seedStartedWords } from './fixtures';
+import { onboard, openSettingsSection, seedOnboarded, seedStartedWords } from './fixtures';
 
 const VIEWPORTS = [
   { name: '360x740', width: 360, height: 740 },
@@ -60,7 +60,11 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByRole('heading', { name: 'Слова' })).toBeVisible();
       await page.screenshot({ path: `screenshots/deck-${vp.name}.png` });
       await page.goto('/uk/settings');
+      // The default view has the sections closed (the '/settings' frame); this one has them open.
+      for (const title of ['Параметри навчання', 'Картка і жести', 'Вигляд'])
+        await openSettingsSection(page, title);
       await expect(page.getByRole('slider')).toBeVisible();
+      await page.waitForTimeout(400);
       await page.screenshot({ path: `screenshots/settings-study-${vp.name}.png`, fullPage: true });
     });
 
@@ -107,6 +111,32 @@ for (const vp of VIEWPORTS) {
       await page.screenshot({ path: `screenshots/word-paused-${vp.name}.png` });
     });
 
+    test('word form: English words for a translation', async ({ page }) => {
+      test.skip(vp.name !== '390x844' && vp.name !== '1280x800');
+      await page.route('**/api/translate?**', (route) =>
+        route.fulfill({
+          json: {
+            translations:
+              new URL(route.request().url()).searchParams.get('from') === 'uk'
+                ? ['revenue', 'income', 'earnings', 'profit']
+                : ['дохід'],
+          },
+        }),
+      );
+      await page.route('**/api/dictionary?**', (route) => route.fulfill({ json: null }));
+      await page.route('https://api.tatoeba.org/**', (route) =>
+        route.fulfill({ json: { data: [] } }),
+      );
+      await onboard(page);
+      await page.goto('/uk/decks');
+      await page.getByRole('button', { name: /^Додати нове слово/ }).click();
+      const dialog = page.getByRole('dialog');
+      await dialog.getByLabel(/Переклади/).fill('дохід');
+      await dialog.getByRole('button', { name: 'Знайти' }).click();
+      await expect(dialog.getByRole('radio', { name: 'revenue' })).toBeChecked();
+      await page.screenshot({ path: `screenshots/word-choices-${vp.name}.png` });
+    });
+
     test('onboarding', async ({ page }) => {
       await page.goto('/uk/onboarding');
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -123,6 +153,7 @@ for (const vp of VIEWPORTS) {
           localStorage.setItem('vocabx:v1:settings', JSON.stringify({ ...settings, themeId }));
         }, theme);
         await page.goto('/uk/settings');
+        await openSettingsSection(page, 'Дані');
         const card = page.locator('section[aria-labelledby="settings-data"]');
         await expect(card.getByRole('button', { name: 'Завантажити мої дані' })).toBeVisible();
         await expect(card.getByText('Слова з прогресом')).toBeVisible();
@@ -172,8 +203,11 @@ for (const vp of VIEWPORTS) {
       );
       await page.goto('/uk/profile');
       const card = page.locator('section[aria-labelledby="profile-account"]');
-      await expect(card.getByRole('button', { name: 'Змінити пошту' })).toBeVisible();
       await card.scrollIntoViewIfNeeded();
+      await card.screenshot({ path: `screenshots/account/card-closed-${vp.name}.png` });
+      await card.getByRole('button', { name: 'Дані та акаунт' }).click();
+      await expect(card.getByRole('button', { name: 'Змінити пошту' })).toBeVisible();
+      await page.waitForTimeout(400);
       await card.screenshot({ path: `screenshots/account/card-${vp.name}.png` });
       await card.getByRole('button', { name: 'Змінити пароль' }).click();
       await expect(page.getByRole('dialog', { name: 'Змінити пароль' })).toBeVisible();
@@ -222,6 +256,51 @@ for (const vp of VIEWPORTS) {
       await page.goto('/uk');
       await expect(page.getByRole('heading', { name: 'Оновіть VocabX' })).toBeVisible();
       await page.screenshot({ path: `screenshots/update/screen-${vp.name}.png` });
+    });
+
+    test('profile signed in', async ({ page }) => {
+      test.skip(vp.name !== '390x844' && vp.name !== '1280x800');
+      await onboard(page);
+      // The server answers late: what is below must not move when the address and the card come.
+      await page.route('**/api/auth/session', async (route) => {
+        await new Promise((r) => setTimeout(r, 1500));
+        await route.fulfill({ json: { user: { email: 'olena@example.com', id: 'u1' } } });
+      });
+      await page.route('**/api/account', (route) =>
+        route.fulfill({ json: { password: true, google: false } }),
+      );
+      await page.route('**/api/sync', (route) =>
+        route.fulfill({ json: { cursor: 0, changes: {} } }),
+      );
+      await page.evaluate(() =>
+        localStorage.setItem(
+          'vocabx:sync',
+          JSON.stringify({
+            owner: 'u1',
+            active: true,
+            cursor: 0,
+            syncedAt: 1700000000000,
+            tick: 0,
+            dirty: { state: {}, words: {}, decks: {}, cards: {}, events: {} },
+          }),
+        ),
+      );
+      await page.goto('/uk/profile');
+      const tiles = page.getByRole('list').first();
+      await expect(tiles).toBeVisible();
+      const before = await tiles.boundingBox();
+      const skeleton = await page.getByTestId('account-skeleton').boundingBox();
+      await page.screenshot({ path: `screenshots/profile/loading-${vp.name}.png` });
+      await expect(page.getByText('olena@example.com')).toBeVisible();
+      const after = await tiles.boundingBox();
+      expect(Math.abs((after?.y ?? 0) - (before?.y ?? 0))).toBeLessThanOrEqual(1);
+      // The card takes the room the skeleton kept.
+      const card = await page.locator('section[aria-labelledby="profile-account"]').boundingBox();
+      expect(Math.abs((card?.height ?? 0) - (skeleton?.height ?? 0))).toBeLessThanOrEqual(2);
+      await page.screenshot({
+        path: `screenshots/profile/signed-in-${vp.name}.png`,
+        fullPage: true,
+      });
     });
 
     test('legal pages', async ({ page }) => {

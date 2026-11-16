@@ -10,6 +10,20 @@
   "textSizeHint": "The size of all text in the app: buttons, menus and cards.",
   "study": "Learning",
   "studyHint": "Changes apply immediately.",
+  "sections": {
+    "learning": {
+      "title": "Learning options",
+      "hint": "Language, recall probability, limits, grades, typing, speech, dictionaries for suggestions."
+    },
+    "card": {
+      "title": "Card and gestures",
+      "hint": "Grade buttons on the phone and the swipe layout."
+    },
+    "look": {
+      "title": "Look",
+      "hint": "Card font size and animation speed."
+    }
+  },
   "targetLang": "Language you are learning",
   "retention": "Target recall probability",
   "retentionHint": "Higher means more frequent reviews and less forgetting. Now {percent}%.",

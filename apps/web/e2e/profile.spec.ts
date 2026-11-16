@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { onboard, quizRightIndex, setSettings } from './fixtures';
+import { onboard, openAccountData, quizRightIndex, setSettings } from './fixtures';
 
 test('the profile: the name can be changed; the numbers and the chart of the week follow the answers', async ({
   page,
@@ -20,7 +20,7 @@ test('the profile: the name can be changed; the numbers and the chart of the wee
   await expect(options.first()).toBeEnabled();
   await page.goto('/uk/profile');
   await expect(page.getByRole('img', { name: 'Ваш персонаж' })).toBeVisible();
-  await expect(page.getByRole('heading', { level: 1, name: 'Учень без імені' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Просто користувач' })).toBeVisible();
   await page.getByRole('button', { name: 'Змінити імʼя' }).click();
   await page.getByRole('textbox', { name: 'Імʼя' }).fill('Олена');
   await page.getByRole('button', { name: 'Зберегти імʼя' }).click();
@@ -70,6 +70,7 @@ test('the account: a failed sign-in is told once; signed in, the address and sig
   });
   await page.reload();
   await expect(page.getByText('olena@example.com')).toBeVisible();
+  await openAccountData(page);
   await page.getByRole('button', { name: 'Вийти', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Google', exact: true })).toBeVisible();
   await expect(page.getByText('olena@example.com')).toHaveCount(0);
@@ -112,6 +113,7 @@ test('signing out on all devices ends the sessions; a session ended elsewhere si
   await signOutTo('/uk/profile');
   await page.goto('/uk/profile');
   await expect(page.getByText(/^Синхронізовано:/)).toBeVisible();
+  await openAccountData(page);
   await page.getByRole('button', { name: 'Вийти на всіх пристроях' }).click();
   const dialog = page.getByRole('dialog', { name: 'Вийти на всіх пристроях?' });
   await expect(dialog).toBeVisible();
@@ -193,6 +195,7 @@ test('syncing: signing in sends what is here, news comes in; signed out or never
     await page.unroute(session);
     await route.fulfill({ json: { url: '/uk/profile' } });
   });
+  await openAccountData(page);
   await page.getByRole('button', { name: 'Вийти', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Google', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { level: 1, name: 'З іншого пристрою' })).toBeVisible();
@@ -257,6 +260,7 @@ test('deleting the account asks first; the words stay here, no longer tied to it
   );
   await onboard(page);
   await page.goto('/uk/profile');
+  await openAccountData(page);
   await page.getByRole('button', { name: 'Видалити акаунт' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Скасувати' }).click();
   expect(deleted).toBe(0);
@@ -431,6 +435,7 @@ test('signed in: the password and the email change from the profile', async ({ p
   await onboard(page);
   await page.goto('/uk/profile');
 
+  await openAccountData(page);
   await page.getByRole('button', { name: 'Змінити пароль' }).click();
   const password = page.getByRole('dialog', { name: 'Змінити пароль' });
   await password.getByLabel('Поточний пароль').fill('old-pass');

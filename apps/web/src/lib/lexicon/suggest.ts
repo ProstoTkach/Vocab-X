@@ -42,6 +42,54 @@ export function isSentence(text: string): boolean {
   return words >= 5 || (words >= 2 && /[.!?…]["»”')]*$/u.test(text));
 }
 
+const wordsOf = (s: string, lang: LangCode) =>
+  s.toLocaleLowerCase(lang).match(/[\p{L}\p{M}\p{N}'’-]+/gu) ?? [];
+
+/** The word, or a form of it: the beginning of a longer word ("flies" for "fly"), no more than 3 letters on. */
+const isFormOf = (token: string, word: string) =>
+  token === word ||
+  (word.length >= 3 &&
+    token.startsWith(word.slice(0, Math.max(2, word.length - 2))) &&
+    token.length <= word.length + 3);
+
+/**
+ * A phrase ("fly up") has to stand in the sentence as it is, its words one after another (each
+ * may be in another form: "flies up"). Sentences where the words are apart ("your fly is down,
+ * zip it up") say nothing about the phrase. A single word is found anywhere.
+ */
+export function containsPhrase(text: string, phrase: string, lang: LangCode): boolean {
+  const want = wordsOf(phrase, lang);
+  if (want.length < 2) return true;
+  const have = wordsOf(text, lang);
+  for (let i = 0; i + want.length <= have.length; i++)
+    if (want.every((w, j) => isFormOf(have[i + j]!, w))) return true;
+  return false;
+}
+
+/**
+ * Dictionaries and corpora hold many sentences made from one template ("The income of X in 2019
+ * was …" for a dozen countries): they are the same example said again. Two sentences are alike
+ * when they begin with the same three words or share at least half of their words (numbers do
+ * not count).
+ */
+export function similarSentences(a: string, b: string, lang: LangCode): boolean {
+  const x = wordsOf(a, lang);
+  const y = wordsOf(b, lang);
+  if (x.length >= 3 && y.length >= 3 && [0, 1, 2].every((i) => x[i] === y[i])) return true;
+  const set = (list: string[]) => new Set(list.filter((w) => !/^\p{N}+$/u.test(w)));
+  const p = set(x);
+  const q = set(y);
+  const shared = [...p].filter((w) => q.has(w)).length;
+  return shared / (p.size + q.size - shared || 1) >= 0.5;
+}
+
+/** The sentences with the alike ones left out (the first of them stays). */
+export function distinctSentences(list: readonly string[], lang: LangCode): string[] {
+  const kept: string[] = [];
+  for (const s of list) if (!kept.some((k) => similarSentences(k, s, lang))) kept.push(s);
+  return kept;
+}
+
 /**
  * Little words that carry no meaning of their own. A sentence made of them and the word ("When
  * is convenient for you?") says nothing about what the word means; with the word left out it
@@ -144,7 +192,13 @@ export async function suggestWord(
 
   const context = (s: string) => contextWords(s, term, q.from);
   const examples = unique(entries.flatMap((e) => e.examples.map((x) => x.text.trim())))
-    .filter((s) => s.length <= 300 && isSentence(s) && context(s) >= MIN_CONTEXT)
+    .filter(
+      (s) =>
+        s.length <= 300 &&
+        isSentence(s) &&
+        context(s) >= MIN_CONTEXT &&
+        containsPhrase(s, term, q.from),
+    )
     // Stable sort: sentences with the word itself first, those that show its meaning well
     // before the thin ones; otherwise in dictionary order.
     .sort(
@@ -159,6 +213,6 @@ export async function suggestWord(
       0,
       o.maxTranslations ?? 8,
     ),
-    examples: examples.slice(0, o.maxExamples ?? 6),
+    examples: distinctSentences(examples, q.from).slice(0, o.maxExamples ?? 6),
   };
 }

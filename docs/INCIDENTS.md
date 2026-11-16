@@ -52,7 +52,10 @@ spreadsheet shared too widely, an export sent to a wrong address.
    of learning about it (GDPR art. 33), and the people affected **without undue delay** when the
    risk is high (art. 34). Ukraine's law has its own deadlines: ask the lawyer who reviews the
    privacy text (`docs/LEGAL_REVIEW.md`) **before** launch which authority and which wording apply,
-   and write the answer here: `Authority: ________`. If in doubt, tell the people: it costs
+   and write the answer here: `Authority: ________`.
+   Contacts: supervisory authority and the lawyer — `danieltkachenko093@gmail.com` (the owner,
+   who passes the report on). Answer to data requests: **30 days** (already promised in the
+   privacy text). If in doubt, tell the people: it costs
    less than hiding it.
 4. **What the message to learners says:** what happened (plain words), what data, since when,
    what we did, what they should do (for passwords: change the password, and if the same password
@@ -92,9 +95,8 @@ the incident.
 
 ## 5. People write to us
 
-- Contact address: `CONTACT_EMAIL` in `apps/web/src/lib/contact.ts` — **empty until the owner
-  fills it** (privacy and terms pages show a placeholder). Fill it before launch and keep one
-  inbox that someone reads: this runbook relies on it.
+- Contact address: `CONTACT_EMAIL` in `apps/web/src/config/site.ts` (shown on the privacy and
+  terms pages). Keep one inbox that someone reads: this runbook relies on it.
 - Requests about data (view, export, delete, correct): export and deletion are in the app
   (Settings → Data, Profile → Account); the privacy text promises an answer — the owner sets the
   deadline (step 5.11); GDPR's limit is one month.

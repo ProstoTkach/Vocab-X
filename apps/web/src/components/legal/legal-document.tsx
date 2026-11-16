@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { CONTACT_EMAIL } from '@/lib/contact';
+import { CONTACT_EMAIL } from '@/config/site';
 import { groupBlocks, splitText, type Piece } from '@/lib/legal';
 
 type Blocks = Record<string, string>;
@@ -13,7 +13,7 @@ const LINK =
   'text-accent underline decoration-accent/40 underline-offset-2 hover:decoration-accent';
 
 /** A paragraph's text with the e-mail address and the first mention of each service linked. */
-function Rich({ text, missing }: { text: string; missing: string }) {
+function Rich({ text }: { text: string }) {
   return (
     <>
       {splitText(text).map((piece: Piece, i) => {
@@ -24,15 +24,10 @@ function Rich({ text, missing }: { text: string; missing: string }) {
               {piece.text}
             </a>
           );
-        return CONTACT_EMAIL ? (
+        return (
           <a key={i} href={`mailto:${CONTACT_EMAIL}`} className={LINK}>
             {CONTACT_EMAIL}
           </a>
-        ) : (
-          // Visible on purpose: the owner has not written the address yet.
-          <mark key={i} className="rounded-control bg-warning/20 px-1 text-fg">
-            {missing}
-          </mark>
         );
       })}
     </>
@@ -42,11 +37,9 @@ function Rich({ text, missing }: { text: string; missing: string }) {
 /** One section's paragraphs and lists, in the order of the keys in the messages. */
 export function LegalBlocks({
   blocks,
-  missing,
   after,
 }: {
   blocks: Blocks;
-  missing: string;
   /** Extra content placed after the paragraph with this key (e.g. `p2`). */
   after?: { key: string; node: ReactNode };
 }) {
@@ -58,14 +51,14 @@ export function LegalBlocks({
           <ul key={i} className="list-disc space-y-1.5 ps-6 marker:text-fg-muted">
             {block.items.map((item) => (
               <li key={item}>
-                <Rich text={item} missing={missing} />
+                <Rich text={item} />
               </li>
             ))}
           </ul>
         ) : (
           <div key={i} className="space-y-3">
             <p>
-              <Rich text={block.text} missing={missing} />
+              <Rich text={block.text} />
             </p>
             {extra}
           </div>
@@ -82,7 +75,6 @@ export function LegalDocument({
   intro,
   summary,
   sections,
-  missing,
   extras = {},
 }: {
   title: string;
@@ -90,8 +82,6 @@ export function LegalDocument({
   intro: string;
   summary?: LegalSection;
   sections: (LegalSection & { id: string })[];
-  /** What stands in the place of the contact address while it is empty. */
-  missing: string;
   /** Content added after one paragraph of a section: { [section id]: { key, node } }. */
   extras?: Record<string, { key: string; node: ReactNode }>;
 }) {
@@ -110,7 +100,7 @@ export function LegalDocument({
           <h2 id="legal-summary" className="font-display text-lg font-semibold">
             {summary.title}
           </h2>
-          <LegalBlocks blocks={summary.blocks} missing={missing} />
+          <LegalBlocks blocks={summary.blocks} />
         </section>
       )}
       {sections.map((section, i) => (
@@ -124,7 +114,7 @@ export function LegalDocument({
           </h2>
           <LegalBlocks
             blocks={section.blocks}
-            missing={missing}
+
             {...(extras[section.id] ? { after: extras[section.id]! } : {})}
           />
         </section>

@@ -30,8 +30,48 @@ function matchesWord(token: string, term: string, locale: string): boolean {
   return t.startsWith(stem) && Array.from(t).length <= len + extra;
 }
 
+/**
+ * A prefix ("anti-") or a suffix ("-tion") is marked where it stands inside the words of the
+ * sentence: "anti-" in "antibody", "-tion" in "action".
+ */
+function highlightAffix(text: string, term: string, locale: string): TextSegment[] {
+  const lead = term.startsWith('-');
+  const core = term.replace(/^-+|-+$/g, '').toLocaleLowerCase(locale);
+  const ranges: [number, number][] = [];
+  if (core) {
+    for (const m of text.matchAll(WORD)) {
+      const word = m[0].toLocaleLowerCase(locale);
+      const at = !lead
+        ? word.startsWith(core)
+          ? 0
+          : -1
+        : word.endsWith(core) && word.length > core.length
+          ? word.length - core.length
+          : -1;
+      if (at >= 0) ranges.push([m.index + at, m.index + at + core.length]);
+    }
+  }
+  return segmentsOf(text, ranges);
+}
+
+function segmentsOf(text: string, ranges: [number, number][]): TextSegment[] {
+  if (ranges.length === 0) return [{ text, match: false }];
+  const out: TextSegment[] = [];
+  let pos = 0;
+  for (const [from, to] of ranges) {
+    if (from > pos) out.push({ text: text.slice(pos, from), match: false });
+    out.push({ text: text.slice(from, to), match: true });
+    pos = to;
+  }
+  if (pos < text.length) out.push({ text: text.slice(pos), match: false });
+  return out;
+}
+
 export function highlightTerm(text: string, term: string, locale: string): TextSegment[] {
-  const termWords = term.trim().match(WORD) ?? [];
+  const trimmed = term.trim();
+  // A hyphen before or after the word makes it a prefix or a suffix.
+  if (/^-|-$/.test(trimmed)) return highlightAffix(text, trimmed, locale);
+  const termWords = trimmed.match(WORD) ?? [];
   if (termWords.length === 0) return [{ text, match: false }];
   const tokens = [...text.matchAll(WORD)].map((m) => ({ text: m[0], start: m.index }));
 
@@ -45,15 +85,5 @@ export function highlightTerm(text: string, term: string, locale: string): TextS
       i += termWords.length - 1;
     }
   }
-  if (ranges.length === 0) return [{ text, match: false }];
-
-  const out: TextSegment[] = [];
-  let pos = 0;
-  for (const [from, to] of ranges) {
-    if (from > pos) out.push({ text: text.slice(pos, from), match: false });
-    out.push({ text: text.slice(from, to), match: true });
-    pos = to;
-  }
-  if (pos < text.length) out.push({ text: text.slice(pos), match: false });
-  return out;
+  return segmentsOf(text, ranges);
 }

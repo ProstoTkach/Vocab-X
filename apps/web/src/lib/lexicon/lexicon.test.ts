@@ -6,6 +6,8 @@ import { createGoogleTranslateProvider } from './google-translate';
 import type { FetchLike } from './http';
 import { proxiedFetch } from './proxy';
 import {
+  containsPhrase,
+  distinctSentences,
   contextWords,
   isSentence,
   mergedLexicon,
@@ -397,5 +399,29 @@ describe('cleaning up what the sources give', () => {
       { text: 'Tom is reliable.', credit: { id: 42, by: 'rul', license: 'CC BY 2.0 FR' } },
       { text: 'Nobody knows the author.' },
     ]);
+  });
+});
+
+describe('containsPhrase', () => {
+  test('a phrase has to stand together, in any form of its words', () => {
+    expect(containsPhrase('Hey, your fly is down, zip it up.', 'fly up', 'en')).toBe(false);
+    expect(containsPhrase('Watch the balloon fly up into the sky.', 'fly up', 'en')).toBe(true);
+    expect(containsPhrase('A bird flies up from the tree.', 'fly up', 'en')).toBe(true);
+    expect(containsPhrase('He flew upon the roof.', 'fly up', 'en')).toBe(false);
+  });
+  test('a single word is found anywhere', () => {
+    expect(containsPhrase('Anything at all.', 'revenue', 'en')).toBe(true);
+  });
+});
+
+describe('distinctSentences', () => {
+  test('keeps one of the sentences made from one template', () => {
+    const list = [
+      'The income of the average household in Algeria was 5,000 dollars in 2019.',
+      'The income of the average household in Morocco was 6,000 dollars in 2020.',
+      'Her average household income in Tunisia is low.',
+      'He lives on a small income from renting a flat.',
+    ];
+    expect(distinctSentences(list, 'en')).toEqual([list[0], list[2], list[3]]);
   });
 });

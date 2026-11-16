@@ -491,3 +491,29 @@
 .vx-beam-end {
   transform: translateX(50%) rotate(30deg);
 }
+
+/* A collapsible part slides open and shut by its measured height; no slide for reduced motion. */
+@keyframes vx-collapsible-open {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+  }
+}
+@keyframes vx-collapsible-close {
+  from {
+    height: var(--radix-collapsible-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+.vx-collapsible[data-state='open'] {
+  animation: vx-collapsible-open calc(var(--vx-motion-normal) * var(--vx-motion-scale))
+    var(--ease-standard);
+}
+.vx-collapsible[data-state='closed'] {
+  animation: vx-collapsible-close calc(var(--vx-motion-normal) * var(--vx-motion-scale))
+    var(--ease-standard);
+}

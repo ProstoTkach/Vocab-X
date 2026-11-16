@@ -1,5 +1,5 @@
 {
-  "noName": "Nameless learner",
+  "noName": "Just a user",
   "nameLabel": "Name",
   "nameEdit": "Change the name",
   "nameSave": "Save the name",
@@ -48,6 +48,9 @@
     "syncFull": "The server holds all the data an account can keep, so new data is not sent. Your data is safe here.",
     "syncOutdated": "Syncing needs a newer version of the app. Your data is safe here; reload the page.",
     "syncedAt": "Synced: {time}",
+    "syncJustNow": "Just now",
+    "dataShow": "Data and account",
+    "dataHide": "Hide",
     "syncNow": "Sync now",
     "updateApp": "Update the app",
     "otherTitle": "Another account’s data",

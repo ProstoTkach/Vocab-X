@@ -1,0 +1,102 @@
+{
+  "id": "text:en-c1-previous-tenant",
+  "lang": "en",
+  "cefr": "C1",
+  "minutes": 1,
+  "format": "letter",
+  "title": "A Letter to the Previous Tenant",
+  "titleI18n": { "uk": "Лист попередньому мешканцю" },
+  "summaryI18n": {
+    "uk": "Під четвертим шаром шпалер у передпокої знайшлося те, чого новий мешканець не чекав.",
+    "en": "Under the fourth layer of wallpaper in the hallway there was something the new tenant did not expect."
+  },
+  "topics": ["home"],
+  "keywords": ["tenant", "flat", "wallpaper", "letter", "handwriting", "curiosity"],
+  "paragraphs": [
+    {
+      "sentences": [
+        {
+          "text": "Dear previous tenant,",
+          "translations": { "uk": "Шановний попередній мешканцю!" }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "You don't know me, but I have been living with your decisions for six months now, so I feel we are overdue an introduction.",
+          "translations": {
+            "uk": "Ви мене не знаєте, але я вже пів року живу з вашими рішеннями, тож, гадаю, нам давно час познайомитися."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        { "text": "I'll begin with gratitude.", "translations": { "uk": "Почну з подяки." } },
+        {
+          "text": "The lemon tree you planted on the balcony has, against all meteorological odds, produced a single lemon.",
+          "translations": {
+            "uk": "Лимонне дерево, яке ви посадили на балконі, всупереч усім законам погоди вродило один-єдиний лимон."
+          }
+        },
+        {
+          "text": "I check on it daily with the anxiety of a new parent.",
+          "translations": {
+            "uk": "Я щодня навідуюся до нього з тривогою, гідною молодих батьків."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        { "text": "Now, the wallpaper.", "translations": { "uk": "Тепер про шпалери." } },
+        {
+          "text": "I have peeled back four layers in the hallway, each more alarming than the last, and I can only conclude that you were either an optimist or in hiding.",
+          "translations": {
+            "uk": "У передпокої під ними виявилося чотири шари, кожен тривожніший за попередній, і висновок у мене один: ви були або оптимістом, або переховувалися."
+          }
+        },
+        {
+          "text": "The innermost layer has handwriting on it: a column of dates, and beside each one a single word.",
+          "translations": {
+            "uk": "На найглибшому шарі є написи від руки: стовпчик дат, а біля кожної — одне слово."
+          }
+        },
+        { "text": "“Yes.”", "translations": { "uk": "«Так»." } },
+        { "text": "“Yes.”", "translations": { "uk": "«Так»." } },
+        { "text": "“No.”", "translations": { "uk": "«Ні»." } },
+        { "text": "“Yes.”", "translations": { "uk": "«Так»." } },
+        {
+          "text": "The final entry, dated the week you moved out, simply says “Finally.”",
+          "translations": {
+            "uk": "Останній запис, датований тижнем вашого виїзду, каже просто: «Нарешті»."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "I am not, by nature, an inquisitive person.",
+          "translations": { "uk": "Я за вдачею людина не допитлива." }
+        },
+        {
+          "text": "But I have stopped stripping the wall, and I find I can no longer walk past it without wondering what you were asking — and who, at long last, answered.",
+          "translations": {
+            "uk": "Але шпалери я далі не здираю і тепер не можу пройти повз ту стіну, не гадаючи, про що ви питали — і хто нарешті відповів."
+          }
+        }
+      ]
+    },
+    {
+      "sentences": [
+        {
+          "text": "Yours, in considerable suspense,",
+          "translations": { "uk": "З повагою та в чималому напруженні," }
+        },
+        { "text": "The current tenant", "translations": { "uk": "нинішній мешканець" } }
+      ]
+    }
+  ]
+}

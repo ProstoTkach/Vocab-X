@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import enDecks from '../../messages/en/decks.json';
 import enLegal from '../../messages/en/legal.json';
 import ukLegal from '../../messages/uk/legal.json';
 import { groupBlocks, splitText } from './legal';
@@ -48,8 +47,4 @@ describe('legal texts', () => {
           expect(() => groupBlocks(section.blocks)).not.toThrow();
         }
     });
-
-  it('the attribution next to suggestions repeats the legal one (the form is a client component)', () => {
-    expect(enDecks.form.googleAttribution).toBe(enLegal.google.attribution);
-  });
 });

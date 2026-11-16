@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
-import { seedOnboarded, setSettings } from './fixtures';
+import { openSettingsSection, seedOnboarded, setSettings } from './fixtures';
 
 const ROUTES = ['/uk', '/uk/review', '/uk/decks', '/uk/league', '/uk/profile', '/uk/settings'];
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) < 768;
@@ -223,6 +223,8 @@ test('the phone "Back" button closes an open window instead of leaving the page'
 test('the developer mode opens with the developer code', async ({ page }) => {
   await seedOnboarded(page);
   await page.goto('/uk/settings');
+  await openSettingsSection(page, 'Дані');
+  await expect(page.getByRole('switch', { name: 'Режим розробника' })).toBeVisible();
   await expect(page.getByRole('switch', { name: 'Панель розробника' })).toHaveCount(0);
   await page.getByRole('switch', { name: 'Режим розробника' }).click();
   const dialog = page.getByRole('dialog', { name: 'Код розробника' });

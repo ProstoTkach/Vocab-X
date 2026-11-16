@@ -307,3 +307,17 @@ export async function setStudySettings(page: Page, patch: Record<string, unknown
 export async function setGradeButtonsOnPhone(page: Page, on: boolean) {
   await setStudySettings(page, { gradeButtonsOnPhone: on });
 }
+
+/** The profile's account card keeps everything but syncing in a closed part: opens it. */
+export async function openAccountData(page: Page) {
+  const toggle = page.getByRole('button', { name: 'Дані та акаунт' });
+  if (await toggle.isVisible()) await toggle.click();
+  await expect(page.getByRole('button', { name: 'Вийти', exact: true })).toBeVisible();
+}
+
+/** Settings keeps most controls in closed sections ("Навчання", "Картка і жести", "Вигляд", "Дані"): opens one by its title. */
+export async function openSettingsSection(page: Page, title: string) {
+  const toggle = page.getByRole('button', { name: new RegExp(`^${title}`) });
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+}

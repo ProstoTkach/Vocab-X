@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { hasLocale } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { GoogleDisclaimer, LegalDocument } from '@/components/legal/legal-document';
 import { routing } from '@/i18n/routing';
@@ -32,7 +31,6 @@ export default async function CreditsPage({ params }: Props) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   const { credits, legal } = await serverMessages(locale);
-  const common = await getTranslations('common');
   const translate = SERVICE_LINKS.find((s) => s.name === 'Google Translate')!;
   return (
     <LegalDocument
@@ -44,7 +42,6 @@ export default async function CreditsPage({ params }: Props) {
         title: credits.sections[id]!.title,
         blocks: { p1: credits.sections[id]!.text },
       }))}
-      missing={common('contactMissing')}
       extras={{
         translations: {
           key: 'p1',

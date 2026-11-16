@@ -14,11 +14,16 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { useEffect, useState, type SyntheticEvent } from 'react';
 import { AvatarBadge } from '@/components/character/avatar-badge';
 import { AccountLinks } from '@/components/account/account-links';
-import { AccountCard, SignInCard, useAccount } from '@/components/profile/account-card';
+import {
+  AccountCard,
+  AccountCardSkeleton,
+  SignInCard,
+  useAccount,
+} from '@/components/profile/account-card';
 import { FramePicker } from '@/components/profile/frame-picker';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { TextField } from '@/components/ui/field';
+import { inputClass } from '@/components/ui/field';
 import { Tooltip } from '@/components/ui/tooltip';
 import { toPublished } from '@/character/look';
 import { track } from '@/lib/analytics';
@@ -115,6 +120,8 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
   const saveName = (e: SyntheticEvent) => {
     e.preventDefault();
     const next = name.trim().slice(0, NAME_MAX);
+    // Nothing typed: the old name stays (it was the placeholder).
+    if (!next) return setEditing(false);
     const updated = { ...profile, displayName: next };
     setProfile(updated);
     setEditing(false);
@@ -124,6 +131,9 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
     track('profile_name', { to: next ? 'set' : 'cleared' });
   };
 
+  // The line for the address: kept from the start when this browser is known to be signed in.
+  const showEmail =
+    accounts && (account ? !!account.email : account === undefined && repos.journal.active);
   const accuracy = numbers.reviews ? numbers.correct / numbers.reviews : null;
   const tiles: { key: Exclude<keyof Numbers, 'correct'> | 'accuracy'; value: string }[] = [
     { key: 'reviews', value: format.number(numbers.reviews) },
@@ -176,27 +186,43 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
           </Button>
         </div>
         <div className="flex w-full min-w-0 flex-1 flex-col gap-2 sm:pe-10">
-          {editing ? (
-            <form onSubmit={saveName} className="flex items-end gap-2">
-              <TextField
-                className="min-w-0 flex-1"
-                label={t('nameLabel')}
-                value={name}
-                maxLength={NAME_MAX}
-                autoComplete="nickname"
-                autoFocus
-                onChange={(e) => setName(e.target.value)}
-              />
-              <Button type="submit" size="icon" aria-label={t('nameSave')}>
-                <Check aria-hidden className="size-4" />
-              </Button>
-            </form>
-          ) : (
-            <h1 className="truncate font-display text-display font-bold md:text-2xl">
-              {shownName}
-            </h1>
-          )}
+          {/* Same height for the name and its field, so the card does not change on editing. */}
+          <div className="flex h-12 items-center">
+            {editing ? (
+              <form onSubmit={saveName} className="flex w-full items-center gap-2">
+                <input
+                  className={cx(inputClass, 'min-w-0 flex-1')}
+                  aria-label={t('nameLabel')}
+                  value={name}
+                  placeholder={shownName}
+                  maxLength={NAME_MAX}
+                  autoComplete="nickname"
+                  autoFocus
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <Button type="submit" size="icon" aria-label={t('nameSave')}>
+                  <Check aria-hidden className="size-4" />
+                </Button>
+              </form>
+            ) : (
+              <h1 className="min-w-0 flex-1 truncate font-display text-display font-bold md:text-2xl">
+                {shownName}
+              </h1>
+            )}
+          </div>
           <p className="text-fg-muted">{t('level', { level, xp: format.number(xpTotal) })}</p>
+          {/* The line is kept while the address is not known, so the block keeps its height. */}
+          {showEmail && (
+            <p
+              aria-hidden={!account?.email}
+              className={cx(
+                'min-h-5 truncate text-sm text-fg-muted',
+                !account?.email && 'invisible',
+              )}
+            >
+              {account?.email ?? ' '}
+            </p>
+          )}
         </div>
         {/* In the corner of the card, so the name stays exactly in the middle on phones. */}
         {!editing && (
@@ -206,7 +232,7 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
             aria-label={t('nameEdit')}
             className="absolute end-2 top-2"
             onClick={() => {
-              setName(profile.displayName);
+              setName('');
               setEditing(true);
             }}
           >
@@ -329,6 +355,8 @@ export function ProfileView({ accounts }: { accounts: boolean }) {
       </Card>
 
       {account?.email && <AccountCard email={account.email} />}
+      {/* Room for the card while the server answers, so the page does not grow at its end. */}
+      {accounts && account === undefined && repos.journal.active && <AccountCardSkeleton />}
       <FramePicker open={framing} onOpenChange={setFraming} />
     </div>
   );

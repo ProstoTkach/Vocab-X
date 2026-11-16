@@ -1,0 +1,283 @@
+{
+  "id": "text:en-b2-two-weeks-notice",
+  "lang": "en",
+  "cefr": "B2",
+  "minutes": 3,
+  "format": "dialogue",
+  "title": "Two Weeks' Notice",
+  "titleI18n": { "uk": "Заява за два тижні" },
+  "summaryI18n": {
+    "uk": "Прію щойно підвищили, а вона звільняється. Маркус намагається її відмовити, хоча дещо приховує.",
+    "en": "Priya has just been promoted, and she is resigning. Marcus tries to talk her out of it, though he is keeping something back."
+  },
+  "topics": ["career", "work"],
+  "keywords": ["job", "promotion", "resign", "bookshop", "savings", "risk", "colleague"],
+  "paragraphs": [
+    {
+      "speaker": "Priya",
+      "sentences": [
+        { "text": "Have you got a minute?", "translations": { "uk": "Маєш хвилинку?" } },
+        {
+          "text": "I'd rather you heard this from me than from the rumour mill.",
+          "translations": { "uk": "Краще ти почуєш це від мене, ніж із офісних пліток." }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        { "text": "That sounds ominous.", "translations": { "uk": "Звучить зловісно." } },
+        { "text": "Go on.", "translations": { "uk": "Кажи." } }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [
+        {
+          "text": "I'm handing in my notice on Friday.",
+          "translations": { "uk": "У п'ятницю я подаю заяву на звільнення." }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        { "text": "You're joking.", "translations": { "uk": "Ти жартуєш." } },
+        {
+          "text": "You've just been promoted!",
+          "translations": { "uk": "Тебе ж щойно підвищили!" }
+        },
+        {
+          "text": "Half the department would kill for your job.",
+          "translations": { "uk": "Пів відділу вбило б за твою посаду." }
+        }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [
+        {
+          "text": "I know, and that's partly the problem.",
+          "translations": { "uk": "Знаю, і почасти в цьому й проблема." }
+        },
+        {
+          "text": "I spent six years working towards that promotion, and when I finally got it, I felt absolutely nothing.",
+          "translations": {
+            "uk": "Я шість років ішла до цього підвищення, а коли нарешті отримала його, не відчула геть нічого."
+          }
+        },
+        {
+          "text": "I sat in my new office and thought, is this it?",
+          "translations": { "uk": "Я сиділа у своєму новому кабінеті й думала: і це все?" }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        {
+          "text": "Everyone feels like that occasionally.",
+          "translations": { "uk": "У всіх таке часом буває." }
+        },
+        { "text": "It wears off.", "translations": { "uk": "Це минає." } },
+        {
+          "text": "Take a holiday, switch your phone off for a fortnight and you'll come back a different person.",
+          "translations": {
+            "uk": "Візьми відпустку, вимкни телефон на два тижні — і повернешся іншою людиною."
+          }
+        }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [
+        {
+          "text": "I tried that in the spring, remember?",
+          "translations": { "uk": "Я вже пробувала навесні, пам'ятаєш?" }
+        },
+        {
+          "text": "I came back and counted the days until the next one.",
+          "translations": { "uk": "Повернулася — і почала рахувати дні до наступної." }
+        },
+        {
+          "text": "That isn't a career, Marcus, it's a waiting room.",
+          "translations": { "uk": "Це не кар'єра, Маркусе, це зала очікування." }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        { "text": "So what's the plan?", "translations": { "uk": "То який план?" } },
+        {
+          "text": "Please tell me you've got something lined up.",
+          "translations": { "uk": "Скажи, будь ласка, що в тебе вже щось є на прикметі." }
+        }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [
+        {
+          "text": "I'm taking over my aunt's bookshop.",
+          "translations": { "uk": "Я беру на себе тітчину книгарню." }
+        },
+        {
+          "text": "She's retiring, and if nobody steps in, it'll be turned into yet another phone repair shop.",
+          "translations": {
+            "uk": "Вона йде на пенсію, і якщо ніхто не візьметься, там відкриють іще одну майстерню з ремонту телефонів."
+          }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        { "text": "A bookshop.", "translations": { "uk": "Книгарня." } },
+        { "text": "In this economy.", "translations": { "uk": "За такої економіки." } },
+        {
+          "text": "Priya, I say this as a friend: have you actually looked at the figures?",
+          "translations": { "uk": "Пріє, кажу як друг: ти взагалі дивилася на цифри?" }
+        }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [
+        {
+          "text": "Of course I have; I'm an accountant.",
+          "translations": { "uk": "Звісно, дивилася: я ж бухгалтерка." }
+        },
+        { "text": "The figures are dreadful.", "translations": { "uk": "Цифри жахливі." } },
+        {
+          "text": "It barely breaks even, the roof needs replacing and the only regular customer is a man who reads the newspapers and never buys anything.",
+          "translations": {
+            "uk": "Вона ледве виходить у нуль, дах треба міняти, а єдиний постійний відвідувач — чоловік, який читає газети й ніколи нічого не купує."
+          }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        {
+          "text": "And you're still going ahead with it?",
+          "translations": { "uk": "І ти все одно на це йдеш?" }
+        }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [
+        {
+          "text": "I've worked out that I can survive for eighteen months on my savings.",
+          "translations": { "uk": "Я порахувала, що протягну на заощадженнях півтора року." }
+        },
+        {
+          "text": "If it hasn't turned around by then, I'll admit defeat and come crawling back.",
+          "translations": {
+            "uk": "Якщо до того часу справи не підуть угору, я визнаю поразку й приповзу назад."
+          }
+        },
+        {
+          "text": "But if I don't try, I'll spend the rest of my life wondering what would have happened.",
+          "translations": { "uk": "Але якщо не спробую, то до кінця життя гадатиму, що було б." }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        {
+          "text": "You do realise they'll never give you your old job back.",
+          "translations": {
+            "uk": "Ти ж розумієш, що стару посаду тобі вже ніколи не повернуть."
+          }
+        }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [
+        {
+          "text": "Then I'd better make it work, hadn't I?",
+          "translations": { "uk": "Тоді мені краще домогтися успіху, правда ж?" }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        { "text": "Fine.", "translations": { "uk": "Гаразд." } },
+        {
+          "text": "I can see I'm not going to talk you out of it.",
+          "translations": { "uk": "Бачу, що тебе не відмовити." }
+        }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [
+        { "text": "You're not.", "translations": { "uk": "Не відмовити." } },
+        {
+          "text": "Although I must say, I expected you to put up more of a fight.",
+          "translations": { "uk": "Хоча, мушу сказати, я чекала, що ти опиратимешся довше." }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        { "text": "Well.", "translations": { "uk": "Ну що ж." } },
+        {
+          "text": "Since we're being honest with each other, there's something I should probably mention.",
+          "translations": {
+            "uk": "Якщо вже ми чесні одне з одним, мені, мабуть, варто дещо сказати."
+          }
+        }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [{ "text": "What?", "translations": { "uk": "Що?" } }]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        {
+          "text": "The man who reads the newspapers and never buys anything.",
+          "translations": { "uk": "Чоловік, який читає газети й ніколи нічого не купує." }
+        },
+        {
+          "text": "Does he wear a green scarf, by any chance?",
+          "translations": { "uk": "Він, бува, не носить зелений шарф?" }
+        }
+      ]
+    },
+    {
+      "speaker": "Priya",
+      "sentences": [
+        {
+          "text": "How could you possibly know that?",
+          "translations": { "uk": "Звідки ти взагалі можеш це знати?" }
+        }
+      ]
+    },
+    {
+      "speaker": "Marcus",
+      "sentences": [
+        { "text": "Because he's my father.", "translations": { "uk": "Бо це мій батько." } },
+        {
+          "text": "He's been telling me for years that somebody with a head for numbers ought to rescue that place.",
+          "translations": {
+            "uk": "Він роками мені торочить, що хтось, хто тямить у цифрах, має врятувати ту книгарню."
+          }
+        },
+        {
+          "text": "I think he's going to be unbearable about this.",
+          "translations": { "uk": "Думаю, тепер він буде нестерпний." }
+        }
+      ]
+    }
+  ]
+}

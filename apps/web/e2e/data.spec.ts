@@ -1,11 +1,12 @@
 // "My data" in settings: what is kept where, the file to download, resetting.
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-import { onboard } from './fixtures';
+import { onboard, openSettingsSection } from './fixtures';
 
 test('the Data card shows the device, the server and the random browser ID', async ({ page }) => {
   await onboard(page);
   await page.goto('/uk/settings');
+  await openSettingsSection(page, 'Дані');
   const card = page.locator('section[aria-labelledby="settings-data"]');
   await expect(card.getByRole('heading', { name: 'На цьому пристрої' })).toBeVisible();
   await expect(card.getByText('Ви не ввійшли в акаунт')).toBeVisible();
@@ -18,6 +19,7 @@ test('the Data card shows the device, the server and the random browser ID', asy
 test('"Завантажити мої дані" saves one JSON file with this device’s data', async ({ page }) => {
   await onboard(page);
   await page.goto('/uk/settings');
+  await openSettingsSection(page, 'Дані');
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Завантажити мої дані' }).click();
   const file = await download;
@@ -35,6 +37,7 @@ test('"Завантажити мої дані" saves one JSON file with this dev
 test('"Скинути дані" asks first, then starts over', async ({ page }) => {
   await onboard(page);
   await page.goto('/uk/settings');
+  await openSettingsSection(page, 'Дані');
   await page.getByRole('button', { name: 'Скинути дані' }).click();
   await page.getByRole('button', { name: 'Скасувати' }).click();
   await expect(page).toHaveURL(/\/settings$/);
