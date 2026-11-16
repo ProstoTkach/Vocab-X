@@ -41,10 +41,10 @@ test('terms and credits carry Google’s disclaimer, credits link Google Transla
   );
 });
 
-test('the contact address stays a visible placeholder while it is empty', async ({ page }) => {
+test('the contact address from the site config is printed on the policy', async ({ page }) => {
   await pinAnalytics(page);
   await page.goto('/en/privacy');
-  await expect(page.getByText('[contact address not set yet]').first()).toBeVisible();
+  await expect(page.getByText('danieltkachenko093@gmail.com').first()).toBeVisible();
 });
 
 test('settings link to the policy; the footer links the other pages', async ({ page }) => {

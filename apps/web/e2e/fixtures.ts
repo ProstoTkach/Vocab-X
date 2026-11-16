@@ -311,6 +311,8 @@ export async function setGradeButtonsOnPhone(page: Page, on: boolean) {
 /** The profile's account card keeps everything but syncing in a closed part: opens it. */
 export async function openAccountData(page: Page) {
   const toggle = page.getByRole('button', { name: 'Дані та акаунт' });
+  const hide = page.getByRole('button', { name: 'Сховати', exact: true });
+  await expect(toggle.or(hide)).toBeVisible();
   if (await toggle.isVisible()) await toggle.click();
   await expect(page.getByRole('button', { name: 'Вийти', exact: true })).toBeVisible();
 }
